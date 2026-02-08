@@ -184,41 +184,80 @@
                 </div>
             </section>
 
-            <section class="flex flex-col lg:flex-row gap-6">
-                @foreach ([['1', '20–26 Feb'], ['2', '20–26 Feb'], ['3', 'Belum tersedia']] as $item)
+            <section class="border-2 border-gray-200 rounded-[3rem] p-8 md:p-10 mb-20">
+                <div class="mb-10">
+                    <h2 class="text-3xl font-black text-[#2E3B66]">Try Out UTBK</h2>
+                    <p class="text-gray-500 font-medium">Simulasikan ujian UTBK mu dengan berbagai sesi Try Out disini!
+                    </p>
+                </div>
+
+                <div x-show="currentPage === 1" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+                    x-transition>
                     <div
-                        class="flex-1 bg-[#DFF0FF] rounded-[35px] p-7 flex flex-col justify-between shadow-md min-h-[250px]">
-                        <div class="flex justify-between items-center">
-                            <h2 class="text-xl font-bold text-blue-600">Try Out</h2>
-                            <span class="bg-blue-600 text-white font-bold px-6 py-1 rounded-full text-xl">UTBK</span>
+                        class="bg-blue-50 rounded-[2rem] p-6 flex flex-col items-center relative hover:shadow-lg transition-all border border-blue-100 group">
+                        <div class="w-full flex justify-between items-start mb-2">
+                            <span class="text-blue-400 font-bold pt-1 text-lg uppercase tracking-tighter">Try
+                                Out</span>
+                            <span class="bg-blue-600 text-white text-lg px-4 py-1 rounded-full font-bold">UTBK</span>
                         </div>
-                        <div class="flex justify-center my-4">
-                            <div
-                                class="w-24 h-24 md:w-32 md:h-32 bg-white/50 rounded-full flex items-center justify-center">
-                                <h1 class="text-5xl md:text-6xl font-extrabold text-blue-600">{{ $item[0] }}</h1>
-                            </div>
-                        </div>
-                        <div class="flex justify-center">
-                            <span
-                                class="bg-white px-6 py-2 rounded-full flex items-center gap-2 text-blue-600 font-medium text-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="2" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg> {{ $item[1] }}
-                            </span>
+                        <div
+                            class="text-[100px] font-black text-blue-500 leading-none my-6 group-hover:scale-110 transition-transform">
+                            1</div>
+                        <div
+                            class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium text-blue-500 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="2" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+
+                            <span>Selesai</span>
                         </div>
                     </div>
-                @endforeach
 
-                <div
-                    class="flex-1 lg:flex-[1.2] bg-transparent relative min-h-[200px] flex items-center justify-center">
-                    <img src="{{ asset('img/slime.png') }}" class="w-32 md:w-[500px] absolute bottom-4 -left-5 z-10"
-                        alt="Slime">
-                    <button
-                        class="absolute top-[110px] right-6 md:right-10 bg-blue-500 hover:bg-blue-600 text-white px-7 py-2 rounded-full font-bold shadow-md z-0">
-                        Lainnya
-                    </button>
+                    <div
+                        class="bg-blue-50 rounded-[2rem] p-6 flex flex-col items-center relative hover:shadow-lg transition-all border border-blue-100 group">
+                        <div class="w-full flex justify-between items-start mb-2">
+                            <span class="text-blue-400 font-bold pt-1 text-lg uppercase tracking-tighter">Try
+                                Out</span>
+                            <span class="bg-blue-600 text-white text-lg px-4 py-1 rounded-full font-bold">UTBK</span>
+                        </div>
+                        <div
+                            class="text-[100px] font-black text-blue-500 leading-none my-6 group-hover:scale-110 transition-transform">
+                            2</div>
+                        <div
+                            class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium text-blue-500 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="2" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+
+                            <span>20-27 Maret</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-gray-50 opacity-60 rounded-[2rem] p-6 flex flex-col items-center relative border border-gray-200">
+                        <div class="w-full flex justify-between items-start mb-2">
+                            <span class="text-gray-400 font-bold pt-1 text-lg uppercase tracking-tighter">Try
+                                Out</span>
+                            <span class="bg-gray-400 text-white text-lg px-4 py-1 rounded-full font-bold">UTBK</span>
+                        </div>
+                        <div class="text-[100px] font-black text-gray-300 leading-none my-6">3</div>
+                        <div
+                            class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium text-gray-400 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="2" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                            </svg>
+
+                            <span>Belum Tersedia</span>
+                        </div>
+                    </div>
+
+
                 </div>
             </section>
         </div>
