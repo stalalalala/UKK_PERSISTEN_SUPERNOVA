@@ -176,11 +176,11 @@
                         Kuasai fundamental dulu sebelum masuk <br> latihan tingkat lanjut.
                         <br><span class="font-bold">Yuk latihan pemahaman dasarmu!</span>
                     </p>
-                    <button
-                        class="mt-7 bg-orange-400 hover:bg-orange-500 text-white font-bold px-8 md:px-10 py-3 rounded-full text-lg flex items-center gap-4 shadow-md">
-                        Mulai Kuis
-                        <span class="bg-white/30 w-8 h-8 flex items-center justify-center rounded-full">➜</span>
-                    </button>
+                    <a href="/kuis"> <button
+                            class="mt-7 bg-orange-400 hover:bg-orange-500 text-white font-bold px-8 md:px-10 py-3 rounded-full text-lg flex items-center gap-4 shadow-md">
+                            Mulai Kuis
+                            <span class="bg-white/30 w-8 h-8 flex items-center justify-center rounded-full">➜</span>
+                        </button></a>
                 </div>
             </section>
 
