@@ -184,7 +184,7 @@
                 </div>
             </section>
 
-            <section class="border-2 border-gray-200 rounded-[3rem] p-8 md:p-10 mb-20">
+            <section class="border-2 bg-white border-gray-200 rounded-[3rem] p-8 md:p-10 mb-20">
                 <div class="mb-10">
                     <h2 class="text-3xl font-black text-[#2E3B66]">Try Out UTBK</h2>
                     <p class="text-gray-500 font-medium">Simulasikan ujian UTBK mu dengan berbagai sesi Try Out disini!
@@ -255,6 +255,14 @@
 
                             <span>Belum Tersedia</span>
                         </div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col items-center justify-center min-h-[200px]">
+                        <img src="{{ asset('img/slime.png') }}" class="w-44 md:w-52 mb-4" alt="Slime">
+                        <button
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-10 py-2.5 rounded-full font-bold shadow-md transition-all hover:scale-105">
+                            Lainnya
+                        </button>
                     </div>
 
 
