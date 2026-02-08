@@ -30,11 +30,13 @@
                 <div class="flex items-center gap-3 bg-[#FBBA16] rounded-full">
                     <button
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="size-5 md:size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                        </svg>
+                        <a href="/">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                            </svg>
+                        </a>
                     </button>
                     <button
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white">
@@ -50,7 +52,7 @@
     </div>
 
     <main class="max-w-[1440px] mx-auto py-10" x-data="{
-        selectedSub: 'PU',
+        selectedSub: 'Kuis Fundamental',
         currentPage: 1
     }">
 
@@ -75,7 +77,7 @@
                         <div class="space-y-1">
                             <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 1'"></h4>
                             <span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
+                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
                         </div>
                         <span
                             class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
@@ -97,7 +99,7 @@
                     <div class="flex justify-between items-start mb-6">
                         <div class="space-y-1">
                             <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 2'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
+                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
                         </div>
                         <span
                             class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
@@ -118,7 +120,7 @@
                     <div class="flex justify-between items-start mb-6">
                         <div class="space-y-1">
                             <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 3'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
+                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
                         </div>
                         <span
                             class="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-full">Selesai</span>
@@ -139,7 +141,7 @@
                     <div class="flex justify-between items-start mb-6">
                         <div class="space-y-1">
                             <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 4'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
+                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
                         </div>
                         <span
                             class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
@@ -161,7 +163,7 @@
                         <div class="space-y-1">
                             <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 5'"></h4>
                             <span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
+                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
                         </div>
                         <span
                             class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
@@ -183,7 +185,7 @@
                     <div class="flex justify-between items-start mb-6">
                         <div class="space-y-1">
                             <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 6'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
+                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
                         </div>
                         <span
                             class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
@@ -204,7 +206,7 @@
                     <div class="flex justify-between items-start mb-6">
                         <div class="space-y-1">
                             <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 7'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
+                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
                         </div>
                         <span
                             class="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-full">Selesai</span>
@@ -225,7 +227,7 @@
                     <div class="flex justify-between items-start mb-6">
                         <div class="space-y-1">
                             <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 8'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
+                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
                         </div>
                         <span
                             class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
@@ -247,7 +249,7 @@
                     <div class="flex justify-between items-start mb-6">
                         <div class="space-y-1">
                             <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 9'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
+                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
                         </div>
                         <span
                             class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
