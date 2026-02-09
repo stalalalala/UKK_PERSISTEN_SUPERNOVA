@@ -143,10 +143,10 @@
                     </div>
 
                     <div class="flex justify-end items-center text-xs md:text-sm gap-4 pt-4">
-                        <button type="button"
-                            class="bg-white border-2 border-gray-200 text-gray-400 font-medium px-8 py-2.5 rounded-full hover:bg-gray-50 transition-all">
-                            Batal
-                        </button>
+                        <a href="/tryout/index"><button type="button"
+                                class="bg-white border-2 border-gray-200 text-gray-400 font-medium px-8 py-2.5 rounded-full hover:bg-gray-50 transition-all">
+                                Batal
+                            </button></a>
                         <button type="submit"
                             class="bg-[#6EB4FF] hover:bg-blue-500 text-white px-8 py-3 rounded-full font-medium shadow-lg shadow-blue-200 transition-all active:scale-95">
                             Simpan Perubahan

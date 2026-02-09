@@ -78,11 +78,11 @@
                         <div>
                             <h3 class="text-3xl font-bold tracking-tight">Bang Jeemin</h3>
                             <p class="text-sm opacity-90 font-medium">contoh@gmail.com</p>
-                        </div>
-                        <button
-                            class="bg-white/20 hover:bg-white/30 text-white px-5 py-2 rounded-2xl text-sm font-medium flex items-center gap-2 transition backdrop-blur-sm">
-                            <i class="fa-regular fa-pen-to-square"></i> Edit Profil
-                        </button>
+                        </div><a href="/profile/edit">
+                            <button
+                                class="bg-white/20 hover:bg-white/30 text-white px-5 py-2 rounded-2xl text-sm font-medium flex items-center gap-2 transition backdrop-blur-sm">
+                                <i class="fa-regular fa-pen-to-square"></i> Edit Profil
+                            </button></a>
                     </div>
                 </div>
 

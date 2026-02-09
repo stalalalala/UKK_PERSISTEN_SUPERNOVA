@@ -23,7 +23,7 @@
             <ul class="hidden lg:flex gap-12 text-gray-800 font-medium text-sm">
                 <li><a href="/" class="font-bold hover:text-blue-500 text-bold">Beranda</a></li>
                 <li><a href="/streak" class="hover:text-blue-500 cursor-pointer">Pet Streak</a></li>
-                <li><a href="/tryout" class="hover:text-blue-500 cursor-pointer">Try Out</a></li>
+                <li><a href="/tryout/index" class="hover:text-blue-500 cursor-pointer">Try Out</a></li>
                 <li><a href="/latihan" class="hover:text-blue-500 cursor-pointer">Latihan Soal</a></li>
                 <li><a href="/video" class="hover:text-blue-500 cursor-pointer">Video Pembelajaran</a></li>
             </ul>
@@ -32,7 +32,7 @@
                 <div class="flex items-center gap-3 bg-[#FBBA16] rounded-full">
                     <button
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white"><a
-                            href="/profile">
+                            href="/profile/index">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="size-5 md:size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
