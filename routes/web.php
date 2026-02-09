@@ -18,7 +18,7 @@ Route::get('/tryout', function () {
     return view('tryout.index');
 });
 
-Route::get('/intruksi', function () {
+Route::get('/tointruksi', function () {
     return view('tryout.intructions');
 });
 
@@ -31,6 +31,10 @@ Route::get('/video', function () {
 });
 
 Route::get('/kuis', function () {
+    return view('kuis.index');
+});
+
+Route::get('/kuisintruksi', function () {
     return view('kuis.index');
 });
 
