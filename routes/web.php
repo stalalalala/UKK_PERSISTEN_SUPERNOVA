@@ -6,8 +6,12 @@ Route::get('/', function () {
     return view('beranda');
 });
 
-Route::get('/profile', function () {
+Route::get('/profile/index', function () {
     return view('profile.index');
+});
+
+Route::get('/profile/edit', function () {
+    return view('profile.edit');
 });
 
 Route::get('/streak', function () {
