@@ -33,3 +33,7 @@ Route::get('/video', function () {
 Route::get('/kuis', function () {
     return view('kuis.index');
 });
+
+Route::get('/slime', function () {
+    return view('slime');
+});

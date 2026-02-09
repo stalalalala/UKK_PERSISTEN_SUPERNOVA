@@ -303,6 +303,7 @@
 
     @include('layouts.footer')
 
+<<<<<<< HEAD
     <div class="max-w-[1440px] mx-auto">
         <section style="background-image: url('{{ asset('img/bg-home-2.png') }}');"
             class="relative bg-cover bg-center bg-no-repeat rounded-[40px] mx-4 md:mx-10 mt-10 mb-10 px-6 py-12 h-160 overflow-hidden shadow-sm border border-white/50">
@@ -332,6 +333,10 @@
             </div>
         </section>
     </div>
+=======
+
+    {{-- RIZKI ADITYA --}}
+>>>>>>> 82b5bc4d66c491b30cffd2b202bf4f6f3765b899
 
 </body>
 
