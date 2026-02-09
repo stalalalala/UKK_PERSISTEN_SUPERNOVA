@@ -34,6 +34,10 @@ Route::get('/tryout/jeda', function () {
     return view('tryout.jeda');
 });
 
+Route::get('/tryout/ranking', function () {
+    return view('tryout.ranking');
+});
+
 //
 
 Route::get('/latihan', function () {

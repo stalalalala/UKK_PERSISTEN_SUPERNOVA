@@ -22,7 +22,7 @@
 
         <main class="p-4 md:p-10 flex justify-center">
             <div
-                class="w-full  bg-white border-2 border-gray-100 rounded-[25px] md:rounded-[35px] p-5 md:p-10 shadow-sm text-center">
+                class="w-full bg-white border-2 border-gray-100 rounded-[25px] md:rounded-[35px] p-5 md:p-10 shadow-sm text-center">
 
                 <div class="flex items-center gap-2 text-xs text-gray-400 font-medium mb-4 md:mb-6">
                     <span>Try Out UTBK</span>
