@@ -10,6 +10,8 @@ Route::get('/profile/index', function () {
     return view('profile.index');
 });
 
+// profile
+
 Route::get('/profile/edit', function () {
     return view('profile.edit');
 });
@@ -18,13 +20,21 @@ Route::get('/streak', function () {
     return view('streak');
 });
 
-Route::get('/tryout', function () {
+// tryout
+
+Route::get('/tryout/index', function () {
     return view('tryout.index');
 });
 
-Route::get('/intruksi', function () {
+Route::get('/tryout/intructions', function () {
     return view('tryout.intructions');
 });
+
+Route::get('/tryout/jeda', function () {
+    return view('tryout.jeda');
+});
+
+//
 
 Route::get('/latihan', function () {
     return view('latihan.index');
