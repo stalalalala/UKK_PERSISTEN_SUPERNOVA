@@ -14,7 +14,7 @@
     @vite('resources/css/app.css')
 </head>
 
-<body class="font-po bg-white overflow-x-hidden">
+<body class="font-poppins bg-white overflow-x-hidden">
 
     <div class="max-w-[1440px] mx-auto">
         <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4">

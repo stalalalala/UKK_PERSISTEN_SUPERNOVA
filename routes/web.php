@@ -34,6 +34,10 @@ Route::get('/kuis', function () {
     return view('kuis.index');
 });
 
+Route::get('/streak', function () {
+    return view('streak.index');
+});
+
 Route::get('/slime', function () {
     return view('slime');
 });
