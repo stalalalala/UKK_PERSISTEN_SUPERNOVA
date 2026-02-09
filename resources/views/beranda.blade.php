@@ -303,6 +303,41 @@
 
     @include('layouts.footer')
 
+<<<<<<< HEAD
+    <div class="max-w-[1440px] mx-auto">
+        <section style="background-image: url('{{ asset('img/bg-home-2.png') }}');"
+            class="relative bg-cover bg-center bg-no-repeat rounded-[40px] mx-4 md:mx-10 mt-10 mb-10 px-6 py-12 h-160 overflow-hidden shadow-sm border border-white/50">
+
+            <div class="flex flex-col items-center text-center relative z-10">
+                <h2 class="text-2xl md:text-4xl font-extrabold text-[#2E3B66] tracking-tight">
+                    Tes Minat dan Bakat
+                </h2>
+                <p class="mt-4 text-[#2E3B66] text-sm md:text-lg max-w-2xl leading-relaxed font-medium">
+                    Kenali potensi diri serta arahkan jurusan <br class="hidden md:block">
+                    dan karir yang sesuai dengan minat dan bakatmu!
+                </p>
+                <div class="mt-8">
+                    <button
+                        class="bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-105">
+                        Mulai Tes
+                        <div class="bg-white w-6 h-6 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FCAE4B"
+                                class="w-4 h-4">
+                                <path fill-rule="evenodd"
+                                    d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+=======
+
+    {{-- RIZKI ADITYA --}}
+>>>>>>> 82b5bc4d66c491b30cffd2b202bf4f6f3765b899
+
 </body>
 
 </html>
