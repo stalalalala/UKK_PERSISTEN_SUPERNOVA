@@ -7,11 +7,23 @@
 }
 
 @keyframes slime-look-cycle {
-  0%, 15% { transform: rotate(0deg) scale(1, 1); }
-  20%, 28% { transform: rotate(5deg) scale(1.02, 0.98); }
-  33%, 45% { transform: rotate(0deg) scale(1, 1); }
-  50%, 58% { transform: rotate(-5deg) scale(1.02, 0.98); }
-  63%, 100% { transform: rotate(0deg) scale(1, 1); }
+  0%, 5% { transform: rotate(0deg) scale(1, 1); }
+  
+  15%, 35% { transform: rotate(5deg) scale(1.02, 0.98); }
+  
+  45%, 55% { transform: rotate(0deg) scale(1, 1); }
+  
+  65%, 85% { transform: rotate(-5deg) scale(1.02, 0.98); }
+  
+  95%, 100% { transform: rotate(0deg) scale(1, 1); }
+}
+
+.slime {
+  transform-origin: bottom center;
+  cursor: pointer;
+  animation: 
+    slime-idle 3.2s ease-in-out infinite,
+    slime-look-cycle 10s ease-in-out infinite;
 }
 
 /* =========================
@@ -25,13 +37,6 @@
   100% { transform: scale(1, 1); }
 }
 
-.slime {
-  transform-origin: bottom center;
-  cursor: pointer;
-  animation: 
-    slime-idle 3.2s ease-in-out infinite,
-    slime-look-cycle 10s ease-in-out infinite;
-}
 
 /* Class trigger */
 .animate-bounce-slime {
