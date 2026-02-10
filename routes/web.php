@@ -42,6 +42,10 @@ Route::get('/tryout/soal', function () {
     return view('tryout.soal');
 });
 
+Route::get('/tryout/hasil', function () {
+    return view('tryout.hasil');
+});
+
 //
 
 Route::get('/latihan', function () {
