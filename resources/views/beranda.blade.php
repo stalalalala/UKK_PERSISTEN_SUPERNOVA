@@ -303,6 +303,7 @@
 
     @include('layouts.footer')
 
+    
 
     <div class="max-w-[1440px] mx-auto">
         <section style="background-image: url('{{ asset('img/bg-home-2.png') }}');"
