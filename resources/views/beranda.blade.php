@@ -14,7 +14,7 @@
     @vite('resources/css/app.css')
 </head>
 
-<body class="font-poppins bg-white overflow-x-hidden">
+<body class="font-po bg-white overflow-x-hidden">
 
     <div class="max-w-[1440px] mx-auto">
         <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4">
@@ -165,7 +165,7 @@
     </div>
 
     <div class="bg-[#EAF2FE] py-16">
-        <div class="max-w-[1440px] mx-auto flex flex-col px-4 md:px-10 py-10 gap-6">
+        <div class="max-w-[1440px] mx-auto flex flex-col px-4 md:px-10 gap-6">
 
             <section style="background-image: url('{{ asset('img/bg-home-1.png') }}');"
                 class="relative bg-cover bg-center bg-no-repeat rounded-[35px] px-4 md:px-14 py-30 overflow-hidden min-h-[300px] flex items-center">
@@ -184,7 +184,7 @@
                 </div>
             </section>
 
-            <section class="border-2 bg-white border-gray-200 rounded-[3rem] p-8 md:p-10 mb-20">
+            <section class="border-2 bg-white border-gray-200 rounded-[3rem] p-8 md:p-10">
                 <div class="mb-10">
                     <h2 class="text-3xl font-black text-[#2E3B66]">Try Out UTBK</h2>
                     <p class="text-gray-500 font-medium">Simulasikan ujian UTBK mu dengan berbagai sesi Try Out disini!
