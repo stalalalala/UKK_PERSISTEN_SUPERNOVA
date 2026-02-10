@@ -22,10 +22,12 @@
 
             <ul class="hidden lg:flex gap-12 text-gray-800 font-medium text-sm">
                 <li><a href="/" class="font-bold hover:text-blue-500 text-bold">Beranda</a></li>
-                <li><a href="/streak" class="hover:text-blue-500 cursor-pointer">Pet Streak</a></li>
-                <li><a href="/tryout/index" class="hover:text-blue-500 cursor-pointer">Try Out</a></li>
-                <li><a href="/latihan" class="hover:text-blue-500 cursor-pointer">Latihan Soal</a></li>
-                <li><a href="/video" class="hover:text-blue-500 cursor-pointer">Video Pembelajaran</a></li>
+                <li><a href="{{ route('streak.index') }}" class="hover:text-blue-500 cursor-pointer">Pet Streak</a></li>
+                <li><a href="{{ route('tryout.index') }}" class="hover:text-blue-500 cursor-pointer">Try Out</a></li>
+                <li><a href="{{ route('latihan.index') }}" class="hover:text-blue-500 cursor-pointer">Latihan Soal</a>
+                </li>
+                <li><a href="{{ route('video.index') }}" class="hover:text-blue-500 cursor-pointer">Video
+                        Pembelajaran</a></li>
             </ul>
 
             <div class="flex gap-2">
@@ -303,7 +305,7 @@
 
     @include('layouts.footer')
 
-    
+
 
     <div class="max-w-[1440px] mx-auto">
         <section style="background-image: url('{{ asset('img/bg-home-2.png') }}');"
