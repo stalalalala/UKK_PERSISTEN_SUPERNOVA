@@ -18,7 +18,7 @@
 
 <body class="font-po bg-white overflow-x-hidden">
 
-    <div class="max-w-[1440px] mx-auto">git
+    <div class="max-w-[1440px] mx-auto">
         <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4">
             <div class="w-20 md:w-28 h-12 bg-blue-400 rounded-full flex-shrink-0"></div>
 
