@@ -26,6 +26,10 @@ Route::get('/latihan', function () {
     return view('latihan.index');
 });
 
+Route::get('/hasil_latihan', function () {
+    return view('latihan.hasil');
+});
+
 Route::get('/video', function () {
     return view('video.index');
 });
@@ -40,4 +44,16 @@ Route::get('/streak', function () {
 
 Route::get('/slime', function () {
     return view('slime');
+});
+
+Route::get('/slime_login', function () {
+    return view('slime_login');
+});
+
+Route::get('/masuk', function () {
+    return view('Auth/masuk');
+});
+
+Route::get('/daftar', function () {
+    return view('Auth/daftar');
 });
