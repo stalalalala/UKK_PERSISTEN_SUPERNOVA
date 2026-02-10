@@ -1,0 +1,33 @@
+/* =========================
+   ANIMASI SLIME AUTO
+========================= */
+@keyframes slime-auto-only-left {
+  0%, 15% { transform: rotate(0deg) scale(1, 1); }
+  25%, 40% { transform: rotate(-10deg) scale(1.02, 0.98); }
+  45% { transform: rotate(0deg) scale(1, 1); }
+  50% { transform: scale(1.15, 0.85); }
+  55% { transform: scale(0.95, 1.05); }
+  60% { transform: scale(1, 1); }
+  65%, 100% { transform: rotate(0deg) scale(1, 1); }
+}
+
+@keyframes slime-breathe-soft {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.01, 0.99); }
+}
+
+.slime-auto-left {
+  transform-origin: bottom center;
+  animation: 
+    slime-breathe-soft 3s ease-in-out infinite,
+    slime-auto-only-left 7s ease-in-out infinite; 
+}
+
+.slime-shadow {
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
+}
+
+/* Mencegah scroll horizontal karena lingkaran besar */
+body {
+  overflow-x: hidden;
+}
