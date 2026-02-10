@@ -56,6 +56,10 @@ Route::get('/kuis', function () {
     return view('kuis.index');
 });
 
+Route::get('/kuis/hasil', function () {
+    return view('kuis.hasil');
+});
+
 Route::get('/streak', function () {
     return view('streak.index');
 });
