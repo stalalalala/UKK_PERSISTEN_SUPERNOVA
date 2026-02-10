@@ -38,6 +38,10 @@ Route::get('/tryout/ranking', function () {
     return view('tryout.ranking');
 });
 
+Route::get('/tryout/soal', function () {
+    return view('tryout.soal');
+});
+
 //
 
 Route::get('/latihan', function () {
