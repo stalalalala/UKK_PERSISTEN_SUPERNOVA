@@ -7,6 +7,10 @@ use App\Http\Controllers\StreakController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TryoutController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\admin\HalamanStreakController;
+use App\Http\Controllers\admin\HalamanPeluangPtnController;
+use App\Http\Controllers\admin\HalamanMonitoringLaporanController;
+use App\Http\Controllers\HalamanStreakController as ControllersHalamanStreakController;
 
 Route::get('/', function () {
     return view('beranda');
@@ -97,3 +101,7 @@ Route::get('/minat_bakat/hasil', function () {
 Route::get('/admin/dashboard', function () {
     return view('admin/dashboard');
 });
+
+Route::get('/admin/streak', [HalamanStreakController::class, 'index'])->name('admin.streak.index');
+Route::get('/admin/peluangPtn', [HalamanPeluangPtnController::class, 'index'])->name('admin.peluang.index');
+Route::get('/admin/monitoringLaporan', [HalamanMonitoringLaporanController::class, 'index'])->name('admin.laporan.index');
