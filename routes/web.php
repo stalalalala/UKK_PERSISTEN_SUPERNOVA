@@ -102,6 +102,16 @@ Route::get('/admin/dashboard', function () {
     return view('admin/dashboard');
 });
 
+
 Route::get('/admin/streak', [HalamanStreakController::class, 'index'])->name('admin.streak.index');
 Route::get('/admin/peluangPtn', [HalamanPeluangPtnController::class, 'index'])->name('admin.peluang.index');
 Route::get('/admin/monitoringLaporan', [HalamanMonitoringLaporanController::class, 'index'])->name('admin.laporan.index');
+
+Route::get('/admin/user/index', function () {
+    return view('admin/user/index');
+});
+
+// kuis
+Route::get('/admin/kuis/create', function () {
+    return view('admin/kuis/create');
+});
