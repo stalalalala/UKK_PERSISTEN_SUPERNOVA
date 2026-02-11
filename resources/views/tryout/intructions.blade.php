@@ -63,7 +63,7 @@
                             class="w-full aspect-square bg-gray-200 rounded-[2.5rem] border-8 border-gray-300 flex items-center justify-center relative">
                             <div class="text-center p-4">
                                 <div class="w-20 h-20 bg-gray-400 rounded-2xl mx-auto mb-4"></div>
-                                <p class="text-gray-500 font-bold text-xs">https://photos/300/300</p>
+
                             </div>
                         </div>
                     </div>

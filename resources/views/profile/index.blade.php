@@ -65,7 +65,8 @@
 
             <div class="flex flex-col items-center gap-2 shrink-0">
                 <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-8 border-white overflow-hidden shadow-sm">
-                    <img src="https://via.placeholder.com/150" alt="Profile" class="w-full h-full object-cover">
+                    <img src="https://i.pinimg.com/564x/07/33/ba/0733ba760b29378474dea0fdbcb97107.jpg" alt="Profile"
+                        class="w-full h-full object-cover">
                 </div>
                 <h2 class="text-xl pt-2 font-bold text-[#2e3b66]">Bang Jeemin</h2>
                 <p class="text-xs text-gray-500 font-medium">contoh@gmail.com</p>

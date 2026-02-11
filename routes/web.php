@@ -85,7 +85,7 @@ Route::get('/daftar', function () {
     return view('Auth/daftar');
 });
 
-Route::get('/minat_bakat', [MinatBakatController::class, 'soal'])->name('minat_bakat.soal');
+Route::get('/minat_bakat', [MinatBakatController::class, 'index'])->name('minat_bakat.soal');
 
 Route::get('/minat_bakat/hasil', function () {
     return view('minat_bakat/hasil');

@@ -18,7 +18,7 @@
 
 <body class="font-po bg-white overflow-x-hidden">
 
-    <div class="max-w-[1440px] mx-10 md:mx-auto py-10 md:py-10 space-y-6">
+    <div class="max-w-[1440px] mx-10 md:mx-auto py-10 md:py-10 px-10 space-y-6">
 
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-lg md:text-2xl font-bold text-slate-700">Try Out UTBK – 1</h1>
@@ -261,7 +261,7 @@
             </div>
         </div>
 
-        <div class="mt-10 mx-auto px-4">
+        <div class="mt-10 mx-auto">
             <h2 class="text-2xl font-bold text-slate-700 mb-6">Pembahasan Try Out</h2>
 
             <div class="bg-[#eef4ff] rounded-3xl p-4 md:p-6 border border-blue-100 shadow-sm">

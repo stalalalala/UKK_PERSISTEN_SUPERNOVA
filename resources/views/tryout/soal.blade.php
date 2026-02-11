@@ -4,28 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soal Page - Premium Layout</title>
+    <title>PERSISTEN - Video Pembelajaran</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-        [x-cloak] {
-            display: none !important;
-        }
-
-        html,
-        body {
-            overflow-x: hidden;
-            width: 100%;
-        }
-    </style>
+    @vite('resources/css/app.css')
 </head>
 
-<body class="bg-slate-100 min-h-screen py-6 px-4 md:px-12 lg:px-20 xl:px-32">
+<body class="bg-slate-100 font-po min-h-screen py-10 overflow-x-hidden px-6 md:px-10">
 
     <div x-data="{ soalAktif: 1, totalSoal: 20, jawabanTerpilih: {} }" x-cloak class="max-w-[1440px] mx-auto">
 
@@ -68,7 +59,7 @@
                 </div>
 
                 <div class="mb-10">
-                    <div class="text-gray-800 text-base sm:text-xl md:text-2xl leading-relaxed font-regular">
+                    <div class="text-gray-800 text-base sm:text-lg md:text-xl leading-relaxed font-regular">
                         Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt nisi molestias ea neque
                         consequatur voluptates nihil ad fuga, et tenetur quo repellat quisquam. Doloremque reiciendis,
                         voluptatum earum amet sequi tempore?
