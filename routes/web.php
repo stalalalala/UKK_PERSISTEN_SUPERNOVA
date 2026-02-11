@@ -97,3 +97,7 @@ Route::get('/minat_bakat/hasil', function () {
 Route::get('/admin/dashboard', function () {
     return view('admin/dashboard');
 });
+
+Route::get('/admin/user/index', function () {
+    return view('admin/user/index');
+});
