@@ -42,11 +42,9 @@
                     </button>
                     <button
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white">
-                        <svg xmlns="http://www.w3.org/2000/xml" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="size-5 md:size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-                        </svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+        </svg>
                     </button>
                 </div>
             </div>
@@ -151,186 +149,151 @@
             <hr class="mb-12 border-gray-300">
         </div>
 
-        <section class="px-4 md:px-10">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+       <section class="px-4 md:px-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-                <div x-show="currentPage === 1"
-                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 1'"></h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-solid fa-book-open"></i><span>Kalimat Efektif</span></div>
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-regular fa-clock"></i><span>10.55</span></div>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <span
-                                class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Belum
-                                Ditonton</span>
-                        </div>
-                    </div>
-                    <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative cursor-pointer">
-                        <iframe width="560" height="315"
-                            src="https://www.youtube.com/embed/cX8sNF9ExDw?si=L0I_1bc2bKOKJceV"
-                            title="YouTube video player" frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
-                            class="w-full h-full object-cover"></iframe>
-                        <div
-                            class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-all">
-                            <div
-                                class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center pl-1 shadow-lg">
-                                <i class="fa-solid fa-play text-gray-800 text-sm"></i>
-                            </div>
-                        </div>
+        <div x-show="currentPage === 1"
+            class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
+            <div class="flex-1 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 1'"></h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
+                                class="fa-solid fa-book-open"></i><span>Kalimat Efektif</span></div>
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
+                                class="fa-regular fa-clock"></i><span>10.55</span></div>
                     </div>
                 </div>
-
-                <div x-show="currentPage === 1"
-                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 2'"></h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-solid fa-book-open"></i><span>Paragraf Padu</span></div>
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-regular fa-clock"></i><span>08:45</span></div>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <span
-                                class="bg-green-500 text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Sudah
-                                Ditonton</span>
-                        </div>
-                    </div>
-                    <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative cursor-pointer">
-                        <img src="https://picsum.photos/400/300?random=2" class="w-full h-full object-cover">
-                        <div
-                            class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-all">
-                            <div
-                                class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center pl-1 shadow-lg">
-                                <i class="fa-solid fa-play text-gray-800 text-sm"></i>
-                            </div>
-                        </div>
-                    </div>
+                <div class="mt-6">
+                    <span class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Belum Ditonton</span>
                 </div>
-
-                <div x-show="currentPage === 1"
-                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 3'"></h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-solid fa-book-open"></i><span>Kalimat Efektif</span></div>
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-regular fa-clock"></i><span>10.55</span></div>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <span
-                                class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Belum
-                                Ditonton</span>
-                        </div>
-                    </div>
-                    <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative cursor-pointer">
-                        <img src="https://picsum.photos/400/300?random=1" class="w-full h-full object-cover">
-                        <div
-                            class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-all">
-                            <div
-                                class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center pl-1 shadow-lg">
-                                <i class="fa-solid fa-play text-gray-800 text-sm"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div x-show="currentPage === 1"
-                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 4'"></h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-solid fa-book-open"></i><span>Paragraf Padu</span></div>
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-regular fa-clock"></i><span>08:45</span></div>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <span
-                                class="bg-green-500 text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Sudah
-                                Ditonton</span>
-                        </div>
-                    </div>
-                    <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative cursor-pointer">
-                        <img src="https://picsum.photos/400/300?random=2" class="w-full h-full object-cover">
-                        <div
-                            class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-all">
-                            <div
-                                class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center pl-1 shadow-lg">
-                                <i class="fa-solid fa-play text-gray-800 text-sm"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div x-show="currentPage === 2"
-                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 5'"></h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-solid fa-book-open"></i><span>Simpulan Teks</span></div>
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-regular fa-clock"></i><span>15:10</span></div>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <span
-                                class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Belum
-                                Ditonton</span>
-                        </div>
-                    </div>
-                    <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative cursor-pointer">
-                        <img src="https://picsum.photos/400/300?random=5" class="w-full h-full object-cover">
-                        <div
-                            class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/40 transition-all">
-                            <div
-                                class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center pl-1 shadow-lg">
-                                <i class="fa-solid fa-play text-gray-800 text-sm"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-
-            <div class="flex justify-center items-center gap-3 mt-16">
-                <button @click="if(currentPage > 1) currentPage--"
-                    class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
-                </button>
-
-                <button @click="currentPage = 1"
-                    :class="currentPage === 1 ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
-                    class="w-10 h-10 rounded-full font-bold">1</button>
-
-                <button @click="currentPage = 2"
-                    :class="currentPage === 2 ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
-                    class="w-10 h-10 rounded-full font-bold">2</button>
-
-                <button @click="if(currentPage < 2) currentPage++"
-                    class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
+            <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative">
+                <iframe src="https://www.youtube.com/embed/cX8sNF9ExDw?si=L0I_1bc2bKOKJceV" 
+                    title="YouTube video player" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen class="w-full h-full object-cover"></iframe>
             </div>
-        </section>
+        </div>
+
+        <div x-show="currentPage === 1"
+            class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
+            <div class="flex-1 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 2'"></h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
+                                class="fa-solid fa-book-open"></i><span>Paragraf Padu</span></div>
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
+                                class="fa-regular fa-clock"></i><span>08:45</span></div>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <span class="bg-green-500 text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Sudah Ditonton</span>
+                </div>
+            </div>
+            <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative">
+                <iframe src="https://www.youtube.com/embed/cX8sNF9ExDw?si=L0I_1bc2bKOKJceV" 
+                    title="YouTube video player" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen class="w-full h-full object-cover"></iframe>
+            </div>
+        </div>
+
+        <div x-show="currentPage === 1"
+            class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
+            <div class="flex-1 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 3'"></h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
+                                class="fa-solid fa-book-open"></i><span>Kalimat Efektif</span></div>
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
+                                class="fa-regular fa-clock"></i><span>10.55</span></div>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <span class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Belum Ditonton</span>
+                </div>
+            </div>
+            <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative">
+                <iframe src="https://www.youtube.com/embed/cX8sNF9ExDw?si=L0I_1bc2bKOKJceV" 
+                    title="YouTube video player" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen class="w-full h-full object-cover"></iframe>
+            </div>
+        </div>
+
+        <div x-show="currentPage === 1"
+            class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
+            <div class="flex-1 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 4'"></h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
+                                class="fa-solid fa-book-open"></i><span>Paragraf Padu</span></div>
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
+                                class="fa-regular fa-clock"></i><span>08:45</span></div>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <span class="bg-green-500 text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Sudah Ditonton</span>
+                </div>
+            </div>
+            <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative">
+                <iframe src="https://www.youtube.com/embed/cX8sNF9ExDw?si=L0I_1bc2bKOKJceV" 
+                    title="YouTube video player" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen class="w-full h-full object-cover"></iframe>
+            </div>
+        </div>
+
+        <div x-show="currentPage === 2"
+            class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
+            <div class="flex-1 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 5'"></h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
+                                class="fa-solid fa-book-open"></i><span>Simpulan Teks</span></div>
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
+                                class="fa-regular fa-clock"></i><span>15:10</span></div>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <span class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Belum Ditonton</span>
+                </div>
+            </div>
+            <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative">
+                <iframe src="https://www.youtube.com/embed/cX8sNF9ExDw?si=L0I_1bc2bKOKJceV" 
+                    title="YouTube video player" frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen class="w-full h-full object-cover"></iframe>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="flex justify-center items-center gap-3 mt-16">
+        <button @click="if(currentPage > 1) currentPage--"
+            class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+        </button>
+
+        <button @click="currentPage = 1"
+            :class="currentPage === 1 ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
+            class="w-10 h-10 rounded-full font-bold">1</button>
+
+        <button @click="currentPage = 2"
+            :class="currentPage === 2 ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
+            class="w-10 h-10 rounded-full font-bold">2</button>
+
+        <button @click="if(currentPage < 2) currentPage++"
+            class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+</section>
     </main>
     @include('layouts.footer')
 

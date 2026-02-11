@@ -101,3 +101,7 @@ Route::get('/admin/dashboard', function () {
 Route::get('/admin/user/index', function () {
     return view('admin/user/index');
 });
+
+Route::get('/admin/video/index', function () {
+    return view('admin/video/index');
+});
