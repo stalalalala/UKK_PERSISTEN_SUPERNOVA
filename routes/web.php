@@ -90,3 +90,10 @@ Route::get('/minat_bakat', [MinatBakatController::class, 'index'])->name('minat_
 Route::get('/minat_bakat/hasil', function () {
     return view('minat_bakat/hasil');
 });
+
+// admin //
+
+// dashboard
+Route::get('/admin/dashboard', function () {
+    return view('admin/dashboard');
+});
