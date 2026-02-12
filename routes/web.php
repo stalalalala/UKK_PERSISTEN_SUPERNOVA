@@ -110,3 +110,19 @@ Route::get('/admin/kuis/create', function () {
 Route::get('/admin/video/index', function () {
     return view('admin/video/index');
 });
+
+Route::get('/admin/latihan_soal/index', function () {
+    return view('admin/latihan_soal/index');
+});
+
+Route::get('/admin/latihan_soal/tambah', function () {
+    return view('admin/latihan_soal/tambah');
+});
+
+Route::get('/admin/latihan_soal/history', function () {
+    return view('admin/latihan_soal/history');
+});
+
+Route::get('/admin/latihan_soal/edit', function () {
+    return view('admin/latihan_soal/edit');
+});
