@@ -190,50 +190,174 @@ dan konten</span>
 
         <h2 class="text-2xl font-semibold text-slate-700 mb-6">Manajemen Video Pembelajaran</h2>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden">
-           <div class="flex flex-col md:flex-row justify-end items-end md:items-center gap-4 mb-6">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <button @click="openModalVideo = true; isEditVideo = false" 
-        class="w-full md:w-auto bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-blue-100">
-        <i class="fa-solid fa-plus text-xs"></i>
-        Tambah Video
-    </button>
+<div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden" 
+     x-data="videoApp()">
     
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div class="flex bg-gray-100 p-1 rounded-2xl w-full md:w-auto">
+            <button @click="activeTab = 'active'" 
+                :class="activeTab === 'active' ? 'bg-white shadow-sm text-[#4A72D4]' : 'text-gray-500 hover:text-gray-700'"
+                class="px-6 py-2 rounded-xl text-sm font-bold transition-all flex-1 md:flex-none">
+                Daftar Video
+            </button>
+            <button @click="activeTab = 'history'" 
+                :class="activeTab === 'history' ? 'bg-white shadow-sm text-[#4A72D4]' : 'text-gray-500 hover:text-gray-700'"
+                class="px-6 py-2 rounded-xl text-sm font-bold transition-all flex-1 md:flex-none flex items-center justify-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+                History
+            </button>
+        </div>
+
+        <div x-show="activeTab === 'active'" x-transition>
+            <button @click="openModalVideo = true; isEditVideo = false" 
+                class="w-full md:w-auto bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-blue-100">
+                <i class="fa-solid fa-plus text-xs"></i>
+                Tambah Video
+            </button>
+        </div>
+    </div>
+
+    <div x-show="activeTab === 'active'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2">
+        <div class="overflow-x-auto rounded-2xl border border-gray-50">
+            <table class="w-full text-sm min-w-[800px]">
+                <thead class="bg-[#F8FAFF] text-[#4A72D4]">
+                    <tr>
+                        <th class="p-4 text-left font-bold uppercase tracking-wider">ID Video</th>
+                        <th class="p-4 text-left font-bold uppercase tracking-wider">Subtes</th>
+                        <th class="p-4 text-left font-bold uppercase tracking-wider">Judul Video</th>
+                        <th class="p-4 text-center font-bold uppercase tracking-wider">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-4 font-mono text-xs text-slate-500">123-VID</td>
+                        <td class="p-4">
+                            <span class="bg-blue-50 text-[#4A72D4] px-3 py-1 rounded-full text-[11px] font-bold">Penalaran Umum</span>
+                        </td>
+                        <td class="p-4 font-semibold text-slate-700">Logika Analitik</td>
+                        <td class="p-4 text-center space-x-2">
+                            <button @click="openModalVideo = true; isEditVideo = true" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-600 transition-all shadow-sm">Ubah</button>
+                            <button @click="handleDelete('123-VID')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-all shadow-sm">Hapus</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div x-show="activeTab === 'history'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" style="display: none;">
+        <div class="overflow-x-auto rounded-2xl border border-red-50">
+            <table class="w-full text-sm min-w-[800px]">
+                <thead class="bg-red-50/30 text-red-600">
+                    <tr>
+                        <th class="p-4 text-left font-bold uppercase tracking-wider">ID Video</th>
+                        <th class="p-4 text-left font-bold uppercase tracking-wider">Judul Video</th>
+                        <th class="p-4 text-left font-bold uppercase tracking-wider">Status</th>
+                        <th class="p-4 text-center font-bold uppercase tracking-wider">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-mono text-xs text-slate-400 italic">099-VID</td>
+                        <td class="p-4 font-medium text-slate-500 line-through">Pengetahuan Kuantitatif Old</td>
+                        <td class="p-4">
+                            <span class="text-[10px] text-red-400 font-bold uppercase tracking-tighter bg-red-50 px-2 py-0.5 rounded border border-red-100">Terhapus</span>
+                        </td>
+                        <td class="p-4 text-center">
+                            <button @click="handleRestore('099-VID')" 
+                                class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md shadow-emerald-100">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                Pulihkan Video
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-            <div class="overflow-x-auto rounded-2xl border border-gray-50">
-                <table class="w-full text-sm min-w-[800px]">
-                    <thead class="bg-[#F8FAFF] text-[#4A72D4]">
-                        <tr>
-                            <th class="p-4 text-left font-bold uppercase tracking-wider">ID Video</th>
-                            <th class="p-4 text-left font-bold uppercase tracking-wider">Subtes</th>
-                            <th class="p-4 text-left font-bold uppercase tracking-wider">Judul Video</th>
-                            <th class="p-4 text-left font-bold uppercase tracking-wider">URL Video</th>
-                            <th class="p-4 text-center font-bold uppercase tracking-wider">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="p-4 font-mono text-xs text-slate-500">123-VID</td>
-                            <td class="p-4">
-                                <span class="bg-blue-50 text-[#4A72D4] px-3 py-1 rounded-full text-[11px] font-bold">Penalaran Umum</span>
-                            </td>
-                            <td class="p-4 font-semibold text-slate-700">Logika Analitik</td>
-                            <td class="p-4">
-                                <a href="#" class="text-blue-500 hover:underline flex items-center gap-2">
-                                    <i class="fa-brands fa-youtube text-red-500"></i>
-                                    youtube.com/v/riki123...
-                                </a>
-                            </td>
-                            <td class="p-4 text-center space-x-2">
-                                <button @click="openModalVideo = true; isEditVideo = true" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-600 transition-all shadow-sm">Ubah</button>
-                                <button class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-all shadow-sm">Hapus</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<script>
+    function videoApp() {
+        return {
+            activeTab: 'active', // 'active' atau 'history'
+            openModalVideo: false, // Digunakan untuk modal Anda yang sudah ada
+            isEditVideo: false,
+
+            // Logika untuk menghapus dengan konfirmasi
+            handleDelete(id) {
+                Swal.fire({
+                    title: 'Hapus Video?',
+                    text: "Data akan dipindahkan ke tab history.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444', // red-500
+                    cancelButtonColor: '#6b7280', // gray-500
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                    customClass: {
+                        popup: 'rounded-3xl',
+                        confirmButton: 'rounded-xl px-4 py-2',
+                        cancelButton: 'rounded-xl px-4 py-2'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Di sini panggil fungsi backend Anda
+                        this.executeDelete(id);
+                    }
+                })
+            },
+
+            // Logika untuk memulihkan dengan konfirmasi
+            handleRestore(id) {
+                Swal.fire({
+                    title: 'Pulihkan Video?',
+                    text: "Video akan dikembalikan ke daftar aktif.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10b981', // emerald-500
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Pulihkan!',
+                    cancelButtonText: 'Batal',
+                    customClass: {
+                        popup: 'rounded-3xl',
+                        confirmButton: 'rounded-xl px-4 py-2',
+                        cancelButton: 'rounded-xl px-4 py-2'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Di sini panggil fungsi backend Anda
+                        this.executeRestore(id);
+                    }
+                })
+            },
+
+            executeDelete(id) {
+                // Contoh feedback sukses setelah hapus
+                Swal.fire({
+                    title: 'Terhapus!',
+                    text: `Video ${id} berhasil dipindahkan.`,
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            },
+
+            executeRestore(id) {
+                // Contoh feedback sukses setelah pulihkan
+                Swal.fire({
+                    title: 'Dipulihkan!',
+                    text: `Video ${id} kembali aktif.`,
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+    }
+</script>
     </main>
 
     <div x-show="openModalVideo" x-cloak class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" x-transition>
