@@ -54,11 +54,9 @@
                     </button>
                     <button
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white">
-                        <svg xmlns="http://www.w3.org/2000/xml" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="size-5 md:size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-                        </svg>
+                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+        </svg>
                     </button>
                 </div>
             </div>
@@ -67,38 +65,74 @@
 
     <main class="max-w-[1440px] mx-auto px-4 md:px-10 py-8">
 
-        <section
-            class="border-2 border-gray-200 rounded-[2.5rem] p-6 mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div
-                    class="border border-gray-200 rounded-[2rem] px-4 py-11 cursor-pointer hover:border-blue-300 transition-colors">
-                    <p class="text-gray-500 text-sm font-semibold mb-1">Pilih Universitas</p>
-                    <div class="flex justify-between items-center font-bold text-lg text-[#2E3B66]">
-                        <span>Universitas Indonesia</span>
-                        <i class="fa-solid fa-chevron-down text-gray-400 text-sm"></i>
-                    </div>
-                </div>
-                <div
-                    class="border border-gray-200 rounded-[2rem] px-4 py-11 cursor-pointer hover:border-blue-300 transition-colors">
-                    <p class="text-gray-500 text-sm font-semibold mb-1">Pilih Jurusan</p>
-                    <div class="flex justify-between items-center font-bold text-lg text-[#2E3B66]">
-                        <span>Teknik Informatika</span>
-                        <i class="fa-solid fa-chevron-down text-gray-400 text-sm"></i>
-                    </div>
+       <section x-data="{ 
+    openUniv: false, 
+    openJurusan: false, 
+    univSelected: 'Universitas Indonesia',
+    jurusanSelected: 'Teknik Informatika'
+}" class="border-2 border-gray-200 rounded-[2.5rem] p-6 mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+    
+    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <div class="relative">
+            <div @click="openUniv = !openUniv; openJurusan = false" 
+                class="border border-gray-200 rounded-[2rem] px-6 py-8 cursor-pointer hover:border-blue-300 transition-all bg-white shadow-sm">
+                <p class="text-gray-500 text-sm font-semibold mb-1">Pilih Universitas</p>
+                <div class="flex justify-between items-center font-bold text-lg text-[#2E3B66]">
+                    <span x-text="univSelected"></span>
+                    <i class="fa-solid fa-chevron-down text-gray-400 text-sm transition-transform" :class="openUniv ? 'rotate-180' : ''"></i>
                 </div>
             </div>
 
-            <div class="bg-blue-500 rounded-[2rem] p-5 text-white relative overflow-hidden">
-                <div class="flex justify-between items-center mb-3">
-                    <span class="font-medium text-xl">Peluang Lolos</span>
-                    <span class="text-3xl font-semibold">60%</span>
+            <div x-show="openUniv" @click.away="openUniv = false" x-cloak
+                class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-[1.5rem] shadow-xl max-h-60 overflow-y-auto p-2">
+                <div class="p-2 border-b mb-2">
+                    <input type="text" placeholder="Cari Univ..." class="w-full p-2 text-sm bg-slate-50 rounded-lg outline-none border-none focus:ring-1 focus:ring-blue-400">
                 </div>
-                <div class="w-full bg-blue-700/40 h-5 rounded-full flex p-1 border border-white/20">
-                    <div class="bg-white w-[60%] h-full rounded-full"></div>
-                </div>
-                <p class="text-md mt-3 opacity-90">Hasil kalkulasi dari sesi Try Out terakhir!</p>
+                <div @click="univSelected = 'Universitas Indonesia'; openUniv = false" class="p-3 hover:bg-blue-50 rounded-xl cursor-pointer text-sm font-medium text-slate-700">Universitas Indonesia</div>
+                <div @click="univSelected = 'Institut Teknologi Bandung'; openUniv = false" class="p-3 hover:bg-blue-50 rounded-xl cursor-pointer text-sm font-medium text-slate-700">Institut Teknologi Bandung</div>
+                <div @click="univSelected = 'Universitas Gadjah Mada'; openUniv = false" class="p-3 hover:bg-blue-50 rounded-xl cursor-pointer text-sm font-medium text-slate-700">Universitas Gadjah Mada</div>
+                <div @click="univSelected = 'Universitas Airlangga'; openUniv = false" class="p-3 hover:bg-blue-50 rounded-xl cursor-pointer text-sm font-medium text-slate-700">Universitas Airlangga</div>
+                <div @click="univSelected = 'Universitas Padjadjaran'; openUniv = false" class="p-3 hover:bg-blue-50 rounded-xl cursor-pointer text-sm font-medium text-slate-700">Universitas Padjadjaran</div>
             </div>
-        </section>
+        </div>
+
+        <div class="relative">
+            <div @click="openJurusan = !openJurusan; openUniv = false" 
+                class="border border-gray-200 rounded-[2rem] px-6 py-8 cursor-pointer hover:border-blue-300 transition-all bg-white shadow-sm">
+                <p class="text-gray-500 text-sm font-semibold mb-1">Pilih Jurusan</p>
+                <div class="flex justify-between items-center font-bold text-lg text-[#2E3B66]">
+                    <span x-text="jurusanSelected"></span>
+                    <i class="fa-solid fa-chevron-down text-gray-400 text-sm transition-transform" :class="openJurusan ? 'rotate-180' : ''"></i>
+                </div>
+            </div>
+
+            <div x-show="openJurusan" @click.away="openJurusan = false" x-cloak
+                class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-[1.5rem] shadow-xl max-h-60 overflow-y-auto p-2">
+                <div class="p-2 border-b mb-2">
+                    <input type="text" placeholder="Cari Jurusan..." class="w-full p-2 text-sm bg-slate-50 rounded-lg outline-none border-none focus:ring-1 focus:ring-blue-400">
+                </div>
+                <div @click="jurusanSelected = 'Teknik Informatika'; openJurusan = false" class="p-3 hover:bg-blue-50 rounded-xl cursor-pointer text-sm font-medium text-slate-700">Teknik Informatika</div>
+                <div @click="jurusanSelected = 'Sistem Informasi'; openJurusan = false" class="p-3 hover:bg-blue-50 rounded-xl cursor-pointer text-sm font-medium text-slate-700">Sistem Informasi</div>
+                <div @click="jurusanSelected = 'Ilmu Komunikasi'; openJurusan = false" class="p-3 hover:bg-blue-50 rounded-xl cursor-pointer text-sm font-medium text-slate-700">Ilmu Komunikasi</div>
+                <div @click="jurusanSelected = 'Kedokteran'; openJurusan = false" class="p-3 hover:bg-blue-50 rounded-xl cursor-pointer text-sm font-medium text-slate-700">Kedokteran</div>
+                <div @click="jurusanSelected = 'Psikologi'; openJurusan = false" class="p-3 hover:bg-blue-50 rounded-xl cursor-pointer text-sm font-medium text-slate-700">Psikologi</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bg-blue-500 rounded-[2rem] p-5 text-white relative overflow-hidden shadow-lg shadow-blue-200">
+        <div class="flex justify-between items-center mb-3">
+            <span class="font-medium text-xl">Peluang Lolos</span>
+            <span class="text-3xl font-semibold">60%</span>
+        </div>
+        <div class="w-full bg-blue-700/40 h-5 rounded-full flex p-1 border border-white/20">
+            <div class="bg-white w-[60%] h-full rounded-full shadow-sm transition-all duration-1000"></div>
+        </div>
+        <p class="text-md mt-3 opacity-90">Hasil dari 2 sesi Try Out!</p>
+    </div>
+</section>
 
         <section class="border-2 border-gray-200 rounded-[3rem] p-8 md:p-10 mb-20">
             <div class="mb-10">
