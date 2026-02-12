@@ -7,6 +7,10 @@ use App\Http\Controllers\StreakController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TryoutController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\admin\HalamanStreakController;
+use App\Http\Controllers\admin\HalamanPeluangPtnController;
+use App\Http\Controllers\admin\HalamanMonitoringLaporanController;
+use App\Http\Controllers\HalamanStreakController as ControllersHalamanStreakController;
 
 Route::get('/', function () {
     return view('beranda');
@@ -98,6 +102,11 @@ Route::get('/admin/dashboard', function () {
     return view('admin/dashboard');
 });
 
+
+Route::get('/admin/streak', [HalamanStreakController::class, 'index'])->name('admin.streak.index');
+Route::get('/admin/peluangPtn', [HalamanPeluangPtnController::class, 'index'])->name('admin.peluang.index');
+Route::get('/admin/monitoringLaporan', [HalamanMonitoringLaporanController::class, 'index'])->name('admin.laporan.index');
+
 Route::get('/admin/user/index', function () {
     return view('admin/user/index');
 });
@@ -134,4 +143,21 @@ Route::get('/admin/tryout/create', function () {
 
 Route::get('/admin/tryout/edit', function () {
     return view('admin/tryout/edit');
+});
+
+// minat bakat
+Route::get('/admin/minatbakat/index', function () {
+    return view('admin/minatbakat/index');
+});
+
+Route::get('/admin/minatbakat/kategori', function () {
+    return view('admin/minatbakat/kategori');
+});
+
+Route::get('/admin/minatbakat/editor', function () {
+    return view('admin/minatbakat/editor');
+});
+
+Route::get('/admin/minatbakat/partisipasi', function () {
+    return view('admin/minatbakat/partisipasi');
 });
