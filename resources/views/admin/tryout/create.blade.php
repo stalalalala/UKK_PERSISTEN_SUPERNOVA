@@ -69,6 +69,16 @@
         }
     },
 
+    step: 'pilih_subtes', // Default awal
+    activeSubtesIndex: null,
+    activeQuestion: 1,
+
+    // Fungsi untuk pindah ke mode edit
+    selectSubtes(index) {
+        this.activeSubtesIndex = index;
+        this.step = 'editing';
+    },
+
     simpanSoal() {
         let current = this.subtesList[this.activeSubtesIndex];
         if (current.soalTerisi < this.targetSoal) {
