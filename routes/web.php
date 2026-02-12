@@ -126,3 +126,21 @@ Route::get('/admin/kuis/index', function () {
 Route::get('/admin/kuis/create', function () {
     return view('admin/kuis/create');
 });
+
+Route::get('/admin/kuis/edit', function () {
+    return view('admin/kuis/edit');
+});
+
+
+// tryout
+Route::get('/admin/tryout/index', function () {
+    return view('admin/tryout/index');
+});
+
+Route::get('/admin/tryout/create', function () {
+    return view('admin/tryout/create');
+});
+
+Route::get('/admin/tryout/edit', function () {
+    return view('admin/tryout/edit');
+});
