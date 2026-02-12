@@ -100,15 +100,20 @@ Route::get('/admin/dashboard', function () {
 
 Route::get('/admin/user/index', function () {
     return view('admin/user/index');
-    });
+});
 
 
     
-    Route::get('/admin/video/index', function () {
+Route::get('/admin/video/index', function () {
         return view('admin/video/index');
-        });
+});
         
-        // kuis
+// kuis
+
+Route::get('/admin/kuis/index', function () {
+    return view('admin/kuis/index');
+});
+
 Route::get('/admin/kuis/create', function () {
     return view('admin/kuis/create');
 });
