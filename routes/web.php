@@ -144,3 +144,20 @@ Route::get('/admin/tryout/create', function () {
 Route::get('/admin/tryout/edit', function () {
     return view('admin/tryout/edit');
 });
+
+// minat bakat
+Route::get('/admin/minatbakat/index', function () {
+    return view('admin/minatbakat/index');
+});
+
+Route::get('/admin/minatbakat/kategori', function () {
+    return view('admin/minatbakat/kategori');
+});
+
+Route::get('/admin/minatbakat/editor', function () {
+    return view('admin/minatbakat/editor');
+});
+
+Route::get('/admin/minatbakat/partisipasi', function () {
+    return view('admin/minatbakat/partisipasi');
+});
