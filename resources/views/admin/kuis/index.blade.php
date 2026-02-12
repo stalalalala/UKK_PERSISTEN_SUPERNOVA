@@ -41,7 +41,19 @@
     // Contoh data kuis (buat sampai 24 atau lebih)
     allKuis: [
         { id: 1, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 2, judul: 'Fundamental 2', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Draft' },
+        { id: 2, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
+        { id: 3, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Draft' },
+        { id: 4, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
+        { id: 5, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
+        { id: 6, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
+        { id: 7, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
+        { id: 8, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
+        { id: 9, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
+        { id: 10, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Draft' },
+        { id: 11, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
+        { id: 12, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
+
+
         // ... tambahkan data kuis sampai 24 item
     ],
 
@@ -96,7 +108,7 @@
                 </a>
 
                 <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl  transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 shrink-0">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -126,7 +138,7 @@
                 </a>
 
                 <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 shrink-0">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -232,6 +244,7 @@
             class="fixed inset-0 bg-black/50 z-40 lg:hidden">
         </div>
 
+
         <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
 
             <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
@@ -283,7 +296,7 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-400 font-medium">Total Set Kuis</p>
-                            <h4 class="text-2xl font-bold text-gray-800">24</h4>
+                            <h4 class="text-2xl font-bold text-gray-800">12</h4>
                         </div>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
@@ -293,7 +306,7 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-400 font-medium">Kuis Aktif</p>
-                            <h4 class="text-2xl font-bold text-gray-800">18</h4>
+                            <h4 class="text-2xl font-bold text-gray-800">10</h4>
                         </div>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
@@ -303,7 +316,7 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-400 font-medium">Draft</p>
-                            <h4 class="text-2xl font-bold text-gray-800">6</h4>
+                            <h4 class="text-2xl font-bold text-gray-800">2</h4>
                         </div>
                     </div>
                 </div>
@@ -353,74 +366,34 @@
                                     <tr class="hover:bg-blue-50/30 transition-colors group">
                                         <td class="px-8 py-5">
                                             <div class="flex flex-col">
-                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]">Set 1:
-                                                    Kuis Fundamental</span>
-                                                <span class="text-xs text-gray-400">Dibuat: 12 Feb 2026</span>
+                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]"
+                                                    x-text="'Set ' + kuis.id + ': ' + kuis.judul"></span>
+                                                <span class="text-xs text-gray-400"
+                                                    x-text="'Dibuat: ' + kuis.tanggal"></span>
                                             </div>
                                         </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600">Pengetahuan Kuantitatif
-                                        </td>
+                                        <td class="px-8 py-5 text-sm font-medium text-gray-600"
+                                            x-text="kuis.kategori"></td>
                                         <td class="px-8 py-5 text-center">
                                             <span
-                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100">20
-                                                Soal</span>
+                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100"
+                                                x-text="kuis.soal + ' Soal'"></span>
                                         </td>
-                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">45 Menit
-                                        </td>
+                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700"
+                                            x-text="kuis.durasi + ' Menit'"></td>
                                         <td class="px-8 py-5 text-center">
                                             <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 uppercase">
+                                                :class="kuis.status === 'Aktif' ? 'bg-emerald-100 text-emerald-600' :
+                                                    'bg-gray-100 text-gray-500'"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase">
                                                 <span
-                                                    class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                                Aktif
+                                                    :class="kuis.status === 'Aktif' ? 'bg-emerald-500 animate-pulse' :
+                                                        'bg-gray-400'"
+                                                    class="w-1.5 h-1.5 rounded-full"></span>
+                                                <span x-text="kuis.status"></span>
                                             </span>
                                         </td>
-                                        <td class="px-8 py-5">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <button
-                                                    class="p-2 text-blue-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all"
-                                                    title="Edit Soal">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-orange-400 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all"
-                                                    title="Preview Kuis">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-rose-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
-                                                    title="Hapus">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
 
-                                    <tr class="hover:bg-blue-50/30 transition-colors group">
-                                        <td class="px-8 py-5">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]">Set 2:
-                                                    Kuis Fundamental</span>
-                                                <span class="text-xs text-gray-400">Dibuat: 12 Feb 2026</span>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600">Pengetahuan Kuantitatif
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100">20
-                                                Soal</span>
-                                        </td>
-                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">45 Menit
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 uppercase">
-                                                <span
-                                                    class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                                Aktif
-                                            </span>
-                                        </td>
                                         <td class="px-8 py-5">
                                             <div class="flex items-center justify-center gap-2">
                                                 <button
@@ -439,284 +412,6 @@
                                                     <i class="fa-solid fa-trash-can"></i>
                                                 </button>
                                             </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr class="hover:bg-blue-50/30 transition-colors group">
-                                        <td class="px-8 py-5">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]">Set 3:
-                                                    Kuis Fundamental</span>
-                                                <span class="text-xs text-gray-400">Dibuat: 12 Feb 2026</span>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600">Pengetahuan Kuantitatif
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100">20
-                                                Soal</span>
-                                        </td>
-                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">45 Menit
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 uppercase">
-                                                <span
-                                                    class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                                Aktif
-                                            </span>
-                                        </td>
-                                        <td class="px-8 py-5">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <button
-                                                    class="p-2 text-blue-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all"
-                                                    title="Edit Soal">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-orange-400 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all"
-                                                    title="Preview Kuis">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-rose-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
-                                                    title="Hapus">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr class="hover:bg-blue-50/30 transition-colors group">
-                                        <td class="px-8 py-5">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]">Set 4:
-                                                    Kuis Fundamental</span>
-                                                <span class="text-xs text-gray-400">Dibuat: 12 Feb 2026</span>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600">Pengetahuan Kuantitatif
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100">20
-                                                Soal</span>
-                                        </td>
-                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">45 Menit
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 uppercase">
-                                                <span
-                                                    class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                                Aktif
-                                            </span>
-                                        </td>
-                                        <td class="px-8 py-5">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <button
-                                                    class="p-2 text-blue-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all"
-                                                    title="Edit Soal">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-orange-400 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all"
-                                                    title="Preview Kuis">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-rose-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
-                                                    title="Hapus">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr class="hover:bg-blue-50/30 transition-colors group">
-                                        <td class="px-8 py-5">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]">Set 5:
-                                                    Kuis Fundamental</span>
-                                                <span class="text-xs text-gray-400">Dibuat: 12 Feb 2026</span>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600">Pengetahuan Kuantitatif
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100">20
-                                                Soal</span>
-                                        </td>
-                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">45 Menit
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 uppercase">
-                                                <span
-                                                    class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                                Aktif
-                                            </span>
-                                        </td>
-                                        <td class="px-8 py-5">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <button
-                                                    class="p-2 text-blue-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all"
-                                                    title="Edit Soal">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-orange-400 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all"
-                                                    title="Preview Kuis">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-rose-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
-                                                    title="Hapus">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr class="hover:bg-blue-50/30 transition-colors group">
-                                        <td class="px-8 py-5">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]">Set 6:
-                                                    Kuis Fundamental</span>
-                                                <span class="text-xs text-gray-400">Dibuat: 12 Feb 2026</span>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600">Pengetahuan Kuantitatif
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100">20
-                                                Soal</span>
-                                        </td>
-                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">45 Menit
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 uppercase">
-                                                <span
-                                                    class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                                Aktif
-                                            </span>
-                                        </td>
-                                        <td class="px-8 py-5">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <button
-                                                    class="p-2 text-blue-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all"
-                                                    title="Edit Soal">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-orange-400 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all"
-                                                    title="Preview Kuis">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-rose-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
-                                                    title="Hapus">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr class="hover:bg-blue-50/30 transition-colors group">
-                                        <td class="px-8 py-5">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]">Set 7:
-                                                    Kuis Fundamental</span>
-                                                <span class="text-xs text-gray-400">Dibuat: 12 Feb 2026</span>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600">Pengetahuan Kuantitatif
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100">20
-                                                Soal</span>
-                                        </td>
-                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">45 Menit
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 uppercase">
-                                                <span
-                                                    class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                                Aktif
-                                            </span>
-                                        </td>
-                                        <td class="px-8 py-5">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <button
-                                                    class="p-2 text-blue-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all"
-                                                    title="Edit Soal">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-orange-400 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all"
-                                                    title="Preview Kuis">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-rose-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
-                                                    title="Hapus">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr class="hover:bg-blue-50/30 transition-colors group">
-                                        <td class="px-8 py-5">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]">Set 8:
-                                                    Kuis Fundamental</span>
-                                                <span class="text-xs text-gray-400">Dibuat: 12 Feb 2026</span>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600">Pengetahuan Kuantitatif
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100">20
-                                                Soal</span>
-                                        </td>
-                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">45 Menit
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 uppercase">
-                                                <span
-                                                    class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                                Aktif
-                                            </span>
-                                        </td>
-                                        <td class="px-8 py-5">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <button
-                                                    class="p-2 text-blue-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all"
-                                                    title="Edit Soal">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-orange-400 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all"
-                                                    title="Preview Kuis">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-rose-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
-                                                    title="Hapus">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
                                         </td>
                                     </tr>
                                 </template>
