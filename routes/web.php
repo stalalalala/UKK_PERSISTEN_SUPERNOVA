@@ -100,8 +100,4 @@ Route::get('/admin/dashboard', function () {
 
 Route::get('/admin/user/index', function () {
     return view('admin/user/index');
-
-// kuis
-Route::get('/admin/kuis/create', function () {
-    return view('admin/kuis/create');
-});
+    });p
