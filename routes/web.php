@@ -10,11 +10,19 @@ use App\Http\Controllers\VideoController;
 use App\Http\Controllers\admin\HalamanStreakController;
 use App\Http\Controllers\admin\HalamanPeluangPtnController;
 use App\Http\Controllers\admin\HalamanMonitoringLaporanController;
+use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\HalamanStreakController as ControllersHalamanStreakController;
+use App\Http\Controllers\HasilLatihanController;
+use App\Http\Controllers\HasilTryoutController;
+use App\Http\Controllers\IntruksiLatihanController;
+use App\Http\Controllers\IntruksiTryoutController;
+use App\Http\Controllers\JedaTryoutController;
+use App\Http\Controllers\RankingController;
+use App\Http\Controllers\SoalKuisController;
+use App\Http\Controllers\SoalLatihanController;
+use App\Http\Controllers\SoalTryoutController;
 
-Route::get('/', function () {
-    return view('beranda');
-});
+Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
 Route::get('/profile/index', function () {
     return view('profile.index');
@@ -33,33 +41,25 @@ Route::get('/streak', [StreakController::class, 'index'])->name('streak.index');
 
 Route::get('/tryout', [TryoutController::class, 'index'])->name('tryout.index');
 
-Route::get('/tryout/intructions', function () {
-    return view('tryout.intructions');
-});
+Route::get('/tryout/intruksi', [IntruksiTryoutController::class, 'index'])->name('tryout.intruksi');
 
-Route::get('/tryout/jeda', function () {
-    return view('tryout.jeda');
-});
+Route::get('/tryout/jeda', [JedaTryoutController::class, 'index'])->name('tryout.jeda');
 
-Route::get('/tryout/ranking', function () {
-    return view('tryout.ranking');
-});
+Route::get('/tryout/ranking', [RankingController::class, 'index'])->name('tryout.ranking');
 
-Route::get('/tryout/soal', function () {
-    return view('tryout.soal');
-});
+Route::get('/tryout/soal', [SoalTryoutController::class, 'index'])->name('tryout.soal');
 
-Route::get('/tryout/hasil', function () {
-    return view('tryout.hasil');
-});
+Route::get('/tryout/hasil', [HasilTryoutController::class, 'index'])->name('tryout.hasil');
 
 //latihan
 
 Route::get('/latihan', [LatihanController::class, 'index'])->name('latihan.index');
 
-Route::get('/hasil_latihan', function () {
-    return view('latihan.hasil');
-});
+Route::get('/latihan/soal', [SoalLatihanController::class, 'index'])->name('latihan.soal');
+
+Route::get('/latihan/hasil', [HasilLatihanController::class, 'index'])->name('latihan.hasil');
+
+Route::get('/latihan/intruksi', [IntruksiLatihanController::class, 'index'])->name('latihan.intruksi');
 
 // video
 
@@ -69,9 +69,11 @@ Route::get('/video', [VideoController::class, 'index'])->name('video.index');
 
 Route::get('/kuis', [KuisController::class, 'index'])->name('kuis.index');
 
-Route::get('/kuis/hasil', function () {
-    return view('kuis.hasil');
-});
+Route::get('/kuis/soal', [SoalKuisController::class, 'index'])->name('latihan.soal');
+
+Route::get('/kuis/hasil', [HasilTryoutController::class, 'index'])->name('latihan.hasil');
+
+// slime
 
 Route::get('/slime', function () {
     return view('slime');
@@ -81,6 +83,8 @@ Route::get('/slime_login', function () {
     return view('slime_login');
 });
 
+// masuk/daftar
+
 Route::get('/masuk', function () {
     return view('Auth/masuk');
 });
@@ -89,14 +93,23 @@ Route::get('/daftar', function () {
     return view('Auth/daftar');
 });
 
-Route::get('/minat_bakat', [MinatBakatController::class, 'index'])->name('minat_bakat.soal');
+// minat bakat
 
-Route::get('/minat_bakat/hasil', function () {
-    return view('minat_bakat/hasil');
-});
+Route::get('/minatbakat', [MinatBakatController::class, 'index'])->name('minatbakat.soal');
+
+Route::get('/minatbakat/hasil', [MinatBakatController::class, 'index'])->name('minatbakat.hasil');
+
+
+
+
+
+
+
+
+
+
 
 // admin //
-
 // dashboard
 Route::get('/admin/dashboard', function () {
     return view('admin/dashboard');
