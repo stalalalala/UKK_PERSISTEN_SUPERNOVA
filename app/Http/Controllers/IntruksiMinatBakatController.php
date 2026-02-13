@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\IntruksiKuis;
+use App\Models\IntruksiMinatBakat;
 use Illuminate\Http\Request;
 
-class IntruksiKuisController extends Controller
+class IntruksiMinatBakatController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('kuis.intruksi');
+        return view('minatbakat.intruksi');
     }
 
     /**
@@ -34,7 +34,7 @@ class IntruksiKuisController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(IntruksiKuis $intruksiKuis)
+    public function show(IntruksiMinatBakat $intruksiMinatBakat)
     {
         //
     }
@@ -42,7 +42,7 @@ class IntruksiKuisController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(IntruksiKuis $intruksiKuis)
+    public function edit(IntruksiMinatBakat $intruksiMinatBakat)
     {
         //
     }
@@ -50,7 +50,7 @@ class IntruksiKuisController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, IntruksiKuis $intruksiKuis)
+    public function update(Request $request, IntruksiMinatBakat $intruksiMinatBakat)
     {
         //
     }
@@ -58,7 +58,7 @@ class IntruksiKuisController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(IntruksiKuis $intruksiKuis)
+    public function destroy(IntruksiMinatBakat $intruksiMinatBakat)
     {
         //
     }

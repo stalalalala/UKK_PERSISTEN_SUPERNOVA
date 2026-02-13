@@ -100,12 +100,12 @@
                 </div>
 
                 <div class="px-12 py-8 bg-gray-50 flex justify-end gap-4 shrink-0">
-                    <a href="{{ route('tryout.index') }}">
+                    <a href="{{ route('latihan.index') }}">
 
                         <button
                             class="px-8 py-3 rounded-full font-bold text-gray-400 bg-gray-200 hover:bg-gray-300 transition">Batal</button>
                     </a>
-                    <a href="{{ route('tryout.soal') }}">
+                    <a href="{{ route('latihan.soal') }}">
                         <button
                             class="px-10 py-3 rounded-full font-bold text-white bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-200 transition">Mulai
                             Mengerjakan</button>

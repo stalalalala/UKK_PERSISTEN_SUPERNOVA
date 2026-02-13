@@ -22,14 +22,14 @@
 
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 px-2">
             <h1 class="text-2xl md:text-4xl font-black text-[#2E3B66] tracking-tight text-center md:text-left">
-                Try Out UTBK - 1
+                Kuis Fundamental
             </h1>
 
             <div class="flex items-center justify-between md:justify-end gap-3 sm:gap-4">
                 <div class="bg-white border-2 border-[#4FAAFD] px-4 py-2 md:px-6 md:py-3 rounded-3xl">
                     <p class="text-[18px] font-bold text-[#4FAAFD] font-mono leading-none ">30.00</p>
                 </div>
-                <a href="{{ route('tryout.index') }}"
+                <a href="{{ route('kuis.index') }}"
                     class="flex-1 md:flex-none flex items-center justify-center px-4 py-2 md:px-6 md:py-3 rounded-3xl text-white font-bold text-xs md:text-sm hover:bg-white hover:text-[#4FAAFD] transition-all bg-[#3B82F6]">
                     Keluar Ujian
                 </a>
