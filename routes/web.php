@@ -174,3 +174,23 @@ Route::get('/admin/minatbakat/editor', function () {
 Route::get('/admin/minatbakat/partisipasi', function () {
     return view('admin/minatbakat/partisipasi');
 });
+
+Route::get('/admin/video/index', function () {
+    return view('admin/video/index');
+});
+
+Route::get('/admin/latihan_soal/index', function () {
+    return view('admin/latihan_soal/index');
+});
+
+Route::get('/admin/latihan_soal/tambah', function () {
+    return view('admin/latihan_soal/tambah');
+});
+
+Route::get('/admin/latihan_soal/history', function () {
+    return view('admin/latihan_soal/history');
+});
+
+Route::get('/admin/latihan_soal/edit', function () {
+    return view('admin/latihan_soal/edit');
+});
