@@ -15,7 +15,7 @@ class HasilMinatbakatController extends Controller
         return view('minatbakat.hasil');
     }
 
-    /**
+    /** 
      * Show the form for creating a new resource.
      */
     public function create()

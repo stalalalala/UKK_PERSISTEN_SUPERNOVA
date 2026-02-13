@@ -10,46 +10,95 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/alpinejs" defer></script>
 
     @vite('resources/css/app.css')
 </head>
 
 <body class="font-po bg-white overflow-x-hidden">
 
-    <div class="max-w-[1440px] mx-auto">
-        <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4">
+    <div class="max-w-[1440px] mx-auto" x-data="{ open: false }">
+        <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4 relative z-10">
             <div class="w-20 md:w-28 h-12 bg-blue-400 rounded-full flex-shrink-0"></div>
 
             <ul class="hidden lg:flex gap-12 text-gray-800 font-medium text-sm">
-                <li><a href="/" class="font-bold hover:text-blue-500 text-bold">Beranda</a></li>
-                <li><a href="{{ route('streak.index') }}" class="hover:text-blue-500 cursor-pointer">Pet Streak</a></li>
-                <li><a href="{{ route('tryout.index') }}" class="hover:text-blue-500 cursor-pointer">Try Out</a></li>
-                <li><a href="{{ route('latihan.index') }}" class="hover:text-blue-500 cursor-pointer">Latihan Soal</a>
-                </li>
-                <li><a href="{{ route('video.index') }}" class="hover:text-blue-500 cursor-pointer">Video
-                        Pembelajaran</a></li>
+                <li><a href="/" class="font-bold hover:text-blue-500">Beranda</a></li>
+                <li><a href="{{ route('streak.index') }}" class="hover:text-blue-500">Pet Streak</a></li>
+                <li><a href="{{ route('tryout.index') }}" class="hover:text-blue-500">Try Out</a></li>
+                <li><a href="{{ route('latihan.index') }}" class="hover:text-blue-500">Latihan Soal</a></li>
+                <li><a href="{{ route('video.index') }}" class="hover:text-blue-500">Video</a></li>
             </ul>
 
-            <div class="flex gap-2">
-                <div class="flex items-center gap-3 bg-[#FBBA16] rounded-full">
-                    <button
-                        class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white"><a
-                            href="/profile/index">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                                stroke="currentColor" class="size-5 md:size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                            </svg></a>
-                    </button>
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full p-1">
+                    <a href="/profile/index"
+                        class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" class="size-5 md:size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                        </svg>
+                    </a>
                     <button
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white">
-                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-white">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                            stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                        </svg>
                     </button>
                 </div>
+
+                <button @click="open = true"
+                    class="lg:hidden p-2 text-gray-600 hover:bg-gray-200 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
             </div>
         </nav>
+
+        <div x-show="open" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
+            <div x-show="open" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="open = false"
+                class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+            <div x-show="open" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-90"
+                x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90"
+                class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Menu Utama</h2>
+                    <button @click="open = false" class="text-gray-400 hover:text-gray-600">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <ul class="space-y-3">
+                    <li><a href="/"
+                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Beranda</a>
+                    </li>
+                    <li><a href="{{ route('streak.index') }}"
+                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Pet
+                            Streak</a></li>
+                    <li><a href="{{ route('tryout.index') }}"
+                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Try
+                            Out</a></li>
+                    <li><a href="{{ route('latihan.index') }}"
+                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Latihan
+                            Soal</a></li>
+                    <li><a href="{{ route('video.index') }}"
+                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Video
+                            Pembelajaran</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <div class="py-16 pb-10">
@@ -168,7 +217,11 @@
         <div class="max-w-[1440px] mx-auto flex flex-col px-4 md:px-10 gap-6">
 
             <section style="background-image: url('{{ asset('img/bg-home-1.png') }}');"
-                class="relative bg-cover bg-center bg-no-repeat rounded-[35px] px-4 md:px-14 py-30 overflow-hidden min-h-[300px] flex items-center">
+                class="relative bg-cover bg-center bg-no-repeat rounded-[35px] px-4 md:px-14 py-30 overflow-hidden h-[250px] md:h-[500px] flex items-center">
+
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-transparent to-black/20 backdrop-blur-[1px]">
+                </div>
 
                 <div class="relative z-10 max-w-xl">
                     <h1 class="text-3xl md:text-5xl font-extrabold text-[#2E3B66]">Belajar dari Nol?</h1>
@@ -177,7 +230,7 @@
                         <br><span class="font-bold">Yuk latihan pemahaman dasarmu!</span>
                     </p>
                     <a href="/kuis"> <button
-                            class="mt-7 bg-orange-400 hover:bg-orange-500 text-white font-bold px-8 md:px-10 py-3 rounded-full text-lg flex items-center gap-4 shadow-md">
+                            class="mt-7 bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-105">
                             Mulai Kuis
                             <span class="bg-white/30 w-8 h-8 flex items-center justify-center rounded-full">➜</span>
                         </button></a>
@@ -273,7 +326,11 @@
 
     <div class="max-w-[1440px] mx-auto">
         <section style="background-image: url('{{ asset('img/bg-home-2.png') }}');"
-            class="relative bg-cover bg-center bg-no-repeat rounded-[40px] mx-4 md:mx-10 mt-10 mb-10 px-6 py-12 h-160 overflow-hidden shadow-sm border border-white/50">
+            class="relative bg-cover bg-center bg-no-repeat rounded-[40px] mx-4 md:mx-10 mt-10 mb-10 px-6 py-12 h-90 md:h-160 overflow-hidden shadow-sm border border-white/50">
+
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-transparent to-black/20 backdrop-blur-[1px]">
+            </div>
 
             <div class="flex flex-col items-center text-center relative z-10">
                 <h2 class="text-2xl md:text-4xl font-extrabold text-[#2E3B66] tracking-tight">
@@ -283,7 +340,7 @@
                     Kenali potensi diri serta arahkan jurusan <br class="hidden md:block">
                     dan karir yang sesuai dengan minat dan bakatmu!
                 </p>
-                <div class="mt-8">
+                <div class="mt-28 md:mt-8">
                     <button
                         class="bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-105">
                         Mulai Tes
