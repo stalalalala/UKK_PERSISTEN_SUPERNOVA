@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persisten Dashboard - Manajemen Kuis</title>
+    <title>Persisten Dashboard - Manajemen Tryout</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,48 +25,40 @@
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(74, 114, 212, 0.2);
             border-radius: 10px;
         }
     </style>
 </head>
 
 <body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="{
-    activeMenu: 'Manajemen Kuis',
     mobileMenuOpen: false,
-    showImportModal: false,
-
     currentPage: 1,
     itemsPerPage: 10,
-    // Contoh data kuis (buat sampai 24 atau lebih)
-    allKuis: [
-        { id: 1, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 2, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 3, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Draft' },
-        { id: 4, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 5, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 6, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 7, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 8, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 9, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 10, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Draft' },
-        { id: 11, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 12, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-
-
-        // ... tambahkan data kuis sampai 24 item
+    // Data dummy Tryout
+    allTryout: [
+        { id: 1, judul: 'Try Out 1', subtes: 7, total_soal: 140, durasi: 195, status: 'Aktif', tgl: '12 Feb 2024' },
+        { id: 2, judul: 'Try Out 1', subtes: 7, total_soal: 140, durasi: 195, status: 'Aktif', tgl: '10 Feb 2024' },
+        { id: 3, judul: 'Try Out 1', subtes: 7, total_soal: 140, durasi: 195, status: 'Draft', tgl: '08 Feb 2024' },
+        { id: 4, judul: 'Try Out 1', subtes: 7, total_soal: 140, durasi: 195, status: 'Aktif', tgl: '05 Feb 2024' },
+        { id: 5, judul: 'Try Out 1', subtes: 5, total_soal: 100, durasi: 120, status: 'Aktif', tgl: '01 Feb 2024' },
+        { id: 6, judul: 'Try Out 1', subtes: 5, total_soal: 100, durasi: 120, status: 'Aktif', tgl: '01 Feb 2024' },
+        { id: 7, judul: 'Try Out 1', subtes: 5, total_soal: 100, durasi: 120, status: 'Aktif', tgl: '01 Feb 2024' },
+        { id: 8, judul: 'Try Out 1', subtes: 5, total_soal: 100, durasi: 120, status: 'Aktif', tgl: '01 Feb 2024' },
+        { id: 9, judul: 'Try Out 1', subtes: 5, total_soal: 100, durasi: 120, status: 'Aktif', tgl: '01 Feb 2024' },
+        { id: 10, judul: 'Try Out 1', subtes: 5, total_soal: 100, durasi: 120, status: 'Aktif', tgl: '01 Feb 2024' },
+        { id: 11, judul: 'Try Out 1', subtes: 5, total_soal: 100, durasi: 120, status: 'Aktif', tgl: '01 Feb 2024' },
+        { id: 12, judul: 'Try Out 1', subtes: 5, total_soal: 100, durasi: 120, status: 'Aktif', tgl: '01 Feb 2024' },
     ],
 
-    // Fungsi untuk menghitung total halaman
     get totalPages() {
-        return Math.ceil(this.allKuis.length / this.itemsPerPage);
+        return Math.ceil(this.allTryout.length / this.itemsPerPage);
     },
 
-    // Fungsi untuk mengambil data yang hanya tampil di halaman aktif
-    get pagedKuis() {
+    get pagedTryout() {
         let start = (this.currentPage - 1) * this.itemsPerPage;
         let end = start + this.itemsPerPage;
-        return this.allKuis.slice(start, end);
+        return this.allTryout.slice(start, end);
     }
 }">
 
@@ -128,7 +120,7 @@
                 </a>
 
                 <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 shrink-0">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -138,7 +130,7 @@
                 </a>
 
                 <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3  rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 shrink-0">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -244,8 +236,7 @@
             class="fixed inset-0 bg-black/50 z-40 lg:hidden">
         </div>
 
-
-        <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
+        <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden p-4 lg:p-8">
 
             <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
                 <div class="flex items-center w-full gap-4">
@@ -287,130 +278,139 @@
                 </div>
             </header>
 
-            <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
+            <div class="flex-1  pb-8 flex flex-col min-h-0 custom-scrollbar">
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
-                        <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-[#4A72D4]">
-                            <i class="fa-solid fa-layer-group text-2xl"></i>
+                        <div
+                            class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shadow-inner">
+                            <i class="fa-solid fa-pen-nib text-2xl"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-400 font-medium">Total Set Kuis</p>
-                            <h4 class="text-2xl font-bold text-gray-800">12</h4>
+                            <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Total Tryout</p>
+                            <h4 class="text-2xl font-bold text-gray-800">24</h4>
                         </div>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
                         <div
-                            class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500">
-                            <i class="fa-solid fa-circle-check text-2xl"></i>
+                            class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 shadow-inner">
+                            <i class="fa-solid fa-bolt text-2xl"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-400 font-medium">Kuis Aktif</p>
-                            <h4 class="text-2xl font-bold text-gray-800">10</h4>
+                            <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Berjalan</p>
+                            <h4 class="text-2xl font-bold text-gray-800">18</h4>
                         </div>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
                         <div
-                            class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500">
-                            <i class="fa-solid fa-clock-rotate-left text-2xl"></i>
+                            class="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 shadow-inner">
+                            <i class="fa-solid fa-file-circle-exclamation text-2xl"></i>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-400 font-medium">Draft</p>
-                            <h4 class="text-2xl font-bold text-gray-800">2</h4>
+                            <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Draft</p>
+                            <h4 class="text-2xl font-bold text-gray-800">6</h4>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-blue-50 overflow-hidden flex flex-col h-full">
+                <div
+                    class="bg-white rounded-xl shadow-sm border border-blue-50 overflow-hidden flex flex-col overflow-hidden h-[calc(100vh-260px)]">
 
                     <div
                         class="p-8 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4 flex-shrink-0">
                         <div>
-                            <h3 class="text-xl font-bold text-gray-800">Daftar Set Kuis</h3>
-                            <p class="text-sm text-gray-400">Kelola soal, waktu, dan kategori kuis</p>
+                            <h3 class="text-xl font-black text-gray-800">Daftar Tryout</h3>
+                            <p class="text-xs text-gray-400 font-medium">Data tryout yang tersedia untuk siswa</p>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <button
-                                class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 shadow-lg shadow-blue-100 active:scale-95">
-                                <i class="fa-solid fa-plus"></i> Buat Set Baru
-                            </button>
-                        </div>
+                        <a href="/tryout/create"
+                            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-7 py-4 rounded-2xl font-bold text-sm transition-all flex items-center gap-3 shadow-xl shadow-blue-100 active:scale-95">
+                            <i class="fa-solid fa-plus-circle text-lg"></i> Buat Tryout Baru
+                        </a>
                     </div>
 
-                    <div class="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
-                        <table class="w-full text-left border-separate border-spacing-0">
-                            <thead class="bg-gray-50/50 sticky top-0 z-10 backdrop-blur-sm">
+                    <div class="flex-1 overflow-auto custom-scrollbar relative">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-50/50 sticky top-0 z-10 backdrop-blur-md">
                                 <tr>
                                     <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50/80">
-                                        Set & Judul</th>
+                                        class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Informasi Tryout</th>
                                     <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50/80">
-                                        Kategori</th>
+                                        class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                        Subtes</th>
                                     <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
-                                        Soal</th>
+                                        class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                        Total Soal</th>
                                     <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
+                                        class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">
                                         Durasi</th>
                                     <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
+                                        class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">
                                         Status</th>
                                     <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
+                                        class="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">
                                         Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                <template x-for="(kuis, index) in pagedKuis" :key="kuis.id">
-                                    <tr class="hover:bg-blue-50/30 transition-colors group">
-                                        <td class="px-8 py-5">
+                            <tbody class="divide-y divide-gray-50 bg-white">
+                                <template x-for="(to, index) in pagedTryout" :key="to.id">
+                                    <tr class="hover:bg-blue-50/40 transition-colors group">
+                                        <td class="px-8 py-6">
                                             <div class="flex flex-col">
-                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]"
-                                                    x-text="'Set ' + kuis.id + ': ' + kuis.judul"></span>
-                                                <span class="text-xs text-gray-400"
-                                                    x-text="'Dibuat: ' + kuis.tanggal"></span>
+                                                <span
+                                                    class="font-bold text-gray-800 text-sm group-hover:text-[#4A72D4] transition-colors"
+                                                    x-text="to.judul"></span>
+                                                <span class="text-[10px] text-gray-400 font-medium mt-1 uppercase"
+                                                    x-text="'ID: #TO-' + to.id + ' • ' + to.tgl"></span>
                                             </div>
                                         </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600"
-                                            x-text="kuis.kategori"></td>
-                                        <td class="px-8 py-5 text-center">
+                                        <td class="px-8 py-6 text-center">
                                             <span
-                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100"
-                                                x-text="kuis.soal + ' Soal'"></span>
+                                                class="bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-indigo-100"
+                                                x-text="to.subtes + ' Subtes'"></span>
                                         </td>
-                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700"
-                                            x-text="kuis.durasi + ' Menit'"></td>
-                                        <td class="px-8 py-5 text-center">
+                                        <td class="px-8 py-6 text-center text-sm font-bold text-gray-600"
+                                            x-text="to.total_soal + ' Soal'"></td>
+                                        <td class="px-8 py-6 text-center text-sm font-bold text-gray-700">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <i class="fa-regular fa-clock text-gray-400"></i>
+                                                <span x-text="to.durasi + ' Menit'"></span>
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-6 text-center">
                                             <span
-                                                :class="kuis.status === 'Aktif' ? 'bg-emerald-100 text-emerald-600' :
+                                                :class="to.status === 'Aktif' ? 'bg-emerald-100 text-emerald-600' :
                                                     'bg-gray-100 text-gray-500'"
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase">
+                                                class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter">
                                                 <span
-                                                    :class="kuis.status === 'Aktif' ? 'bg-emerald-500 animate-pulse' :
+                                                    :class="to.status === 'Aktif' ? 'bg-emerald-500 animate-pulse' :
                                                         'bg-gray-400'"
                                                     class="w-1.5 h-1.5 rounded-full"></span>
-                                                <span x-text="kuis.status"></span>
+                                                <span x-text="to.status"></span>
                                             </span>
                                         </td>
-
-                                        <td class="px-8 py-5">
+                                        <td class="px-8 py-6">
                                             <div class="flex items-center justify-center gap-2">
                                                 <button
-                                                    class="p-2 text-blue-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all"
-                                                    title="Edit Soal">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
+                                                    class="w-8 h-8 flex items-center justify-center text-blue-400 hover:bg-blue-50 rounded-lg transition-all"><i
+                                                        class="fa-solid fa-pen-to-square"></i></button>
                                                 <button
-                                                    class="p-2 text-orange-400 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all"
-                                                    title="Preview Kuis">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
+                                                    class="w-8 h-8 flex items-center justify-center text-orange-400 hover:bg-orange-50 rounded-lg transition-all"><i
+                                                        class="fa-solid fa-chart-line"></i></button>
                                                 <button
-                                                    class="p-2 text-rose-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
-                                                    title="Hapus">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
+                                                    class="w-8 h-8 flex items-center justify-center text-rose-400 hover:bg-rose-50 rounded-lg transition-all"><i
+                                                        class="fa-solid fa-trash-can"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+
+                                <template x-if="pagedTryout.length === 0">
+                                    <tr>
+                                        <td colspan="6" class="px-8 py-20 text-center">
+                                            <div class="flex flex-col items-center">
+                                                <i class="fa-solid fa-folder-open text-4xl text-gray-200 mb-4"></i>
+                                                <p class="text-sm text-gray-400 font-medium">Belum ada data tryout.</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -420,96 +420,41 @@
                     </div>
 
                     <div
-                        class="p-8 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4 flex-shrink-0 bg-white">
-                        <p class="text-sm text-gray-400 font-medium">
+                        class="p-6 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/95 backdrop-blur-sm flex-shrink-0 shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.05)] flex-shrink-0 bg-white">
+                        <p class="text-[11px] text-gray-400 font-bold uppercase tracking-wider">
                             Menampilkan
-                            <span x-text="((currentPage - 1) * itemsPerPage) + 1"></span> -
-                            <span x-text="Math.min(currentPage * itemsPerPage, allKuis.length)"></span>
-                            dari <span x-text="allKuis.length"></span> Set Kuis
+                            <span class="text-gray-700" x-text="((currentPage - 1) * itemsPerPage) + 1"></span> -
+                            <span class="text-gray-700"
+                                x-text="Math.min(currentPage * itemsPerPage, allTryout.length)"></span>
+                            dari <span class="text-gray-700" x-text="allTryout.length"></span> Data Tryout
                         </p>
 
                         <div class="flex items-center gap-2">
                             <button @click="if(currentPage > 1) currentPage--" :disabled="currentPage === 1"
-                                class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-100 hover:bg-gray-50 text-gray-400 disabled:opacity-50">
-                                <i class="fa-solid fa-chevron-left text-xs"></i>
+                                class="w-10 h-10 flex items-center justify-center rounded-2xl border border-gray-100 hover:bg-white hover:shadow-md text-gray-400 disabled:opacity-30 transition-all bg-white">
+                                <i class="fa-solid fa-chevron-left text-[10px]"></i>
                             </button>
 
                             <template x-for="page in totalPages" :key="page">
                                 <button @click="currentPage = page"
-                                    :class="currentPage === page ? 'bg-[#4A72D4] text-white shadow-blue-100' :
-                                        'border border-gray-100 text-gray-600 hover:bg-gray-50'"
-                                    class="w-10 h-10 flex items-center justify-center rounded-xl font-bold transition-all shadow-md"
+                                    :class="currentPage === page ? 'bg-[#4A72D4] text-white shadow-lg shadow-blue-200' :
+                                        'bg-white border border-gray-100 text-gray-500 hover:bg-gray-50'"
+                                    class="w-10 h-10 flex items-center justify-center rounded-2xl font-bold text-xs transition-all"
                                     x-text="page">
                                 </button>
                             </template>
 
                             <button @click="if(currentPage < totalPages) currentPage++"
                                 :disabled="currentPage === totalPages"
-                                class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-100 hover:bg-gray-50 text-gray-400 disabled:opacity-50">
-                                <i class="fa-solid fa-chevron-right text-xs"></i>
+                                class="w-10 h-10 flex items-center justify-center rounded-2xl border border-gray-100 hover:bg-white hover:shadow-md text-gray-400 disabled:opacity-30 transition-all bg-white">
+                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
                             </button>
                         </div>
                     </div>
                 </div>
-            </main>
-    </div>
-
-    <div x-show="showImportModal" class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
-
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="showImportModal = false">
-        </div>
-
-        <div class="relative min-h-screen flex items-center justify-center p-4">
-            <div class="relative bg-white w-full max-w-lg rounded-[35px] shadow-2xl p-8 transform transition-all"
-                x-show="showImportModal" x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 scale-95 translate-y-8"
-                x-transition:enter-end="opacity-100 scale-100 translate-y-0">
-
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
-                        <i class="fa-solid fa-file-import text-emerald-500"></i> Import Data Kuis
-                    </h3>
-                    <button @click="showImportModal = false"
-                        class="text-gray-400 hover:text-red-500 transition-colors">
-                        <i class="fa-solid fa-circle-xmark text-2xl"></i>
-                    </button>
-                </div>
-
-                <div
-                    class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-200 transition-all bg-gray-50/50">
-                    <div
-                        class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
-                    </div>
-                    <p class="text-sm font-bold text-gray-600">Klik atau seret file Excel ke sini</p>
-                    <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 5MB (.xlsx, .xls)</p>
-                    <input type="file" class="hidden" id="excel_upload">
-                    <button onclick="document.getElementById('excel_upload').click()"
-                        class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">Pilih
-                        File</button>
-                </div>
-
-                <div class="mt-8 p-4 bg-blue-50 rounded-2xl flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-circle-info text-blue-500"></i>
-                        <span class="text-[11px] font-bold text-blue-700 uppercase tracking-tight">Belum punya
-                            formatnya?</span>
-                    </div>
-                    <a href="#" class="text-[11px] font-black text-[#4A72D4] hover:underline">DOWNLOAD
-                        TEMPLATE</a>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 mt-8">
-                    <button @click="showImportModal = false"
-                        class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">Batalkan</button>
-                    <button
-                        class="py-4 bg-[#4A72D4] text-white rounded-2xl text-sm font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">Proses
-                        Import</button>
-                </div>
             </div>
-        </div>
+        </main>
     </div>
-
 </body>
 
 </html>

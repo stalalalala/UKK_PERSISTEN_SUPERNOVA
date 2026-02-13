@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MinatBakat;
+use App\Models\SoalLatihan;
 use Illuminate\Http\Request;
 
-class MinatBakatController extends Controller
+class SoalLatihanController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('minatbakat.soal');
+        return view('latihan.soal');
     }
 
     /**
@@ -34,7 +34,7 @@ class MinatBakatController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MinatBakat $minatBakat)
+    public function show(SoalLatihan $soalLatihan)
     {
         //
     }
@@ -42,7 +42,7 @@ class MinatBakatController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(MinatBakat $minatBakat)
+    public function edit(SoalLatihan $soalLatihan)
     {
         //
     }
@@ -50,7 +50,7 @@ class MinatBakatController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, MinatBakat $minatBakat)
+    public function update(Request $request, SoalLatihan $soalLatihan)
     {
         //
     }
@@ -58,7 +58,7 @@ class MinatBakatController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(MinatBakat $minatBakat)
+    public function destroy(SoalLatihan $soalLatihan)
     {
         //
     }

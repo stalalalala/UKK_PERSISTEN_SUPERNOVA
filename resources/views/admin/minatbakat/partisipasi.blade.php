@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persisten Dashboard - Manajemen Kuis</title>
+    <title>Hasil Partisipasi - Persisten</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,49 +25,23 @@
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(74, 114, 212, 0.2);
             border-radius: 10px;
         }
     </style>
 </head>
 
 <body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="{
-    activeMenu: 'Manajemen Kuis',
-    mobileMenuOpen: false,
-    showImportModal: false,
-
+    searchQuery: '',
     currentPage: 1,
-    itemsPerPage: 10,
-    // Contoh data kuis (buat sampai 24 atau lebih)
-    allKuis: [
-        { id: 1, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 2, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 3, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Draft' },
-        { id: 4, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 5, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 6, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 7, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 8, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 9, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 10, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Draft' },
-        { id: 11, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 12, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
+    totalPages: 5,
 
-
-        // ... tambahkan data kuis sampai 24 item
-    ],
-
-    // Fungsi untuk menghitung total halaman
-    get totalPages() {
-        return Math.ceil(this.allKuis.length / this.itemsPerPage);
-    },
-
-    // Fungsi untuk mengambil data yang hanya tampil di halaman aktif
-    get pagedKuis() {
-        let start = (this.currentPage - 1) * this.itemsPerPage;
-        let end = start + this.itemsPerPage;
-        return this.allKuis.slice(start, end);
-    }
+    participants: [
+        { id: 1, name: 'Budi Santoso', email: 'budi@gmail.com', tgl: '12 Feb 2026', top3: ['Logika', 'Visual', 'Intra'], status: 'Selesai' },
+        { id: 2, name: 'Siti Aminah', email: 'siti.am@yahoo.com', tgl: '11 Feb 2026', top3: ['Linguistik', 'Inter', 'Musik'], status: 'Selesai' },
+        { id: 3, name: 'Andi Wijaya', email: 'andi_w@gmail.com', tgl: '10 Feb 2026', top3: ['Kinestetik', 'Visual', 'Logika'], status: 'Selesai' },
+        { id: 4, name: 'Rina Putri', email: 'rina.p@gmail.com', tgl: '09 Feb 2026', top3: ['Musik', 'Linguistik', 'Inter'], status: 'Diproses' }
+    ]
 }">
 
     <div class="flex h-full w-full">
@@ -128,7 +102,7 @@
                 </a>
 
                 <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 shrink-0">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -138,7 +112,7 @@
                 </a>
 
                 <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3  rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 shrink-0">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -244,9 +218,7 @@
             class="fixed inset-0 bg-black/50 z-40 lg:hidden">
         </div>
 
-
-        <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
-
+        <main class="flex-1 flex flex-col min-w-0 bg-[#F8FAFF] overflow-hidden p-4 lg:p-8">
             <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
                 <div class="flex items-center w-full gap-4">
                     <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
@@ -287,131 +259,75 @@
                 </div>
             </header>
 
-            <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
-                        <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-[#4A72D4]">
-                            <i class="fa-solid fa-layer-group text-2xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-400 font-medium">Total Set Kuis</p>
-                            <h4 class="text-2xl font-bold text-gray-800">12</h4>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
-                        <div
-                            class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500">
-                            <i class="fa-solid fa-circle-check text-2xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-400 font-medium">Kuis Aktif</p>
-                            <h4 class="text-2xl font-bold text-gray-800">10</h4>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
-                        <div
-                            class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500">
-                            <i class="fa-solid fa-clock-rotate-left text-2xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-400 font-medium">Draft</p>
-                            <h4 class="text-2xl font-bold text-gray-800">2</h4>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-blue-50 overflow-hidden flex flex-col h-full">
-
-                    <div
-                        class="p-8 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4 flex-shrink-0">
-                        <div>
-                            <h3 class="text-xl font-bold text-gray-800">Daftar Set Kuis</h3>
-                            <p class="text-sm text-gray-400">Kelola soal, waktu, dan kategori kuis</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <button
-                                class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 shadow-lg shadow-blue-100 active:scale-95">
-                                <i class="fa-solid fa-plus"></i> Buat Set Baru
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
-                        <table class="w-full text-left border-separate border-spacing-0">
-                            <thead class="bg-gray-50/50 sticky top-0 z-10 backdrop-blur-sm">
+            <div class="flex-1 pb-10 overflow-y-auto custom-scrollbar">
+                <div
+                    class="bg-white rounded-xl border border-blue-50/50 shadow-sm overflow-hidden flex flex-col h-full">
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-50 sticky top-0 z-10">
                                 <tr>
                                     <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50/80">
-                                        Set & Judul</th>
+                                        class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Peserta</th>
                                     <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50/80">
-                                        Kategori</th>
+                                        class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                        Tgl Tes</th>
                                     <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
-                                        Soal</th>
+                                        class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                        Top 3 Potensi</th>
                                     <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
-                                        Durasi</th>
-                                    <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
+                                        class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">
                                         Status</th>
                                     <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
+                                        class="px-8 py-6 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">
                                         Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-50">
-                                <template x-for="(kuis, index) in pagedKuis" :key="kuis.id">
-                                    <tr class="hover:bg-blue-50/30 transition-colors group">
-                                        <td class="px-8 py-5">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]"
-                                                    x-text="'Set ' + kuis.id + ': ' + kuis.judul"></span>
-                                                <span class="text-xs text-gray-400"
-                                                    x-text="'Dibuat: ' + kuis.tanggal"></span>
+                                <template x-for="user in participants" :key="user.id">
+                                    <tr class="hover:bg-blue-50/30 transition-all group">
+                                        <td class="px-8 py-6">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-12 h-12 rounded-2xl bg-[#4A72D4]/10 text-[#4A72D4] flex items-center justify-center font-black text-xs"
+                                                    x-text="user.name.split(' ').map(n => n[0]).join('')"></div>
+                                                <div>
+                                                    <p class="text-xs font-black text-gray-800" x-text="user.name">
+                                                    </p>
+                                                    <p class="text-[10px] font-bold text-gray-400"
+                                                        x-text="user.email">
+                                                    </p>
+                                                </div>
                                             </div>
                                         </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600"
-                                            x-text="kuis.kategori"></td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100"
-                                                x-text="kuis.soal + ' Soal'"></span>
-                                        </td>
-                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700"
-                                            x-text="kuis.durasi + ' Menit'"></td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                :class="kuis.status === 'Aktif' ? 'bg-emerald-100 text-emerald-600' :
-                                                    'bg-gray-100 text-gray-500'"
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase">
-                                                <span
-                                                    :class="kuis.status === 'Aktif' ? 'bg-emerald-500 animate-pulse' :
-                                                        'bg-gray-400'"
-                                                    class="w-1.5 h-1.5 rounded-full"></span>
-                                                <span x-text="kuis.status"></span>
-                                            </span>
-                                        </td>
-
-                                        <td class="px-8 py-5">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <button
-                                                    class="p-2 text-blue-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all"
-                                                    title="Edit Soal">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-orange-400 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all"
-                                                    title="Preview Kuis">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-rose-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
-                                                    title="Hapus">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
+                                        <td class="px-8 py-6 text-center text-[11px] font-bold text-gray-500"
+                                            x-text="user.tgl"></td>
+                                        <td class="px-8 py-6">
+                                            <div class="flex gap-2">
+                                                <template x-for="(tag, i) in user.top3" :key="i">
+                                                    <span
+                                                        class="px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tighter"
+                                                        :class="i === 0 ? 'bg-blue-100 text-blue-600' :
+                                                            'bg-gray-100 text-gray-400'"
+                                                        x-text="tag"></span>
+                                                </template>
                                             </div>
+                                        </td>
+                                        <td class="px-8 py-6 text-center">
+                                            <span
+                                                :class="user.status === 'Selesai' ? 'text-emerald-500 bg-emerald-50' :
+                                                    'text-orange-500 bg-orange-50'"
+                                                class="px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest"
+                                                x-text="user.status"></span>
+                                        </td>
+                                        <td class="px-8 py-6 text-right space-x-2">
+                                            <button title="Lihat Grafik"
+                                                class="w-10 h-10 rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-[#4A72D4] hover:shadow-md transition-all">
+                                                <i class="fa-solid fa-chart-simple text-xs"></i>
+                                            </button>
+                                            <button title="Cetak Raport"
+                                                class="w-10 h-10 rounded-xl bg-[#4A72D4] text-white shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">
+                                                <i class="fa-solid fa-print text-xs"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 </template>
@@ -419,97 +335,29 @@
                         </table>
                     </div>
 
-                    <div
-                        class="p-8 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4 flex-shrink-0 bg-white">
-                        <p class="text-sm text-gray-400 font-medium">
-                            Menampilkan
-                            <span x-text="((currentPage - 1) * itemsPerPage) + 1"></span> -
-                            <span x-text="Math.min(currentPage * itemsPerPage, allKuis.length)"></span>
-                            dari <span x-text="allKuis.length"></span> Set Kuis
-                        </p>
-
+                    <div class="p-8 border-t border-gray-50 flex items-center justify-between bg-white shrink-0">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Menampilkan 1-4 dari
+                            1,284 Peserta</p>
                         <div class="flex items-center gap-2">
-                            <button @click="if(currentPage > 1) currentPage--" :disabled="currentPage === 1"
-                                class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-100 hover:bg-gray-50 text-gray-400 disabled:opacity-50">
-                                <i class="fa-solid fa-chevron-left text-xs"></i>
-                            </button>
-
-                            <template x-for="page in totalPages" :key="page">
-                                <button @click="currentPage = page"
-                                    :class="currentPage === page ? 'bg-[#4A72D4] text-white shadow-blue-100' :
-                                        'border border-gray-100 text-gray-600 hover:bg-gray-50'"
-                                    class="w-10 h-10 flex items-center justify-center rounded-xl font-bold transition-all shadow-md"
-                                    x-text="page">
-                                </button>
+                            <button
+                                class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-100 text-gray-400 hover:bg-gray-50"><i
+                                    class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                            <template x-for="p in [1,2,3]" :key="p">
+                                <button
+                                    class="w-10 h-10 flex items-center justify-center rounded-xl font-black text-xs transition-all"
+                                    :class="currentPage === p ? 'bg-[#4A72D4] text-white shadow-lg shadow-blue-100' :
+                                        'text-gray-400 hover:bg-gray-50'"
+                                    x-text="p" @click="currentPage = p"></button>
                             </template>
-
-                            <button @click="if(currentPage < totalPages) currentPage++"
-                                :disabled="currentPage === totalPages"
-                                class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-100 hover:bg-gray-50 text-gray-400 disabled:opacity-50">
-                                <i class="fa-solid fa-chevron-right text-xs"></i>
-                            </button>
+                            <button
+                                class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-100 text-gray-400 hover:bg-gray-50"><i
+                                    class="fa-solid fa-chevron-right text-[10px]"></i></button>
                         </div>
                     </div>
                 </div>
-            </main>
-    </div>
-
-    <div x-show="showImportModal" class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
-
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="showImportModal = false">
-        </div>
-
-        <div class="relative min-h-screen flex items-center justify-center p-4">
-            <div class="relative bg-white w-full max-w-lg rounded-[35px] shadow-2xl p-8 transform transition-all"
-                x-show="showImportModal" x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 scale-95 translate-y-8"
-                x-transition:enter-end="opacity-100 scale-100 translate-y-0">
-
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
-                        <i class="fa-solid fa-file-import text-emerald-500"></i> Import Data Kuis
-                    </h3>
-                    <button @click="showImportModal = false"
-                        class="text-gray-400 hover:text-red-500 transition-colors">
-                        <i class="fa-solid fa-circle-xmark text-2xl"></i>
-                    </button>
-                </div>
-
-                <div
-                    class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-200 transition-all bg-gray-50/50">
-                    <div
-                        class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
-                    </div>
-                    <p class="text-sm font-bold text-gray-600">Klik atau seret file Excel ke sini</p>
-                    <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 5MB (.xlsx, .xls)</p>
-                    <input type="file" class="hidden" id="excel_upload">
-                    <button onclick="document.getElementById('excel_upload').click()"
-                        class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">Pilih
-                        File</button>
-                </div>
-
-                <div class="mt-8 p-4 bg-blue-50 rounded-2xl flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-circle-info text-blue-500"></i>
-                        <span class="text-[11px] font-bold text-blue-700 uppercase tracking-tight">Belum punya
-                            formatnya?</span>
-                    </div>
-                    <a href="#" class="text-[11px] font-black text-[#4A72D4] hover:underline">DOWNLOAD
-                        TEMPLATE</a>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 mt-8">
-                    <button @click="showImportModal = false"
-                        class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">Batalkan</button>
-                    <button
-                        class="py-4 bg-[#4A72D4] text-white rounded-2xl text-sm font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">Proses
-                        Import</button>
-                </div>
             </div>
-        </div>
+        </main>
     </div>
-
 </body>
 
 </html>

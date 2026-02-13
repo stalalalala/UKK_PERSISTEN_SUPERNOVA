@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persisten Dashboard - Manajemen Kuis</title>
+    <title>Editor Soal Bakat - Persisten</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,48 +25,45 @@
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(74, 114, 212, 0.2);
             border-radius: 10px;
+        }
+
+        [x-cloak] {
+            display: none !important;
         }
     </style>
 </head>
 
 <body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="{
-    activeMenu: 'Manajemen Kuis',
-    mobileMenuOpen: false,
-    showImportModal: false,
+    activeQuestion: 1,
 
-    currentPage: 1,
-    itemsPerPage: 10,
-    // Contoh data kuis (buat sampai 24 atau lebih)
-    allKuis: [
-        { id: 1, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 2, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 3, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Draft' },
-        { id: 4, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 5, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 6, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 7, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 8, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 9, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 10, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Draft' },
-        { id: 11, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-        { id: 12, judul: 'Fundamental 1', kategori: 'Pengetahuan Kuantitatif', soal: 20, durasi: 45, status: 'Aktif' },
-
-
-        // ... tambahkan data kuis sampai 24 item
+    // Daftar Kategori untuk Mapping (Ambil dari categories.blade)
+    bakatCategories: [
+        { id: 1, name: 'Logika Matematika' },
+        { id: 2, name: 'Visual Spasial' },
+        { id: 3, name: 'Linguistik' },
+        { id: 4, name: 'Interpersonal' },
+        { id: 5, name: 'Intrapersonal' }
     ],
 
-    // Fungsi untuk menghitung total halaman
-    get totalPages() {
-        return Math.ceil(this.allKuis.length / this.itemsPerPage);
-    },
+    // Data Soal dengan status
+    questions: Array.from({ length: 20 }, (_, i) => ({
+        id: i + 1,
+        status: 'original', // original | changed
+        text: 'Jika Anda melihat pola angka yang rumit, apa reaksi pertama Anda?',
+        options: [
+            { label: 'A', text: 'Mencoba memecahkannya segera', targetBakat: 1, poin: 1 },
+            { label: 'B', text: 'Mencari gambar atau visual terkait', targetBakat: 2, poin: 1 },
+            { label: 'C', text: 'Menjelaskan polanya dengan kata-kata', targetBakat: 3, poin: 1 },
+            { label: 'D', text: 'Menanyakan pendapat teman', targetBakat: 4, poin: 1 }
+        ]
+    })),
 
-    // Fungsi untuk mengambil data yang hanya tampil di halaman aktif
-    get pagedKuis() {
-        let start = (this.currentPage - 1) * this.itemsPerPage;
-        let end = start + this.itemsPerPage;
-        return this.allKuis.slice(start, end);
+    markAsChanged() {
+        if (this.questions[this.activeQuestion - 1].status !== 'changed') {
+            this.questions[this.activeQuestion - 1].status = 'changed';
+        }
     }
 }">
 
@@ -128,7 +125,7 @@
                 </a>
 
                 <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 shrink-0">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -138,7 +135,7 @@
                 </a>
 
                 <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3  rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 shrink-0">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -244,9 +241,7 @@
             class="fixed inset-0 bg-black/50 z-40 lg:hidden">
         </div>
 
-
-        <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
-
+        <main class="flex-1 flex flex-col min-w-0 bg-[#F8FAFF] p-4 lg:p-8">
             <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
                 <div class="flex items-center w-full gap-4">
                     <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
@@ -287,229 +282,105 @@
                 </div>
             </header>
 
-            <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
+            <div class="flex-1 flex overflow-hidden">
+                <div class="flex-1 pb-10 overflow-y-auto custom-scrollbar">
+                    <div class="max-w-4xl mx-auto space-y-8">
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
-                        <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-[#4A72D4]">
-                            <i class="fa-solid fa-layer-group text-2xl"></i>
+                        <div class="bg-white rounded-[45px] p-10 shadow-sm border border-blue-50/50">
+                            <div class="flex items-center gap-4 mb-8">
+                                <div class="w-12 h-12 bg-blue-50 text-[#4A72D4] rounded-2xl flex items-center justify-center font-black text-lg"
+                                    x-text="activeQuestion"></div>
+                                <h4 class="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">Pertanyaan
+                                    Tes</h4>
+                            </div>
+
+                            <textarea @input="markAsChanged()" x-model="questions[activeQuestion-1].text"
+                                class="w-full p-8 bg-gray-50 border-2 border-transparent focus:border-[#4A72D4] focus:bg-white rounded-[30px] min-h-[120px] outline-none transition-all text-sm font-bold leading-relaxed shadow-inner"></textarea>
                         </div>
-                        <div>
-                            <p class="text-sm text-gray-400 font-medium">Total Set Kuis</p>
-                            <h4 class="text-2xl font-bold text-gray-800">12</h4>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
-                        <div
-                            class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500">
-                            <i class="fa-solid fa-circle-check text-2xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-400 font-medium">Kuis Aktif</p>
-                            <h4 class="text-2xl font-bold text-gray-800">10</h4>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
-                        <div
-                            class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500">
-                            <i class="fa-solid fa-clock-rotate-left text-2xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-400 font-medium">Draft</p>
-                            <h4 class="text-2xl font-bold text-gray-800">2</h4>
+
+                        <div class="space-y-4">
+                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] ml-6">Opsi
+                                Jawaban & Mapping Skor</h4>
+
+                            <template x-for="(opt, index) in questions[activeQuestion-1].options"
+                                :key="index">
+                                <div
+                                    class="bg-white p-6 rounded-[35px] border border-blue-50/50 shadow-sm flex flex-col md:flex-row gap-6 items-center group hover:border-[#4A72D4] transition-all">
+                                    <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center font-black text-xs text-gray-400 group-hover:bg-[#4A72D4] group-hover:text-white transition-all shadow-sm"
+                                        x-text="opt.label"></div>
+
+                                    <input type="text" @input="markAsChanged()" x-model="opt.text"
+                                        class="flex-1 bg-transparent border-none focus:ring-0 text-sm font-bold text-gray-700"
+                                        placeholder="Teks Jawaban...">
+
+                                    <div
+                                        class="flex items-center gap-3 bg-gray-50 p-2 rounded-2xl border border-gray-100">
+                                        <label class="text-[9px] font-black text-gray-300 uppercase ml-2">Target
+                                            Bakat:</label>
+                                        <select @change="markAsChanged()" x-model="opt.targetBakat"
+                                            class="bg-transparent border-none text-[10px] font-bold text-[#4A72D4] outline-none cursor-pointer">
+                                            <template x-for="cat in bakatCategories" :key="cat.id">
+                                                <option :value="cat.id" x-text="cat.name"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+
+                                    <div class="w-20">
+                                        <input type="number" @input="markAsChanged()" x-model="opt.poin"
+                                            class="w-full text-center bg-blue-50 text-[#4A72D4] py-2 rounded-xl text-xs font-black border-none"
+                                            placeholder="Poin">
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-blue-50 overflow-hidden flex flex-col h-full">
+                <div class="w-80 bg-white border-l border-blue-50 p-8 flex flex-col shrink-0">
+                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-8 text-center">
+                        Navigasi Butir Soal</h4>
 
-                    <div
-                        class="p-8 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4 flex-shrink-0">
-                        <div>
-                            <h3 class="text-xl font-bold text-gray-800">Daftar Set Kuis</h3>
-                            <p class="text-sm text-gray-400">Kelola soal, waktu, dan kategori kuis</p>
+                    <div class="grid grid-cols-4 gap-3 overflow-y-auto custom-scrollbar pr-2 mb-8">
+                        <template x-for="q in questions" :key="q.id">
+                            <button @click="activeQuestion = q.id"
+                                :class="{
+                                    'bg-[#4A72D4] text-white shadow-lg shadow-blue-200 ring-2 ring-offset-2 ring-blue-400': activeQuestion ===
+                                        q.id,
+                                    'bg-emerald-500 text-white': q.status === 'original' && activeQuestion !== q.id,
+                                    'bg-orange-500 text-white shadow-md shadow-orange-100': q.status === 'changed' &&
+                                        activeQuestion !== q.id
+                                }"
+                                class="aspect-square rounded-2xl flex items-center justify-center font-bold text-xs transition-all hover:scale-110 relative border-2 border-transparent">
+                                <span x-text="q.id"></span>
+
+                                <template x-if="q.status === 'changed'">
+                                    <div
+                                        class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full flex items-center justify-center">
+                                        <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                                    </div>
+                                </template>
+                            </button>
+                        </template>
+                    </div>
+
+                    <div class="mt-auto space-y-3 pt-6 border-t border-gray-50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase">Sudah Terisi (Original)</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            <button
-                                class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 shadow-lg shadow-blue-100 active:scale-95">
-                                <i class="fa-solid fa-plus"></i> Buat Set Baru
-                            </button>
+                            <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase">Ada Perubahan</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 bg-[#4A72D4] rounded-full"></div>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase">Sedang Dipilih</span>
                         </div>
                     </div>
-
-                    <div class="flex-1 overflow-y-auto overflow-x-auto custom-scrollbar">
-                        <table class="w-full text-left border-separate border-spacing-0">
-                            <thead class="bg-gray-50/50 sticky top-0 z-10 backdrop-blur-sm">
-                                <tr>
-                                    <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50/80">
-                                        Set & Judul</th>
-                                    <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50/80">
-                                        Kategori</th>
-                                    <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
-                                        Soal</th>
-                                    <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
-                                        Durasi</th>
-                                    <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
-                                        Status</th>
-                                    <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center bg-gray-50/80">
-                                        Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-50">
-                                <template x-for="(kuis, index) in pagedKuis" :key="kuis.id">
-                                    <tr class="hover:bg-blue-50/30 transition-colors group">
-                                        <td class="px-8 py-5">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]"
-                                                    x-text="'Set ' + kuis.id + ': ' + kuis.judul"></span>
-                                                <span class="text-xs text-gray-400"
-                                                    x-text="'Dibuat: ' + kuis.tanggal"></span>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600"
-                                            x-text="kuis.kategori"></td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100"
-                                                x-text="kuis.soal + ' Soal'"></span>
-                                        </td>
-                                        <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700"
-                                            x-text="kuis.durasi + ' Menit'"></td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                :class="kuis.status === 'Aktif' ? 'bg-emerald-100 text-emerald-600' :
-                                                    'bg-gray-100 text-gray-500'"
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase">
-                                                <span
-                                                    :class="kuis.status === 'Aktif' ? 'bg-emerald-500 animate-pulse' :
-                                                        'bg-gray-400'"
-                                                    class="w-1.5 h-1.5 rounded-full"></span>
-                                                <span x-text="kuis.status"></span>
-                                            </span>
-                                        </td>
-
-                                        <td class="px-8 py-5">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <button
-                                                    class="p-2 text-blue-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all"
-                                                    title="Edit Soal">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-orange-400 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all"
-                                                    title="Preview Kuis">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
-                                                <button
-                                                    class="p-2 text-rose-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
-                                                    title="Hapus">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div
-                        class="p-8 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4 flex-shrink-0 bg-white">
-                        <p class="text-sm text-gray-400 font-medium">
-                            Menampilkan
-                            <span x-text="((currentPage - 1) * itemsPerPage) + 1"></span> -
-                            <span x-text="Math.min(currentPage * itemsPerPage, allKuis.length)"></span>
-                            dari <span x-text="allKuis.length"></span> Set Kuis
-                        </p>
-
-                        <div class="flex items-center gap-2">
-                            <button @click="if(currentPage > 1) currentPage--" :disabled="currentPage === 1"
-                                class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-100 hover:bg-gray-50 text-gray-400 disabled:opacity-50">
-                                <i class="fa-solid fa-chevron-left text-xs"></i>
-                            </button>
-
-                            <template x-for="page in totalPages" :key="page">
-                                <button @click="currentPage = page"
-                                    :class="currentPage === page ? 'bg-[#4A72D4] text-white shadow-blue-100' :
-                                        'border border-gray-100 text-gray-600 hover:bg-gray-50'"
-                                    class="w-10 h-10 flex items-center justify-center rounded-xl font-bold transition-all shadow-md"
-                                    x-text="page">
-                                </button>
-                            </template>
-
-                            <button @click="if(currentPage < totalPages) currentPage++"
-                                :disabled="currentPage === totalPages"
-                                class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-100 hover:bg-gray-50 text-gray-400 disabled:opacity-50">
-                                <i class="fa-solid fa-chevron-right text-xs"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </main>
-    </div>
-
-    <div x-show="showImportModal" class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
-
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="showImportModal = false">
-        </div>
-
-        <div class="relative min-h-screen flex items-center justify-center p-4">
-            <div class="relative bg-white w-full max-w-lg rounded-[35px] shadow-2xl p-8 transform transition-all"
-                x-show="showImportModal" x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="opacity-0 scale-95 translate-y-8"
-                x-transition:enter-end="opacity-100 scale-100 translate-y-0">
-
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
-                        <i class="fa-solid fa-file-import text-emerald-500"></i> Import Data Kuis
-                    </h3>
-                    <button @click="showImportModal = false"
-                        class="text-gray-400 hover:text-red-500 transition-colors">
-                        <i class="fa-solid fa-circle-xmark text-2xl"></i>
-                    </button>
-                </div>
-
-                <div
-                    class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-200 transition-all bg-gray-50/50">
-                    <div
-                        class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
-                    </div>
-                    <p class="text-sm font-bold text-gray-600">Klik atau seret file Excel ke sini</p>
-                    <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 5MB (.xlsx, .xls)</p>
-                    <input type="file" class="hidden" id="excel_upload">
-                    <button onclick="document.getElementById('excel_upload').click()"
-                        class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">Pilih
-                        File</button>
-                </div>
-
-                <div class="mt-8 p-4 bg-blue-50 rounded-2xl flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-circle-info text-blue-500"></i>
-                        <span class="text-[11px] font-bold text-blue-700 uppercase tracking-tight">Belum punya
-                            formatnya?</span>
-                    </div>
-                    <a href="#" class="text-[11px] font-black text-[#4A72D4] hover:underline">DOWNLOAD
-                        TEMPLATE</a>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 mt-8">
-                    <button @click="showImportModal = false"
-                        class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">Batalkan</button>
-                    <button
-                        class="py-4 bg-[#4A72D4] text-white rounded-2xl text-sm font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">Proses
-                        Import</button>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
-
 </body>
 
 </html>
