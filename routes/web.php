@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\admin\AdminKuisController;
+use App\Http\Controllers\admin\AdminLatihanController;
+use App\Http\Controllers\admin\AdminMinatBakatController;
+use App\Http\Controllers\admin\AdminTryoutController;
+use App\Http\Controllers\admin\AdminVideoController;
 use App\Http\Controllers\KuisController;
 use App\Http\Controllers\LatihanController;
 use App\Http\Controllers\MinatBakatController;
@@ -7,6 +12,7 @@ use App\Http\Controllers\StreakController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TryoutController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\HalamanStreakController;
 use App\Http\Controllers\admin\HalamanPeluangPtnController;
 use App\Http\Controllers\admin\HalamanMonitoringLaporanController;
@@ -21,6 +27,7 @@ use App\Http\Controllers\RankingController;
 use App\Http\Controllers\SoalKuisController;
 use App\Http\Controllers\SoalLatihanController;
 use App\Http\Controllers\SoalTryoutController;
+use App\Models\admin\AdminMinatBakat;
 
 Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
@@ -110,87 +117,19 @@ Route::get('/minatbakat/hasil', [MinatBakatController::class, 'index'])->name('m
 
 
 // admin //
-// dashboard
-Route::get('/admin/dashboard', function () {
-    return view('admin/dashboard');
-});
 
 
-Route::get('/admin/streak', [HalamanStreakController::class, 'index'])->name('admin.streak.index');
-Route::get('/admin/peluangPtn', [HalamanPeluangPtnController::class, 'index'])->name('admin.peluang.index');
-Route::get('/admin/monitoringLaporan', [HalamanMonitoringLaporanController::class, 'index'])->name('admin.laporan.index');
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Dashboard biasanya hanya index, kita bisa batasi pakai only()
+    Route::resource('dashboard', DashboardController::class)->only(['index']);
 
-Route::get('/admin/user/index', function () {
-    return view('admin/user/index');
-});
-
-
-    
-Route::get('/admin/video/index', function () {
-        return view('admin/video/index');
-});
-        
-// kuis
-
-Route::get('/admin/kuis/index', function () {
-    return view('admin/kuis/index');
-});
-
-Route::get('/admin/kuis/create', function () {
-    return view('admin/kuis/create');
-});
-
-Route::get('/admin/kuis/edit', function () {
-    return view('admin/kuis/edit');
-});
-
-
-// tryout
-Route::get('/admin/tryout/index', function () {
-    return view('admin/tryout/index');
-});
-
-Route::get('/admin/tryout/create', function () {
-    return view('admin/tryout/create');
-});
-
-Route::get('/admin/tryout/edit', function () {
-    return view('admin/tryout/edit');
-});
-
-// minat bakat
-Route::get('/admin/minatbakat/index', function () {
-    return view('admin/minatbakat/index');
-});
-
-Route::get('/admin/minatbakat/kategori', function () {
-    return view('admin/minatbakat/kategori');
-});
-
-Route::get('/admin/minatbakat/editor', function () {
-    return view('admin/minatbakat/editor');
-});
-
-Route::get('/admin/minatbakat/partisipasi', function () {
-    return view('admin/minatbakat/partisipasi');
-});
-
-Route::get('/admin/video/index', function () {
-    return view('admin/video/index');
-});
-
-Route::get('/admin/latihan_soal/index', function () {
-    return view('admin/latihan_soal/index');
-});
-
-Route::get('/admin/latihan_soal/tambah', function () {
-    return view('admin/latihan_soal/tambah');
-});
-
-Route::get('/admin/latihan_soal/history', function () {
-    return view('admin/latihan_soal/history');
-});
-
-Route::get('/admin/latihan_soal/edit', function () {
-    return view('admin/latihan_soal/edit');
+    Route::resource('user', User::class);
+    Route::resource('streak', HalamanStreakController::class);
+    Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
+    Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
+    Route::resource('tryout', AdminTryoutController::class);
+    Route::resource('kuis', AdminKuisController::class);
+    Route::resource('latihan', AdminLatihanController::class);
+    Route::resource('videoPembelajaran', AdminVideoController::class);
+    Route::resource('minatBakat', AdminMinatBakatController::class);
 });
