@@ -30,15 +30,13 @@
         activeMenu: 'Manajemen streak',
         currentView: 'main', 
         
-        // Fungsi Reset untuk Tambah Pet Baru
         openAddModal() {
             this.editMode = false;
             this.imageUrl = null;
-            this.targetLevel = ''; // Kosong saat tambah baru
+            this.targetLevel = '';
             this.showModal = true;
         },
 
-        // Fungsi Ambil Data untuk Edit
         openEditModal(img, lvl) {
             this.editMode = true;
             this.imageUrl = img;
@@ -82,42 +80,182 @@
     <div class="flex h-screen w-full relative">
         
         <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-               class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 lg:static lg:translate-x-0 shrink-0">
-            <div class="flex items-center justify-between mb-10 px-2 shrink-0">
+               class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
+
+            <div class="flex items-center justify-between mb-10 px-2">
                 <div class="flex items-center gap-3">
-                    <div class="bg-white p-2 rounded-xl text-[#4A72D4]"><i class="fa-solid fa-bolt-lightning text-lg"></i></div>
-                    <h1 class="text-xl font-black tracking-tighter uppercase">PERSISTEN</h1>
+                    <div class="bg-white p-2 rounded-xl">
+                        <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold tracking-tight">P E R S I S T E N</h1>
                 </div>
-                <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
-            <nav class="flex-1 space-y-1">
-                <template x-for="item in ['Dashboard', 'Manajemen user', 'Manajemen streak', 'Manajemen tryout']">
-                    <button @click="activeMenu = item; currentView = 'main'" :class="activeMenu === item ? 'bg-white/20' : 'hover:bg-white/10'" class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl mb-1">
-                        <div class="w-2 h-2 rounded-full" :class="activeMenu === item ? 'bg-white' : 'bg-white/30'"></div>
-                        <span class="text-sm font-medium" x-text="item"></span>
-                    </button>
-                </template>
+
+            <nav class="flex-1 space-y-1 overflow-y-auto pr-2 
+                        [&::-webkit-scrollbar]:w-1 
+                        [&::-webkit-scrollbar-track]:bg-transparent 
+                        [&::-webkit-scrollbar-thumb]:bg-white/20 
+                        [&::-webkit-scrollbar-thumb]:rounded-full">
+                
+                <a href="#" @click="activeMenu = 'Dashboard'; currentView = 'main'"
+                    :class="activeMenu === 'Dashboard' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <div class="w-5 h-5 border-2 border-current rounded group-hover:border-white transition-colors shrink-0"></div>
+                    <span class="text-md font-regular">Dashboard</span>
+                </a>
+
+                <a href="#" @click="activeMenu = 'Manajemen user'; currentView = 'main'"
+                    :class="activeMenu === 'Manajemen user' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen user</span>
+                </a>
+
+                <a href="#" @click="activeMenu = 'Manajemen streak'; currentView = 'main'"
+                    :class="activeMenu === 'Manajemen streak' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen streak</span>
+                </a>
+
+                <a href="#" @click="activeMenu = 'Manajemen tryout'; currentView = 'main'"
+                    :class="activeMenu === 'Manajemen tryout' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen tryout</span>
+                </a>
+
+                <a href="#" @click="activeMenu = 'Manajemen kuis'; currentView = 'main'"
+                    :class="activeMenu === 'Manajemen kuis' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen kuis</span>
+                </a>
+
+                <a href="#" @click="activeMenu = 'Manajemen latihan soal'; currentView = 'main'"
+                    :class="activeMenu === 'Manajemen latihan soal' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen latihan soal</span>
+                </a>
+
+                <a href="#" @click="activeMenu = 'Manajemen video pembelajaran'; currentView = 'main'"
+                    :class="activeMenu === 'Manajemen video pembelajaran' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen video pembelajaran</span>
+                </a>
+
+                <a href="#" @click="activeMenu = 'Manajemen minat bakat'; currentView = 'main'"
+                    :class="activeMenu === 'Manajemen minat bakat' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen minat bakat</span>
+                </a>
+
+                <a href="#" @click="activeMenu = 'Manajemen perangkingan'; currentView = 'main'"
+                    :class="activeMenu === 'Manajemen perangkingan' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen perangkingan</span>
+                </a>
+
+                <a href="#" @click="activeMenu = 'Manajemen peluang PTN'; currentView = 'main'"
+                    :class="activeMenu === 'Manajemen peluang PTN' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen peluang PTN</span>
+                </a>
+
+                <a href="#" @click="activeMenu = 'Monitoring dan laporan'; currentView = 'main'"
+                    :class="activeMenu === 'Monitoring dan laporan' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Monitoring dan laporan</span>
+                </a>
+
+                <a href="#" @click="activeMenu = 'Manajemen sistem dan konten'; currentView = 'main'"
+                    :class="activeMenu === 'Manajemen sistem dan konten' ? 'bg-[#D4DEF7] text-[#2E3B66]' : 'hover:bg-white/10 text-white'"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 shrink-0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen sistem dan konten</span>
+                </a>
+
             </nav>
+
+            <button class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
+                <svg xmlns="http://www.w3.org/2000/xml" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5 md:size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                </svg>
+                <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
+            </button>
         </aside>
 
         <main class="flex-1 main-content p-4 md:p-10 custom-scrollbar">
             
-            <header class="flex items-center justify-between mb-8">
-                <div class="flex items-center gap-4">
-                    <button @click="mobileMenuOpen = true" class="lg:hidden bg-white p-3 rounded-xl shadow-sm text-[#4A72D4]"><i class="fa-solid fa-bars-staggered text-xl"></i></button>
-                    <div>
-                        <h2 class="text-2xl font-black text-[#1E293B]" x-text="currentView === 'main' ? 'Manajemen Pet Streak' : 'Sampah Pet'"></h2>
+            <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+                <div class="flex items-center w-full gap-4">
+                    <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
+                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    
+                    <div class="relative w-full group flex items-center gap-2">
+                        <div class="relative w-full">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                </svg>
+                            </div>
+                            <input type="text" placeholder="Search...."
+                                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
+                        </div>
+                        <button class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
+                            Cari
+                        </button>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 bg-white p-1.5 pr-5 pl-1.5 rounded-2xl shadow-sm border border-blue-100">
-                    <img src="/img/sean.jpg" class="w-10 h-10 object-cover rounded-xl shadow-md">
-                    <div class="hidden sm:block leading-none">
-                        <p class="font-bold text-sm">Sean</p>
-                        <p class="text-[10px] text-green-500 font-medium italic">Online</p>
+
+                <div class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 self-end md:self-auto">
+                    <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
                     </div>
+                    <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
                 </div>
             </header>
-
             <div x-show="currentView === 'main'" x-transition>
                 <div class="bg-white rounded-[35px] shadow-sm border border-blue-100 overflow-hidden mb-10">
                     <div class="p-8 border-b border-gray-50 flex justify-between items-center">
