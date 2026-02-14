@@ -101,7 +101,7 @@
 }">
 
     <div class="flex h-full w-full">
-         <aside x-data="{ currentPage: 'tryout' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+        <aside x-data="{ currentPage: 'tryout' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
             class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
             <div class="flex items-center justify-between mb-10 px-2">
@@ -157,7 +157,7 @@
                     <span class="text-md font-regular">Manajemen streak</span>
                 </a>
 
-                <a href="#"  x-init="if(currentPage === 'tryout') { $el.scrollIntoView({ block: 'center' }) }"
+                <a href="#" x-init="if (currentPage === 'tryout') { $el.scrollIntoView({ block: 'center' }) }"
                     class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 shrink-0">
@@ -210,7 +210,7 @@
                         bakat</span>
                 </a>
 
-                
+
 
                 <a href="#"
                     class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
@@ -234,7 +234,7 @@
                         laporan</span>
                 </a>
 
-              
+
 
             </nav>
 
