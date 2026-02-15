@@ -4,84 +4,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PERSISTEN - Video Pembelajaran</title>
-
+    <title>PERSISTEN - Kuis Fundamental</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
 
-    @vite('resources/css/app.css')
+        /* Scrollbar styling agar lebih tipis dan rapi */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 
-<body class="bg-slate-100 font-po min-h-screen py-10 overflow-x-hidden px-6 md:px-10">
+<body class="bg-slate-100 font-po h-screen overflow-hidden p-4 md:p-6 lg:p-10">
 
-    <div x-data="{ soalAktif: 1, totalSoal: 20, jawabanTerpilih: {} }" x-cloak class="max-w-[1440px] mx-auto">
+    <div x-data="{ soalAktif: 1, totalSoal: 20, jawabanTerpilih: {} }" x-cloak class="h-full flex flex-col max-w-[1600px] mx-auto">
 
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 px-2">
-            <h1 class="text-2xl md:text-4xl font-black text-[#2E3B66] tracking-tight text-center md:text-left">
-                Kuis Fundamental
-            </h1>
-
-            <div class="flex items-center justify-between md:justify-end gap-3 sm:gap-4">
-                <div class="bg-white border-2 border-[#4FAAFD] px-4 py-2 md:px-6 md:py-3 rounded-3xl">
-                    <p class="text-[18px] font-bold text-[#4FAAFD] font-mono leading-none ">30.00</p>
+        <div class="flex flex-row items-center justify-between mb-6 shrink-0">
+            <h1 class="text-xl md:text-3xl font-black text-[#2E3B66]">Try Out UTBK - 1</h1>
+            <div class="flex items-center gap-2 md:gap-4">
+                <div
+                    class="flex items-center gap-2 bg-white border-2 border-[#4FAAFD] px-4 py-1.5 md:py-2 rounded-full">
+                    <svg class="w-5 h-5 text-[#4FAAFD]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-base md:text-lg font-bold text-[#4FAAFD] font-mono">30.00</p>
                 </div>
-                <a href="{{ route('kuis.index') }}"
-                    class="flex-1 md:flex-none flex items-center justify-center px-4 py-2 md:px-6 md:py-3 rounded-3xl text-white font-bold text-xs md:text-sm hover:bg-white hover:text-[#4FAAFD] transition-all bg-[#3B82F6]">
-                    Keluar Ujian
-                </a>
+                <a href="#"
+                    class="bg-[#3B82F6] text-white px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-xs md:text-sm shadow-md hover:bg-blue-600 transition-all">Keluar
+                    Ujian</a>
             </div>
         </div>
 
-        <div class="bg-white rounded-[35px] shadow-sm overflow-hidden border border-gray-100 flex flex-col lg:flex-row">
+        <div
+            class="bg-white rounded-[40px] shadow-sm border border-gray-100 flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
 
-            <div class="flex-1 p-5 sm:p-10 md:p-14 lg:p-16 border-b lg:border-b-0 lg:border-r border-gray-100">
-
-                <div class="flex flex-row justify-between items-center mb-6 gap-2">
-                    <div class="flex flex-col">
-                        <p class="text-xs md:text-sm font-semibold text-[#2E3B66]">UTBK: Penalaran Umum</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs md:text-sm font-semibold text-[#2E3B66] whitespace-nowrap">
-                            Soal <span class="text-[#2E3B66] text-base" x-text="soalAktif"></span> dari <span
-                                x-text="totalSoal"></span>
-                        </p>
-                    </div>
+            <div
+                class="flex-1 flex flex-col p-6 md:p-10 overflow-y-auto custom-scroll border-b lg:border-b-0 lg:border-r-2 border-gray-100">
+                <div class="flex justify-between items-center mb-4">
+                    <p class="text-sm font-bold text-gray-400">UTBK: Penalaran Umum</p>
+                    <p class="text-sm font-bold text-gray-400">Soal <span x-text="soalAktif"></span> dari <span
+                            x-text="totalSoal"></span></p>
                 </div>
 
-                <div class="w-full h-2 bg-gray-100 rounded-full mb-8 overflow-hidden">
-                    <div class="h-full bg-blue-500 transition-all duration-500"
+                <div class="w-full h-2.5 bg-gray-100 rounded-full mb-8">
+                    <div class="h-full bg-blue-400 rounded-full transition-all duration-500"
                         :style="'width:' + (Object.keys(jawabanTerpilih).length / totalSoal * 100) + '%'"></div>
                 </div>
 
-                <div class="mb-10">
-                    <div class="text-gray-800 text-base sm:text-lg md:text-xl leading-relaxed font-regular">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt nisi molestias ea neque
-                        consequatur voluptates nihil ad fuga, et tenetur quo repellat quisquam. Doloremque reiciendis,
-                        voluptatum earum amet sequi tempore? Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Sunt nisi molestias ea neque
-                        consequatur voluptates nihil ad fuga, et tenetur quo repellat quisquam. Doloremque reiciendis,
-                        voluptatum earum amet sequi tempore?
+                <div class="mb-10 flex-grow">
+                    <div
+                        class="text-blue-600 text-lg font-medium leading-relaxed underline decoration-blue-300 underline-offset-4">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                        laboris nisi ut aliquip ex ea commodo consequat.
+                    </div>
+                    <div class="mt-6 text-gray-700 text-lg">
+                        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+                        pariatur.
                     </div>
                 </div>
 
-                <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-4 max-w-md">
+                <div class="grid grid-cols-5 sm:grid-cols-7 gap-3 mb-10">
                     <template x-for="i in totalSoal">
                         <button @click="soalAktif = i"
-                            class="relative aspect-square flex items-center justify-center rounded-xl font-bold text-lg transition-all border-2"
-                            :class="soalAktif === i ?
-                                'bg-[#4FAAFD] border-[#4FAAFD] text-white shadow-md' :
+                            class="relative aspect-square flex items-center justify-center rounded-2xl font-bold text-lg transition-all border-2"
+                            :class="soalAktif === i ? 'bg-[#4FAAFD] border-[#4FAAFD] text-white shadow-lg' :
                                 (jawabanTerpilih[i] ? 'border-[#4FAAFD] text-[#4FAAFD] bg-white' :
                                     'border-[#4FAAFD] text-[#4FAAFD] bg-white hover:bg-blue-50')">
-
                             <span x-text="i"></span>
-
                             <template x-if="jawabanTerpilih[i]">
                                 <div
-                                    class="absolute -top-2 -right-2 w-6 h-6 bg-white text-[#4FAAFD] text-xs rounded-full flex items-center justify-center border-2 border-[#4FAAFD] shadow-sm font-bold z-10">
+                                    class="absolute -top-2 -right-2 w-6 h-6 bg-white text-[#4FAAFD] text-[10px] rounded-full flex items-center justify-center border-2 border-[#4FAAFD] font-black z-10 shadow-sm">
                                     <span x-text="jawabanTerpilih[i]"></span>
                                 </div>
                             </template>
@@ -89,48 +98,47 @@
                     </template>
                 </div>
 
-                <div class="flex items-center gap-3 mt-10 md:mt-14">
+                <div class="flex items-center gap-4 mt-auto">
                     <button @click="if(soalAktif > 1) soalAktif--" :disabled="soalAktif === 1"
-                        class="flex-1 py-3 px-2 text-gray-400 font-semibold text-[10px] md:text-sm border border-gray-200 rounded-3xl hover:bg-gray-50 disabled:opacity-20 transition-all">
-                        Kembali
-                    </button>
+                        class="flex-1 py-4 border-2 border-gray-200 rounded-2xl font-bold text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all">Kembali</button>
                     <button @click="if(soalAktif < totalSoal) soalAktif++"
-                        class="flex-[1] py-3 px-2 bg-[#3B82F6] text-white font-semibold text-xs md:text-base rounded-3xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95">
-                        <span x-text="soalAktif === totalSoal ? 'Kumpulkan Ujian' : 'Selanjutnya'"></span>
+                        class="flex-1 py-4 bg-[#4FAAFD] text-white rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all active:scale-95">
+                        <span x-text="soalAktif === totalSoal ? 'Selesai' : 'Selanjutnya'"></span>
                     </button>
                 </div>
             </div>
 
-            <div class="w-full lg:w-[380px] xl:w-[450px] p-5 sm:p-10 lg:p-14 bg-slate-50/50">
-                <h3 class="text-[18px] font-bold text-[#2E3B66] tracking-widest mb-6 text-center lg:text-left">Pilih
-                    Jawaban:</h3>
+            <div class="w-full lg:w-[45%] xl:w-[40%] bg-white p-6 md:p-10 flex flex-col overflow-y-auto custom-scroll">
+                <h3 class="text-xl font-bold text-[#2E3B66] mb-6">Pilih Jawaban:</h3>
 
                 <div class="space-y-4">
                     <template x-for="opt in ['A', 'B', 'C', 'D', 'E']">
                         <div @click="jawabanTerpilih[soalAktif] = opt"
-                            :class="jawabanTerpilih[soalAktif] === opt ? 'border-[#3378FF] ring-1 ring-[#3378FF]' :
-                                'border-transparent'"
-                            class="group flex items-center p-4 rounded-2xl border-2 bg-[#E1F0FF] cursor-pointer transition-all duration-200 shadow-sm">
-                            <div class="mr-4">
-                                <div :class="jawabanTerpilih[soalAktif] === opt ? 'border-[#3378FF]' : 'border-gray-300'"
-                                    class="w-6 h-6 rounded-full border-2 bg-white flex items-center justify-center transition-all">
+                            class="group flex items-center p-5 rounded-[25px] border-2 cursor-pointer transition-all duration-200"
+                            :class="jawabanTerpilih[soalAktif] === opt ? 'bg-[#D6E9FF] border-blue-400' :
+                                'bg-[#EAF5FF] border-transparent hover:border-blue-200'">
+
+                            <div class="mr-4 shrink-0">
+                                <div class="w-6 h-6 rounded-full border-2 bg-white flex items-center justify-center"
+                                    :class="jawabanTerpilih[soalAktif] === opt ? 'border-blue-500' : 'border-gray-300'">
                                     <div x-show="jawabanTerpilih[soalAktif] === opt"
-                                        class="w-3 h-3 rounded-full bg-[#3378FF]" x-transition></div>
+                                        class="w-3 h-3 rounded-full bg-blue-500"></div>
                                 </div>
                             </div>
 
-                            <div :class="jawabanTerpilih[soalAktif] === opt ? 'bg-[#3378FF] text-white' : 'bg-white text-[#3378FF]'"
-                                class="w-9 h-9 rounded-full flex items-center justify-center font-bold mr-4 shrink-0 shadow-sm transition-colors">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-black mr-4 shrink-0 shadow-sm transition-all"
+                                :class="jawabanTerpilih[soalAktif] === opt ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'">
                                 <span x-text="opt"></span>
                             </div>
 
-                            <span class="text-sm md:text-base font-medium text-[#2E3B66] leading-tight">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                            <span class="text-sm md:text-base font-semibold text-[#2E3B66] leading-snug">
+                                Lorem ipsum dolor sit amet, consectetur sit amet adipiscing elit.
                             </span>
                         </div>
                     </template>
                 </div>
             </div>
+
         </div>
     </div>
 </body>

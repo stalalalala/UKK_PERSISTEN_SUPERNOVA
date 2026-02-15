@@ -226,7 +226,7 @@
                 class="relative bg-cover bg-center bg-no-repeat rounded-[35px] px-4 md:px-14 py-30 overflow-hidden h-[250px] md:h-[500px] flex items-center">
 
                 <div
-                    class="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-transparent to-black/20 backdrop-blur-[1px]">
+                    class="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-transparent to-black/20 backdrop-blur-[1px] md:hidden">
                 </div>
 
                 <div class="relative z-10 max-w-xl">
@@ -338,7 +338,7 @@
             class="relative bg-cover bg-center bg-no-repeat rounded-[40px] mx-4 md:mx-10 mt-10 mb-10 px-6 py-12 h-90 md:h-160 overflow-hidden shadow-sm border border-white/50">
 
             <div
-                class="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-transparent to-black/20 backdrop-blur-[1px]">
+                class="absolute inset-0 bg-gradient-to-br from-blue-600/30 via-transparent to-black/20 backdrop-blur-[1px] md:hidden">
             </div>
 
             <div class="flex flex-col items-center text-center relative z-10">

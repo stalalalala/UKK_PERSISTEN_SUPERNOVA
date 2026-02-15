@@ -11,6 +11,7 @@ use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\HalamanStreakController;
 use App\Http\Controllers\admin\HalamanPeluangPtnController;
 use App\Http\Controllers\admin\HalamanMonitoringLaporanController;
+use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\KuisController;
 use App\Http\Controllers\LatihanController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\TryoutController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\HasilKuisController;
 use App\Http\Controllers\HasilLatihanController;
+use App\Http\Controllers\HasilMinatbakatController;
 use App\Http\Controllers\HasilTryoutController;
 use App\Http\Controllers\IntruksiKuisController;
 use App\Http\Controllers\IntruksiLatihanController;
@@ -120,7 +122,80 @@ Route::middleware('auth')->group(function () {
             Route::get('/intruksi', [IntruksiMinatBakatController::class, 'index'])->name('intruksi');
         });
 
-        Route::get('/slime', function () { return view('slime'); });
-        Route::get('/slime_login', function () { return view('slime_login'); });
-    });
+Route::get('/latihan/soal', [SoalLatihanController::class, 'index'])->name('latihan.soal');
+
+Route::get('/latihan/hasil', [HasilLatihanController::class, 'index'])->name('latihan.hasil');
+
+Route::get('/latihan/intruksi', [IntruksiLatihanController::class, 'index'])->name('latihan.intruksi');
+
+// video
+
+Route::get('/video', [VideoController::class, 'index'])->name('video.index');
+
+// kuis
+
+Route::get('/kuis', [KuisController::class, 'index'])->name('kuis.index');
+
+Route::get('/kuis/soal', [SoalKuisController::class, 'index'])->name('kuis.soal');
+
+Route::get('/kuis/hasil', [HasilKuisController::class, 'index'])->name('kuis.hasil');
+
+Route::get('/kuis/intruksi', [IntruksiKuisController::class, 'index'])->name('kuis.intruksi');
+
+
+
+// slime
+
+Route::get('/slime', function () {
+    return view('slime');
+});
+
+Route::get('/slime_login', function () {
+    return view('slime_login');
+});
+
+// masuk/daftar
+
+Route::get('/masuk', function () {
+    return view('Auth/masuk');
+});
+
+Route::get('/daftar', function () {
+    return view('Auth/daftar');
+});
+
+// minat bakat
+
+Route::get('/minatbakat', [MinatBakatController::class, 'index'])->name('minatbakat.soal');
+
+Route::get('/minatbakat/hasil', [HasilMinatbakatController::class, 'index'])->name('minatbakat.hasil');
+
+Route::get('/minatbakat/intruksi', [IntruksiMinatBakatController::class, 'index'])->name('minatbakat.intruksi');
+
+
+
+
+
+
+
+
+
+
+
+// admin //
+
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Dashboard biasanya hanya index, kita bisa batasi pakai only()
+    Route::resource('dashboard', DashboardController::class)->only(['index']);
+
+    Route::resource('user', UserController::class);
+    Route::resource('streak', HalamanStreakController::class);
+    Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
+    Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
+    Route::resource('tryout', AdminTryoutController::class);
+    Route::resource('kuis', AdminKuisController::class);
+    Route::resource('latihan', AdminLatihanController::class);
+    Route::resource('videoPembelajaran', AdminVideoController::class);
+    Route::resource('minatBakat', AdminMinatBakatController::class);
 });

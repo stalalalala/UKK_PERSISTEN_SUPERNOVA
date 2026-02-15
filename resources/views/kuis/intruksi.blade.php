@@ -58,54 +58,89 @@
 
                 <div class="flex-1 flex flex-col md:flex-row p-8 md:p-12 gap-10 overflow-y-auto">
 
-                    <div class="w-full md:w-2/5 flex items-start justify-center">
-                        <div
-                            class="w-full aspect-square bg-gray-200 rounded-[2.5rem] border-8 border-gray-300 flex items-center justify-center relative">
-                            <div class="text-center p-4">
-                                <div class="w-20 h-20 bg-gray-400 rounded-2xl mx-auto mb-4"></div>
+                    <div class="flex-1 flex flex-col md:flex-row p-8 md:p-12 gap-10 overflow-y-auto items-center">
 
+                        <div class="w-full md:w-2/5 flex justify-center">
+                            <div
+                                class="w-64 h-64 md:w-full md:aspect-square flex items-center justify-center relative overflow-hidden">
+                                <img src="{{ asset('img/slime.png') }}" alt="Slime"
+                                    class="w-full h-full object-contain">
                             </div>
                         </div>
-                    </div>
 
-                    <div class="w-full md:w-3/5 flex flex-col">
-                        <h2 class="text-2xl md:text-3xl font-extrabold text-[#2E3B66] mb-8">Instruksi Pengerjaan Soal
-                        </h2>
+                        <div class="w-full md:w-3/5 flex flex-col">
+                            <h2
+                                class="text-2xl md:text-3xl font-extrabold text-[#2E3B66] mb-8 text-center md:text-left">
+                                Instruksi Pengerjaan Kuis Fundamental
+                            </h2>
 
-                        <div class="space-y-6">
-                            <div class="flex items-start gap-4">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-[#FEA33A] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">
-                                    1</div>
-                                <p class="text-gray-600 font-semibold pt-2">Kerjakan setiap soal dengan teliti.</p>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-[#9885FB] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">
-                                    2</div>
-                                <p class="text-gray-600 font-semibold pt-2">Terdapat batas waktu pada setiap sesi,
-                                    pantau
-                                    timer untuk mengetahui sisa waktu pengerjaan.</p>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-[#FF908E] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">
-                                    3</div>
-                                <p class="text-gray-600 font-semibold pt-2">Fokus mengerjakan soal, pilih jawaban
-                                    terbaik,
-                                    dan manfaatkan waktu yang tersedia sebaik mungkin.</p>
+                            <div class="space-y-6">
+                                <div class="flex items-start gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-[#FEA33A] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">
+                                        1
+                                    </div>
+                                    <p class="text-gray-600 font-semibold pt-2">
+                                        Pilih satu jawaban yang paling tepat untuk setiap pertanyaan. Nilai hanya
+                                        diberikan pada jawaban yang benar.
+                                    </p>
+                                </div>
+
+                                <div class="flex items-start gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-[#9885FB] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">
+                                        2
+                                    </div>
+                                    <p class="text-gray-600 font-semibold pt-2">
+                                        Perhatikan durasi waktu di pojok layar. Kuis akan otomatis terhenti jika waktu
+                                        habis.
+                                    </p>
+                                </div>
+
+                                <div class="flex items-start gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-[#FF908E] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">
+                                        3
+                                    </div>
+                                    <p class="text-gray-600 font-semibold pt-2">
+                                        Dilarang membuka tab baru atau mencari jawaban di internet selama kuis
+                                        berlangsung untuk menjaga sportivitas.
+                                    </p>
+                                </div>
+
+                                <div class="flex items-start gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-[#4B8A81] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">
+                                        4
+                                    </div>
+                                    <p class="text-gray-600 font-semibold pt-2">
+                                        Kamu bisa melewati soal yang sulit dan kembali mengerjakannya nanti selama waktu
+                                        masih tersedia.
+                                    </p>
+                                </div>
+
+                                <div class="flex items-start gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-[#3171CD] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">
+                                        5
+                                    </div>
+                                    <p class="text-gray-600 font-semibold pt-2">
+                                        Klik tombol "Submit" atau "Selesai" setelah memastikan semua soal terjawab untuk
+                                        melihat skor akhirmu.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="px-12 py-8 bg-gray-50 flex justify-end gap-4 shrink-0">
-                    <a href="{{ route('kuis.index') }}">
+                    <a href="/">
 
                         <button
                             class="px-8 py-3 rounded-full font-bold text-gray-400 bg-gray-200 hover:bg-gray-300 transition">Batal</button>
                     </a>
-                    <a href="{{ route('kuis.soal') }}">
+                    <a href="{{ route('tryout.') }}">
                         <button
                             class="px-10 py-3 rounded-full font-bold text-white bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-200 transition">Mulai
                             Mengerjakan</button>
