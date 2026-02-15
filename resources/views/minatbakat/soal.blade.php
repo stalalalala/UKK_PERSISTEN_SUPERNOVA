@@ -7,7 +7,7 @@
     <title>Tes Minat & Bakat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <style>
         body {
@@ -25,7 +25,7 @@
     </style>
 </head>
 
-<body class="bg-blue-50 flex items-center justify-center min-h-screen p-2 sm:p-4" x-data="{
+<body class="flex items-center justify-center min-h-screen p-2 sm:p-4" x-data="{
     step: 1,
     totalSteps: 50,
     selected: null,
@@ -39,7 +39,7 @@
 }">
 
     <div
-        class="bg-white rounded-3xl shadow-xl w-full max-w-[1440px] mx-10 overflow-hidden border border-blue-100 flex flex-col">
+        class="bg-white rounded-xl shadow-sm w-full max-w-[1440px] mx-10 overflow-hidden border border-blue-100 flex flex-col">
 
         <div class="p-4 sm:p-6 flex justify-between items-center">
             <h1 class="text-lg sm:text-2xl font-bold text-slate-800">Tes Minat & Bakat</h1>
@@ -70,7 +70,7 @@
             <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold shadow-lg ring-4 ring-white"
                 x-text="step"></div>
 
-            <p class="text-center text-slate-600 text-base sm:text-xl leading-relaxed font-semibold mb-8 sm:mb-12">
+            <p class="text-center text-slate-600 text-base sm:text-xl leading-relaxed  mb-8 sm:mb-12">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.
             </p>
 
@@ -82,7 +82,7 @@
                             class="w-full h-32 sm:h-48 bg-blue-500 clip-slant rounded-lg sm:rounded-xl flex items-end justify-center pb-4 sm:pb-6 px-1 transition-all outline-none"
                             :class="selected === 1 ? 'ring-2 sm:ring-4 ring-blue-200 shadow-lg scale-105' :
                                 'opacity-70 hover:opacity-100'">
-                            <span class="text-white btn-text font-bold uppercase text-center leading-none">Sangat
+                            <span class="text-white btn-text font-semibold uppercase text-center leading-none">Sangat
                                 Setuju</span>
                         </button>
                         <div class="py-2 sm:py-4">
@@ -101,7 +101,8 @@
                             class="w-full h-28 sm:h-40 bg-blue-300 clip-slant rounded-lg sm:rounded-xl flex items-end justify-center pb-4 sm:pb-6 px-1 transition-all outline-none"
                             :class="selected === 2 ? 'ring-2 sm:ring-4 ring-blue-100 shadow-lg scale-105' :
                                 'opacity-70 hover:opacity-100'">
-                            <span class="text-white btn-text font-bold uppercase text-center leading-none">Setuju</span>
+                            <span
+                                class="text-white btn-text font-semibold uppercase text-center leading-none">Setuju</span>
                         </button>
                         <div class="py-2 sm:py-4">
                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -119,7 +120,8 @@
                             class="w-full h-24 sm:h-32 bg-gray-400 clip-slant rounded-lg sm:rounded-xl flex items-end justify-center pb-4 sm:pb-6 px-1 transition-all outline-none"
                             :class="selected === 3 ? 'ring-2 sm:ring-4 ring-gray-200 shadow-lg scale-105' :
                                 'opacity-70 hover:opacity-100'">
-                            <span class="text-white btn-text font-bold uppercase text-center leading-none">Netral</span>
+                            <span
+                                class="text-white btn-text font-semibold uppercase text-center leading-none">Netral</span>
                         </button>
                         <div class="py-2 sm:py-4">
                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +139,7 @@
                             class="w-full h-20 sm:h-28 bg-red-300 clip-slant rounded-lg sm:rounded-xl flex items-end justify-center pb-4 sm:pb-6 px-1 transition-all outline-none"
                             :class="selected === 4 ? 'ring-2 sm:ring-4 ring-red-100 shadow-lg scale-105' :
                                 'opacity-70 hover:opacity-100'">
-                            <span class="text-white btn-text font-bold uppercase text-center leading-none">Tidak
+                            <span class="text-white btn-text font-semibold uppercase text-center leading-none">Tidak
                                 Setuju</span>
                         </button>
                         <div class="py-2 sm:py-4">
@@ -156,7 +158,8 @@
                             class="w-full h-16 sm:h-24 bg-red-500 clip-slant rounded-lg sm:rounded-xl flex items-end justify-center pb-4 sm:pb-6 px-1 transition-all outline-none"
                             :class="selected === 5 ? 'ring-2 sm:ring-4 ring-red-200 shadow-lg scale-105' :
                                 'opacity-70 hover:opacity-100'">
-                            <span class="text-white btn-text font-bold uppercase text-center leading-none">Sangat Tidak
+                            <span class="text-white btn-text font-semibold uppercase text-center leading-none">Sangat
+                                Tidak
                                 Setuju</span>
                         </button>
                         <div class="py-2 sm:py-4">

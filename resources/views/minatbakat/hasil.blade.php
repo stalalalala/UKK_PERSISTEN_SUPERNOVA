@@ -16,7 +16,8 @@
     @vite('resources/css/app.css')
 </head>
 
-<body class="bg-gray-50 flex flex-col items-center justify-start md:justify-center min-h-screen p-4 md:p-6 lg:p-10">
+<body
+    class="bg-gray-50 font-po flex flex-col items-center justify-start md:justify-center min-h-screen p-4 md:p-6 lg:p-10">
 
     <div class="max-w-[1440px] mx-10 w-full">
 
@@ -27,16 +28,19 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                 </svg>
-                <h1 class="text-lg md:text-2xl font-bold tracking-tight">Tes Minat & Bakat</h1>
+                <h1 class="text-lg md:text-2xl text-slate-800 font-bold tracking-tight">Tes Minat & Bakat</h1>
             </div>
 
-            <button
-                class="px-4 py-1.5 md:px-6 md:py-2 bg-white border border-blue-400 text-blue-500 rounded-full font-semibold shadow-sm hover:bg-blue-50 transition-all active:scale-95 text-xs md:text-base">
-                Kembali
-            </button>
+            <a href="/">
+
+                <button
+                    class="px-4 py-1.5 md:px-6 md:py-2 bg-white border border-blue-400 text-blue-500 rounded-full font-semibold shadow-sm hover:bg-blue-50 transition-all active:scale-95 text-xs md:text-base">
+                    Kembali
+                </button>
+            </a>
         </div>
 
-        <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] border border-gray-200 shadow-xl p-4 md:p-8">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 md:p-8">
 
             <div class="text-center mb-6">
                 <div
@@ -68,26 +72,26 @@
             <div class="bg-blue-50/50 rounded-[1.2rem] md:rounded-[2rem] p-3 md:p-6 mt-2">
                 <div class="bg-white rounded-xl md:rounded-2xl p-5 md:p-8 shadow-inner border border-blue-100/50">
 
-                    <div class="mb-6 md:mb-8">
+                    <div class="mb-4 md:mb-6">
                         <div class="flex items-center gap-2 mb-2">
-                            <div class="w-1.5 h-4 md:h-5 bg-cyan-500 rounded-full"></div>
+                            <div class="w-1.5 h-4 md:h-9 bg-cyan-500 rounded-full"></div>
                             <h3 class="text-cyan-900 font-extrabold text-sm md:text-lg uppercase tracking-wide">
                                 Investigative</h3>
                         </div>
-                        <p class="text-gray-600 leading-relaxed text-[11px] md:text-sm pl-3 border-l border-gray-100">
+                        <p class="text-gray-600 leading-relaxed  pl-3 border-l border-gray-100">
                             Fokus pada aktivitas yang memerlukan observasi, penyelidikan, dan evaluasi kritis. Orang
                             dengan minat ini cenderung menyukai matematika, sains, dan pemecahan masalah yang kompleks
                             secara logis.
                         </p>
                     </div>
 
-                    <div class="mb-6 md:mb-8">
+                    <div class="mb-4 md:mb-6">
                         <div class="flex items-center gap-2 mb-2">
-                            <div class="w-1.5 h-4 md:h-5 bg-purple-500 rounded-full"></div>
+                            <div class="w-1.5 h-4 md:h-9 bg-purple-500 rounded-full"></div>
                             <h3 class="text-purple-900 font-extrabold text-sm md:text-lg uppercase tracking-wide">
                                 Artistic</h3>
                         </div>
-                        <p class="text-gray-600 leading-relaxed text-[11px] md:text-sm pl-3 border-l border-gray-100">
+                        <p class="text-gray-600 leading-relaxed  pl-3 border-l border-gray-100">
                             Menyukai ekspresi diri, kreativitas, dan intuisi. Mereka cenderung tidak menyukai struktur
                             yang kaku dan lebih memilih bekerja di lingkungan yang memungkinkan inovasi seni, desain,
                             atau komunikasi.
@@ -96,11 +100,11 @@
 
                     <div>
                         <div class="flex items-center gap-2 mb-2">
-                            <div class="w-1.5 h-4 md:h-5 bg-orange-500 rounded-full"></div>
+                            <div class="w-1.5 h-4 md:h-9 bg-orange-500 rounded-full"></div>
                             <h3 class="text-orange-900 font-extrabold text-sm md:text-lg uppercase tracking-wide">
                                 Enterprising</h3>
                         </div>
-                        <p class="text-gray-600 leading-relaxed text-[11px] md:text-sm pl-3 border-l border-gray-100">
+                        <p class="text-gray-600 leading-relaxed  pl-3 border-l border-gray-100">
                             Memiliki jiwa kepemimpinan, persuasif, dan berorientasi pada hasil. Cocok dalam bidang
                             manajemen, bisnis, pemasaran, atau posisi yang membutuhkan kemampuan negosiasi dan
                             pengambilan keputusan cepat.

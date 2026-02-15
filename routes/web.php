@@ -16,10 +16,12 @@ use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\HalamanStreakController;
 use App\Http\Controllers\admin\HalamanPeluangPtnController;
 use App\Http\Controllers\admin\HalamanMonitoringLaporanController;
+use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\HalamanStreakController as ControllersHalamanStreakController;
 use App\Http\Controllers\HasilKuisController;
 use App\Http\Controllers\HasilLatihanController;
+use App\Http\Controllers\HasilMinatbakatController;
 use App\Http\Controllers\HasilTryoutController;
 use App\Http\Controllers\IntruksiKuisController;
 use App\Http\Controllers\IntruksiLatihanController;
@@ -109,7 +111,7 @@ Route::get('/daftar', function () {
 
 Route::get('/minatbakat', [MinatBakatController::class, 'index'])->name('minatbakat.soal');
 
-Route::get('/minatbakat/hasil', [MinatBakatController::class, 'index'])->name('minatbakat.hasil');
+Route::get('/minatbakat/hasil', [HasilMinatbakatController::class, 'index'])->name('minatbakat.hasil');
 
 Route::get('/minatbakat/intruksi', [IntruksiMinatBakatController::class, 'index'])->name('minatbakat.intruksi');
 
@@ -130,7 +132,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Dashboard biasanya hanya index, kita bisa batasi pakai only()
     Route::resource('dashboard', DashboardController::class)->only(['index']);
 
-    Route::resource('user', User::class);
+    Route::resource('user', UserController::class);
     Route::resource('streak', HalamanStreakController::class);
     Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
     Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
