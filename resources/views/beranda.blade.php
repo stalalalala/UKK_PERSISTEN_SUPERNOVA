@@ -26,11 +26,11 @@
                 <li><a href="{{ route('streak.index') }}" class="hover:text-blue-500">Pet Streak</a></li>
                 <li><a href="{{ route('tryout.index') }}" class="hover:text-blue-500">Try Out</a></li>
                 <li><a href="{{ route('latihan.index') }}" class="hover:text-blue-500">Latihan Soal</a></li>
-                <li><a href="{{ route('video.index') }}" class="hover:text-blue-500">Video</a></li>
+                <li><a href="{{ route('video.index') }}" class="hover:text-blue-500">Video Pembelajaran</a></li>
             </ul>
 
             <div class="flex items-center gap-2">
-                <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full p-1">
+                <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full">
                     <a href="/profile/index"
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -194,21 +194,24 @@
                     ];
                 @endphp
 
-                <div class="grid justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-5">
-                    @foreach ($subs as $s)
-                        <div
-                            class="{{ $s[1] }} rounded-[30px] w-full h-full text-white shadow-lg hover:shadow-2xl hover:-translate-y-3 transition duration-300 cursor-pointer text-center">
-                            <div class="px-2 py-3">
-                                <div
-                                    class="w-16 h-16 bg-white/30 rounded-full mt-1 mx-auto flex items-center justify-center font-bold text-xl">
-                                    {{ $s[0] }}
+                <a href="{{ route('latihan.index') }}">
+                    <div
+                        class="grid justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-5">
+                        @foreach ($subs as $s)
+                            <div
+                                class="{{ $s[1] }} rounded-[30px] w-full h-full text-white shadow-lg hover:shadow-2xl hover:-translate-y-3 transition duration-300 cursor-pointer text-center">
+                                <div class="px-2 py-3">
+                                    <div
+                                        class="w-16 h-16 bg-white/30 rounded-full mt-1 mx-auto flex items-center justify-center font-bold text-xl">
+                                        {{ $s[0] }}
+                                    </div>
+                                    <p class="mt-3 font-medium text-md">Mulai</p>
+                                    <p class="font-medium text-md">Latihan!</p>
                                 </div>
-                                <p class="mt-3 font-medium text-md">Mulai</p>
-                                <p class="font-medium text-md">Latihan!</p>
                             </div>
-                        </div>
-                    @endforeach
-                </div>
+                        @endforeach
+                    </div>
+                </a>
             </section>
         </div>
     </div>
@@ -312,10 +315,13 @@
 
                     <div class="flex-1 flex flex-col items-center justify-center min-h-[200px]">
                         <img src="{{ asset('img/slime.png') }}" class="w-44 md:w-52 mb-4" alt="Slime">
-                        <button
-                            class="bg-blue-500 hover:bg-blue-600 text-white px-10 py-2.5 rounded-full font-bold shadow-md transition-all hover:scale-105">
-                            Lainnya
-                        </button>
+                        <a href="{{ route('tryout.index') }}">
+
+                            <button
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-10 py-2.5 rounded-full font-bold shadow-md transition-all hover:scale-105">
+                                Lainnya
+                            </button>
+                        </a>
                     </div>
 
 
@@ -341,18 +347,21 @@
                     dan karir yang sesuai dengan minat dan bakatmu!
                 </p>
                 <div class="mt-28 md:mt-8">
-                    <button
-                        class="bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-105">
-                        Mulai Tes
-                        <div class="bg-white w-6 h-6 rounded-full flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FCAE4B"
-                                class="w-4 h-4">
-                                <path fill-rule="evenodd"
-                                    d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </button>
+
+                    <a href="{{ route('minatbakat.intruksi') }}">
+                        <button
+                            class="bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-105">
+                            Mulai Tes
+                            <div class="bg-white w-6 h-6 rounded-full flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FCAE4B"
+                                    class="w-4 h-4">
+                                    <path fill-rule="evenodd"
+                                        d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </button>
+                    </a>
                 </div>
             </div>
         </section>

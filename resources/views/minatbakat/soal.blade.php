@@ -11,7 +11,7 @@
         rel="stylesheet">
     <style>
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
         .clip-slant {
@@ -43,10 +43,19 @@
 
         <div class="p-4 sm:p-6 flex justify-between items-center">
             <h1 class="text-lg sm:text-2xl font-bold text-slate-800">Tes Minat & Bakat</h1>
-            <div
-                class="bg-white border border-gray-200 px-3 py-1 sm:px-5 sm:py-1.5 rounded-full text-xs sm:text-sm font-bold text-gray-500 shadow-sm whitespace-nowrap">
-                Soal <span x-text="step"></span> dari 50
+            <div class="flex flex-row items-center gap-2">
+
+                <div
+                    class="bg-white border border-gray-200 px-3 py-2 rounded-full text-xs sm:text-sm font-bold text-gray-500 shadow-sm whitespace-nowrap">
+                    Soal <span x-text="step"></span> dari 50
+                </div>
+                <a href="/">
+
+                    <button
+                        class="px-8 py-2 rounded-full font-bold text-gray-400 bg-gray-200 hover:bg-gray-300 transition">Batal</button>
+                </a>
             </div>
+
         </div>
 
         <div class="px-6 sm:px-12 mb-4">

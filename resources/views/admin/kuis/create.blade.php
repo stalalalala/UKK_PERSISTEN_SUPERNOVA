@@ -61,7 +61,7 @@
 }">
 
     <div class="flex h-full w-full">
-        <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+        <aside x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
             class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
             <div class="flex items-center justify-between mb-10 px-2">
@@ -98,7 +98,7 @@
                 </a>
 
                 <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl  transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 shrink-0">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -127,8 +127,8 @@
                     <span class="text-md font-regular">Manajemen tryout</span>
                 </a>
 
-                <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 bg-[#D4DEF7]  text-[#2E3B66] rounded-2xl transition-all duration-200 group text-left">
+                <a href="#" x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6 shrink-0">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -170,16 +170,7 @@
                         bakat</span>
                 </a>
 
-                <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="size-6 shrink-0">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                    </svg>
-                    <span class="text-md font-regular">Manajemen
-                        perangkingan</span>
-                </a>
+
 
                 <a href="#"
                     class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
@@ -203,16 +194,7 @@
                         laporan</span>
                 </a>
 
-                <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="size-6 shrink-0">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                    </svg>
-                    <span class="text-md font-regular">Manajemen sistem
-                        dan konten</span>
-                </a>
+
 
             </nav>
 
@@ -276,26 +258,27 @@
                 </div>
             </header>
 
-            <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-[#4A72D4]">
+                        Kuis Fundamental - Set <span x-text="currentSet">1</span>
+                    </h2>
+                    <p class="text-gray-400 text-sm">Persisten Admin Panel / Kuis</p>
+                </div>
+
+                <div class="flex flex-wrap gap-3 w-full lg:w-auto">
+
+
+                    <button @click="showImportModal = true"
+                        class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95">
+                        <i class="fa-solid fa-file-excel text-lg"></i> Import via Excel
+                    </button>
+                </div>
+            </div>
+
+            <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar pb-4 lg:pb-8">
                 <div x-show="activeMenu === 'Manajemen Kuis'" x-transition>
 
-                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-                        <div>
-                            <h2 class="text-2xl font-extrabold text-[#4A72D4]">
-                                Kuis Fundamental - Set <span x-text="currentSet">1</span>
-                            </h2>
-                            <p class="text-gray-400 text-sm">Persisten Admin Panel / Kuis</p>
-                        </div>
-
-                        <div class="flex flex-wrap gap-3 w-full lg:w-auto">
-
-
-                            <button @click="showImportModal = true"
-                                class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95">
-                                <i class="fa-solid fa-file-excel text-lg"></i> Import via Excel
-                            </button>
-                        </div>
-                    </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                         <div class="lg:col-span-2 space-y-6">

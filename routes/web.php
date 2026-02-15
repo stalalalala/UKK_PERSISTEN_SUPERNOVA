@@ -18,11 +18,15 @@ use App\Http\Controllers\admin\HalamanPeluangPtnController;
 use App\Http\Controllers\admin\HalamanMonitoringLaporanController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\HalamanStreakController as ControllersHalamanStreakController;
+use App\Http\Controllers\HasilKuisController;
 use App\Http\Controllers\HasilLatihanController;
 use App\Http\Controllers\HasilTryoutController;
+use App\Http\Controllers\IntruksiKuisController;
 use App\Http\Controllers\IntruksiLatihanController;
+use App\Http\Controllers\IntruksiMinatBakatController;
 use App\Http\Controllers\IntruksiTryoutController;
 use App\Http\Controllers\JedaTryoutController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\SoalKuisController;
 use App\Http\Controllers\SoalLatihanController;
@@ -31,12 +35,9 @@ use App\Models\admin\AdminMinatBakat;
 
 Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
-Route::get('/profile/index', function () {
-    return view('profile.index');
-});
+Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
 
 // profile
-
 Route::get('/profile/edit', function () {
     return view('profile.edit');
 });
@@ -76,9 +77,13 @@ Route::get('/video', [VideoController::class, 'index'])->name('video.index');
 
 Route::get('/kuis', [KuisController::class, 'index'])->name('kuis.index');
 
-Route::get('/kuis/soal', [SoalKuisController::class, 'index'])->name('latihan.soal');
+Route::get('/kuis/soal', [SoalKuisController::class, 'index'])->name('kuis.soal');
 
-Route::get('/kuis/hasil', [HasilTryoutController::class, 'index'])->name('latihan.hasil');
+Route::get('/kuis/hasil', [HasilKuisController::class, 'index'])->name('kuis.hasil');
+
+Route::get('/kuis/intruksi', [IntruksiKuisController::class, 'index'])->name('kuis.intruksi');
+
+
 
 // slime
 
@@ -105,6 +110,8 @@ Route::get('/daftar', function () {
 Route::get('/minatbakat', [MinatBakatController::class, 'index'])->name('minatbakat.soal');
 
 Route::get('/minatbakat/hasil', [MinatBakatController::class, 'index'])->name('minatbakat.hasil');
+
+Route::get('/minatbakat/intruksi', [IntruksiMinatBakatController::class, 'index'])->name('minatbakat.intruksi');
 
 
 
