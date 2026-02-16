@@ -9,39 +9,39 @@ use Illuminate\Http\Request;
 class AdminVideoController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan daftar video + history.
      */
-   public function index()
+    public function index()
     {
-        // Ambil data yang aktif
-    $videos = AdminVideo::all();
+        $videos  = AdminVideo::all();          // Video aktif
+        $history = AdminVideo::onlyTrashed()->get(); // Video dihapus sementara
 
-    // Ambil data yang ada di history (soft deleted)
-    $history = AdminVideo::onlyTrashed()->get();
-
-    // Kirim keduanya ke view
-    return view('admin.video.index', compact('videos', 'history'));
+        return view('admin.video.index', compact('videos', 'history'));
     }
 
     /**
-     * Simpan video baru ke database.
+     * Simpan video baru.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'video_id'    => 'required|unique:admin_videos,video_id',
-            'subtes'      => 'required',
-            'judul_video' => 'required',
-            'link'        => 'required|url',
-        ]);
+{
+    $request->validate([
+        'subtes'      => 'required',
+        'judul_video' => 'required',
+        'link'        => 'required|url',
+    ]);
 
-        AdminVideo::create($request->all());
+    AdminVideo::create([
+        'subtes'      => $request->subtes,
+        'judul_video' => $request->judul_video,
+        'link'        => $request->link,
+    ]);
 
-        return redirect()->back()->with('success', 'Video berhasil ditambahkan!');
-    }
+    return redirect()->back()->with('success', 'Video berhasil ditambahkan!');
+}
+
 
     /**
-     * Update data video yang sudah ada.
+     * Update video.
      */
     public function update(Request $request, $id)
     {
@@ -53,48 +53,39 @@ class AdminVideoController extends Controller
             'link'        => 'required|url',
         ]);
 
-        $video->update($request->all());
+        $video->update($request->only(['subtes', 'judul_video', 'link']));
 
         return redirect()->back()->with('success', 'Video berhasil diperbarui!');
     }
 
     /**
-     * Hapus sementara (Pindahkan ke History).
+     * Hapus sementara (soft delete).
      */
     public function destroy($id)
     {
         $video = AdminVideo::findOrFail($id);
-        $video->delete(); // Mengisi kolom deleted_at
+        $video->delete();
 
         return redirect()->back()->with('success', 'Video dipindahkan ke History.');
     }
 
     /**
-     * Tampilkan halaman History (Data yang dihapus sementara).
-     */
-    public function history()
-    {
-        $history = AdminVideo::onlyTrashed()->get();
-        return view('admin.video.history', compact('history'));
-    }
-
-    /**
-     * Pulihkan video dari History.
+     * Pulihkan video dari history.
      */
     public function restore($id)
     {
-        $video = AdminVideo::withTrashed()->where('video_id', $id)->firstOrFail();
+        $video = AdminVideo::withTrashed()->findOrFail($id);
         $video->restore();
 
         return redirect()->back()->with('success', 'Video berhasil dipulihkan!');
     }
 
     /**
-     * Hapus permanen dari database.
+     * Hapus permanen.
      */
     public function forceDelete($id)
     {
-        $video = AdminVideo::withTrashed()->where('video_id', $id)->firstOrFail();
+        $video = AdminVideo::withTrashed()->findOrFail($id);
         $video->forceDelete();
 
         return redirect()->back()->with('success', 'Video dihapus permanen!');

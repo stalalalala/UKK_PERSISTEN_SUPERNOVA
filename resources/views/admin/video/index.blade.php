@@ -10,12 +10,12 @@
     <script src="//unpkg.com/alpinejs" defer></script>
     @vite('resources/css/app.css')
 </head>
-
 <body class="bg-slate-100 font-po overflow-x-hidden">
 
-<div x-data="userApp()" class="flex h-screen overflow-hidden">
+<div x-data="videoApp()" class="flex h-screen overflow-hidden">
 
-    <aside x-data="{ currentPage: 'video' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+    <!-- ================= SIDEBAR ================= -->
+   <aside x-data="{ currentPage: 'video' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
     class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
     <div class="flex items-center justify-between mb-10 px-2">
@@ -134,40 +134,18 @@
     </button>
 </aside>
 
+    <!-- ================= MAIN ================= -->
     <main class="flex-1 p-4 md:p-8 overflow-y-auto h-screen">
-
         <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
             <div class="flex items-center w-full gap-4">
                 <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
-                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
+                    <i class="fa-solid fa-bars text-gray-600"></i>
                 </button>
-                
                 <div class="relative w-full group flex items-center gap-2">
-                    <div class="relative w-full">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                            </svg>
-                        </div>
-                        <input type="text" placeholder="Search...."
-                            class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
-                    </div>
-                    <button class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
-                        Cari
-                    </button>
+                    <input type="text" placeholder="Search...."
+                           class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
+                    <button class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">Cari</button>
                 </div>
-            </div>
-
-            <div class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 self-end md:self-auto">
-                <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
-                </div>
-                <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
             </div>
         </header>
 
@@ -175,254 +153,251 @@
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden" 
-     x-data="videoApp()">
-    
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div class="flex bg-gray-100 p-1 rounded-2xl w-full md:w-auto">
-            <button @click="activeTab = 'active'" 
-                :class="activeTab === 'active' ? 'bg-white shadow-sm text-[#4A72D4]' : 'text-gray-500 hover:text-gray-700'"
-                class="px-6 py-2 rounded-xl text-sm font-bold transition-all flex-1 md:flex-none">
-                Daftar Video
-            </button>
-            <button @click="activeTab = 'history'" 
-                :class="activeTab === 'history' ? 'bg-white shadow-sm text-[#4A72D4]' : 'text-gray-500 hover:text-gray-700'"
-                class="px-6 py-2 rounded-xl text-sm font-bold transition-all flex-1 md:flex-none flex items-center justify-center gap-2">
-                <i class="fa-solid fa-clock-rotate-left text-xs"></i>
-                History
-            </button>
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden">
+
+            <!-- ================= TAB ================= -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div class="flex bg-gray-100 p-1 rounded-2xl w-full md:w-auto">
+                    <button @click="activeTab = 'active'"
+                        :class="activeTab === 'active' ? 'bg-white shadow-sm text-[#4A72D4]' : 'text-gray-500 hover:text-gray-700'"
+                        class="px-6 py-2 rounded-xl text-sm font-bold transition-all flex-1 md:flex-none">Daftar Video</button>
+                    <button @click="activeTab = 'history'"
+                        :class="activeTab === 'history' ? 'bg-white shadow-sm text-[#4A72D4]' : 'text-gray-500 hover:text-gray-700'"
+                        class="px-6 py-2 rounded-xl text-sm font-bold transition-all flex-1 md:flex-none flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+                        History
+                    </button>
+                </div>
+
+                <div x-show="activeTab === 'active'" x-transition>
+                    <button @click="openAddModal()"
+                        class="w-full md:w-auto bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-blue-100">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        Tambah Video
+                    </button>
+                </div>
+            </div>
+
+            <!-- ================= TABLE ACTIVE ================= -->
+            <div x-show="activeTab === 'active'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2">
+                <div class="overflow-x-auto rounded-2xl border border-gray-50">
+                    <table class="w-full text-sm min-w-[800px]">
+                        <thead class="bg-[#F8FAFF] text-[#4A72D4]">
+                        <tr>
+                            <th class="p-4 text-left font-bold uppercase tracking-wider">ID Video</th>
+                            <th class="p-4 text-left font-bold uppercase tracking-wider">Subtes</th>
+                            <th class="p-4 text-left font-bold uppercase tracking-wider">Judul Video</th>
+                            <th class="p-4 text-left font-bold uppercase tracking-wider">Link</th>
+                            <th class="p-4 text-center font-bold uppercase tracking-wider">Aksi</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                        @foreach($videos as $video)
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 font-mono text-xs text-slate-500">{{ $video->kode }}</td>
+                            <td class="p-4">
+                                <span class="bg-blue-50 text-[#4A72D4] px-3 py-1 rounded-full text-[11px] font-bold">{{ $video->subtes }}</span>
+                            </td>
+                            <td class="p-4 font-semibold text-slate-700">{{ $video->judul_video }}</td>
+                            <td class="p-4 text-slate-700 truncate max-w-[100px]">{{ $video->link }}</td>
+                            <td class="p-4 text-center space-x-2">
+                                <button @click="openEditModal(@js($video))"
+                                    class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-600 transition-all shadow-sm">Ubah</button>
+                                <button @click="handleDelete('{{ $video->id }}')"
+                                    class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-all shadow-sm">Hapus</button>
+                                <form id="form-delete-{{ $video->id }}" action="{{ route('admin.videoPembelajaran.destroy', $video->id) }}" method="POST" class="hidden">
+                                    @csrf @method('DELETE')
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ================= TABLE HISTORY ================= -->
+            <div x-show="activeTab === 'history'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" style="display: none;">
+                <div class="overflow-x-auto rounded-2xl border border-red-50">
+                    <table class="w-full text-sm min-w-[800px]">
+                        <thead class="bg-red-50/30 text-red-600">
+                        <tr>
+                            <th class="p-4 text-left font-bold uppercase tracking-wider">ID Video</th>
+                            <th class="p-4 text-left font-bold uppercase tracking-wider">Subtes</th>
+                            <th class="p-4 text-left font-bold uppercase tracking-wider">Judul Video</th>
+                            <th class="p-4 text-left font-bold uppercase tracking-wider">Link</th>
+                            <th class="p-4 text-center font-bold uppercase tracking-wider">Aksi</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                        @foreach($history as $item)
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-4 font-mono text-xs text-slate-500">{{ $video->kode }}</td>
+                            <td class="p-4">
+                                <span class="bg-blue-50 text-[#4A72D4] px-3 py-1 rounded-full text-[11px] font-bold">{{ $item->subtes }}</span>
+                            </td>
+                            <td class="p-4 font-semibold text-slate-700">{{ $item->judul_video }}</td>
+                            <td class="p-4 text-slate-700 truncate max-w-[100px]">{{ $item->link }}</td>
+                            <td class="p-4 text-center space-x-2">
+                                <button @click="handleRestore('{{ $item->id }}')"
+                                    class="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-600 transition-all shadow-sm">Pulihkan</button>
+                                <button @click="handleForceDelete('{{ $item->id }}')"
+                                    class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-all shadow-sm">Hapus</button>
+                                <form id="form-restore-{{ $item->id }}" action="{{ route('admin.videoPembelajaran.restore', $item->id) }}" method="POST" class="hidden">@csrf</form>
+                                <form id="form-force-delete-{{ $item->id }}" action="{{ route('admin.videoPembelajaran.force-delete', $item->id) }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
+                            </td>
+                        </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-
-        <div x-show="activeTab === 'active'" x-transition>
-            {{-- Sesuaikan fungsi buka modal lo di sini --}}
-            <button @click="openModalVideo = true; isEditVideo = false" 
-                class="w-full md:w-auto bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-blue-100">
-                <i class="fa-solid fa-plus text-xs"></i>
-                Tambah Video
-            </button>
-        </div>
-    </div>
-
-    <div x-show="activeTab === 'active'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2">
-        <div class="overflow-x-auto rounded-2xl border border-gray-50">
-            <table class="w-full text-sm min-w-[800px]">
-                <thead class="bg-[#F8FAFF] text-[#4A72D4]">
-                    <tr>
-                        <th class="p-4 text-left font-bold uppercase tracking-wider">ID Video</th>
-                        <th class="p-4 text-left font-bold uppercase tracking-wider">Subtes</th>
-                        <th class="p-4 text-left font-bold uppercase tracking-wider">Judul Video</th>
-                        <th class="p-4 text-left font-bold uppercase tracking-wider">Link</th>
-                        <th class="p-4 text-center font-bold uppercase tracking-wider">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50">
-                    @foreach($videos as $video)
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 font-mono text-xs text-slate-500">{{ $video->video_id }}</td>
-                        <td class="p-4">
-                            <span class="bg-blue-50 text-[#4A72D4] px-3 py-1 rounded-full text-[11px] font-bold">{{ $video->subtes }}</span>
-                        </td>
-                        <td class="p-4 font-semibold text-slate-700">{{ $video->judul_video }}</td>
-                        <td class="p-4 font-semibold text-slate-700 truncate max-w-[200px]">{{ $video->link }}</td>
-                        <td class="p-4 text-center space-x-2">
-                            {{-- Pastikan fungsi di bawah ini ada di videoApp() lo --}}
-                            <button @click="openModalVideo = true; isEditVideo = true; videoData = @js($video)" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-600 transition-all shadow-sm">Ubah</button>
-                            
-                            <button @click="handleDelete('{{ $video->video_id }}')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-all shadow-sm">Hapus</button>
-                            
-                            <form id="form-delete-{{ $video->video_id }}" action="{{ route('videoPembelajaran.destroy', $video->video_id) }}" method="POST" class="hidden">
-                                @csrf @method('DELETE')
-                            </form>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div x-show="activeTab === 'history'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" style="display: none;">
-        <div class="overflow-x-auto rounded-2xl border border-red-50">
-            <table class="w-full text-sm min-w-[800px]">
-                <thead class="bg-red-50/30 text-red-600">
-                    <tr>
-                        <th class="p-4 text-left font-bold uppercase tracking-wider">ID Video</th>
-                        <th class="p-4 text-left font-bold uppercase tracking-wider">Subtes</th>
-                        <th class="p-4 text-left font-bold uppercase tracking-wider">Judul Video</th>
-                        <th class="p-4 text-left font-bold uppercase tracking-wider">Link</th>
-                        <th class="p-4 text-center font-bold uppercase tracking-wider">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-50">
-                    @foreach($history as $item)
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-4 font-mono text-xs text-slate-500">{{ $item->video_id }}</td>
-                        <td class="p-4">
-                            <span class="bg-blue-50 text-[#4A72D4] px-3 py-1 rounded-full text-[11px] font-bold">{{ $item->subtes }}</span>
-                        </td>
-                        <td class="p-4 font-semibold text-slate-700">{{ $item->judul_video }}</td>
-                        <td class="p-4 font-semibold text-slate-700">{{ $item->link }}</td>
-                        <td class="p-4 text-center space-x-2">
-                            <button @click="handleRestore('{{ $item->video_id }}')" 
-                                class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md shadow-emerald-100">
-                                <i class="fa-solid fa-rotate-left"></i>
-                                Pulihkan
-                            </button>
-
-                            <button @click="handleForceDelete('{{ $item->video_id }}')" 
-                                class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-all shadow-sm">
-                                Hapus Permanen
-                            </button>
-
-                            <form id="form-restore-{{ $item->video_id }}" action="{{ route('videoPembelajaran.restore', $item->video_id) }}" method="POST" class="hidden">@csrf</form>
-                            <form id="form-force-delete-{{ $item->video_id }}" action="{{ route('videoPembelajaran.force-delete', $item->video_id) }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
 
     </main>
 
+    <!-- ================= MODAL TAMBAH/UBAH ================= -->
     <div x-show="openModalVideo" x-cloak class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" x-transition>
-        <div @click.away="openModalVideo = false" class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl">
-            
+        <div @click.away="closeModal()" class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-extrabold text-slate-800" x-text="isEditVideo ? 'Ubah Video' : 'Tambah Video'"></h3>
-                <button @click="openModalVideo = false" class="text-gray-300 hover:text-red-500 transition-colors">
+                <button @click="closeModal()" class="text-gray-300 hover:text-red-500 transition-colors">
                     <i class="fa-solid fa-circle-xmark text-2xl"></i>
                 </button>
             </div>
 
-            <form class="space-y-5">
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">ID Video</label>
-                    <input type="text" class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="#VID-XXXX">
-                </div>
+            <form :action="isEditVideo ? `/admin/videoPembelajaran/${videoData.id}` : '{{ route('admin.videoPembelajaran.store') }}'" method="POST">
+                @csrf
+                <template x-if="isEditVideo">
+                    <input type="hidden" name="_method" value="PUT">
+                </template>
 
-                <div class="space-y-1">
+                <div class="space-y-1 mb-3">
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Kategori Subtes</label>
-                    <select class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none appearance-none">
-                    <option>Pilih Subtes</option>
-                    <option>Penalaran Umum</option>
-                    <option>Pengetahuan dan Pemahaman Umum</option>
-                    <option>Pemahaman Bacaan dan Menulis</option>
-                    <option>Pengetahuan Kuantitatif</option>
-                    <option>Penalaran Matematika</option>
-                    <option>Literasi dalam Bahasa Indonesia</option>
-                    <option>Literasi dalam Bahasa Inggris</option>
-                      </select>
+                    <select name="subtes" x-model="videoData.subtes" class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none appearance-none">
+                        <option value="">Pilih Subtes</option>
+                        <option>Penalaran Umum</option>
+                        <option>Pengetahuan dan Pemahaman Umum</option>
+                        <option>Pemahaman Bacaan dan Menulis</option>
+                        <option>Pengetahuan Kuantitatif</option>
+                        <option>Penalaran Matematika</option>
+                        <option>Literasi dalam Bahasa Indonesia</option>
+                        <option>Literasi dalam Bahasa Inggris</option>
+                    </select>
                 </div>
 
-                <div class="space-y-1">
+                <div class="space-y-1 mb-3">
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Judul Video</label>
-                    <input type="text" class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="Masukkan judul video...">
+                    <input type="text" name="judul_video" x-model="videoData.judul_video" class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="Masukkan judul video..." required>
                 </div>
 
-                <div class="space-y-1">
+                <div class="space-y-1 mb-6">
                     <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Link / URL Video</label>
-                    <input type="url" class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="https://youtube.com/...">
+                    <input type="url" name="link" x-model="videoData.link" class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="https://youtube.com/..." required>
                 </div>
 
-                <div class="flex gap-3 pt-6">
-                    <button type="button" @click="openModalVideo = false" class="flex-1 bg-slate-50 text-slate-400 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition-all">Batal</button>
+                <div class="flex gap-3">
+                    <button type="button" @click="closeModal()" class="flex-1 bg-slate-50 text-slate-400 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition-all">Batal</button>
                     <button type="submit" class="flex-1 bg-[#4A72D4] text-white font-bold py-3.5 rounded-2xl hover:bg-blue-600 shadow-lg shadow-blue-100 transition-all active:scale-95">Simpan</button>
                 </div>
             </form>
         </div>
     </div>
+
 </div>
 
 <script>
-    function videoApp() {
-        return {
-            activeTab: 'active', 
-            handleDelete(id) {
-                Swal.fire({
-                    title: 'Hapus Video?',
-                    text: "Data akan dipindahkan ke tab history.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444', // red-500
-                    cancelButtonColor: '#6b7280', // gray-500
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal',
-                    customClass: {
-                        popup: 'rounded-3xl',
-                        confirmButton: 'rounded-xl px-4 py-2',
-                        cancelButton: 'rounded-xl px-4 py-2'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.executeDelete(id);
-                    }
-                })
-            },
+function videoApp() {
+    return {
+        // ================= STATE =================
+        mobileMenuOpen: false,
+        activeTab: 'active',
+        openModalVideo: false,
+        isEditVideo: false,
+        videoData: { id: '', subtes: '', judul_video: '', link: '' },
 
-            // Logika untuk memulihkan dengan konfirmasi
-            handleRestore(id) {
-                Swal.fire({
-                    title: 'Pulihkan Video?',
-                    text: "Video akan dikembalikan ke daftar aktif.",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#10b981', // emerald-500
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Ya, Pulihkan!',
-                    cancelButtonText: 'Batal',
-                    customClass: {
-                        popup: 'rounded-3xl',
-                        confirmButton: 'rounded-xl px-4 py-2',
-                        cancelButton: 'rounded-xl px-4 py-2'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.executeRestore(id);
-                    }
-                })
-            },
+        // ================= MODAL =================
+        openAddModal() {
+            this.openModalVideo = true;
+            this.isEditVideo = false;
+            this.videoData = { id: '', subtes: '', judul_video: '', link: '' };
+        },
+        openEditModal(video) {
+            this.openModalVideo = true;
+            this.isEditVideo = true;
+            this.videoData = { ...video };
+        },
+        closeModal() {
+            this.openModalVideo = false;
+        },
 
-            executeDelete(id) {
-                // Sini tempat panggil API Delete
-                Swal.fire({
-                    title: 'Terhapus!',
-                    text: `Video ${id} berhasil dipindahkan.`,
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false,
-                    customClass: {
-                        popup: 'rounded-3xl'
-                    }
-                });
-            },
-
-            executeRestore(id) {
-                // Sini tempat panggil API Restore
-                Swal.fire({
-                    title: 'Dipulihkan!',
-                    text: `Video ${id} kembali aktif.`,
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false,
-                    customClass: {
-                        popup: 'rounded-3xl'
-                    }
-                });
-            }
+        // ================= CRUD =================
+        handleDelete(id) {
+            Swal.fire({
+                title: 'Hapus Video?',
+                text: "Data akan dipindahkan ke tab history.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl px-4 py-2',
+                    cancelButton: 'rounded-xl px-4 py-2'
+                }
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    document.getElementById(`form-delete-${id}`).submit();
+                }
+            })
+        },
+        handleRestore(id) {
+            Swal.fire({
+                title: 'Pulihkan Video?',
+                text: "Video akan dikembalikan ke daftar aktif.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Pulihkan!',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl px-4 py-2',
+                    cancelButton: 'rounded-xl px-4 py-2'
+                }
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    document.getElementById(`form-restore-${id}`).submit();
+                }
+            })
+        },
+        handleForceDelete(id) {
+            Swal.fire({
+                title: 'Hapus Permanen?',
+                text: "Data tidak bisa dikembalikan!",
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Hapus Permanen',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl px-4 py-2',
+                    cancelButton: 'rounded-xl px-4 py-2'
+                }
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    document.getElementById(`form-force-delete-${id}`).submit();
+                }
+            })
         }
     }
-
-    function userApp() {
-        return {
-            openModalVideo: false,
-            isEditVideo: false,
-            mobileMenuOpen: false 
-        }
-    }
+}
 </script>
+
 </body>
 </html>
