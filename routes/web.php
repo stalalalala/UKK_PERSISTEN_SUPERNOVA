@@ -11,6 +11,7 @@ use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\HalamanStreakController;
 use App\Http\Controllers\admin\HalamanPeluangPtnController;
 use App\Http\Controllers\admin\HalamanMonitoringLaporanController;
+use App\Http\Controllers\admin\UserController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\KuisController;
 use App\Http\Controllers\LatihanController;
@@ -58,7 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('dashboard', DashboardController::class)->only(['index']);
         // Pastikan User model sudah di-import jika menggunakan resource
-        Route::resource('user', \App\Models\User::class); 
+        Route::resource('user', UserController::class); 
         Route::resource('streak', HalamanStreakController::class);
         Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
         Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
