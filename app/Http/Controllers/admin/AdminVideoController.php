@@ -11,56 +11,92 @@ class AdminVideoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+   public function index()
     {
-        return view('admin.video.index');
+        // Ambil data yang aktif
+    $videos = AdminVideo::all();
+
+    // Ambil data yang ada di history (soft deleted)
+    $history = AdminVideo::onlyTrashed()->get();
+
+    // Kirim keduanya ke view
+    return view('admin.video.index', compact('videos', 'history'));
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Simpan video baru ke database.
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'video_id'    => 'required|unique:admin_videos,video_id',
+            'subtes'      => 'required',
+            'judul_video' => 'required',
+            'link'        => 'required|url',
+        ]);
+
+        AdminVideo::create($request->all());
+
+        return redirect()->back()->with('success', 'Video berhasil ditambahkan!');
     }
 
     /**
-     * Display the specified resource.
+     * Update data video yang sudah ada.
      */
-    public function show(AdminVideo $adminVideo)
+    public function update(Request $request, $id)
     {
-        //
+        $video = AdminVideo::findOrFail($id);
+
+        $request->validate([
+            'subtes'      => 'required',
+            'judul_video' => 'required',
+            'link'        => 'required|url',
+        ]);
+
+        $video->update($request->all());
+
+        return redirect()->back()->with('success', 'Video berhasil diperbarui!');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Hapus sementara (Pindahkan ke History).
      */
-    public function edit(AdminVideo $adminVideo)
+    public function destroy($id)
     {
-        //
+        $video = AdminVideo::findOrFail($id);
+        $video->delete(); // Mengisi kolom deleted_at
+
+        return redirect()->back()->with('success', 'Video dipindahkan ke History.');
     }
 
     /**
-     * Update the specified resource in storage.
+     * Tampilkan halaman History (Data yang dihapus sementara).
      */
-    public function update(Request $request, AdminVideo $adminVideo)
+    public function history()
     {
-        //
+        $history = AdminVideo::onlyTrashed()->get();
+        return view('admin.video.history', compact('history'));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Pulihkan video dari History.
      */
-    public function destroy(AdminVideo $adminVideo)
+    public function restore($id)
     {
-        //
+        $video = AdminVideo::withTrashed()->where('video_id', $id)->firstOrFail();
+        $video->restore();
+
+        return redirect()->back()->with('success', 'Video berhasil dipulihkan!');
+    }
+
+    /**
+     * Hapus permanen dari database.
+     */
+    public function forceDelete($id)
+    {
+        $video = AdminVideo::withTrashed()->where('video_id', $id)->firstOrFail();
+        $video->forceDelete();
+
+        return redirect()->back()->with('success', 'Video dihapus permanen!');
     }
 }

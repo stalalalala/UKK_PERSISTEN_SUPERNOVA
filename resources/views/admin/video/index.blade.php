@@ -194,6 +194,7 @@
         </div>
 
         <div x-show="activeTab === 'active'" x-transition>
+            {{-- Sesuaikan fungsi buka modal lo di sini --}}
             <button @click="openModalVideo = true; isEditVideo = false" 
                 class="w-full md:w-auto bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-blue-100">
                 <i class="fa-solid fa-plus text-xs"></i>
@@ -210,21 +211,31 @@
                         <th class="p-4 text-left font-bold uppercase tracking-wider">ID Video</th>
                         <th class="p-4 text-left font-bold uppercase tracking-wider">Subtes</th>
                         <th class="p-4 text-left font-bold uppercase tracking-wider">Judul Video</th>
+                        <th class="p-4 text-left font-bold uppercase tracking-wider">Link</th>
                         <th class="p-4 text-center font-bold uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
+                    @foreach($videos as $video)
                     <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-4 font-mono text-xs text-slate-500">123-VID</td>
+                        <td class="p-4 font-mono text-xs text-slate-500">{{ $video->video_id }}</td>
                         <td class="p-4">
-                            <span class="bg-blue-50 text-[#4A72D4] px-3 py-1 rounded-full text-[11px] font-bold">Penalaran Umum</span>
+                            <span class="bg-blue-50 text-[#4A72D4] px-3 py-1 rounded-full text-[11px] font-bold">{{ $video->subtes }}</span>
                         </td>
-                        <td class="p-4 font-semibold text-slate-700">Logika Analitik</td>
+                        <td class="p-4 font-semibold text-slate-700">{{ $video->judul_video }}</td>
+                        <td class="p-4 font-semibold text-slate-700 truncate max-w-[200px]">{{ $video->link }}</td>
                         <td class="p-4 text-center space-x-2">
-                            <button @click="openModalVideo = true; isEditVideo = true" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-600 transition-all shadow-sm">Ubah</button>
-                            <button @click="handleDelete('123-VID')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-all shadow-sm">Hapus</button>
+                            {{-- Pastikan fungsi di bawah ini ada di videoApp() lo --}}
+                            <button @click="openModalVideo = true; isEditVideo = true; videoData = @js($video)" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-600 transition-all shadow-sm">Ubah</button>
+                            
+                            <button @click="handleDelete('{{ $video->video_id }}')" class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-all shadow-sm">Hapus</button>
+                            
+                            <form id="form-delete-{{ $video->video_id }}" action="{{ route('videoPembelajaran.destroy', $video->video_id) }}" method="POST" class="hidden">
+                                @csrf @method('DELETE')
+                            </form>
                         </td>
                     </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -236,26 +247,38 @@
                 <thead class="bg-red-50/30 text-red-600">
                     <tr>
                         <th class="p-4 text-left font-bold uppercase tracking-wider">ID Video</th>
+                        <th class="p-4 text-left font-bold uppercase tracking-wider">Subtes</th>
                         <th class="p-4 text-left font-bold uppercase tracking-wider">Judul Video</th>
-                        <th class="p-4 text-left font-bold uppercase tracking-wider">Status</th>
+                        <th class="p-4 text-left font-bold uppercase tracking-wider">Link</th>
                         <th class="p-4 text-center font-bold uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
+                    @foreach($history as $item)
                     <tr class="hover:bg-gray-50">
-                        <td class="p-4 font-mono text-xs text-slate-400 italic">099-VID</td>
-                        <td class="p-4 font-medium text-slate-500 line-through">Pengetahuan Kuantitatif Old</td>
+                        <td class="p-4 font-mono text-xs text-slate-500">{{ $item->video_id }}</td>
                         <td class="p-4">
-                            <span class="text-[10px] text-red-400 font-bold uppercase tracking-tighter bg-red-50 px-2 py-0.5 rounded border border-red-100">Terhapus</span>
+                            <span class="bg-blue-50 text-[#4A72D4] px-3 py-1 rounded-full text-[11px] font-bold">{{ $item->subtes }}</span>
                         </td>
-                        <td class="p-4 text-center">
-                            <button @click="handleRestore('099-VID')" 
+                        <td class="p-4 font-semibold text-slate-700">{{ $item->judul_video }}</td>
+                        <td class="p-4 font-semibold text-slate-700">{{ $item->link }}</td>
+                        <td class="p-4 text-center space-x-2">
+                            <button @click="handleRestore('{{ $item->video_id }}')" 
                                 class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-md shadow-emerald-100">
                                 <i class="fa-solid fa-rotate-left"></i>
-                                Pulihkan Video
+                                Pulihkan
                             </button>
+
+                            <button @click="handleForceDelete('{{ $item->video_id }}')" 
+                                class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-all shadow-sm">
+                                Hapus Permanen
+                            </button>
+
+                            <form id="form-restore-{{ $item->video_id }}" action="{{ route('videoPembelajaran.restore', $item->video_id) }}" method="POST" class="hidden">@csrf</form>
+                            <form id="form-force-delete-{{ $item->video_id }}" action="{{ route('videoPembelajaran.force-delete', $item->video_id) }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
                         </td>
                     </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>

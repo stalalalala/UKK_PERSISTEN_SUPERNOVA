@@ -66,7 +66,12 @@ Route::middleware('auth')->group(function () {
         Route::resource('tryout', AdminTryoutController::class);
         Route::resource('kuis', AdminKuisController::class);
         Route::resource('latihan', AdminLatihanController::class);
+
+        Route::get('videoPembelajaran/history', [AdminVideoController::class, 'history'])->name('videoPembelajaran.history');
+        Route::post('videoPembelajaran/{id}/restore', [AdminVideoController::class, 'restore'])->name('videoPembelajaran.restore');
+        Route::delete('videoPembelajaran/{id}/force-delete', [AdminVideoController::class, 'forceDelete'])->name('videoPembelajaran.force-delete');
         Route::resource('videoPembelajaran', AdminVideoController::class);
+
         Route::resource('minatBakat', AdminMinatBakatController::class);
     });
 
