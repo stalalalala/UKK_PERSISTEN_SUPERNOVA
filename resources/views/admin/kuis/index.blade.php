@@ -404,12 +404,12 @@
 
 
                                     <!-- Aksi -->
-                                    <td class="px-3 md:px-6 py-4 text-center align-top whitespace-nowrap">
+                                    <td class="px-3 md:px-6 pt-1 pb-4 text-center align-top whitespace-nowrap">
                                         <div class="flex justify-center gap-2">
 
                                             <!-- Edit -->
                                             <a href="{{ route('admin.kuis.edit', $item->id) }}"
-                                                class="px-4 pb-2 rounded-lg hover:bg-blue-100 text-blue-500">
+                                                class="px-4 py-2 rounded-lg hover:bg-blue-100 text-blue-500">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                                                     class="size-6">
@@ -425,7 +425,7 @@
                                                 @csrf
 
                                                 <button type="submit"
-                                                    class="px-4 pb-2 rounded-lg transition
+                                                    class="px-4 py-2 rounded-lg transition
         {{ $item->is_active ? 'hover:bg-emerald-100 text-emerald-600' : 'hover:bg-gray-100 text-gray-500' }}">
 
                                                     @if ($item->is_active)
@@ -458,7 +458,7 @@
                                                 onsubmit="return confirm('Yakin ingin menghapus kuis ini?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button class="px-4 pb-2 rounded-lg hover:bg-red-100 text-red-500">
+                                                <button class="px-4 py-2 rounded-lg hover:bg-red-100 text-red-500">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                                                         class="size-6">

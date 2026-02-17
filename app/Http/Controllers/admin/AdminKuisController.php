@@ -108,7 +108,8 @@ class AdminKuisController extends Controller
         return [
             'id' => $q->id,
             'pertanyaan' => $q->pertanyaan,
-            'subtes' => $q->subtes, // ✅ FIX
+            'subtes' => $q->subtes,
+            'materi' => $q->materi,
 
             'opsi_a' => $q->opsi_a,
             'opsi_b' => $q->opsi_b,
@@ -152,7 +153,8 @@ class AdminKuisController extends Controller
             if ($question) {
                 $question->update([
                     'pertanyaan' => $q['pertanyaan'],
-                    'subtes'     => $q['subtes'] ?? null, // ✅ FIX
+                    'subtes'     => $q['subtes'] ?? null,
+                    'materi' => $q['materi'] ?? null,
 
                     'opsi_a' => $q['opsi_a'],
                     'opsi_b' => $q['opsi_b'],

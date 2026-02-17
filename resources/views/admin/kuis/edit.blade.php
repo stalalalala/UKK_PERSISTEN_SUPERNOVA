@@ -341,284 +341,285 @@
                                                 <div x-show="open" x-transition
                                                     class="absolute z-50 w-full mt-2 top-full left-0 bg-white border border-blue-50 shadow-xl rounded-2xl overflow-hidden py-2">
                                                     <template x-for="item in options">
-                                                        <div @click="selectedSubtes = item; open = false"
-                                                            class="px-4 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-[#4A72D4] cursor-pointer transition-colors font-medium"
-                                                            x-text="item"></div>
-                                                    </template>
+                                                        <div@click="
+                                                                selectedSubtes = item;
+                                                                currentQuestion.subtes = item;
+                                                                markChanged();
+                                                                open = false;
+                                                            "
+                                                        class="px-4 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-[#4A72D4] cursor-pointer transition-colors font-medium"
+                                                        x-text="item">
                                                 </div>
-                                                <input type="hidden" name="subtes" :value="selectedSubtes" required>
+                                                </template>
                                             </div>
+                                            <input type="hidden" name="subtes" :value="selectedSubtes" required>
                                         </div>
+                                    </div>
 
-                                        {{-- Set --}}
-                                        <div class="w-full md:w-32 flex flex-col gap-2" x-data="{ open: false }"
-                                            @click.away="open = false">
-                                            <label
-                                                class="text-[10px] font-bold text-gray-400 uppercase ml-1">Set</label>
-                                            <div
-                                                class="bg-white px-4 py-3 rounded-2xl shadow-sm border border-blue-50 flex items-center relative h-full">
-                                                <button type="button" @click="open = !open"
-                                                    class="w-full flex items-center justify-between text-sm font-bold text-[#4A72D4] focus:outline-none">
-                                                    <span x-text="currentSet"></span>
-                                                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200"
-                                                        :class="open ? 'rotate-180' : ''"></i>
-                                                </button>
-                                                <div x-show="open" x-transition
-                                                    class="absolute z-50 w-full mt-2 top-full left-0 bg-white border border-blue-50 shadow-xl rounded-2xl overflow-hidden py-2">
-                                                    <template x-for="n in 10">
-                                                        <div @click="currentSet = n; open = false"
-                                                            class="px-4 py-2 text-sm text-center text-gray-600 hover:bg-blue-50 hover:text-[#4A72D4] cursor-pointer transition-colors font-medium"
-                                                            x-text="n"></div>
-                                                    </template>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{-- Waktu --}}
-                                        <div class="w-full md:w-48 flex flex-col gap-2" x-data="{ open: false, selectedWaktu: 20 }"
-                                            @click.away="open = false">
-                                            <label
-                                                class="text-[10px] font-bold text-gray-400 uppercase ml-1">Waktu</label>
-                                            <div
-                                                class="bg-white px-4 py-3 rounded-2xl shadow-sm border border-blue-50 flex items-center gap-2 relative h-full">
-                                                <i class="fa-solid fa-stopwatch text-orange-400 text-sm"></i>
-                                                <button type="button" @click="open = !open"
-                                                    class="w-full flex items-center justify-between text-sm font-bold text-gray-700 focus:outline-none">
-                                                    <span x-text="selectedWaktu + ' Menit'"></span>
-                                                    <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"
-                                                        :class="open ? 'rotate-180' : ''"></i>
-                                                </button>
-                                                <div x-show="open" x-transition
-                                                    class="absolute z-50 w-full mt-2 top-full left-0 bg-white border border-blue-50 shadow-xl rounded-2xl overflow-hidden py-2">
-                                                    <template x-for="t in [20,25,30,35,40,45,50,55,60]">
-                                                        <div @click="selectedWaktu = t; open = false"
-                                                            class="px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-[#4A72D4] cursor-pointer transition-colors font-medium"
-                                                            x-text="t + ' Menit'"></div>
-                                                    </template>
-                                                </div>
+                                    {{-- Set --}}
+                                    <div class="w-full md:w-32 flex flex-col gap-2" x-data="{ open: false }"
+                                        @click.away="open = false">
+                                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Set</label>
+                                        <div
+                                            class="bg-white px-4 py-3 rounded-2xl shadow-sm border border-blue-50 flex items-center relative h-full">
+                                            <button type="button" @click="open = !open"
+                                                class="w-full flex items-center justify-between text-sm font-bold text-[#4A72D4] focus:outline-none">
+                                                <span x-text="currentSet"></span>
+                                                <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200"
+                                                    :class="open ? 'rotate-180' : ''"></i>
+                                            </button>
+                                            <div x-show="open" x-transition
+                                                class="absolute z-50 w-full mt-2 top-full left-0 bg-white border border-blue-50 shadow-xl rounded-2xl overflow-hidden py-2">
+                                                <template x-for="n in 10">
+                                                    <div @click="currentSet = n; open = false"
+                                                        class="px-4 py-2 text-sm text-center text-gray-600 hover:bg-blue-50 hover:text-[#4A72D4] cursor-pointer transition-colors font-medium"
+                                                        x-text="n"></div>
+                                                </template>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="space-y-6" x-data="{ imageUrl: null }">
-
-                                        <div class="space-y-2">
-                                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi
-                                                atau Teks (Opsional)</label>
-
-                                            <div x-show="currentQuestion" x-cloak>
-
-                                                <div class="relative group">
-                                                    <textarea required x-model="currentQuestion?.pertanyaan" @input="markChanged()" x-data="{
-                                                        resize() {
-                                                            $el.style.height = 'auto';
-                                                            $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
-                                                        }
-                                                    }"
-                                                        x-init="resize()" @input.debounce.300ms="resize(); markChanged()"
-                                                        class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none shadow-inner transition-all overflow-hidden resize-none"
-                                                        placeholder="Masukkan teks pertanyaan di sini..." style="min-height: 120px;">
-        </textarea>
-
-                                                    <div class="absolute right-4 bottom-4">
-                                                        <label
-                                                            class="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-100 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all">
-
-                                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                                class="h-4 w-4 text-blue-500" fill="none"
-                                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                            </svg>
-
-                                                            <span
-                                                                class="text-[10px] font-bold text-blue-600 uppercase">
-                                                                Ubah Foto
-                                                            </span>
-
-                                                            <input type="file" class="hidden" accept="image/*"
-                                                                @change="const file = $event.target.files[0];
-                    if (file) { imageUrl = URL.createObjectURL(file) }">
-                                                        </label>
-                                                    </div>
-                                                </div>
-
+                                    {{-- Waktu --}}
+                                    <div class="w-full md:w-48 flex flex-col gap-2" x-data="{ open: false, selectedWaktu: 20 }"
+                                        @click.away="open = false">
+                                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Waktu</label>
+                                        <div
+                                            class="bg-white px-4 py-3 rounded-2xl shadow-sm border border-blue-50 flex items-center gap-2 relative h-full">
+                                            <i class="fa-solid fa-stopwatch text-orange-400 text-sm"></i>
+                                            <button type="button" @click="open = !open"
+                                                class="w-full flex items-center justify-between text-sm font-bold text-gray-700 focus:outline-none">
+                                                <span x-text="selectedWaktu + ' Menit'"></span>
+                                                <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"
+                                                    :class="open ? 'rotate-180' : ''"></i>
+                                            </button>
+                                            <div x-show="open" x-transition
+                                                class="absolute z-50 w-full mt-2 top-full left-0 bg-white border border-blue-50 shadow-xl rounded-2xl overflow-hidden py-2">
+                                                <template x-for="t in [20,25,30,35,40,45,50,55,60]">
+                                                    <div @click="selectedWaktu = t; open = false"
+                                                        class="px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-[#4A72D4] cursor-pointer transition-colors font-medium"
+                                                        x-text="t + ' Menit'"></div>
+                                                </template>
                                             </div>
-
-
-                                            <template x-if="imageUrl">
-                                                <div class="relative mt-3 inline-block">
-                                                    <img :src="imageUrl"
-                                                        class="max-h-48 rounded-2xl border-2 border-white shadow-sm ring-1 ring-gray-100">
-                                                    <button @click="imageUrl = null"
-                                                        class="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:scale-110 transition-all shadow-md">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3"
-                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </template>
                                         </div>
+                                    </div>
+                            </div>
 
-                                        <div class="space-y-2">
-                                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">
-                                                Pertanyaan
-                                            </label>
+                            <div class="space-y-6" x-data="{ imageUrl: null }">
 
-                                            <textarea required x-model="currentQuestion.pertanyaan" x-data="{
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi
+                                        atau Teks (Opsional)</label>
+
+                                    <div x-show="currentQuestion" x-cloak>
+
+                                        <div class="relative group">
+                                            <textarea required x-model="currentQuestion.materi" @input="markChanged()" x-data="{
                                                 resize() {
                                                     $el.style.height = 'auto';
                                                     $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
                                                 }
-                                            }" x-init="resize()"
-                                                @input="resize(); markChanged()"
-                                                class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm 
-               focus:bg-white focus:ring-2 focus:ring-blue-100 
-               outline-none shadow-inner transition-all 
-               overflow-hidden resize-none"
+                                            }"
+                                                x-init="resize()" @input.debounce.300ms="resize(); markChanged()"
+                                                class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none shadow-inner transition-all overflow-hidden resize-none"
                                                 placeholder="Masukkan teks pertanyaan di sini..." style="min-height: 120px;">
-    </textarea>
-                                        </div>
+        </textarea>
 
+                                            <div class="absolute right-4 bottom-4">
+                                                <label
+                                                    class="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-100 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all">
 
-                                        <div x-show="currentQuestion" x-cloak class="grid grid-cols-1 gap-4"
-                                            x-data="{ selected: null }">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-4 w-4 text-blue-500" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
 
-                                            <template x-for="(opt, i) in ['A','B','C','D','E']" :key="opt">
-
-                                                <div :class="selected === i ?
-                                                    'bg-emerald-50 border-emerald-200' :
-                                                    'bg-gray-50 border-transparent'"
-                                                    class="flex items-start gap-4 p-4 rounded-2xl border-2 transition-all">
-
-                                                    <!-- Label A B C D E -->
-                                                    <span
-                                                        class="w-10 h-10 shrink-0 flex items-center justify-center bg-white rounded-xl shadow-sm font-black text-[#4A72D4]"
-                                                        x-text="opt">
+                                                    <span class="text-[10px] font-bold text-blue-600 uppercase">
+                                                        Ubah Foto
                                                     </span>
 
-                                                    <!-- Input Jawaban -->
-                                                    <textarea required x-model="currentQuestion['opsi_' + opt.toLowerCase()]" @input="markChanged()"
-                                                        x-data="{
-                                                            resize() {
-                                                                $el.style.height = '40px';
-                                                                $el.style.height = $el.scrollHeight + 'px';
-                                                            }
-                                                        }" x-init="resize()" @input.debounce.200ms="resize(); markChanged()"
-                                                        class="flex-1 bg-transparent border-none outline-none text-sm font-medium pt-2 resize-none overflow-hidden"
-                                                        placeholder="Tulis jawaban di sini...">
-            </textarea>
-
-                                                    <!-- Radio Jawaban Benar -->
-                                                    <div class="pt-2">
-                                                        <input type="radio" name="benar" :value="opt"
-                                                            x-model="currentQuestion.jawaban_benar"
-                                                            @change="markChanged()"
-                                                            class="w-5 h-5 accent-emerald-500 cursor-pointer shrink-0">
-                                                    </div>
-
-                                                </div>
-
-                                            </template>
+                                                    <input type="file" class="hidden" accept="image/*"
+                                                        @change="const file = $event.target.files[0];
+                    if (file) { imageUrl = URL.createObjectURL(file) }">
+                                                </label>
+                                            </div>
                                         </div>
 
                                     </div>
 
-                                    <div
-                                        class="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-100 mt-6">
-                                        <p
-                                            class="text-[10px] text-gray-400 text-center md:text-left order-2 md:order-1">
-                                            Klik "Simpan" untuk mengunci jawaban nomor ini.
-                                        </p>
 
-                                        <div class="flex items-center gap-2 w-full md:w-auto order-1 md:order-2">
-                                            <button type="reset" @click="selected = null"
-                                                class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-red-400 transition-colors">
-                                                Reset
-                                            </button>
-
-                                            <button type="submit"
-                                                :class="questions.find(q => q.id === activeQuestion).status === 'changed' ?
-                                                    'bg-orange-500' : 'bg-[#4A72D4]'"
-                                                class="text-white px-8 py-3 rounded-xl font-bold text-sm transition-all">
-                                                <span
-                                                    x-text="questions.find(q => q.id === activeQuestion).status === 'changed' ? 'Update Soal' : 'Simpan & Lanjut'"></span>
+                                    <template x-if="imageUrl">
+                                        <div class="relative mt-3 inline-block">
+                                            <img :src="imageUrl"
+                                                class="max-h-48 rounded-2xl border-2 border-white shadow-sm ring-1 ring-gray-100">
+                                            <button @click="imageUrl = null"
+                                                class="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:scale-110 transition-all shadow-md">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
                                             </button>
                                         </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div class="space-y-6">
-                            <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50">
-                                <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-6">
-                                    Navigasi Soal</h4>
-
-                                <div class="grid grid-cols-5 gap-3">
-                                    <template x-for="q in questions" :key="q.id">
-                                        <button @click="activeQuestion = q.id"
-                                            :class="{
-                                                // Warna Biru jika Aktif
-                                                'bg-[#4A72D4] text-white shadow-lg shadow-blue-200 ring-2 ring-offset-2 ring-blue-400': activeQuestion ===
-                                                    q.id,
-                                            
-                                                // Warna Hijau jika Original (Belum diubah)
-                                                'bg-emerald-500 text-white border-emerald-500': q
-                                                    .status === 'original' && activeQuestion !== q.id,
-                                            
-                                                // Warna Orange jika Ada Perubahan
-                                                'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-100': q
-                                                    .status === 'changed' && activeQuestion !== q.id,
-                                            
-                                                // Warna Abu jika Kosong (jika ada soal baru)
-                                                'bg-gray-50 text-gray-400 border-gray-100': q.status === 'empty' &&
-                                                    activeQuestion !== q.id
-                                            }"
-                                            class="aspect-square rounded-xl border-2 flex items-center justify-center font-bold text-xs transition-all hover:scale-110 relative">
-                                            <span x-text="questions.indexOf(q)+1"></span>
-
-
-                                            <template x-if="q.status === 'changed'">
-                                                <span
-                                                    class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full flex items-center justify-center">
-                                                    <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
-                                                </span>
-                                            </template>
-                                        </button>
                                     </template>
                                 </div>
 
-                                <div class="mt-8 space-y-3 pt-6 border-t border-gray-50">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
-                                        <span class="text-[10px] font-bold text-gray-500 uppercase">Data Asli
-                                            (Tersimpan)</span>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
-                                        <span class="text-[10px] font-bold text-gray-500 uppercase">Ada
-                                            Perubahan</span>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-3 h-3 bg-[#4A72D4] rounded-full"></div>
-                                        <span class="text-[10px] font-bold text-gray-500 uppercase">Sedang
-                                            Diedit</span>
-                                    </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">
+                                        Pertanyaan
+                                    </label>
+
+                                    <textarea required x-model="currentQuestion.pertanyaan" x-data="{
+                                        resize() {
+                                            $el.style.height = 'auto';
+                                            $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
+                                        }
+                                    }" x-init="resize()"
+                                        @input="resize(); markChanged()"
+                                        class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm 
+               focus:bg-white focus:ring-2 focus:ring-blue-100 
+               outline-none shadow-inner transition-all 
+               overflow-hidden resize-none"
+                                        placeholder="Masukkan teks pertanyaan di sini..." style="min-height: 120px;">
+    </textarea>
                                 </div>
 
-                                <button :disabled="soalTersimpan < 20"
-                                    class="w-full mt-8 py-4 bg-orange-500 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-orange-100 transition-all">
-                                    Publikasikan Perubahan
-                                </button>
+
+                                <div x-show="currentQuestion" x-cloak class="grid grid-cols-1 gap-4"
+                                    x-data="{ selected: null }">
+
+                                    <template x-for="(opt, i) in ['A','B','C','D','E']" :key="opt">
+
+                                        <div :class="selected === i ?
+                                            'bg-emerald-50 border-emerald-200' :
+                                            'bg-gray-50 border-transparent'"
+                                            class="flex items-start gap-4 p-4 rounded-2xl border-2 transition-all">
+
+                                            <!-- Label A B C D E -->
+                                            <span
+                                                class="w-10 h-10 shrink-0 flex items-center justify-center bg-white rounded-xl shadow-sm font-black text-[#4A72D4]"
+                                                x-text="opt">
+                                            </span>
+
+                                            <!-- Input Jawaban -->
+                                            <textarea required x-model="currentQuestion['opsi_' + opt.toLowerCase()]" @input="markChanged()"
+                                                x-data="{
+                                                    resize() {
+                                                        $el.style.height = '40px';
+                                                        $el.style.height = $el.scrollHeight + 'px';
+                                                    }
+                                                }" x-init="resize()" @input.debounce.200ms="resize(); markChanged()"
+                                                class="flex-1 bg-transparent border-none outline-none text-sm font-medium pt-2 resize-none overflow-hidden"
+                                                placeholder="Tulis jawaban di sini...">
+            </textarea>
+
+                                            <!-- Radio Jawaban Benar -->
+                                            <div class="pt-2">
+                                                <input type="radio" name="benar" :value="opt"
+                                                    x-model="currentQuestion.jawaban_benar" @change="markChanged()"
+                                                    class="w-5 h-5 accent-emerald-500 cursor-pointer shrink-0">
+                                            </div>
+
+                                        </div>
+
+                                    </template>
+                                </div>
+
                             </div>
+
+                            <div
+                                class="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-100 mt-6">
+                                <p class="text-[10px] text-gray-400 text-center md:text-left order-2 md:order-1">
+                                    Klik "Simpan" untuk mengunci jawaban nomor ini.
+                                </p>
+
+                                <div class="flex items-center gap-2 w-full md:w-auto order-1 md:order-2">
+                                    <button type="reset" @click="selected = null"
+                                        class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-red-400 transition-colors">
+                                        Reset
+                                    </button>
+
+                                    <button type="submit"
+                                        :class="questions.find(q => q.id === activeQuestion).status === 'changed' ?
+                                            'bg-orange-500' : 'bg-[#4A72D4]'"
+                                        class="text-white px-8 py-3 rounded-xl font-bold text-sm transition-all">
+                                        <span
+                                            x-text="questions.find(q => q.id === activeQuestion).status === 'changed' ? 'Update Soal' : 'Simpan & Lanjut'"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50">
+                            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-6">
+                                Navigasi Soal</h4>
+
+                            <div class="grid grid-cols-5 gap-3">
+                                <template x-for="q in questions" :key="q.id">
+                                    <button @click="activeQuestion = q.id"
+                                        :class="{
+                                            // Warna Biru jika Aktif
+                                            'bg-[#4A72D4] text-white shadow-lg shadow-blue-200 ring-2 ring-offset-2 ring-blue-400': activeQuestion ===
+                                                q.id,
+                                        
+                                            // Warna Hijau jika Original (Belum diubah)
+                                            'bg-emerald-500 text-white border-emerald-500': q
+                                                .status === 'original' && activeQuestion !== q.id,
+                                        
+                                            // Warna Orange jika Ada Perubahan
+                                            'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-100': q
+                                                .status === 'changed' && activeQuestion !== q.id,
+                                        
+                                            // Warna Abu jika Kosong (jika ada soal baru)
+                                            'bg-gray-50 text-gray-400 border-gray-100': q.status === 'empty' &&
+                                                activeQuestion !== q.id
+                                        }"
+                                        class="aspect-square rounded-xl border-2 flex items-center justify-center font-bold text-xs transition-all hover:scale-110 relative">
+                                        <span x-text="questions.indexOf(q)+1"></span>
+
+
+                                        <template x-if="q.status === 'changed'">
+                                            <span
+                                                class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full flex items-center justify-center">
+                                                <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                                            </span>
+                                        </template>
+                                    </button>
+                                </template>
+                            </div>
+
+                            <div class="mt-8 space-y-3 pt-6 border-t border-gray-50">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                                    <span class="text-[10px] font-bold text-gray-500 uppercase">Data Asli
+                                        (Tersimpan)</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                    <span class="text-[10px] font-bold text-gray-500 uppercase">Ada
+                                        Perubahan</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 bg-[#4A72D4] rounded-full"></div>
+                                    <span class="text-[10px] font-bold text-gray-500 uppercase">Sedang
+                                        Diedit</span>
+                                </div>
+                            </div>
+
+                            <button :disabled="soalTersimpan < 20"
+                                class="w-full mt-8 py-4 bg-orange-500 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-orange-100 transition-all">
+                                Publikasikan Perubahan
+                            </button>
                         </div>
                     </div>
                 </div>
-            </main>
+    </div>
+    </main>
     </div>
 
     <div x-show="showImportModal" class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
