@@ -18,8 +18,10 @@ class AdminKuisController extends Controller
             ->get();
 
         $trash = Kuis::onlyTrashed()
+            ->withCount('questions')
             ->latest()
             ->get();
+
 
         return view('admin.kuis.index', compact('kuis', 'trash'));
     }
@@ -48,7 +50,7 @@ class AdminKuisController extends Controller
         // decode soal dari hidden input
         $questions = json_decode($request->questions_json, true);
 
-        if (!$questions || count($questions) < 20) {
+        if (!$questions || count($questions) < 2) {
             return back()->with('error', 'Harus mengisi minimal 20 soal!');
         }
 
@@ -79,6 +81,7 @@ class AdminKuisController extends Controller
         foreach ($questions as $q) {
             $kuis->questions()->create([
                 'pertanyaan'    => $q['pertanyaan'],
+                'subtes'        => $q['subtes'] ?? null,
                 'opsi_a'        => $q['opsi_a'],
                 'opsi_b'        => $q['opsi_b'],
                 'opsi_c'        => $q['opsi_c'],
@@ -98,54 +101,78 @@ class AdminKuisController extends Controller
     // EDIT FORM
     // ============================
     public function edit($id)
-    {
-        $kuis = Kuis::with('questions')->findOrFail($id);
+{
+    $kuis = Kuis::with('questions')->findOrFail($id);
 
-        return view('admin.kuis.edit', compact('kuis'));
-    }
+    $questions = $kuis->questions->map(function ($q) {
+        return [
+            'id' => $q->id,
+            'pertanyaan' => $q->pertanyaan,
+            'subtes' => $q->subtes, // ✅ FIX
+
+            'opsi_a' => $q->opsi_a,
+            'opsi_b' => $q->opsi_b,
+            'opsi_c' => $q->opsi_c,
+            'opsi_d' => $q->opsi_d,
+            'opsi_e' => $q->opsi_e,
+
+            'jawaban_benar' => $q->jawaban_benar,
+            'bobot' => $q->bobot,
+        ];
+    });
+
+    return view('admin.kuis.edit', compact('kuis', 'questions'));
+}
+
+
+
 
     // ============================
     // UPDATE QUIZ + QUESTIONS OPTIONAL
     // ============================
     public function update(Request $request, $id)
-    {
-        $kuis = Kuis::findOrFail($id);
+{
+    $kuis = Kuis::findOrFail($id);
 
-        // update kuis opsional
-        $kuis->update([
-            'durasi'    => $request->durasi ?? $kuis->durasi,
-            'materi'    => $request->materi ?? $kuis->materi,
-            'video_url' => $request->video_url ?? $kuis->video_url,
-        ]);
+    $kuis->update([
+    'durasi' => $request->durasi ?? $kuis->durasi,
+    'materi' => $request->materi ?? $kuis->materi,
+    'video_url' => $request->video_url ?? $kuis->video_url,
+]);
 
-        // update soal opsional
-        if ($request->questions) {
 
-            foreach ($request->questions as $qid => $q) {
+    if ($request->questions_json) {
 
-                $question = $kuis->questions()->find($qid);
+        $questions = json_decode($request->questions_json, true);
 
-                if ($question) {
-                    $question->update([
-                        'pertanyaan' => $q['pertanyaan'] ?? $question->pertanyaan,
+        foreach ($questions as $q) {
 
-                        'opsi_a' => $q['opsi_a'] ?? $question->opsi_a,
-                        'opsi_b' => $q['opsi_b'] ?? $question->opsi_b,
-                        'opsi_c' => $q['opsi_c'] ?? $question->opsi_c,
-                        'opsi_d' => $q['opsi_d'] ?? $question->opsi_d,
-                        'opsi_e' => $q['opsi_e'] ?? $question->opsi_e,
+            $question = $kuis->questions()->where('id', $q['id'])->first();
 
-                        'jawaban_benar' => $q['jawaban_benar'] ?? $question->jawaban_benar,
-                        'bobot' => $q['bobot'] ?? $question->bobot,
-                    ]);
-                }
+            if ($question) {
+                $question->update([
+                    'pertanyaan' => $q['pertanyaan'],
+                    'subtes'     => $q['subtes'] ?? null, // ✅ FIX
+
+                    'opsi_a' => $q['opsi_a'],
+                    'opsi_b' => $q['opsi_b'],
+                    'opsi_c' => $q['opsi_c'],
+                    'opsi_d' => $q['opsi_d'],
+                    'opsi_e' => $q['opsi_e'],
+
+                    'jawaban_benar' => $q['jawaban_benar'],
+                    'bobot'         => $q['bobot'] ?? 1,
+                ]);
             }
         }
-
-        return redirect()
-            ->route('admin.kuis.index')
-            ->with('success', 'Kuis berhasil diperbarui!');
     }
+
+    return redirect()
+        ->route('admin.kuis.index')
+        ->with('success', 'Kuis berhasil diperbarui!');
+}
+
+
 
     // ============================
     // DELETE (SOFT DELETE)
@@ -182,4 +209,27 @@ class AdminKuisController extends Controller
 
         return back()->with('success', 'Status kuis berhasil diubah!');
     }
+
+    // ============================
+// SHOW / PREVIEW
+// ============================
+public function show($id)
+{
+    $kuis = Kuis::with('questions')->findOrFail($id);
+
+    return view('admin.kuis.show', compact('kuis'));
+}
+
+// ============================
+// FORCE DELETE (HAPUS PERMANEN)
+// ============================
+public function forceDelete($id)
+{
+    $kuis = Kuis::onlyTrashed()->findOrFail($id);
+
+    $kuis->forceDelete();
+
+    return back()->with('success', 'Kuis berhasil dihapus permanen!');
+}
+
 }

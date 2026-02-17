@@ -11,6 +11,7 @@ class KuisQuestion extends Model
     protected $fillable = [
         'kuis_id',
         'pertanyaan',
+        'kuis',
         'opsi_a',
         'opsi_b',
         'opsi_c',

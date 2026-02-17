@@ -97,15 +97,22 @@ Route::middleware('auth')->group(function () {
         Route::resource('latihan', AdminLatihanController::class);
         Route::resource('videoPembelajaran', AdminVideoController::class);
 
-        // Kuis Fundamental 
-        Route::get('/kuis', [AdminKuisController::class, 'index'])->name('kuis.index');
-        Route::get('/kuis/create', [AdminKuisController::class, 'create'])->name('kuis.create');
-        Route::post('/kuis/store', [AdminKuisController::class, 'store'])->name('kuis.store');
-        Route::get('/kuis/{id}/edit', [AdminKuisController::class, 'edit'])->name('kuis.edit');
-        Route::put('/kuis/{id}', [AdminKuisController::class, 'update'])->name('kuis.update');
-        Route::delete('/kuis/{id}', [AdminKuisController::class, 'destroy'])->name('kuis.destroy');
-        Route::post('/kuis/{id}/toggle', [AdminKuisController::class, 'toggle'])->name('kuis.toggle');
-        Route::post('/kuis/{id}/restore', [AdminKuisController::class, 'restore'])->name('kuis.restore');
+        // Kuis Fundamental
+         Route::get('/kuis', [AdminKuisController::class, 'index'])->name('kuis.index');
+         Route::get('/kuis/create', [AdminKuisController::class, 'create'])->name('kuis.create');
+         Route::post('/kuis/store', [AdminKuisController::class, 'store'])->name('kuis.store');
+
+         Route::get('/kuis/{id}/edit', [AdminKuisController::class, 'edit'])->name('kuis.edit');
+         Route::put('/kuis/{id}', [AdminKuisController::class, 'update'])->name('kuis.update');
+
+         Route::delete('/kuis/{id}', [AdminKuisController::class, 'destroy'])->name('kuis.destroy');
+
+         Route::post('/kuis/{id}/toggle', [AdminKuisController::class, 'toggle'])->name('kuis.toggle');
+
+         Route::post('/kuis/{id}/restore', [AdminKuisController::class, 'restore'])->name('kuis.restore');
+
+         Route::delete('/kuis/force-delete/{id}', [AdminKuisController::class, 'forceDelete'])->name('kuis.forceDelete');
+
 
 
         /* Minat Bakat */

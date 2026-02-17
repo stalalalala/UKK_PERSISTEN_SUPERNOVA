@@ -313,146 +313,159 @@
                     </div>
                 </div>
 
-                <div class="table-responsive custom-scrollbar">
+                <div class="w-full overflow-x-auto table-responsive custom-scrollbar">
                     <table x-show="activeTab === 'list'"
                         class="w-full text-left border-separate border-spacing-0 min-w-[800px]">
-                        <thead class="bg-gray-50/50 sticky top-0 z-10 backdrop-blur-sm">
-                            @foreach ($kuis as $item)
-                                <tr>
-                                    <th
-                                        class="px-28 md:px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                        Set & Judul</th>
-                                    <th
-                                        class="px-24 md:px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                        Kategori</th>
-                                    <th
-                                        class="px-16 md:px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center">
-                                        Soal</th>
-                                    <th
-                                        class="px-16 md:px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center">
-                                        Durasi</th>
-                                    <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center">
-                                        Status</th>
-                                    <th
-                                        class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center">
-                                        Aksi</th>
-                                </tr>
+                        <thead class="bg-gray-50 sticky top-0 z-10 backdrop-blur-sm">
+                            <tr>
+                                <th class="px-4 md:px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase">
+                                    Set & Judul
+                                </th>
+
+                                <th class="px-4 md:px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase">
+                                    Kategori
+                                </th>
+
+                                <th
+                                    class="px-3 md:px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase">
+                                    Soal
+                                </th>
+
+                                <th
+                                    class="px-3 md:px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase">
+                                    Durasi
+                                </th>
+
+                                <th
+                                    class="px-3 md:px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase">
+                                    Status
+                                </th>
+
+                                <th
+                                    class="px-3 md:px-6 py-4 text-center text-[11px] font-bold text-gray-400 uppercase">
+                                    Aksi
+                                </th>
+                            </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
-                            <template x-for="(kuis, index) in pagedKuis" :key="kuis.id">
+
+                            @foreach ($kuis as $item)
                                 <tr class="hover:bg-blue-50/30 transition-colors group">
-                                    <td class="px-8 py-5">
-                                        <div class="flex flex-col">
+
+                                    <!-- Judul -->
+                                    <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                                        <div class="font-semibold text-gray-800">
                                             {{ $item->judul }}
-                                            <span class="text-xs text-gray-400"
-                                                x-text="'Dibuat: ' + kuis.tanggal"></span>
+                                        </div>
+                                        <div class="text-xs text-gray-400">
+                                            Dibuat: {{ $item->created_at->format('d M Y') }}
                                         </div>
                                     </td>
-                                    <td class="px-8 py-5 text-sm font-medium text-gray-600">{{ $item->kategori }}
+
+
+                                    <!-- Kategori -->
+                                    <td
+                                        class="px-4 md:px-6 py-4 font-semibold text-gray-600 align-top whitespace-nowrap">
+                                        {{ $item->kategori }}
                                     </td>
-                                    <td class="px-8 py-5 text-center">
+
+
+                                    <!-- Soal -->
+                                    <td class="px-3 md:px-6 py-4 text-center align-top whitespace-nowrap">
                                         <span
-                                            class="bg-blue-50 text-[#4A72D4] text-xs font-bold px-3 py-1 rounded-full border border-blue-100">{{ $item->questions_count }}
-                                            Soal</span>
+                                            class="inline-block bg-blue-50 text-blue-600 font-semibold px-3 py-1 rounded-full text-xs">
+                                            {{ $item->questions_count }} Soal
+                                        </span>
                                     </td>
-                                    <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">
-                                        {{ $item->durasi }} Menit</td>
-                                    <td class="px-8 py-5 text-center">
-                                        @if ($kuis->status === 'Aktif')
+
+                                    <!-- Durasi -->
+                                    <td
+                                        class="px-3 md:px-6 py-4 text-center align-top whitespace-nowrap text-gray-700">
+                                        <span
+                                            class="inline-block bg-red-50 text-red-600 font-semibold px-3 py-1 rounded-full text-xs">
+                                            {{ $item->durasi }} Menit
+                                        </span>
+                                    </td>
+
+                                    <!-- Status -->
+                                    <td class="px-3 md:px-6 py-4 text-center align-top whitespace-nowrap">
+                                        @if ($item->is_active)
                                             <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase
-                   bg-emerald-100 text-emerald-600">
-
-                                                <span
-                                                    class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-
-                                                <span>Aktif</span>
+                                                class="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-600 font-bold">
+                                                Aktif
                                             </span>
                                         @else
                                             <span
-                                                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase
-                   bg-gray-100 text-gray-500">
-
-                                                <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-
-                                                <span>Hidden</span>
+                                                class="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-500 font-bold">
+                                                Hidden
                                             </span>
                                         @endif
                                     </td>
 
-                                    <td class="px-8 py-5">
-                                        <div class="flex items-center justify-center gap-2">
 
-                                            <!-- EDIT -->
+                                    <!-- Aksi -->
+                                    <td class="px-3 md:px-6 py-4 text-center align-top whitespace-nowrap">
+                                        <div class="flex justify-center gap-2">
+
+                                            <!-- Edit -->
                                             <a href="{{ route('admin.kuis.edit', $item->id) }}"
-                                                class="p-2 text-blue-400 hover:bg-blue-50 rounded-lg transition-all"
-                                                title="Edit">
-
-                                                <!-- Heroicon: Pencil Square -->
+                                                class="px-4 pb-2 rounded-lg hover:bg-blue-100 text-blue-500">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                    class="w-5 h-5">
+                                                    class="size-6">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.213 3 21l1.787-4.5L16.862 3.487z" />
+                                                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
                                                 </svg>
+
                                             </a>
 
-
-                                            <!-- PREVIEW -->
-                                            <a href="{{ route('admin.kuis.show', $item->id) }}"
-                                                class="p-2 text-orange-400 hover:bg-orange-50 rounded-lg transition-all"
-                                                title="Preview">
-
-                                                <!-- Heroicon: Eye -->
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                    class="w-5 h-5">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.577 3.01 9.964 7.183.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.64 0-8.577-3.01-9.964-7.178z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                </svg>
-                                            </a>
-
-
-                                            <!-- TOGGLE ACTIVE/HIDDEN -->
+                                            <!-- Toggle -->
                                             <form action="{{ route('admin.kuis.toggle', $item->id) }}"
                                                 method="POST">
                                                 @csrf
-                                                <button type="submit"
-                                                    class="p-2 text-yellow-400 hover:bg-yellow-50 rounded-lg transition-all"
-                                                    title="{{ $item->is_active ? 'Hidden' : 'Aktifkan' }}">
 
-                                                    <!-- Heroicon: Arrow Path -->
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                        class="w-5 h-5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M16.023 9.348h4.992m0 0v4.992m0-4.992l-3.181 3.181a8.25 8.25 0 11-2.757-5.196" />
-                                                    </svg>
+                                                <button type="submit"
+                                                    class="px-4 pb-2 rounded-lg transition
+        {{ $item->is_active ? 'hover:bg-emerald-100 text-emerald-600' : 'hover:bg-gray-100 text-gray-500' }}">
+
+                                                    @if ($item->is_active)
+                                                        <!-- ICON: Mata Normal (Aktif) -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="2"
+                                                            stroke="currentColor" class="size-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                        </svg>
+                                                    @else
+                                                        <!-- ICON: Mata Dicoret (Hidden) -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="1.5"
+                                                            stroke="currentColor" class="size-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                                        </svg>
+                                                    @endif
+
                                                 </button>
                                             </form>
 
 
-                                            <!-- DELETE -->
+                                            <!-- Delete -->
                                             <form action="{{ route('admin.kuis.destroy', $item->id) }}"
                                                 method="POST"
                                                 onsubmit="return confirm('Yakin ingin menghapus kuis ini?')">
                                                 @csrf
                                                 @method('DELETE')
-
-                                                <button type="submit"
-                                                    class="p-2 text-rose-400 hover:bg-rose-50 rounded-lg transition-all"
-                                                    title="Hapus">
-
-                                                    <!-- Heroicon: Trash -->
+                                                <button class="px-4 pb-2 rounded-lg hover:bg-red-100 text-red-500">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                         viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                        class="w-5 h-5">
+                                                        class="size-6">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0z" />
+                                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                                     </svg>
+
                                                 </button>
                                             </form>
 
@@ -460,8 +473,7 @@
                                     </td>
 
                                 </tr>
-                                @endforeach
-                            </template>
+                            @endforeach
                             <tr x-show="allKuis.length === 0">
                                 <td colspan="6" class="px-8 py-10 text-center text-gray-400 italic">Tidak ada kuis
                                     aktif.</td>
@@ -470,13 +482,15 @@
                     </table>
 
                     <table x-show="activeTab === 'history'"
-                        class="w-full text-left border-separate border-spacing-0 min-w-[800px]">
+                        class="w-full text-left border-separate border-spacing-0 min-w-full">
                         <thead class="bg-orange-50/50 sticky top-0 z-10 backdrop-blur-sm">
                             <tr>
                                 <th class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                                     Judul Kuis (Terhapus)</th>
                                 <th class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                                     Kategori</th>
+                                <th class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                                    Soal</th>
                                 <th
                                     class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center">
                                     Durasi</th>
@@ -485,81 +499,99 @@
                                     Aksi Pemulihan</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-50">
-                            <template x-for="hist in pagedHistory" :key="hist.id">
-                                @foreach ($trash as $trashItem)
-                                    <tr class="hover:bg-orange-50/30 transition-colors group">
-                                        <td class="px-8 py-5">
-                                            <div class="flex flex-col">
+                        <tbody class="divide-y divide-gray-100">
+
+                            @forelse ($trash as $trashItem)
+                                <tr class="hover:bg-orange-50/40 transition group">
+
+                                    <!-- Judul -->
+                                    <td class="px-4 md:px-8 py-4">
+                                        <div class="flex flex-col">
+                                            <span class="font-semibold text-gray-800">
                                                 {{ $trashItem->judul }}
-                                                <span class="text-[10px] text-rose-400 font-bold uppercase">Data di
-                                                    History</span>
-                                            </div>
-                                        </td>
-                                        <td class="px-8 py-5 text-sm font-medium text-gray-600">
-                                            {{ $trashItem->kategori }}
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <span
-                                                class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-[10px] font-bold uppercase">{{ $trashItem->durasi }}
-                                                Menit</span>
-                                        </td>
-                                        <td class="px-8 py-5 text-center">
-                                            <div class="flex items-center justify-center gap-3">
+                                            </span>
+                                            <span class="text-[10px] text-rose-400 font-bold uppercase">
+                                                Data di History
+                                            </span>
+                                        </div>
+                                    </td>
 
-                                                <!-- RESTORE -->
-                                                <form action="{{ route('admin.kuis.restore', $trashItem->id) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    <button type="submit"
-                                                        class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 flex items-center gap-2">
+                                    <!-- Kategori -->
+                                    <td
+                                        class="px-4 md:px-8 py-4 text-gray-600 font-semibold align-top whitespace-nowrap">
+                                        {{ $trashItem->kategori }}
+                                    </td>
 
-                                                        <!-- Heroicon: Arrow U-Turn Left -->
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            viewBox="0 0 24 24" stroke-width="2"
-                                                            stroke="currentColor" class="w-4 h-4">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M9 15l-3-3m0 0l3-3m-3 3h12a6 6 0 010 12h-3" />
-                                                        </svg>
+                                    <!-- Jumlah Soal -->
+                                    <td class="px-4 md:px-8 py-4 text-sm text-gray-600 align-top whitespace-nowrap">
+                                        <span
+                                            class="inline-block bg-blue-50 text-blue-600 font-semibold px-3 py-1 rounded-full text-xs">
+                                            {{ $trashItem->questions_count }} Soal
+                                        </span>
+                                    </td>
 
-                                                        Pulihkan
-                                                    </button>
-                                                </form>
+                                    <!-- Durasi -->
+                                    <td class="px-4 md:px-8 py-4 text-center align-top whitespace-nowrap">
+                                        <span
+                                            class="inline-block bg-red-50 text-red-600 font-semibold px-3 py-1 rounded-full text-xs">
+                                            {{ $trashItem->durasi }} Menit
+                                        </span>
+                                    </td>
 
+                                    <!-- Aksi -->
+                                    <td class="px-4 md:px-8 py-4">
+                                        <div class="flex flex-col md:flex-row gap-2 justify-center">
 
-                                                <!-- DELETE PERMANENT -->
-                                                <form action="{{ route('admin.kuis.forceDelete', $trashItem->id) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('Yakin ingin menghapus permanen kuis ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
+                                            <!-- RESTORE -->
+                                            <form action="{{ route('admin.kuis.restore', $trashItem->id) }}"
+                                                method="POST">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="w-full md:w-auto px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                        class="size-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                                    </svg>
 
-                                                    <button type="submit"
-                                                        class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 flex items-center gap-2">
+                                                </button>
+                                            </form>
 
-                                                        <!-- Heroicon: X Circle -->
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            viewBox="0 0 24 24" stroke-width="2"
-                                                            stroke="currentColor" class="w-4 h-4">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M12 9v3m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
+                                            <!-- FORCE DELETE -->
+                                            <form action="{{ route('admin.kuis.forceDelete', $trashItem->id) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Yakin ingin menghapus permanen kuis ini?')">
+                                                @csrf
+                                                @method('DELETE')
 
-                                                        Hapus Permanen
-                                                    </button>
-                                                </form>
+                                                <button type="submit"
+                                                    class="w-full md:w-auto px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                        class="size-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
 
-                                            </div>
-                                        </td>
+                                                </button>
+                                            </form>
 
-                                    </tr>
-                            </template>
-                            <tr x-show="historyData.length === 0">
-                                <td colspan="4" class="px-8 py-10 text-center text-gray-400 italic">History kosong.
-                                </td>
-                            </tr>
-                            @endforeach
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-8 py-10 text-center text-gray-400 italic">
+                                        History kosong.
+                                    </td>
+                                </tr>
+                            @endforelse
+
                         </tbody>
+
                     </table>
                 </div>
 

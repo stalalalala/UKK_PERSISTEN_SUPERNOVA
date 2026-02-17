@@ -82,6 +82,8 @@
                 let index = this.activeQuestion - 1;
 
                 this.questions[index] = {
+                    subtes: this.selectedSubtes,
+
                     materi: this.currentQuestion.materi,
                     gambar: this.currentQuestion.gambar,
 
@@ -96,6 +98,8 @@
                     jawaban_benar: ['a', 'b', 'c', 'd', 'e'][this.currentQuestion.benar],
                     bobot: this.currentQuestion.bobot,
                 };
+
+
 
                 // ==========================
                 // HITUNG TOTAL TERISI

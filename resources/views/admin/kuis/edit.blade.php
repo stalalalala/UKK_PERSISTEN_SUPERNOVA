@@ -31,60 +31,43 @@
     </style>
 </head>
 
-<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="{
-    activeMenu: 'Manajemen Kuis',
-    mobileMenuOpen: false,
-    showImportModal: false,
 
-    // --- STATE UNTUK EDIT KUIS ---
-    currentSet: 1,
-    activeQuestion: 1,
-    targetSoal: 20,
+<script>
+    function editKuisData() {
+        return {
+            mobileMenuOpen: false,
+            showImportModal: false,
+            activeMenu: "Manajemen Kuis",
+            currentSet: 1,
+            soalTersimpan: 0,
 
-    // Kita buat array 20 soal. 
-    // status: 'original' (hijau), 'changed' (orange), 'empty' (abu-abu)
-    // Saat mode EDIT, kita set semua status ke 'original'
-    questions: Array.from({ length: 20 }, (_, i) => ({
-        id: i + 1,
-        status: 'original',
-        jawaban: null // Tempat menyimpan jawaban per nomor
-    })),
 
-    // Fungsi untuk mendeteksi perubahan (Panggil ini di @input atau @change)
-    markAsChanged(id) {
-        let q = this.questions.find(item => item.id === id);
-        if (q && q.status !== 'changed') {
-            q.status = 'changed';
+            activeQuestion: @json($questions->first()['id'] ?? null),
+
+            questions: @json($questions),
+
+            get currentQuestion() {
+                return this.questions.find(q => q.id === this.activeQuestion);
+            },
+
+            selectQuestion(id) {
+                this.activeQuestion = id;
+            },
+
+            markChanged() {
+                if (this.currentQuestion) {
+                    this.currentQuestion.status = "changed";
+                }
+            }
         }
-    },
-
-    // Fungsi Simpan (Update)
-    simpanSoal() {
-        // 1. Ambil soal yang sedang aktif
-        let currentQ = this.questions.find(q => q.id === this.activeQuestion);
-
-        // 2. Tandai sebagai 'changed' (orange) karena admin menekan simpan
-        if (currentQ) {
-            currentQ.status = 'changed';
-        }
-
-        // 3. Logika Pindah Soal Otomatis
-        if (this.activeQuestion < this.targetSoal) {
-            this.activeQuestion++; // Pindah ke nomor berikutnya
-
-            // Reset visual textarea (opsional, tergantung kebutuhan)
-            // Jika pakai x-model, teks akan otomatis ganti ke data soal berikutnya
-        } else {
-            alert('Semua soal telah direview!');
-        }
-    },
-
-    // Getter untuk menghitung berapa soal yang sudah 'tersentuh' (untuk progress bar/button)
-    get soalTersimpan() {
-        return this.questions.filter(q => q.status !== 'empty').length;
     }
+</script>
 
-}">
+
+
+
+
+<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="editKuisData()">
 
     <div class="flex h-full w-full">
         <aside x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
@@ -115,88 +98,109 @@
                 [&::-webkit-scrollbar-thumb]:bg-white/20 
                 [&::-webkit-scrollbar-thumb]:rounded-full">
 
-               <a href="{{ route('admin.dashboard.index') }}" 
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
-                </svg>
-            <span class="text-md font-regular">Dashboard</span>
-        </a>
+                <a href="{{ route('admin.dashboard.index') }}"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+                    </svg>
+                    <span class="text-md font-regular">Dashboard</span>
+                </a>
 
-        <a href="{{ route('admin.user.index') }}"
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl  transition-all duration-200 group text-left">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-            </svg>
-            <span class="text-md font-regular">Manajemen user</span>
-        </a>
+                <a href="{{ route('admin.user.index') }}"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl  transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen user</span>
+                </a>
 
-        <a href="{{ route('admin.streak.index') }}" 
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
-            </svg>
-            <span class="text-md font-regular">Manajemen streak</span>
-        </a>
+                <a href="{{ route('admin.streak.index') }}"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen streak</span>
+                </a>
 
-         <a href="{{ route('admin.tryout.index') }}" 
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-            </svg>
-            <span class="text-md font-regular">Manajemen tryout</span>
-        </a>
+                <a href="{{ route('admin.tryout.index') }}"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen tryout</span>
+                </a>
 
-         <a href="{{ route('admin.kuis.index') }}" x-init="if(currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }"
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
-            </svg>
-            <span class="text-md font-regular">Manajemen kuis</span>
-        </a>
+                <a href="{{ route('admin.kuis.index') }}" x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen kuis</span>
+                </a>
 
-         <a href="{{ route('admin.latihan.index') }}" 
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-7">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-            </svg>
-            <span class="text-md font-regular">Manajemen latihan soal</span>
-        </a>
+                <a href="{{ route('admin.latihan.index') }}"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-7">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen latihan soal</span>
+                </a>
 
-         <a href="{{ route('admin.videoPembelajaran.index') }}" 
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-9">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
-            </svg>
-            <span class="text-md font-regular">Manajemen video pembelajaran</span>
-        </a>
+                <a href="{{ route('admin.videoPembelajaran.index') }}"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-9">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen video pembelajaran</span>
+                </a>
 
-         <a href="{{ route('admin.minatBakat.index') }}" 
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-7">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
-            </svg>
-            <span class="text-md font-regular">Manajemen minat bakat</span>
-        </a>
+                <a href="{{ route('admin.minatBakat.index') }}"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-7">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen minat bakat</span>
+                </a>
 
-        
 
-         <a href="{{ route('admin.peluang.index') }}" 
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
-            </svg>
-            <span class="text-md font-regular">Manajemen peluang PTN</span>
-        </a>
 
-         <a href="{{ route('admin.laporan.index') }}" 
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-7">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
-            </svg>
-            <span class="text-md font-regular">Monitoring dan laporan</span>
-        </a>
+                <a href="{{ route('admin.peluang.index') }}"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+                    </svg>
+                    <span class="text-md font-regular">Manajemen peluang PTN</span>
+                </a>
+
+                <a href="{{ route('admin.laporan.index') }}"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-7">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
+                    </svg>
+                    <span class="text-md font-regular">Monitoring dan laporan</span>
+                </a>
 
 
 
@@ -297,16 +301,32 @@
                                     </div>
                                 </div>
 
-                                <form id="formKuis" @submit.prevent="simpanSoal()" class="space-y-8">
+                                <form action="{{ route('admin.kuis.update', $kuis->id) }}" method="POST"
+                                    class="space-y-8">
+
+                                    @csrf
+                                    @method('PUT')
+
+                                    <!-- Hidden JSON -->
+                                    <input type="hidden" name="questions_json" :value="JSON.stringify(questions)">
+
                                     <div class="grid grid-cols-1 md:flex md:items-stretch gap-4 mb-8">
 
                                         {{-- Subtes --}}
                                         <div class="flex-1 min-w-0 flex flex-col gap-2" x-data="{
                                             open: false,
                                             selectedSubtes: '',
-                                            options: ['Penalaran Umum', 'Penalaran & Pemahaman Umum', 'Pemahaman Bacaan & Menulis', 'Pengetahuan Kuantitatif', 'Penalaran Matematika', 'Literasi Bahasa Indonesia', 'Literasi Bahasa Inggris']
+                                            options: [
+                                                'Penalaran Umum', 'Pengetahuan & Pemahaman Umum', 'Pemahaman Bacaan & Menulis', 'Pengetahuan Kuantitatif', 'Penalaran Matematika', 'Literasi Bahasa Indonesia', 'Literasi Bahasa Ingris'
+                                            ]
                                         }"
+                                            x-effect="
+        if(currentQuestion){
+            selectedSubtes = currentQuestion.subtes
+        }
+    "
                                             @click.away="open = false">
+
                                             <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Kategori
                                                 Subtes</label>
                                             <div
@@ -386,34 +406,46 @@
                                             <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi
                                                 atau Teks (Opsional)</label>
 
-                                            <div class="relative group">
-                                                <textarea required x-data="{
-                                                    resize() {
-                                                        $el.style.height = 'auto';
-                                                        $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
-                                                    }
-                                                }" x-init="resize()" @input="resize()"
-                                                    class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none shadow-inner transition-all overflow-hidden resize-none"
-                                                    placeholder="Masukkan teks soal di sini..." style="min-height: 120px;"></textarea>
+                                            <div x-show="currentQuestion" x-cloak>
 
-                                                <div class="absolute right-4 bottom-4">
-                                                    <label
-                                                        class="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-100 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all">
-                                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                                            class="h-4 w-4 text-blue-500" fill="none"
-                                                            viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                        </svg>
-                                                        <span
-                                                            class="text-[10px] font-bold text-blue-600 uppercase">Ubah
-                                                            Foto</span>
-                                                        <input type="file" class="hidden" accept="image/*"
-                                                            @change="const file = $event.target.files[0]; if (file) { imageUrl = URL.createObjectURL(file) }">
-                                                    </label>
+                                                <div class="relative group">
+                                                    <textarea required x-model="currentQuestion?.pertanyaan" @input="markChanged()" x-data="{
+                                                        resize() {
+                                                            $el.style.height = 'auto';
+                                                            $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
+                                                        }
+                                                    }"
+                                                        x-init="resize()" @input.debounce.300ms="resize(); markChanged()"
+                                                        class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none shadow-inner transition-all overflow-hidden resize-none"
+                                                        placeholder="Masukkan teks pertanyaan di sini..." style="min-height: 120px;">
+        </textarea>
+
+                                                    <div class="absolute right-4 bottom-4">
+                                                        <label
+                                                            class="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-100 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all">
+
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                class="h-4 w-4 text-blue-500" fill="none"
+                                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                            </svg>
+
+                                                            <span
+                                                                class="text-[10px] font-bold text-blue-600 uppercase">
+                                                                Ubah Foto
+                                                            </span>
+
+                                                            <input type="file" class="hidden" accept="image/*"
+                                                                @change="const file = $event.target.files[0];
+                    if (file) { imageUrl = URL.createObjectURL(file) }">
+                                                        </label>
+                                                    </div>
                                                 </div>
+
                                             </div>
+
 
                                             <template x-if="imageUrl">
                                                 <div class="relative mt-3 inline-block">
@@ -432,48 +464,67 @@
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label
-                                                class="text-[10px] font-bold text-gray-400 uppercase ml-1">Pertanyaan</label>
-                                            <textarea required x-data="{
+                                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">
+                                                Pertanyaan
+                                            </label>
+
+                                            <textarea required x-model="currentQuestion.pertanyaan" x-data="{
                                                 resize() {
                                                     $el.style.height = 'auto';
                                                     $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
                                                 }
-                                            }" x-init="resize()" @input="resize()"
-                                                class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none shadow-inner transition-all overflow-hidden resize-none"
-                                                placeholder="Masukkan teks pertanyaan di sini..." style="min-height: 120px;"></textarea>
+                                            }" x-init="resize()"
+                                                @input="resize(); markChanged()"
+                                                class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm 
+               focus:bg-white focus:ring-2 focus:ring-blue-100 
+               outline-none shadow-inner transition-all 
+               overflow-hidden resize-none"
+                                                placeholder="Masukkan teks pertanyaan di sini..." style="min-height: 120px;">
+    </textarea>
                                         </div>
 
-                                        <div class="grid grid-cols-1 gap-4" x-data="{ selected: null }">
-                                            <template x-for="(opt, i) in ['A','B','C','D','E']">
-                                                <div :class="selected === i ? 'bg-emerald-50 border-emerald-200' :
+
+                                        <div x-show="currentQuestion" x-cloak class="grid grid-cols-1 gap-4"
+                                            x-data="{ selected: null }">
+
+                                            <template x-for="(opt, i) in ['A','B','C','D','E']" :key="opt">
+
+                                                <div :class="selected === i ?
+                                                    'bg-emerald-50 border-emerald-200' :
                                                     'bg-gray-50 border-transparent'"
                                                     class="flex items-start gap-4 p-4 rounded-2xl border-2 transition-all">
 
+                                                    <!-- Label A B C D E -->
                                                     <span
                                                         class="w-10 h-10 shrink-0 flex items-center justify-center bg-white rounded-xl shadow-sm font-black text-[#4A72D4]"
-                                                        x-text="opt"></span>
+                                                        x-text="opt">
+                                                    </span>
 
-                                                    <textarea placeholder="Tulis jawaban di sini..." required x-data="{
-                                                        resize() {
-                                                            $el.style.height = '40px';
-                                                            $el.style.height = $el.scrollHeight + 'px'
-                                                        }
-                                                    }" x-init="resize()"
-                                                        @input="
-                                                              resize(); 
-                                                              markAsChanged(activeQuestion)
-                                                          "
-                                                        class="flex-1 bg-transparent border-none outline-none text-sm font-medium pt-2 resize-none overflow-hidden"></textarea>
+                                                    <!-- Input Jawaban -->
+                                                    <textarea required x-model="currentQuestion['opsi_' + opt.toLowerCase()]" @input="markChanged()"
+                                                        x-data="{
+                                                            resize() {
+                                                                $el.style.height = '40px';
+                                                                $el.style.height = $el.scrollHeight + 'px';
+                                                            }
+                                                        }" x-init="resize()" @input.debounce.200ms="resize(); markChanged()"
+                                                        class="flex-1 bg-transparent border-none outline-none text-sm font-medium pt-2 resize-none overflow-hidden"
+                                                        placeholder="Tulis jawaban di sini...">
+            </textarea>
 
+                                                    <!-- Radio Jawaban Benar -->
                                                     <div class="pt-2">
-                                                        <input type="radio" name="benar" @click="selected = i"
-                                                            required
+                                                        <input type="radio" name="benar" :value="opt"
+                                                            x-model="currentQuestion.jawaban_benar"
+                                                            @change="markChanged()"
                                                             class="w-5 h-5 accent-emerald-500 cursor-pointer shrink-0">
                                                     </div>
+
                                                 </div>
+
                                             </template>
                                         </div>
+
                                     </div>
 
                                     <div
@@ -528,7 +579,8 @@
                                                     activeQuestion !== q.id
                                             }"
                                             class="aspect-square rounded-xl border-2 flex items-center justify-center font-bold text-xs transition-all hover:scale-110 relative">
-                                            <span x-text="q.id"></span>
+                                            <span x-text="questions.indexOf(q)+1"></span>
+
 
                                             <template x-if="q.status === 'changed'">
                                                 <span
