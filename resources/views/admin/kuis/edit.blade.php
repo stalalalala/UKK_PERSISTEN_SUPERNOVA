@@ -301,8 +301,8 @@
                                     </div>
                                 </div>
 
-                                <form action="{{ route('admin.kuis.update', $kuis->id) }}" method="POST"
-                                    class="space-y-8">
+                                <form id="formUpdateKuis" action="{{ route('admin.kuis.update', $kuis->id) }}"
+                                    method="POST" class="space-y-8">
 
                                     @csrf
                                     @method('PUT')
@@ -413,16 +413,21 @@
                                     <div x-show="currentQuestion" x-cloak>
 
                                         <div class="relative group">
-                                            <textarea required x-model="currentQuestion.materi" @input="markChanged()" x-data="{
+                                            <textarea x-model="currentQuestion.materi" name="materi" x-data="{
                                                 resize() {
                                                     $el.style.height = 'auto';
-                                                    $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
+                                                    $el.style.height =
+                                                        ($el.scrollHeight < 140 ? 140 : $el.scrollHeight) + 'px';
                                                 }
-                                            }"
-                                                x-init="resize()" @input.debounce.300ms="resize(); markChanged()"
-                                                class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none shadow-inner transition-all overflow-hidden resize-none"
-                                                placeholder="Masukkan teks pertanyaan di sini..." style="min-height: 120px;">
-        </textarea>
+                                            }" x-init="resize()"
+                                                x-effect="resize()" @input="resize(); markChanged()"
+                                                class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm
+           focus:bg-white focus:ring-2 focus:ring-blue-100
+           outline-none shadow-inner transition-all
+           resize-none overflow-hidden leading-relaxed"
+                                                placeholder="Masukkan materi atau teks pendukung di sini..." style="min-height:140px;">
+</textarea>
+
 
                                             <div class="absolute right-4 bottom-4">
                                                 <label
@@ -487,45 +492,50 @@
                                 </div>
 
 
-                                <div x-show="currentQuestion" x-cloak class="grid grid-cols-1 gap-4"
-                                    x-data="{ selected: null }">
+                                <div x-show="currentQuestion" x-cloak class="grid grid-cols-1 gap-4">
 
-                                    <template x-for="(opt, i) in ['A','B','C','D','E']" :key="opt">
+                                    <template x-for="(opt, i) in ['a','b','c','d','e']" :key="opt">
 
-                                        <div :class="selected === i ?
+                                        <div :class="currentQuestion.jawaban_benar === opt ?
                                             'bg-emerald-50 border-emerald-200' :
                                             'bg-gray-50 border-transparent'"
                                             class="flex items-start gap-4 p-4 rounded-2xl border-2 transition-all">
 
-                                            <!-- Label A B C D E -->
+                                            <!-- Label -->
                                             <span
-                                                class="w-10 h-10 shrink-0 flex items-center justify-center bg-white rounded-xl shadow-sm font-black text-[#4A72D4]"
+                                                class="w-10 h-10 shrink-0 flex items-center justify-center
+                       bg-white rounded-xl shadow-sm font-black text-[#4A72D4]"
                                                 x-text="opt">
                                             </span>
 
-                                            <!-- Input Jawaban -->
-                                            <textarea required x-model="currentQuestion['opsi_' + opt.toLowerCase()]" @input="markChanged()"
-                                                x-data="{
-                                                    resize() {
-                                                        $el.style.height = '40px';
-                                                        $el.style.height = $el.scrollHeight + 'px';
-                                                    }
-                                                }" x-init="resize()" @input.debounce.200ms="resize(); markChanged()"
-                                                class="flex-1 bg-transparent border-none outline-none text-sm font-medium pt-2 resize-none overflow-hidden"
-                                                placeholder="Tulis jawaban di sini...">
+                                            <!-- Textarea Jawaban Auto Resize -->
+                                            <textarea x-model="currentQuestion['opsi_' + opt.toLowerCase()]" name="opsi[]" x-data="{
+                                                resize() {
+                                                    $el.style.height = 'auto';
+                                                    $el.style.height =
+                                                        ($el.scrollHeight < 60 ? 60 : $el.scrollHeight) + 'px';
+                                                }
+                                            }"
+                                                x-init="resize()" x-effect="resize()" @input="resize(); markChanged()"
+                                                class="flex-1 bg-white/40 rounded-xl px-4 py-3
+                       border-none outline-none text-sm font-medium
+                       resize-none overflow-hidden leading-relaxed
+                       focus:ring-2 focus:ring-blue-100 transition-all"
+                                                placeholder="Tulis jawaban di sini..." style="min-height:60px;">
             </textarea>
 
                                             <!-- Radio Jawaban Benar -->
-                                            <div class="pt-2">
-                                                <input type="radio" name="benar" :value="opt"
+                                            <div class="pt-3">
+                                                <input type="radio" name="jawaban_benar" :value="opt"
                                                     x-model="currentQuestion.jawaban_benar" @change="markChanged()"
-                                                    class="w-5 h-5 accent-emerald-500 cursor-pointer shrink-0">
+                                                    class="w-5 h-5 accent-emerald-500 cursor-pointer">
                                             </div>
 
                                         </div>
 
                                     </template>
                                 </div>
+
 
                             </div>
 
@@ -542,12 +552,11 @@
                                     </button>
 
                                     <button type="submit"
-                                        :class="questions.find(q => q.id === activeQuestion).status === 'changed' ?
-                                            'bg-orange-500' : 'bg-[#4A72D4]'"
-                                        class="text-white px-8 py-3 rounded-xl font-bold text-sm transition-all">
-                                        <span
-                                            x-text="questions.find(q => q.id === activeQuestion).status === 'changed' ? 'Update Soal' : 'Simpan & Lanjut'"></span>
+                                        class="bg-[#4A72D4] hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-md active:scale-95">
+
+                                        Simpan Soal
                                     </button>
+
                                 </div>
                             </div>
                             </form>
@@ -611,9 +620,9 @@
                                 </div>
                             </div>
 
-                            <button :disabled="soalTersimpan < 20"
-                                class="w-full mt-8 py-4 bg-orange-500 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-orange-100 transition-all">
-                                Publikasikan Perubahan
+                            <button type="submit" form="formUpdateKuis"
+                                class="w-full mt-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-orange-100 transition-all active:scale-95">
+                                Update Perubahan Kuis
                             </button>
                         </div>
                     </div>

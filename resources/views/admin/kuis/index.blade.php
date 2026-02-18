@@ -263,7 +263,7 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-400 font-medium">Total Set Kuis</p>
-                        <h4 class="text-2xl font-bold text-gray-800" x-text="allKuis.length"></h4>
+                        <h4 class="text-2xl font-bold text-gray-800">{{ $allKuis->count() }}</h4>
                     </div>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 flex items-center gap-5">
@@ -272,8 +272,8 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-400 font-medium">Kuis Aktif</p>
-                        <h4 class="text-2xl font-bold text-gray-800"
-                            x-text="allKuis.filter(k => k.status === 'Aktif').length"></h4>
+                        <h4 class="text-2xl font-bold text-gray-800">{{ $allKuis->where('is_active', 1)->count() }}
+                        </h4>
                     </div>
                 </div>
                 <div
@@ -283,7 +283,7 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-400 font-medium">Sampah (History)</p>
-                        <h4 class="text-2xl font-bold text-gray-800" x-text="historyData.length"></h4>
+                        <h4 class="text-2xl font-bold text-gray-800">{{ $historyData->count() }}</h4>
                     </div>
                 </div>
             </div>

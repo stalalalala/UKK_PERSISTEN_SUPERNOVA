@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         body {
@@ -53,6 +54,55 @@
                 opsi: ['', '', '', '', ''],
                 benar: null,
                 bobot: 1,
+            },
+
+            importExcel(event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {
+                        type: 'array'
+                    });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+                    // Ambil 20 soal pertama
+                    this.questions = jsonData.slice(0, 20).map((row, index) => ({
+                        subtes: this.selectedSubtes,
+                        materi: row['Materi'] || '',
+                        pertanyaan: row['Pertanyaan'] || '',
+                        opsi_a: row['Opsi A'] || '',
+                        opsi_b: row['Opsi B'] || '',
+                        opsi_c: row['Opsi C'] || '',
+                        opsi_d: row['Opsi D'] || '',
+                        opsi_e: row['Opsi E'] || '',
+                        jawaban_benar: (row['Jawaban Benar'] || '').toLowerCase(),
+                        bobot: 1, // Otomatis 1 sesuai keinginan Anda
+                    }));
+
+                    this.soalTersimpan = this.questions.length;
+                    this.activeQuestion = 1;
+                    this.loadQuestion();
+                    this.showImportModal = false;
+                    alert("Berhasil mengimpor 20 soal!");
+                };
+                reader.readAsArrayBuffer(file);
+            },
+
+            downloadTemplate() {
+                const data = [
+                    ['Materi', 'Pertanyaan', 'Opsi A', 'Opsi B', 'Opsi C', 'Opsi D', 'Opsi E', 'Jawaban Benar',
+                        'Bobot'
+                    ],
+                    ['Contoh: Teks bacaan atau link foto', 'Apa ibukota Indonesia?', 'Jakarta', 'Bandung',
+                        'Surabaya', 'Medan', 'Bali', 'a', 1
+                    ]
+                ];
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Template Soal");
+                XLSX.writeFile(wb, "Template_Kuis_20_Soal.xlsx");
             },
 
 
@@ -519,9 +569,20 @@
                                                 atau Teks (Opsional)</label>
 
                                             <div class="relative group">
-                                                <textarea x-model="currentQuestion.materi" name="materi"
-                                                    class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none shadow-inner transition-all overflow-hidden resize-none"
-                                                    placeholder="Masukkan teks soal di sini..." style="min-height: 120px;"></textarea>
+                                                <textarea x-model="currentQuestion.materi" name="materi" x-data="{
+                                                    resize() {
+                                                        $el.style.height = 'auto';
+                                                        $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
+                                                    }
+                                                }" x-init="resize()"
+                                                    @input="resize()"
+                                                    class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm 
+           focus:bg-white focus:ring-2 focus:ring-blue-100 
+           outline-none shadow-inner transition-all 
+           resize-none overflow-hidden leading-relaxed"
+                                                    placeholder="Masukkan teks soal di sini..." style="min-height:120px;">
+</textarea>
+
 
                                                 <div class="absolute right-4 bottom-4">
                                                     <label
@@ -580,26 +641,36 @@
                                         </div>
 
                                         <div class="grid grid-cols-1 gap-4">
-                                            <template x-for="(opt, i) in ['A','B','C','D','E']">
+                                            <template x-for="(opt, i) in ['a','b','c','d','e']">
                                                 <div :class="currentQuestion.benar === i ?
                                                     'bg-emerald-50 border-emerald-200' :
                                                     'bg-gray-50 border-transparent'"
                                                     class="flex items-start gap-4 p-4 rounded-2xl border-2 transition-all">
 
+                                                    <!-- Label A B C -->
                                                     <span
                                                         class="w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm font-black text-[#4A72D4]"
                                                         x-text="opt"></span>
 
-                                                    <textarea x-model="currentQuestion.opsi[i]"
-                                                        class="flex-1 bg-transparent border-none outline-none text-sm font-medium pt-2 resize-none overflow-hidden"
-                                                        placeholder="Tulis jawaban di sini..."></textarea>
+                                                    <!-- Textarea Jawaban Auto Resize -->
+                                                    <textarea x-model="currentQuestion.opsi[i]" x-data="{
+                                                        resize() {
+                                                            $el.style.height = 'auto';
+                                                            $el.style.height = ($el.scrollHeight < 60 ? 60 : $el.scrollHeight) + 'px';
+                                                        }
+                                                    }" x-init="resize()" @input="resize()"
+                                                        class="flex-1 bg-transparent border-none outline-none text-sm font-medium resize-none overflow-hidden leading-relaxed"
+                                                        placeholder="Tulis jawaban di sini..." style="min-height:60px;"></textarea>
 
+                                                    <!-- Radio Button -->
                                                     <input type="radio" @click="currentQuestion.benar = i"
                                                         :checked="currentQuestion.benar === i"
-                                                        class="w-5 h-5 accent-emerald-500 cursor-pointer">
+                                                        class="w-5 h-5 mt-3 accent-emerald-500 cursor-pointer">
+
                                                 </div>
                                             </template>
                                         </div>
+
                                     </div>
 
                                     <div
@@ -641,7 +712,7 @@
                                     Navigasi Soal</h4>
 
                                 <div class="grid grid-cols-5 gap-3">
-                                    <template x-for="n in 2">
+                                    <template x-for="n in 20">
                                         <button @click="activeQuestion = n; loadQuestion()"
                                             :class="{
                                                 'bg-blue-500 text-white': activeQuestion === n,
@@ -711,10 +782,12 @@
                     </div>
                     <p class="text-sm font-bold text-gray-600">Klik atau seret file Excel ke sini</p>
                     <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 5MB (.xlsx, .xls)</p>
-                    <input type="file" class="hidden" id="excel_upload">
+                    <input type="file" class="hidden" id="excel_upload" @change="importExcel($event)"
+                        accept=".xlsx, .xls">
                     <button onclick="document.getElementById('excel_upload').click()"
-                        class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">Pilih
-                        File</button>
+                        class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">
+                        Pilih File
+                    </button>
                 </div>
 
                 <div class="mt-8 p-4 bg-blue-50 rounded-2xl flex items-center justify-between">
@@ -723,8 +796,11 @@
                         <span class="text-[11px] font-bold text-blue-700 uppercase tracking-tight">Belum punya
                             formatnya?</span>
                     </div>
-                    <a href="#" class="text-[11px] font-black text-[#4A72D4] hover:underline">DOWNLOAD
-                        TEMPLATE</a>
+                    <a href="https://docs.google.com/spreadsheets/d/1pXgloFuLOm6xi_1TcTLJP2bTbAKmPidtII__kh4x6pk/export?format=xlsx"
+                        target="_blank" @click="downloadTemplate()"
+                        class="text-[11px] font-black text-[#4A72D4] hover:underline">
+                        DOWNLOAD TEMPLATE
+                    </a>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mt-8">

@@ -17,13 +17,17 @@ class AdminKuisController extends Controller
             ->latest()
             ->get();
 
-        $trash = Kuis::onlyTrashed()
+        $trash = Kuis::onlyTrashed() 
             ->withCount('questions')
             ->latest()
             ->get();
 
 
-        return view('admin.kuis.index', compact('kuis', 'trash'));
+        $allKuis = Kuis::withCount('questions')->latest()->get();
+$historyData = Kuis::onlyTrashed()->withCount('questions')->latest()->get();
+
+return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData'));
+
     }
 
     // ============================
@@ -50,7 +54,7 @@ class AdminKuisController extends Controller
         // decode soal dari hidden input
         $questions = json_decode($request->questions_json, true);
 
-        if (!$questions || count($questions) < 2) {
+        if (!$questions || count($questions) < 20) {
             return back()->with('error', 'Harus mengisi minimal 20 soal!');
         }
 
@@ -79,18 +83,22 @@ class AdminKuisController extends Controller
         // SAVE QUESTIONS
         // ============================
         foreach ($questions as $q) {
-            $kuis->questions()->create([
-                'pertanyaan'    => $q['pertanyaan'],
-                'subtes'        => $q['subtes'] ?? null,
-                'opsi_a'        => $q['opsi_a'],
-                'opsi_b'        => $q['opsi_b'],
-                'opsi_c'        => $q['opsi_c'],
-                'opsi_d'        => $q['opsi_d'],
-                'opsi_e'        => $q['opsi_e'],
-                'jawaban_benar' => $q['jawaban_benar'],
-                'bobot'         => $q['bobot'] ?? 1,
-            ]);
-        }
+    $kuis->questions()->create([
+        'materi'     => $q['materi'] ?? null,
+        'pertanyaan' => $q['pertanyaan'],
+        'subtes'     => $q['subtes'] ?? null,
+
+        'opsi_a' => $q['opsi_a'],
+        'opsi_b' => $q['opsi_b'],
+        'opsi_c' => $q['opsi_c'],
+        'opsi_d' => $q['opsi_d'],
+        'opsi_e' => $q['opsi_e'],
+
+        'jawaban_benar' => $q['jawaban_benar'],
+        'bobot' => $q['bobot'] ?? 1,
+    ]);
+}
+
 
         return redirect()
             ->route('admin.kuis.index')
@@ -105,22 +113,26 @@ class AdminKuisController extends Controller
     $kuis = Kuis::with('questions')->findOrFail($id);
 
     $questions = $kuis->questions->map(function ($q) {
-        return [
-            'id' => $q->id,
-            'pertanyaan' => $q->pertanyaan,
-            'subtes' => $q->subtes,
-            'materi' => $q->materi,
+    return [
+        'id' => $q->id,
 
-            'opsi_a' => $q->opsi_a,
-            'opsi_b' => $q->opsi_b,
-            'opsi_c' => $q->opsi_c,
-            'opsi_d' => $q->opsi_d,
-            'opsi_e' => $q->opsi_e,
+        'materi' => $q->materi,
+        'subtes' => $q->subtes,
+        'pertanyaan' => $q->pertanyaan,
 
-            'jawaban_benar' => $q->jawaban_benar,
-            'bobot' => $q->bobot,
-        ];
-    });
+        'opsi_a' => $q->opsi_a,
+        'opsi_b' => $q->opsi_b,
+        'opsi_c' => $q->opsi_c,
+        'opsi_d' => $q->opsi_d,
+        'opsi_e' => $q->opsi_e,
+
+        'jawaban_benar' => $q->jawaban_benar,
+        'bobot' => $q->bobot,
+
+        'status' => 'original'
+    ];
+});
+
 
     return view('admin.kuis.edit', compact('kuis', 'questions'));
 }
@@ -152,19 +164,20 @@ class AdminKuisController extends Controller
 
             if ($question) {
                 $question->update([
-                    'pertanyaan' => $q['pertanyaan'],
-                    'subtes'     => $q['subtes'] ?? null,
-                    'materi' => $q['materi'] ?? null,
+    'materi'     => $q['materi'] ?? null,
+    'subtes'     => $q['subtes'] ?? null,
+    'pertanyaan' => $q['pertanyaan'],
 
-                    'opsi_a' => $q['opsi_a'],
-                    'opsi_b' => $q['opsi_b'],
-                    'opsi_c' => $q['opsi_c'],
-                    'opsi_d' => $q['opsi_d'],
-                    'opsi_e' => $q['opsi_e'],
+    'opsi_a' => $q['opsi_a'],
+    'opsi_b' => $q['opsi_b'],
+    'opsi_c' => $q['opsi_c'],
+    'opsi_d' => $q['opsi_d'],
+    'opsi_e' => $q['opsi_e'],
 
-                    'jawaban_benar' => $q['jawaban_benar'],
-                    'bobot'         => $q['bobot'] ?? 1,
-                ]);
+    'jawaban_benar' => $q['jawaban_benar'],
+    'bobot' => $q['bobot'] ?? 1,
+]);
+
             }
         }
     }
