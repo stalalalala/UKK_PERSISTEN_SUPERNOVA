@@ -7,30 +7,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AdminVideo extends Model
 {
-     use SoftDeletes;
+    use SoftDeletes;
 
     protected $table = 'admin_videos';
 
     protected $fillable = [
         'subtes',
         'judul_video',
-        'link'
+        'iframe' 
     ];
 
-   
+    /**
+     * Kode unik video
+     */
     public function getKodeAttribute()
     {
         return $this->id . '-VID';
-    }
-
-   
-    public function getEmbedAttribute()
-    {
-        if (str_contains($this->link, 'watch?v=')) {
-            return str_replace('watch?v=', 'embed/', $this->link);
-        }
-
-        return $this->link;
     }
 
 }

@@ -70,6 +70,9 @@ Route::middleware('auth')->group(function () {
         Route::get('videoPembelajaran/history', [AdminVideoController::class, 'history'])->name('videoPembelajaran.history');
         Route::post('videoPembelajaran/{id}/restore', [AdminVideoController::class, 'restore'])->name('videoPembelajaran.restore');
         Route::delete('videoPembelajaran/{id}/force-delete', [AdminVideoController::class, 'forceDelete'])->name('videoPembelajaran.force-delete');
+        Route::post('videoPembelajaran/import',
+            [AdminVideoController::class, 'import'])->name('videoPembelajaran.import');
+
         Route::resource('videoPembelajaran', AdminVideoController::class);
 
         // minat bakat
