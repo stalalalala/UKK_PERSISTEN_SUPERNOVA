@@ -6,6 +6,7 @@
     <title>Admin - Manajemen Soal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -37,9 +38,9 @@
             
             <div class="flex gap-2">
                 <label class="cursor-pointer flex items-center justify-center w-12 h-12 bg-emerald-500 text-white rounded-2xl shadow-lg hover:bg-emerald-600 transition-all group relative">
-                    <i class="fa-solid fa-file-csv"></i>
-                    <input type="file" class="hidden" @change="importCSV($event)" accept=".csv">
-                    <span class="absolute -bottom-10 scale-0 group-hover:scale-100 transition-all bg-gray-800 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap shadow-xl z-50">Import CSV</span>
+                    <i class="fa-solid fa-file-excel"></i>
+                    <input type="file" class="hidden" @change="importExcel($event)" accept=".csv, .xlsx, .xls">
+                    <span class="absolute -bottom-10 scale-0 group-hover:scale-100 transition-all bg-gray-800 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap shadow-xl z-50">Import Excel/CSV</span>
                 </label>
 
                 <button @click="showHistory = true" class="relative w-12 h-12 bg-white rounded-2xl shadow-sm border border-blue-50 flex items-center justify-center">
@@ -140,7 +141,15 @@
                 itemsPerPage: 5,
                 categoryName: '{{ $categoryName }}',
                 questions: @json($questions),
-                history: [],
+                
+                // MENGAMBIL DATA DARI LOCAL STORAGE AGAR TIDAK HILANG SAAT REFRESH
+                history: JSON.parse(localStorage.getItem('recycle_bin_soal') || '[]'),
+
+                // Pantau setiap perubahan history dan simpan ke LocalStorage secara otomatis
+                saveHistory() {
+                    localStorage.setItem('recycle_bin_soal', JSON.stringify(this.history));
+                },
+
                 get filteredQuestions() {
                     return this.questions.filter(q => q.text.toLowerCase().includes(this.searchQuery.toLowerCase()));
                 },
@@ -151,6 +160,7 @@
                 get totalPages() {
                     return Math.ceil(this.filteredQuestions.length / this.itemsPerPage) || 1;
                 },
+
                 async saveNew() {
                     if(!this.newText.trim()) return;
                     try {
@@ -168,26 +178,34 @@
                         }
                     } catch (e) { console.error(e); }
                 },
-                async importCSV(event) {
+
+                async importExcel(event) {
                     const file = event.target.files[0];
                     if (!file) return;
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    try {
-                        const response = await fetch('{{ route("admin.minatbakat.soal.importBulk") }}', {
-                            method: 'POST',
-                            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
-                            body: formData
-                        });
-                        const result = await response.json();
-                        if (result.success) {
-                            alert(result.message);
-                            window.location.reload(); 
-                        } else {
-                            alert('Gagal: ' + result.message);
-                        }
-                    } catch (e) { alert('Terjadi kesalahan koneksi.'); }
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            const sheetName = workbook.SheetNames[0];
+                            const worksheet = workbook.Sheets[sheetName];
+                            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                            
+                            const response = await fetch('{{ route("admin.minatbakat.soal.importBulk") }}', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                                body: JSON.stringify({ data: jsonData })
+                            });
+                            const result = await response.json();
+                            if (result.success) {
+                                alert(result.message);
+                                window.location.reload(); 
+                            } else { alert('Gagal: ' + result.message); }
+                        } catch (err) { alert('Terjadi kesalahan saat membaca file.'); }
+                    };
+                    reader.readAsArrayBuffer(file);
                 },
+
                 async deleteSoal(soal) {
                     if(!confirm('Pindahkan soal ke History?')) return;
                     try {
@@ -196,11 +214,19 @@
                             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
                         });
                         if(response.ok) {
-                            this.history.unshift({ ...soal, deletedAt: new Date().toLocaleTimeString() });
+                            // Masukkan ke history array
+                            this.history.unshift({ 
+                                ...soal, 
+                                deletedAt: new Date().toLocaleString('id-ID', { hour: '2-digit', minute: '2-digit' }) 
+                            });
+                            // Simpan ke local storage
+                            this.saveHistory();
+                            
                             this.questions = this.questions.filter(q => q.id !== soal.id);
                         }
                     } catch (e) { alert('Gagal menghapus'); }
                 },
+
                 async restoreSoal(h) {
                     if(!confirm('Pulihkan soal ini?')) return;
                     try {
@@ -212,13 +238,18 @@
                         if(response.ok) {
                             const restored = await response.json();
                             this.questions.unshift(restored);
+                            
+                            // Hapus dari history array dan update local storage
                             this.history = this.history.filter(item => item.id !== h.id);
+                            this.saveHistory();
                         }
                     } catch (e) { alert('Gagal memulihkan'); }
                 },
+
                 forceDelete(id) {
                     if(confirm('Hapus PERMANEN dari history?')) {
                         this.history = this.history.filter(h => h.id !== id);
+                        this.saveHistory();
                     }
                 }
             }

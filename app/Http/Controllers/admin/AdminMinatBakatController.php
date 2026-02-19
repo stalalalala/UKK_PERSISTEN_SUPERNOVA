@@ -225,57 +225,40 @@ public function generatePdf($id)
 public function importSoalBulk(Request $request)
 {
     try {
-        // 1. Validasi file (Pastikan yang diupload adalah CSV)
-        if (!$request->hasFile('file')) {
-            return response()->json(['success' => false, 'message' => 'File tidak ditemukan'], 400);
+        $rows = $request->data; // Data JSON dari frontend
+        if (!$rows || count($rows) <= 1) {
+            return response()->json(['success' => false, 'message' => 'File kosong atau format salah'], 400);
         }
 
-        $file = $request->file('file');
-        $path = $file->getRealPath();
-
-        // 2. Buka file CSV
-        $handle = fopen($path, "r");
         $count = 0;
-        $isHeader = true;
-
-        // 3. Mulai Transaksi Database (Supaya aman kalau ada error di tengah jalan)
         DB::beginTransaction();
 
-        while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
-            // Lewati baris pertama (Judul Kolom)
-            if ($isHeader) {
-                $isHeader = false;
-                continue;
-            }
+        foreach ($rows as $index => $row) {
+            // Lewati header (baris pertama)
+            if ($index === 0) continue;
 
-            // Asumsi struktur file CSV kamu:
-            // Kolom 0: No | Kolom 1: Pertanyaan | Kolom 2: Nama Kategori
+            // Mapping kolom (0: No, 1: Pertanyaan, 2: Kategori)
             $pertanyaan = $row[1] ?? null;
             $kategori   = $row[2] ?? null;
 
             if (!empty($pertanyaan) && !empty($kategori)) {
                 \App\Models\MinatBakatSoal::create([
-                    'text'          => $pertanyaan,
+                    'text'          => trim($pertanyaan),
                     'kategori_name' => trim($kategori)
                 ]);
                 $count++;
             }
         }
 
-        fclose($handle);
-        DB::commit(); // Simpan perubahan ke database
-
+        DB::commit();
         return response()->json([
-            'success' => true,
-            'message' => "Alhamdulillah! Berhasil mengimpor $count soal."
+            'success' => true, 
+            'message' => "Berhasil mengimpor $count soal dari Excel/CSV!"
         ]);
 
     } catch (\Exception $e) {
-        DB::rollBack(); // Batalkan jika ada error
-        return response()->json([
-            'success' => false,
-            'message' => "Gagal: " . $e->getMessage()
-        ], 500);
+        DB::rollBack();
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     }
 }
 }
