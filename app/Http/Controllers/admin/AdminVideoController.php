@@ -8,12 +8,9 @@ use Illuminate\Http\Request;
 
 class AdminVideoController extends Controller
 {
-    /**
-     * Tampilkan daftar video + history.
-     */
     public function index()
     {
-        $videos  = AdminVideo::all();          // Video aktif
+        $videos  = AdminVideo::all();              // Video aktif
         $history = AdminVideo::onlyTrashed()->get(); // Video dihapus sementara
 
         return view('admin.video.index', compact('videos', 'history'));
@@ -23,20 +20,42 @@ class AdminVideoController extends Controller
      * Simpan video baru.
      */
     public function store(Request $request)
+    {
+        $request->validate([
+            'subtes'      => 'required',
+            'judul_video' => 'required',
+            'iframe'      => 'required', 
+        ]);
+
+        AdminVideo::create([
+            'subtes'      => $request->subtes,
+            'judul_video' => $request->judul_video,
+            'iframe'      => $request->iframe, 
+        ]);
+
+        return redirect()->back()->with('success', 'Video berhasil ditambahkan!');
+    }
+
+    public function import(Request $request)
 {
-    $request->validate([
-        'subtes'      => 'required',
-        'judul_video' => 'required',
-        'link'        => 'required|url',
-    ]);
+    foreach ($request->data as $row) {
 
-    AdminVideo::create([
-        'subtes'      => $request->subtes,
-        'judul_video' => $request->judul_video,
-        'link'        => $request->link,
-    ]);
+        $iframe = trim($row['iframe'] ?? '');
 
-    return redirect()->back()->with('success', 'Video berhasil ditambahkan!');
+        // decode kalau sudah jadi entity (&lt; &gt;)
+        $iframe = html_entity_decode($iframe);
+
+        // hapus tanda kutip luar kalau ada
+        $iframe = preg_replace('/^"(.*)"$/', '$1', $iframe);
+
+        AdminVideo::create([
+            'subtes' => $row['subtes'] ?? '',
+            'judul_video' => $row['judul_video'] ?? '',
+            'iframe' => $iframe,
+        ]);
+    }
+
+    return response()->json(['success' => true]);
 }
 
 
@@ -50,10 +69,10 @@ class AdminVideoController extends Controller
         $request->validate([
             'subtes'      => 'required',
             'judul_video' => 'required',
-            'link'        => 'required|url',
+            'iframe'      => 'required', 
         ]);
 
-        $video->update($request->only(['subtes', 'judul_video', 'link']));
+        $video->update($request->only(['subtes', 'judul_video', 'iframe'])); 
 
         return redirect()->back()->with('success', 'Video berhasil diperbarui!');
     }

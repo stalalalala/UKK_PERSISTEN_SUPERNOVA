@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+    [x-cloak] { display: none !important; }
+  </style>
     @vite('resources/css/app.css')
 </head>
 <body class="bg-slate-100 font-po overflow-x-hidden">
@@ -126,32 +132,57 @@
 
         </nav>
 
-    <button class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
-        <svg xmlns="http://www.w3.org/2000/xml" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5 md:size-6">
+     <form action="{{ route('logout') }}" method="POST" class="w-full inline">
+    @csrf
+    <button type="submit" class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5 md:size-6 text-white">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
         </svg>
         <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
     </button>
+    </form>
 </aside>
 
     <!-- ================= MAIN ================= -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto h-screen">
-        <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+         <header
+            class="flex flex-col md:flex-row items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0">
             <div class="flex items-center w-full gap-4">
                 <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
-                    <i class="fa-solid fa-bars text-gray-600"></i>
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
                 </button>
+
                 <div class="relative w-full group flex items-center gap-2">
-                    <input type="text" placeholder="Search...."
-                           class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
-                    <button class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">Cari</button>
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                        </div>
+                        <input type="text" placeholder="Search Tryout...."
+                            class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
+                    </div>
+                    <button
+                        class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
+                        Cari
+                    </button>
                 </div>
             </div>
-        </header>
 
+            <div
+                class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 self-end md:self-auto">
+                <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
+                </div>
+                <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
+                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+            </div>
+        </header>
+ <section class="flex-1 p-4 lg:p-6 xl:p-8 overflow-y-auto">
         <h2 class="text-2xl font-semibold text-slate-700 mb-6">Manajemen Video Pembelajaran</h2>
 
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+       
 
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden">
 
@@ -170,11 +201,19 @@
                 </div>
 
                 <div x-show="activeTab === 'active'" x-transition>
+                    <div class="flex gap-2">
+                    <button @click="openImportModal()"
+                        class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-md">
+                        <i class="fa-solid fa-file-import text-xs"></i>
+                        Import Excel
+                    </button>
+
                     <button @click="openAddModal()"
-                        class="w-full md:w-auto bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-blue-100">
+                        class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-md">
                         <i class="fa-solid fa-plus text-xs"></i>
                         Tambah Video
                     </button>
+                </div>
                 </div>
             </div>
 
@@ -199,12 +238,26 @@
                                 <span class="bg-blue-50 text-[#4A72D4] px-3 py-1 rounded-full text-[11px] font-bold">{{ $video->subtes }}</span>
                             </td>
                             <td class="p-4 font-semibold text-slate-700">{{ $video->judul_video }}</td>
-                            <td class="p-4 text-slate-700 truncate max-w-[100px]">{{ $video->link }}</td>
+                            <td class="p-4">
+                                <div class="w-28 h-20 overflow-hidden rounded-lg bg-gray-100">
+                                    <div class="w-full h-full">
+                                        {!! preg_replace(
+                                            ['/width=".*?"/', '/height=".*?"/'],
+                                            ['width="100%"', 'height="100%"'],
+                                            $video->iframe
+                                        ) !!}
+                                    </div>
+                                </div>
+                            </td>
                             <td class="p-4 text-center space-x-2">
                                 <button @click="openEditModal(@js($video))"
-                                    class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-blue-600 transition-all shadow-sm">Ubah</button>
+                                    class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                    </svg></button>
                                 <button @click="handleDelete('{{ $video->id }}')"
-                                    class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-all shadow-sm">Hapus</button>
+                                    class=" text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                    </svg></button>
                                 <form id="form-delete-{{ $video->id }}" action="{{ route('admin.videoPembelajaran.destroy', $video->id) }}" method="POST" class="hidden">
                                     @csrf @method('DELETE')
                                 </form>
@@ -232,17 +285,30 @@
                         <tbody class="divide-y divide-gray-50">
                         @foreach($history as $item)
                         <tr class="hover:bg-gray-50">
-                            <td class="p-4 font-mono text-xs text-slate-500">{{ $video->kode }}</td>
+                            <td class="p-4 font-mono text-xs text-slate-500">{{ $item->kode }}</td>
                             <td class="p-4">
                                 <span class="bg-blue-50 text-[#4A72D4] px-3 py-1 rounded-full text-[11px] font-bold">{{ $item->subtes }}</span>
                             </td>
                             <td class="p-4 font-semibold text-slate-700">{{ $item->judul_video }}</td>
-                            <td class="p-4 text-slate-700 truncate max-w-[100px]">{{ $item->link }}</td>
+                            <td class="p-4">
+                                <div class="w-28 h-20 overflow-hidden rounded-lg bg-gray-100">
+                                    <div class="w-full h-full">
+                                        {!! preg_replace(
+                                            ['/width=".*?"/', '/height=".*?"/'],
+                                            ['width="100%"', 'height="100%"'],
+                                            $item->iframe
+                                        ) !!}
+                                    </div> 
+                            </td>
                             <td class="p-4 text-center space-x-2">
                                 <button @click="handleRestore('{{ $item->id }}')"
-                                    class="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-600 transition-all shadow-sm">Pulihkan</button>
+                                    class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+    </svg></button>
                                 <button @click="handleForceDelete('{{ $item->id }}')"
-                                    class="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition-all shadow-sm">Hapus</button>
+                                    class=" text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                    </svg></button>
                                 <form id="form-restore-{{ $item->id }}" action="{{ route('admin.videoPembelajaran.restore', $item->id) }}" method="POST" class="hidden">@csrf</form>
                                 <form id="form-force-delete-{{ $item->id }}" action="{{ route('admin.videoPembelajaran.force-delete', $item->id) }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
                             </td>
@@ -253,11 +319,11 @@
                 </div>
             </div>
         </div>
-
+ </section>
     </main>
 
     <!-- ================= MODAL TAMBAH/UBAH ================= -->
-    <div x-show="openModalVideo" x-cloak class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" x-transition>
+    <div x-show="openModalVideo" x-cloak style="display: none;" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" x-transition>
         <div @click.away="closeModal()" class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-extrabold text-slate-800" x-text="isEditVideo ? 'Ubah Video' : 'Tambah Video'"></h3>
@@ -292,8 +358,12 @@
                 </div>
 
                 <div class="space-y-1 mb-6">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Link / URL Video</label>
-                    <input type="url" name="link" x-model="videoData.link" class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="https://youtube.com/..." required>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Iframe Video</label>
+                    <textarea name="iframe" x-model="videoData.iframe" 
+                        class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" 
+                        placeholder='<iframe width="560" height="315" src="https://www.youtube.com/embed/..." frameborder="0" allowfullscreen></iframe>'
+                        rows="4"
+                        required></textarea>
                 </div>
 
                 <div class="flex gap-3">
@@ -304,6 +374,74 @@
         </div>
     </div>
 
+    <!-- ================= MODAL IMPORT ================= -->
+
+<div x-show="openImportModalVideo" x-cloak class="fixed inset-0 z-[100] overflow-y-auto">
+   
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="closeImportModal()"></div>
+
+    <!-- Modal Content -->
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+        <div class="relative bg-white w-full max-w-lg rounded-[35px] shadow-2xl p-8 transform transition-all"
+             x-show="openImportModalVideo"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0">
+
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fa-solid fa-video text-emerald-500"></i> Import Video dari Excel
+                </h3>
+                <button @click="closeImportModal()" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <i class="fa-solid fa-circle-xmark text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Upload Area -->
+            <div class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-300 transition-all bg-gray-50/50">
+                <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
+                </div>
+                <p class="text-sm font-bold text-gray-600">Klik di sini</p>
+                <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 100MB (.xlsx, .xls)</p>
+                
+                <!-- Input File -->
+                <input type="file" class="hidden" id="video_excel_upload" @change="handleFileUpload($event)" accept=".xlsx,.xls">
+                <button onclick="document.getElementById('video_excel_upload').click()"
+                        class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">
+                    Pilih File
+                </button>
+            </div>
+
+            <!-- Template Info -->
+            <div class="mt-8 p-4 bg-emerald-50 rounded-2xl flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-circle-info text-emerald-500"></i>
+                    <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-tight">Belum punya formatnya?</span>
+                </div>
+                <a href="https://docs.google.com/spreadsheets/d/1fETPSBkIrL-oo-xsghGYZiJh665qYPuaQP2a1pizft4/copy"
+                   target="_blank"
+                   class="text-[11px] font-black text-emerald-600 hover:underline">
+                    DOWNLOAD TEMPLATE
+                </a>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="grid grid-cols-2 gap-4 mt-8">
+                <button @click="closeImportModal()"
+                        class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                    Batalkan
+                </button>
+               
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
 </div>
 
 <script>
@@ -313,14 +451,15 @@ function videoApp() {
         mobileMenuOpen: false,
         activeTab: 'active',
         openModalVideo: false,
+        openImportModalVideo: false,
         isEditVideo: false,
-        videoData: { id: '', subtes: '', judul_video: '', link: '' },
+        videoData: { id: '', subtes: '', judul_video: '', iframe: '' },
 
         // ================= MODAL =================
         openAddModal() {
             this.openModalVideo = true;
             this.isEditVideo = false;
-            this.videoData = { id: '', subtes: '', judul_video: '', link: '' };
+            this.videoData = { id: '', subtes: '', judul_video: '', iframe: '' };
         },
         openEditModal(video) {
             this.openModalVideo = true;
@@ -331,70 +470,116 @@ function videoApp() {
             this.openModalVideo = false;
         },
 
+        openImportModal() {
+    this.openImportModalVideo = true;
+},
+closeImportModal() {
+    this.openImportModalVideo = false;
+},
+
+handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        console.log(jsonData);
+
+        // Kirim ke backend Laravel
+        fetch("{{ route('admin.videoPembelajaran.import') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ data: jsonData })
+        })
+        .then(res => res.json())
+        .then(response => {
+            Swal.fire('Berhasil!', 'Data berhasil diimport', 'success')
+                .then(() => location.reload());
+        });
+    };
+
+    reader.readAsArrayBuffer(file);
+},
+
+
+
         // ================= CRUD =================
         handleDelete(id) {
-            Swal.fire({
-                title: 'Hapus Video?',
-                text: "Data akan dipindahkan ke tab history.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal',
-                customClass: {
-                    popup: 'rounded-3xl',
-                    confirmButton: 'rounded-xl px-4 py-2',
-                    cancelButton: 'rounded-xl px-4 py-2'
-                }
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    document.getElementById(`form-delete-${id}`).submit();
-                }
-            })
-        },
-        handleRestore(id) {
-            Swal.fire({
-                title: 'Pulihkan Video?',
-                text: "Video akan dikembalikan ke daftar aktif.",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#10b981',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Pulihkan!',
-                cancelButtonText: 'Batal',
-                customClass: {
-                    popup: 'rounded-3xl',
-                    confirmButton: 'rounded-xl px-4 py-2',
-                    cancelButton: 'rounded-xl px-4 py-2'
-                }
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    document.getElementById(`form-restore-${id}`).submit();
-                }
-            })
-        },
-        handleForceDelete(id) {
-            Swal.fire({
-                title: 'Hapus Permanen?',
-                text: "Data tidak bisa dikembalikan!",
-                icon: 'error',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Hapus Permanen',
-                cancelButtonText: 'Batal',
-                customClass: {
-                    popup: 'rounded-3xl',
-                    confirmButton: 'rounded-xl px-4 py-2',
-                    cancelButton: 'rounded-xl px-4 py-2'
-                }
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    document.getElementById(`form-force-delete-${id}`).submit();
-                }
-            })
+    Swal.fire({
+        title: 'Hapus Video?',
+        text: "Data akan dipindahkan ke tab history.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal',
+        customClass: {
+            popup: 'rounded-3xl',
+            confirmButton: 'rounded-xl px-4 py-2',
+            cancelButton: 'rounded-xl px-4 py-2'
         }
+    }).then((result) => {
+        if(result.isConfirmed) {
+            document.getElementById(`form-delete-${id}`).submit();
+        }
+    });
+},
+
+handleRestore(id) {
+    Swal.fire({
+        title: 'Pulihkan Video?',
+        text: "Data akan dikembalikan ke daftar video.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#22c55e',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Pulihkan!',
+        cancelButtonText: 'Batal',
+        customClass: {
+            popup: 'rounded-3xl',
+            confirmButton: 'rounded-xl px-4 py-2',
+            cancelButton: 'rounded-xl px-4 py-2'
+        }
+    }).then((result) => {
+        if(result.isConfirmed) {
+            document.getElementById(`form-restore-${id}`).submit();
+        }
+    });
+},
+
+handleForceDelete(id) {
+    Swal.fire({
+        title: 'Hapus Permanen?',
+        text: "Data akan dihapus permanen dan tidak bisa dikembalikan!",
+        icon: 'error',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Hapus Permanen!',
+        cancelButtonText: 'Batal',
+        customClass: {
+            popup: 'rounded-3xl',
+            confirmButton: 'rounded-xl px-4 py-2',
+            cancelButton: 'rounded-xl px-4 py-2'
+        }
+    }).then((result) => {
+        if(result.isConfirmed) {
+            document.getElementById(`form-force-delete-${id}`).submit();
+        }
+    });
+}
     }
 }
 </script>

@@ -103,7 +103,7 @@
     </div>
 
     <main class="max-w-[1440px] mx-auto py-10" x-data="{
-        selectedSub: 'PU',
+        selectedSub: 'Penalaran Umum',
         currentPage: 1
     }">
 
@@ -116,9 +116,9 @@
         <section class="px-4 md:px-10 mb-12">
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-5">
 
-                <div @click="selectedSub = 'PU'; currentPage = 1"
+                <div @click="selectedSub = 'Penalaran Umum'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#FEA33A]"
-                    :class="selectedSub === 'PU' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Penalaran Umum' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -127,9 +127,9 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'PBM'; currentPage = 1"
+                <div @click="selectedSub = 'Pemahaman Bacaan dan Menulis'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#9885FB]"
-                    :class="selectedSub === 'PBM' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Pemahaman Bacaan dan Menulis' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -138,9 +138,9 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'PPU'; currentPage = 1"
+                <div @click="selectedSub = 'Pengetahuan dan Pemahaman Umum'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#FF908E]"
-                    :class="selectedSub === 'PPU' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Pengetahuan dan Pemahaman Umum' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -149,9 +149,9 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'PK'; currentPage = 1"
+                <div @click="selectedSub = 'Pengetahuan Kuantitatif'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#4CAA60]"
-                    :class="selectedSub === 'PK' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Pengetahuan Kuantitatif' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -160,9 +160,9 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'PM'; currentPage = 1"
+                <div @click="selectedSub = 'Penalaran Matematika'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#CEA4EC]"
-                    :class="selectedSub === 'PM' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Penalaran Matematika' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -171,9 +171,9 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'LBI'; currentPage = 1"
+                <div @click="selectedSub = 'Literasi dalam Bahasa Indonesia'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#A5BBEC]"
-                    :class="selectedSub === 'LBI' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Literasi dalam Bahasa Indonesia' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -182,9 +182,9 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'LBE'; currentPage = 1"
+                <div @click="selectedSub = 'Literasi dalam Bahasa Inggris'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#4B8A81]"
-                    :class="selectedSub === 'LBE' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Literasi dalam Bahasa Inggris' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -203,134 +203,52 @@
         <section class="px-4 md:px-10">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-                <div x-show="currentPage === 1"
-                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 1'"></h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-solid fa-book-open"></i><span>Kalimat Efektif</span></div>
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-regular fa-clock"></i><span>10.55</span></div>
-                            </div>
+                @foreach($videos as $video)
+        <div 
+            x-show="selectedSub === '{{ $video->subtes }}'"
+            x-transition
+            class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
+
+            <div class="flex-1 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-blue-600 font-bold text-xl mb-3">
+                        {{ $video->subtes }}
+                    </h3>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>{{ $video->judul_video }}</span>
                         </div>
-                        <div class="mt-6">
-                            <span
-                                class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Belum
-                                Ditonton</span>
+
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold">
+                            
+                            <span>Video Pembelajaran</span>
                         </div>
-                    </div>
-                    <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative">
-                        <iframe src="https://www.youtube.com/embed/cX8sNF9ExDw?si=L0I_1bc2bKOKJceV"
-                            title="YouTube video player" frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen class="w-full h-full object-cover"></iframe>
                     </div>
                 </div>
 
-                <div x-show="currentPage === 1"
-                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 2'"></h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-solid fa-book-open"></i><span>Paragraf Padu</span></div>
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-regular fa-clock"></i><span>08:45</span></div>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <span
-                                class="bg-green-500 text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Sudah
-                                Ditonton</span>
-                        </div>
-                    </div>
-                    <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative">
-                        <iframe src="https://www.youtube.com/embed/cX8sNF9ExDw?si=L0I_1bc2bKOKJceV"
-                            title="YouTube video player" frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen class="w-full h-full object-cover"></iframe>
-                    </div>
+                <div class="mt-6">
+                    <span class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
+                        Belum Ditonton
+                    </span>
                 </div>
+            </div>
 
-                <div x-show="currentPage === 1"
-                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 3'"></h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-solid fa-book-open"></i><span>Kalimat Efektif</span></div>
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-regular fa-clock"></i><span>10.55</span></div>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <span
-                                class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Belum
-                                Ditonton</span>
-                        </div>
-                    </div>
-                    <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative">
-                        <iframe src="https://www.youtube.com/embed/cX8sNF9ExDw?si=L0I_1bc2bKOKJceV"
-                            title="YouTube video player" frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen class="w-full h-full object-cover"></iframe>
-                    </div>
-                </div>
+            <div class="w-full sm:w-56 h-36 rounded-3xl overflow-hidden bg-gray-100 relative">
+        <div class="absolute inset-0">
+            {!! preg_replace(
+                ['/width=".*?"/', '/height=".*?"/'],
+                ['width="100%"', 'height="100%"'],
+                $video->iframe
+            ) !!}
+        </div>
+    </div>
 
-                <div x-show="currentPage === 1"
-                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 4'"></h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-solid fa-book-open"></i><span>Paragraf Padu</span></div>
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-regular fa-clock"></i><span>08:45</span></div>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <span
-                                class="bg-green-500 text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Sudah
-                                Ditonton</span>
-                        </div>
-                    </div>
-                    <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative">
-                        <iframe src="https://www.youtube.com/embed/cX8sNF9ExDw?si=L0I_1bc2bKOKJceV"
-                            title="YouTube video player" frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen class="w-full h-full object-cover"></iframe>
-                    </div>
-                </div>
 
-                <div x-show="currentPage === 2"
-                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-blue-600 font-bold text-xl mb-3" x-text="selectedSub + ' - Set 5'"></h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-solid fa-book-open"></i><span>Simpulan Teks</span></div>
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold"><i
-                                        class="fa-regular fa-clock"></i><span>15:10</span></div>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <span
-                                class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Belum
-                                Ditonton</span>
-                        </div>
-                    </div>
-                    <div class="w-full sm:w-56 h-36 bg-gray-100 rounded-3xl overflow-hidden relative">
-                        <iframe src="https://www.youtube.com/embed/cX8sNF9ExDw?si=L0I_1bc2bKOKJceV"
-                            title="YouTube video player" frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen class="w-full h-full object-cover"></iframe>
-                    </div>
+        </div>
+    @endforeach
+
                 </div>
 
             </div>
