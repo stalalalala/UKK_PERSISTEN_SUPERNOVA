@@ -24,7 +24,7 @@ use App\Http\Controllers\HasilLatihanController;
 use App\Http\Controllers\HasilTryoutController;
 use App\Http\Controllers\IntruksiKuisController;
 use App\Http\Controllers\IntruksiLatihanController;
-use App\Http\Controllers\IntruksiMinatBakatController;
+use App\Http\Controllers\InstruksiMinatBakatController;
 use App\Http\Controllers\IntruksiTryoutController;
 use App\Http\Controllers\JedaTryoutController;
 use App\Http\Controllers\ProfileController;
@@ -72,7 +72,37 @@ Route::middleware('auth')->group(function () {
         Route::delete('videoPembelajaran/{id}/force-delete', [AdminVideoController::class, 'forceDelete'])->name('videoPembelajaran.force-delete');
         Route::resource('videoPembelajaran', AdminVideoController::class);
 
-        Route::resource('minatBakat', AdminMinatBakatController::class);
+        // minat bakat
+        Route::get('minat-bakat/manajemen', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'manajemenSoal'])
+    ->name('minatbakat.manajemen');
+
+        Route::post('minat-bakat/soal', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'storeSoal'])
+            ->name('minatbakat.soal.store');
+
+        Route::post('minat-bakat/soal/restore', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'restoreSoal'])
+            ->name('minatbakat.soal.restore');
+
+        Route::delete('minat-bakat/soal/{id}', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'destroySoal'])
+            ->name('minatbakat.soal.destroy');
+        
+        Route::get('minat-bakat/export', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'exportPartisipan'])
+        ->name('minatbakat.export');
+
+        Route::post('minat-bakat/reset', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'resetPartisipan'])
+        ->name('minatbakat.reset');
+
+        Route::get('minat-bakat/pdf/{id}', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'generatePdf'])
+    ->name('minatbakat.pdf');
+
+        Route::post('minat-bakat/soal/import-bulk', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'importSoalBulk'])
+    ->name('minatbakat.soal.importBulk');
+
+        Route::resource('minatBakat', AdminMinatBakatController::class)->names([
+            'index'   => 'minatbakat.index',
+            'store'   => 'minatbakat.kategori.store',
+            'update'  => 'minatbakat.kategori.update',
+            'destroy' => 'minatbakat.kategori.destroy',
+        ]);
     });
 
     // -----------------------------------------------------
@@ -120,11 +150,12 @@ Route::middleware('auth')->group(function () {
         });
 
         // Minat Bakat
-        Route::prefix('minatbakat')->name('minatbakat.')->group(function () {
-            Route::get('/', [MinatBakatController::class, 'index'])->name('soal');
-            Route::get('/hasil', [MinatBakatController::class, 'index'])->name('hasil'); // Perhatikan jika method di controller sama
-            Route::get('/intruksi', [IntruksiMinatBakatController::class, 'index'])->name('intruksi');
-        });
+        Route::get('minatbakat/hasil', [MinatBakatController::class, 'hasil'])->name('minatbakat.hasil');
+        Route::get('minatbakat/intruksi', [MinatBakatController::class, 'intruksi'])->name('minatbakat.intruksi');
+
+        Route::resource('minatbakat', MinatBakatController::class)->names([
+            'index' => 'minatbakat.soal',
+        ]);
 
         Route::get('/slime', function () { return view('slime'); });
         Route::get('/slime_login', function () { return view('slime_login'); });
