@@ -59,51 +59,100 @@
             importExcel(event) {
                 const file = event.target.files[0];
                 const reader = new FileReader();
+
                 reader.onload = (e) => {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {
-                        type: 'array'
+                        type: "array"
                     });
+
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-                    // Ambil 20 soal pertama
-                    this.questions = jsonData.slice(0, 20).map((row, index) => ({
-                        subtes: this.selectedSubtes,
-                        materi: row['Materi'] || '',
-                        pertanyaan: row['Pertanyaan'] || '',
-                        opsi_a: row['Opsi A'] || '',
-                        opsi_b: row['Opsi B'] || '',
-                        opsi_c: row['Opsi C'] || '',
-                        opsi_d: row['Opsi D'] || '',
-                        opsi_e: row['Opsi E'] || '',
-                        jawaban_benar: (row['Jawaban Benar'] || '').toLowerCase(),
-                        bobot: 1, // Otomatis 1 sesuai keinginan Anda
+                    this.questions = jsonData.slice(0, 20).map((row) => ({
+
+                        // ✅ Ambil dari Excel
+                        subtes: row["Kategori Subtes"] || "",
+                        waktu: row["Waktu"] || 20,
+
+                        materi: row["Materi"] || "",
+                        pertanyaan: row["Pertanyaan"] || "",
+
+                        opsi_a: row["Opsi A"] || "",
+                        opsi_b: row["Opsi B"] || "",
+                        opsi_c: row["Opsi C"] || "",
+                        opsi_d: row["Opsi D"] || "",
+                        opsi_e: row["Opsi E"] || "",
+
+                        // ✅ Jawaban Benar (dropdown)
+                        jawaban_benar: (row["Jawaban Benar"] || "")
+                            .toString()
+                            .trim()
+                            .toLowerCase(),
+
+                        // ✅ Bobot ikut dari Excel
+                        bobot: row["Bobot"] || 1,
                     }));
+
+                    // ✅ Auto set dropdown UI ikut soal pertama
+                    if (this.questions.length > 0) {
+                        this.selectedSubtes = this.questions[0].subtes;
+                        this.selectedWaktu = this.questions[0].waktu;
+                    }
 
                     this.soalTersimpan = this.questions.length;
                     this.activeQuestion = 1;
                     this.loadQuestion();
+
                     this.showImportModal = false;
-                    alert("Berhasil mengimpor 20 soal!");
+
+                    alert("Berhasil import soal dari Excel!");
                 };
+
                 reader.readAsArrayBuffer(file);
             },
 
+
             downloadTemplate() {
+
                 const data = [
-                    ['Materi', 'Pertanyaan', 'Opsi A', 'Opsi B', 'Opsi C', 'Opsi D', 'Opsi E', 'Jawaban Benar',
-                        'Bobot'
+                    [
+                        "Kategori Subtes",
+                        "Waktu",
+                        "Materi",
+                        "Pertanyaan",
+                        "Opsi A",
+                        "Opsi B",
+                        "Opsi C",
+                        "Opsi D",
+                        "Opsi E",
+                        "Jawaban Benar",
+                        "Bobot"
                     ],
-                    ['Contoh: Teks bacaan atau link foto', 'Apa ibukota Indonesia?', 'Jakarta', 'Bandung',
-                        'Surabaya', 'Medan', 'Bali', 'a', 1
+
+                    [
+                        "Penalaran Umum",
+                        20,
+                        "Teks bacaan atau materi soal",
+                        "Apa ibukota Indonesia?",
+                        "Jakarta",
+                        "Bandung",
+                        "Surabaya",
+                        "Medan",
+                        "Bali",
+                        "a",
+                        1
                     ]
                 ];
+
                 const ws = XLSX.utils.aoa_to_sheet(data);
                 const wb = XLSX.utils.book_new();
+
                 XLSX.utils.book_append_sheet(wb, ws, "Template Soal");
-                XLSX.writeFile(wb, "Template_Kuis_20_Soal.xlsx");
+
+                XLSX.writeFile(wb, "Template_Persisten_20_Soal.xlsx");
             },
+
 
 
             simpanSoal() {
@@ -174,12 +223,14 @@
 
 
             loadQuestion() {
-
                 let index = this.activeQuestion - 1;
 
                 if (this.questions[index]) {
-
                     let q = this.questions[index];
+
+                    // ✅ Set dropdown ikut soal
+                    this.selectedSubtes = q.subtes;
+                    this.selectedWaktu = q.waktu;
 
                     this.currentQuestion = {
                         materi: q.materi,
@@ -189,19 +240,9 @@
                         benar: ['a', 'b', 'c', 'd', 'e'].indexOf(q.jawaban_benar),
                         bobot: q.bobot,
                     };
-
-                } else {
-
-                    this.currentQuestion = {
-                        materi: '',
-                        gambar: null,
-                        pertanyaan: '',
-                        opsi: ['', '', '', '', ''],
-                        benar: null,
-                        bobot: 1,
-                    };
                 }
             },
+
 
 
             submitFinal() {
@@ -796,7 +837,7 @@
                         <span class="text-[11px] font-bold text-blue-700 uppercase tracking-tight">Belum punya
                             formatnya?</span>
                     </div>
-                    <a href="https://docs.google.com/spreadsheets/d/1pXgloFuLOm6xi_1TcTLJP2bTbAKmPidtII__kh4x6pk/export?format=xlsx"
+                    <a href="https://docs.google.com/spreadsheets/d/1NteyIa-UdkroBZKt5IQzPyYD5TYDJVrFYABlRhJ-dnA/copy"
                         target="_blank" @click="downloadTemplate()"
                         class="text-[11px] font-black text-[#4A72D4] hover:underline">
                         DOWNLOAD TEMPLATE

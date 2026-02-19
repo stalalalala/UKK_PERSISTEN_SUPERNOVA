@@ -276,6 +276,11 @@
 
                 <div class="flex flex-wrap gap-3 w-full lg:w-auto">
 
+                    <a href="{{ route('kuis.index') }}"
+                        class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-white hover:bg-white-600 text-emerald-600 px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95">
+                        Kembali ke kuis
+                    </a>
+
 
                     <button @click="showImportModal = true"
                         class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95">
@@ -297,7 +302,8 @@
                                             <i class="fa-solid fa-pen-nib text-xl"></i>
                                         </div>
                                         <h3 class="text-xl font-bold text-gray-800">Ubah Soal Nomor <span
-                                                x-text="activeQuestion"></span></h3>
+                                                x-text="questions.findIndex(q => q.id === activeQuestion) + 1"></span>
+                                        </h3>
                                     </div>
                                 </div>
 
@@ -378,6 +384,9 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <input type="hidden" name="durasi" :value="selectedWaktu">
+
 
                                     {{-- Waktu --}}
                                     <div class="w-full md:w-48 flex flex-col gap-2" x-data="{ open: false, selectedWaktu: 20 }"
