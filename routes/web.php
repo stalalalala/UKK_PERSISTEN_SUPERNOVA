@@ -179,11 +179,12 @@ Route::middleware('auth')->group(function () {
            KUIS PESERTA
         ======================= */
         Route::prefix('kuis')->name('kuis.')->group(function () {
-            Route::get('/', [KuisController::class, 'index'])->name('index');
-            Route::get('/intruksi', [IntruksiKuisController::class, 'index'])->name('intruksi');
-            Route::get('/soal', [SoalKuisController::class, 'index'])->name('soal');
-            Route::get('/hasil', [HasilKuisController::class, 'index'])->name('hasil');
-        });
+        Route::get('/', [KuisController::class, 'index'])->name('index');
+        Route::get('/intruksi/{id}', [KuisController::class, 'intruksi'])->name('intruksi');
+        Route::get('/soal/{id}', [SoalKuisController::class, 'index'])->name('soal');
+        Route::post('/submit/{id}', [KuisController::class, 'submit'])->name('submit');
+        Route::get('/hasil/{id}', [KuisController::class, 'hasil'])->name('hasil');
+      });
 
 
         /* =======================

@@ -595,40 +595,14 @@
                     </table>
                 </div>
 
-                <div
-                    class="p-6 md:p-8 border-t border-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white">
-                    <p class="text-sm text-gray-400 font-medium">
-                        Menampilkan
-                        <span x-text="((currentPage - 1) * itemsPerPage) + 1"></span> -
-                        <span
-                            x-text="activeTab === 'list' ? Math.min(currentPage * itemsPerPage, allKuis.length) : Math.min(currentPage * itemsPerPage, historyData.length)"></span>
-                        dari <span x-text="activeTab === 'list' ? allKuis.length : historyData.length"></span> Item
+                <div class="p-6 md:p-8 border-t border-gray-50 bg-white">
+                    <p class="text-sm text-gray-400 font-bold uppercase tracking-widest text-center sm:text-left">
+                        Menampilkan {{ $allKuis->count() }}
+                        Set Kuis Fundamental
                     </p>
-
-                    <div class="flex items-center gap-2">
-                        <button @click="if(currentPage > 1) currentPage--" :disabled="currentPage === 1"
-                            class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-100 hover:bg-gray-50 text-gray-400 disabled:opacity-50">
-                            <i class="fa-solid fa-chevron-left text-xs"></i>
-                        </button>
-
-                        <div class="flex gap-2">
-                            <template x-for="page in totalPages" :key="page">
-                                <button @click="currentPage = page"
-                                    :class="currentPage === page ? 'bg-[#4A72D4] text-white shadow-blue-100' :
-                                        'border border-gray-100 text-gray-600 hover:bg-gray-50'"
-                                    class="w-10 h-10 flex items-center justify-center rounded-xl font-bold transition-all shadow-md"
-                                    x-text="page">
-                                </button>
-                            </template>
-                        </div>
-
-                        <button @click="if(currentPage < totalPages) currentPage++"
-                            :disabled="currentPage === totalPages"
-                            class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-100 hover:bg-gray-50 text-gray-400 disabled:opacity-50">
-                            <i class="fa-solid fa-chevron-right text-xs"></i>
-                        </button>
-                    </div>
                 </div>
+
+
             </div>
         </div>
     </main>

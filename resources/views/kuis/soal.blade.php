@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PERSISTEN - Kuis Fundamental</title>
+    <title>PERSISTEN - Kuis {{ $kuis->set_ke }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +14,10 @@
             display: none !important;
         }
 
-        /* Scrollbar styling agar lebih tipis dan rapi */
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
         .custom-scroll::-webkit-scrollbar {
             width: 6px;
         }
@@ -27,120 +30,203 @@
             background: #cbd5e1;
             border-radius: 10px;
         }
+
+        /* Mencegah scroll bodi utama di laptop agar layout tetap fit di layar */
+        @media (min-width: 1024px) {
+            .desktop-fixed {
+                height: 100vh;
+                overflow: hidden;
+            }
+        }
     </style>
 </head>
 
-<body class="bg-slate-100 font-po h-screen overflow-hidden p-4 md:p-6 lg:p-10">
+<body class="bg-slate-100 p-4 md:p-6 lg:p-10 desktop-fixed">
 
-    <div x-data="{ soalAktif: 1, totalSoal: 20, jawabanTerpilih: {} }" x-cloak class="h-full flex flex-col max-w-[1600px] mx-auto">
+    <div x-data="kuisApp()" x-init="startTimer()" x-cloak class="h-full flex flex-col max-w-[1600px] mx-auto">
 
         <div class="flex flex-row items-center justify-between mb-6 shrink-0">
-            <h1 class="text-xl md:text-3xl font-black text-[#2E3B66]">Try Out UTBK - 1</h1>
+            <h1 class="text-xl md:text-3xl font-bold text-[#2E3B66]">Set {{ $kuis->set_ke }} -
+                <span class="text-blue-500">{{ $kuis->category->name ?? 'Kuis' }}</span>
+            </h1>
             <div class="flex items-center gap-2 md:gap-4">
                 <div
-                    class="flex items-center gap-2 bg-white border-2 border-[#4FAAFD] px-4 py-1.5 md:py-2 rounded-full">
+                    class="flex items-center gap-2 bg-white border-2 border-[#4FAAFD] px-4 py-1.5 md:py-2 rounded-full shadow-sm">
                     <svg class="w-5 h-5 text-[#4FAAFD]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    <p class="text-base md:text-lg font-bold text-[#4FAAFD] font-mono">30.00</p>
+                    <p class="text-base md:text-lg font-bold text-[#4FAAFD] font-mono" x-text="formatTime(timeLeft)">
+                    </p>
                 </div>
-                <a href="#"
-                    class="bg-[#3B82F6] text-white px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-xs md:text-sm shadow-md hover:bg-blue-600 transition-all">Keluar
-                    Ujian</a>
+                <button @click="confirmExit()"
+                    class="bg-red-500 text-white px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-xs md:text-sm shadow-md hover:bg-red-600 transition-all">
+                    Keluar Ujian
+                </button>
             </div>
         </div>
 
         <div
-            class="bg-white rounded-[40px] shadow-sm border border-gray-100 flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
+            class="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
 
-            <div
-                class="flex-1 flex flex-col p-6 md:p-10 overflow-y-auto custom-scroll border-b lg:border-b-0 lg:border-r-2 border-gray-100">
-                <div class="flex justify-between items-center mb-4">
-                    <p class="text-sm font-bold text-gray-400">UTBK: Penalaran Umum</p>
-                    <p class="text-sm font-bold text-gray-400">Soal <span x-text="soalAktif"></span> dari <span
-                            x-text="totalSoal"></span></p>
-                </div>
+            <div class="flex-1 flex flex-col min-h-0 border-b lg:border-b-0 lg:border-r-2 border-gray-100 bg-white">
 
-                <div class="w-full h-2.5 bg-gray-100 rounded-full mb-8">
-                    <div class="h-full bg-blue-400 rounded-full transition-all duration-500"
-                        :style="'width:' + (Object.keys(jawabanTerpilih).length / totalSoal * 100) + '%'"></div>
-                </div>
-
-                <div class="mb-10 flex-grow">
-                    <div
-                        class="text-blue-600 text-lg font-medium leading-relaxed underline decoration-blue-300 underline-offset-4">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                        laboris nisi ut aliquip ex ea commodo consequat.
+                <div class="p-6 pb-0">
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="text-sm font-bold text-blue-500 uppercase tracking-widest">
+                            {{ $kuis->kategori->name ?? 'Kuis Fundamental' }}</p>
+                        <p class="text-sm font-semibold text-gray-400">Soal <span x-text="soalAktifIdx + 1"></span> dari
+                            <span x-text="questions.length"></span></p>
                     </div>
-                    <div class="mt-6 text-gray-700 text-lg">
-                        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                        pariatur.
+                    <div class="w-full h-2.5 bg-gray-100 rounded-full mb-6">
+                        <div class="h-full bg-blue-400 rounded-full transition-all duration-500"
+                            :style="'width:' + (Object.keys(jawabanTerpilih).length / questions.length * 100) + '%'">
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-5 sm:grid-cols-7 gap-3 mb-10">
-                    <template x-for="i in totalSoal">
-                        <button @click="soalAktif = i"
-                            class="relative aspect-square flex items-center justify-center rounded-2xl font-bold text-lg transition-all border-2"
-                            :class="soalAktif === i ? 'bg-[#4FAAFD] border-[#4FAAFD] text-white shadow-lg' :
-                                (jawabanTerpilih[i] ? 'border-[#4FAAFD] text-[#4FAAFD] bg-white' :
-                                    'border-[#4FAAFD] text-[#4FAAFD] bg-white hover:bg-blue-50')">
-                            <span x-text="i"></span>
-                            <template x-if="jawabanTerpilih[i]">
-                                <div
-                                    class="absolute -top-2 -right-2 w-6 h-6 bg-white text-[#4FAAFD] text-[10px] rounded-full flex items-center justify-center border-2 border-[#4FAAFD] font-black z-10 shadow-sm">
-                                    <span x-text="jawabanTerpilih[i]"></span>
-                                </div>
+                <div class="flex-grow overflow-y-auto custom-scroll px-6 md:px-10">
+                    <div class="bg-blue-50/50 p-6 rounded-xl border border-blue-100 mb-6">
+                        <div class="text-[#2E3B66] leading-relaxed"
+                            x-text="questions[soalAktifIdx].materi || 'Baca teks berikut untuk menjawab pertanyaan.'">
+                        </div>
+                    </div>
+
+                    <div class="mb-10">
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase mb-2">Pertanyaan:</h4>
+                        <div class="text-[#2E3B66] font-bold text-lg md:text-xl leading-relaxed"
+                            x-text="questions[soalAktifIdx].pertanyaan"></div>
+                    </div>
+
+                    <div class="hidden lg:block mb-10 pt-6 border-t border-gray-100">
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase mb-4">Navigasi Soal:</h4>
+                        <div class="grid grid-cols-10 gap-2">
+                            <template x-for="(q, index) in questions" :key="q.id">
+                                <button @click="soalAktifIdx = index"
+                                    class="relative aspect-square flex items-center justify-center rounded-lg font-bold text-xs transition-all border-2"
+                                    :class="soalAktifIdx === index ? 'bg-[#4FAAFD] border-[#4FAAFD] text-white shadow-md' :
+                                        (jawabanTerpilih[q.id] ? 'border-[#4FAAFD] text-[#4FAAFD] bg-blue-50' :
+                                            'border-gray-100 text-gray-300 bg-white hover:bg-gray-50')">
+                                    <span x-text="index + 1"></span>
+                                    <template x-if="jawabanTerpilih[q.id]">
+                                        <div
+                                            class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white shadow-sm">
+                                        </div>
+                                    </template>
+                                </button>
                             </template>
-                        </button>
-                    </template>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-4 mt-auto">
-                    <button @click="if(soalAktif > 1) soalAktif--" :disabled="soalAktif === 1"
-                        class="flex-1 py-4 border-2 border-gray-200 rounded-2xl font-bold text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all">Kembali</button>
-                    <button @click="if(soalAktif < totalSoal) soalAktif++"
-                        class="flex-1 py-4 bg-[#4FAAFD] text-white rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all active:scale-95">
-                        <span x-text="soalAktif === totalSoal ? 'Selesai' : 'Selanjutnya'"></span>
-                    </button>
+                <div class="p-6 md:p-8 bg-white border-t border-gray-50 shrink-0">
+                    <div class="flex items-center gap-4">
+                        <button @click="prevSoal()" :disabled="soalAktifIdx === 0"
+                            class="flex-1 py-3 md:py-4 border-2 border-gray-200 rounded-2xl font-bold text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all">
+                            Kembali
+                        </button>
+                        <button @click="nextSoal()"
+                            class="flex-1 py-3 md:py-4 bg-[#4FAAFD] text-white rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all active:scale-95">
+                            <span x-text="soalAktifIdx === questions.length - 1 ? 'Selesai' : 'Selanjutnya'"></span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="w-full lg:w-[45%] xl:w-[40%] bg-white p-6 md:p-10 flex flex-col overflow-y-auto custom-scroll">
-                <h3 class="text-xl font-bold text-[#2E3B66] mb-6">Pilih Jawaban:</h3>
-
+            <div class="w-full lg:w-[40%] bg-white p-6 md:p-10 flex flex-col overflow-y-auto custom-scroll">
+                <h3 class="text-lg font-semibold text-[#2E3B66] mb-6">Pilih Jawaban:</h3>
                 <div class="space-y-4">
-                    <template x-for="opt in ['A', 'B', 'C', 'D', 'E']">
-                        <div @click="jawabanTerpilih[soalAktif] = opt"
-                            class="group flex items-center p-5 rounded-[25px] border-2 cursor-pointer transition-all duration-200"
-                            :class="jawabanTerpilih[soalAktif] === opt ? 'bg-[#D6E9FF] border-blue-400' :
-                                'bg-[#EAF5FF] border-transparent hover:border-blue-200'">
-
-                            <div class="mr-4 shrink-0">
-                                <div class="w-6 h-6 rounded-full border-2 bg-white flex items-center justify-center"
-                                    :class="jawabanTerpilih[soalAktif] === opt ? 'border-blue-500' : 'border-gray-300'">
-                                    <div x-show="jawabanTerpilih[soalAktif] === opt"
-                                        class="w-3 h-3 rounded-full bg-blue-500"></div>
-                                </div>
-                            </div>
+                    <template x-for="opt in ['a', 'b', 'c', 'd', 'e']" :key="opt">
+                        <div @click="pilihJawaban(questions[soalAktifIdx].id, opt)"
+                            class="group flex items-center p-5 rounded-xl border-2 cursor-pointer transition-all duration-200"
+                            :class="jawabanTerpilih[questions[soalAktifIdx].id] === opt ?
+                                'bg-[#D6E9FF] border-blue-400 shadow-sm' :
+                                'bg-[#F8FBFF] border-transparent hover:border-blue-100'">
 
                             <div class="w-10 h-10 rounded-full flex items-center justify-center font-black mr-4 shrink-0 shadow-sm transition-all"
-                                :class="jawabanTerpilih[soalAktif] === opt ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'">
-                                <span x-text="opt"></span>
+                                :class="jawabanTerpilih[questions[soalAktifIdx].id] === opt ? 'bg-blue-500 text-white' :
+                                    'bg-white text-blue-500'">
+                                <span class="uppercase" x-text="opt"></span>
                             </div>
 
-                            <span class="text-sm md:text-base font-semibold text-[#2E3B66] leading-snug">
-                                Lorem ipsum dolor sit amet, consectetur sit amet adipiscing elit.
-                            </span>
+                            <span class="text-sm md:text-base text-[#2E3B66] font-medium leading-snug"
+                                x-text="questions[soalAktifIdx]['opsi_' + opt]"></span>
                         </div>
                     </template>
                 </div>
-            </div>
 
+                <div class="lg:hidden mt-10 pt-6 border-t border-gray-100">
+                    <h4 class="text-xs font-semibold text-gray-400 uppercase mb-4">Navigasi Soal:</h4>
+                    <div class="grid grid-cols-5 sm:grid-cols-8 gap-2">
+                        <template x-for="(q, index) in questions" :key="q.id">
+                            <button @click="soalAktifIdx = index"
+                                class="relative aspect-square flex items-center justify-center rounded-lg font-bold text-xs border-2"
+                                :class="soalAktifIdx === index ? 'bg-[#4FAAFD] border-[#4FAAFD] text-white' : (jawabanTerpilih[q
+                                        .id] ? 'border-[#4FAAFD] text-[#4FAAFD] bg-blue-50' :
+                                    'border-gray-100 text-gray-300 bg-white')">
+                                <span x-text="index + 1"></span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <form id="formKuis" action="{{ route('kuis.submit', $kuis->id) }}" method="POST" class="hidden">
+            @csrf
+            <input type="hidden" name="jawaban" :value="JSON.stringify(jawabanTerpilih)">
+        </form>
     </div>
+
+    <script>
+        function kuisApp() {
+            return {
+                soalAktifIdx: 0,
+                questions: @json($kuis->questions),
+                jawabanTerpilih: {},
+                timeLeft: {{ $kuis->durasi * 60 }},
+                startTimer() {
+                    let timer = setInterval(() => {
+                        if (this.timeLeft > 0) this.timeLeft--;
+                        else {
+                            clearInterval(timer);
+                            this.submitKuis();
+                        }
+                    }, 1000);
+                },
+                formatTime(seconds) {
+                    let min = Math.floor(seconds / 60);
+                    let sec = seconds % 60;
+                    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+                },
+                pilihJawaban(soalId, opsi) {
+                    this.jawabanTerpilih[soalId] = opsi;
+                },
+                nextSoal() {
+                    if (this.soalAktifIdx < this.questions.length - 1) {
+                        this.soalAktifIdx++;
+                        // Scroll otomatis ke atas konten soal jika di HP saat ganti nomor
+                        if (window.innerWidth < 1024) window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    } else {
+                        if (confirm('Yakin ingin menyelesaikan kuis?')) this.submitKuis();
+                    }
+                },
+                prevSoal() {
+                    if (this.soalAktifIdx > 0) this.soalAktifIdx--;
+                },
+                submitKuis() {
+                    document.getElementById('formKuis').submit();
+                },
+                confirmExit() {
+                    if (confirm('Progres akan hilang. Yakin ingin keluar?')) window.location.href =
+                        "{{ route('kuis.index') }}";
+                }
+            }
+        }
+    </script>
 </body>
 
 </html>

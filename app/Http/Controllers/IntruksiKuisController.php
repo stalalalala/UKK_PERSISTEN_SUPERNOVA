@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\IntruksiKuis;
+use App\Models\Kuis;
 use Illuminate\Http\Request;
 
 class IntruksiKuisController extends Controller
@@ -10,10 +11,14 @@ class IntruksiKuisController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        return view('kuis.intruksi');
-    }
+    public function index($id)
+{
+    // Cari data kuis berdasarkan ID
+    $kuis = Kuis::findOrFail($id);
+    
+    // Kirim data kuis ke blade intruksi
+    return view('peserta.kuis.intruksi', compact('kuis'));
+}
 
     /**
      * Show the form for creating a new resource.

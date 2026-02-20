@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kuis;
 use App\Models\SoalKuis;
 use Illuminate\Http\Request;
 
@@ -10,10 +11,16 @@ class SoalKuisController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-       return view('kuis.soal');
-    }
+   public function index($id)
+{
+    // Ambil kuis dan soal-soal yang hanya milik kuis_id ini
+    $kuis = Kuis::with(['questions'])->findOrFail($id);
+    
+    // questions_count digunakan untuk info di sidebar soal
+    $totalSoal = $kuis->questions->count();
+
+    return view('kuis.soal', compact('kuis', 'totalSoal'));
+}
 
     /**
      * Show the form for creating a new resource.

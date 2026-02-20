@@ -14,8 +14,8 @@ class AdminKuisController extends Controller
     public function index()
     {
         $kuis = Kuis::withCount('questions')
-            ->latest()
-            ->get();
+        ->orderBy('set_ke', 'desc')
+        ->get();
 
         $trash = Kuis::onlyTrashed() 
             ->withCount('questions')
@@ -35,7 +35,10 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
     // ============================
     public function create()
     {
-        return view('admin.kuis.create');
+        $lastSet = Kuis::max('set_ke');
+    $nextSet = $lastSet ? $lastSet + 1 : 1;
+
+    return view('admin.kuis.create', compact('nextSet'));
     }
 
     // ============================
@@ -61,10 +64,8 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
         // ============================
         // AUTO SET NUMBER
         // ============================
-        $lastSet = Kuis::where('kategori', $request->kategori)
-            ->max('set_ke');
-
-        $setKe = $lastSet ? $lastSet + 1 : 1;
+        $lastSet = Kuis::max('set_ke'); 
+    $setKe = $lastSet ? $lastSet + 1 : 1;
 
         // ============================
         // CREATE QUIZ SET
@@ -193,23 +194,50 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
     // DELETE (SOFT DELETE)
     // ============================
     public function destroy($id)
-    {
-        $kuis = Kuis::findOrFail($id);
-        $kuis->delete();
+{
+    $kuis = Kuis::findOrFail($id);
+    $deletedSetNumber = $kuis->set_ke;
 
-        return back()->with('success', 'Kuis dipindahkan ke Trash!');
+    // 1. Hapus kuis (Soft Delete)
+    $kuis->delete();
+
+    // 2. Geser nomor set yang lain ke bawah (decrement)
+    // Semua kuis yang set_ke-nya di atas nomor yang dihapus akan dikurangi 1
+    Kuis::where('set_ke', '>', $deletedSetNumber)
+        ->decrement('set_ke');
+    
+    // 3. Update Judul agar sesuai dengan nomor set yang baru
+    // Karena judulmu mengandung kata "Set X", maka judulnya perlu di-refresh
+    $kuisToUpdate = Kuis::where('set_ke', '>=', $deletedSetNumber)->get();
+    foreach($kuisToUpdate as $k) {
+        $k->update([
+            'judul' => "Kuis Fundamental Set " . $k->set_ke
+        ]);
     }
+
+    return back()->with('success', 'Kuis dihapus dan urutan set diperbarui!');
+}
 
     // ============================
     // RESTORE FROM TRASH
     // ============================
     public function restore($id)
-    {
-        $kuis = Kuis::onlyTrashed()->findOrFail($id);
-        $kuis->restore();
+{
+    $kuis = Kuis::onlyTrashed()->findOrFail($id);
+    
+    // Cari angka set tertinggi saat ini di tabel aktif
+    $lastSet = Kuis::max('set_ke');
+    $newSet = $lastSet ? $lastSet + 1 : 1;
 
-        return back()->with('success', 'Kuis berhasil dipulihkan!');
-    }
+    // Pulihkan dengan nomor set baru di urutan paling akhir
+    $kuis->restore();
+    $kuis->update([
+        'set_ke' => $newSet,
+        'judul'  => "Kuis Fundamental Set $newSet"
+    ]);
+
+    return back()->with('success', 'Kuis dipulihkan sebagai Set terakhir!');
+}
 
     // ============================
     // TOGGLE ACTIVE / HIDDEN

@@ -7,59 +7,69 @@ use Illuminate\Http\Request;
 
 class KuisController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        return view('kuis.index');
+    
+    public function index() {
+    $allKuis = Kuis::withCount('questions')
+                ->where('is_active', true)
+                ->orderBy('set_ke', 'asc') 
+                ->paginate(6);
+
+    return view('kuis.index', compact('allKuis'));
+}
+
+public function intruksi($id) {
+    $kuis = Kuis::findOrFail($id);
+    return view('kuis.intruksi', compact('kuis'));
+}
+
+public function kerjakan($id) {
+    // Ambil kuis dan 20 soalnya
+    $kuis = Kuis::with('questions')->findOrFail($id);
+    return view('kuis.soal', compact('kuis'));
+}
+
+public function submit(Request $request, $id) {
+    $kuis = Kuis::with('questions')->findOrFail($id);
+    $jawabanUser = $request->input('jawaban', []); // format: [question_id => 'A']
+
+    $benar = 0;
+    $salah = 0;
+    $kosong = 0;
+    $detailHasil = [];
+
+    foreach ($kuis->questions as $q) {
+        $userAns = $jawabanUser[$q->id] ?? null;
+        
+        if (!$userAns) {
+            $kosong++;
+            $status = 'kosong';
+        } elseif ($userAns == $q->jawaban_benar) {
+            $benar++;
+            $status = 'benar';
+        } else {
+            $salah++;
+            $status = 'salah';
+        }
+
+        $detailHasil[] = [
+            'pertanyaan' => $q->pertanyaan,
+            'jawaban_user' => $userAns,
+            'kunci' => $q->jawaban_benar,
+            'status' => $status
+        ];
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    // Simpan hasil ke session sementara untuk ditampilkan di blade hasil
+    session(['terakhir_kuis' => [
+        'kuis_id' => $id,
+        'benar' => $benar,
+        'salah' => $salah,
+        'kosong' => $kosong,
+        'detail' => $detailHasil,
+        'skor' => ($benar / $kuis->questions->count()) * 100
+    ]]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    return redirect()->route('kuis.hasil', $id);
+}
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Kuis $kuis)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Kuis $kuis)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Kuis $kuis)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Kuis $kuis)
-    {
-        //
-    }
 }

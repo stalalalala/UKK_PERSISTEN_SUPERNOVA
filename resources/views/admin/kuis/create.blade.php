@@ -38,7 +38,7 @@
             activeMenu: 'Manajemen Kuis',
             mobileMenuOpen: false,
             showImportModal: false,
-            currentSet: 1,
+            currentSet: @json($nextSet),
             selectedSubtes: '',
             selectedWaktu: 20,
 
@@ -58,6 +58,8 @@
 
             importExcel(event) {
                 const file = event.target.files[0];
+                if (!file) return;
+
                 const reader = new FileReader();
 
                 reader.onload = (e) => {
@@ -69,11 +71,29 @@
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(sheet);
 
+                    if (jsonData.length === 0) {
+                        alert("File Excel kosong!");
+                        return;
+                    }
+
+                    // =========================================
+                    // ✅ 1. Ambil Subtes & Waktu dari BARIS PERTAMA SAJA
+                    // =========================================
+                    const globalSubtes = jsonData[0]["Kategori Subtes"] || "";
+                    const globalWaktu = jsonData[0]["Waktu"] || 20;
+
+                    // Set dropdown UI
+                    this.selectedSubtes = globalSubtes;
+                    this.selectedWaktu = globalWaktu;
+
+                    // =========================================
+                    // ✅ 2. Mapping soal TANPA ambil subtes per baris
+                    // =========================================
                     this.questions = jsonData.slice(0, 20).map((row) => ({
 
-                        // ✅ Ambil dari Excel
-                        subtes: row["Kategori Subtes"] || "",
-                        waktu: row["Waktu"] || 20,
+                        // ❌ Jangan lagi ambil dari row
+                        subtes: globalSubtes,
+                        waktu: globalWaktu,
 
                         materi: row["Materi"] || "",
                         pertanyaan: row["Pertanyaan"] || "",
@@ -84,22 +104,17 @@
                         opsi_d: row["Opsi D"] || "",
                         opsi_e: row["Opsi E"] || "",
 
-                        // ✅ Jawaban Benar (dropdown)
                         jawaban_benar: (row["Jawaban Benar"] || "")
                             .toString()
                             .trim()
                             .toLowerCase(),
 
-                        // ✅ Bobot ikut dari Excel
                         bobot: row["Bobot"] || 1,
                     }));
 
-                    // ✅ Auto set dropdown UI ikut soal pertama
-                    if (this.questions.length > 0) {
-                        this.selectedSubtes = this.questions[0].subtes;
-                        this.selectedWaktu = this.questions[0].waktu;
-                    }
-
+                    // =========================================
+                    // ✅ 3. Reset state
+                    // =========================================
                     this.soalTersimpan = this.questions.length;
                     this.activeQuestion = 1;
                     this.loadQuestion();
@@ -554,26 +569,13 @@
                                         </div>
 
                                         {{-- Set --}}
-                                        <div class="w-full md:w-32 flex flex-col gap-2" x-data="{ open: false }"
-                                            @click.away="open = false">
+                                        <div class="w-full md:w-32 flex flex-col gap-2">
                                             <label
                                                 class="text-[10px] font-bold text-gray-400 uppercase ml-1">Set</label>
                                             <div
-                                                class="bg-white px-4 py-3 rounded-2xl shadow-sm border border-blue-50 flex items-center relative h-full">
-                                                <button type="button" @click="open = !open"
-                                                    class="w-full flex items-center justify-between text-sm font-bold text-[#4A72D4] focus:outline-none">
-                                                    <span x-text="currentSet"></span>
-                                                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200"
-                                                        :class="open ? 'rotate-180' : ''"></i>
-                                                </button>
-                                                <div x-show="open" x-transition
-                                                    class="absolute z-50 w-full mt-2 top-full left-0 bg-white border border-blue-50 shadow-xl rounded-2xl overflow-hidden py-2">
-                                                    <template x-for="n in 10">
-                                                        <div @click="currentSet = n; open = false"
-                                                            class="px-4 py-2 text-sm text-center text-gray-600 hover:bg-blue-50 hover:text-[#4A72D4] cursor-pointer transition-colors font-medium"
-                                                            x-text="n"></div>
-                                                    </template>
-                                                </div>
+                                                class="bg-gray-50 px-4 py-3 rounded-2xl border border-gray-100 flex items-center h-full">
+                                                <span class="text-sm font-bold text-[#4A72D4]"
+                                                    x-text="'Set ' + currentSet"></span>
                                             </div>
                                         </div>
 

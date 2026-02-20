@@ -38,20 +38,16 @@
             mobileMenuOpen: false,
             showImportModal: false,
             activeMenu: "Manajemen Kuis",
-            currentSet: 1,
-            soalTersimpan: 0,
+            currentSet: @json($kuis->set_ke),
 
+            // 🔥 INI YANG PENTING
+            selectedWaktu: @json($kuis->durasi),
 
             activeQuestion: @json($questions->first()['id'] ?? null),
-
             questions: @json($questions),
 
             get currentQuestion() {
                 return this.questions.find(q => q.id === this.activeQuestion);
-            },
-
-            selectQuestion(id) {
-                this.activeQuestion = id;
             },
 
             markChanged() {
@@ -363,25 +359,12 @@
                                     </div>
 
                                     {{-- Set --}}
-                                    <div class="w-full md:w-32 flex flex-col gap-2" x-data="{ open: false }"
-                                        @click.away="open = false">
+                                    <div class="w-full md:w-32 flex flex-col gap-2">
                                         <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Set</label>
                                         <div
-                                            class="bg-white px-4 py-3 rounded-2xl shadow-sm border border-blue-50 flex items-center relative h-full">
-                                            <button type="button" @click="open = !open"
-                                                class="w-full flex items-center justify-between text-sm font-bold text-[#4A72D4] focus:outline-none">
-                                                <span x-text="currentSet"></span>
-                                                <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200"
-                                                    :class="open ? 'rotate-180' : ''"></i>
-                                            </button>
-                                            <div x-show="open" x-transition
-                                                class="absolute z-50 w-full mt-2 top-full left-0 bg-white border border-blue-50 shadow-xl rounded-2xl overflow-hidden py-2">
-                                                <template x-for="n in 10">
-                                                    <div @click="currentSet = n; open = false"
-                                                        class="px-4 py-2 text-sm text-center text-gray-600 hover:bg-blue-50 hover:text-[#4A72D4] cursor-pointer transition-colors font-medium"
-                                                        x-text="n"></div>
-                                                </template>
-                                            </div>
+                                            class="bg-gray-50 px-4 py-3 rounded-2xl border border-gray-100 flex items-center h-full">
+                                            <span class="text-sm font-bold text-[#4A72D4]"
+                                                x-text="'Set ' + currentSet"></span>
                                         </div>
                                     </div>
 
@@ -389,7 +372,7 @@
 
 
                                     {{-- Waktu --}}
-                                    <div class="w-full md:w-48 flex flex-col gap-2" x-data="{ open: false, selectedWaktu: 20 }"
+                                    <div class="w-full md:w-48 flex flex-col gap-2" x-data="{ open: false }"
                                         @click.away="open = false">
                                         <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Waktu</label>
                                         <div
