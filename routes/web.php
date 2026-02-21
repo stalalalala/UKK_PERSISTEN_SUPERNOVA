@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\admin\AdminKuisController;
 use App\Http\Controllers\admin\AdminLatihanController;
 use App\Http\Controllers\admin\AdminMinatBakatController;
@@ -36,14 +37,35 @@ use App\Http\Controllers\SoalTryoutController;
 // =========================================================
 // 1. GUEST ROUTES (Belum Login)
 // =========================================================
-Route::middleware('guest')->group(function () {
-    Route::get('/masuk', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/masuk', [LoginController::class, 'login']);
-    
-    Route::get('/daftar', function () {
-        return view('Auth.daftar');
-    })->name('register');
+
+Route::middleware('guest')->group(function(){
+    Route::get('/masuk',[LoginController::class,'showLoginForm'])->name('login');
+    Route::post('/masuk',[LoginController::class,'login']);
+
+    Route::get('/daftar',[LoginController::class,'showRegisterForm'])->name('register');
+    Route::post('/daftar',[LoginController::class,'register']);
+
+    Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('login.google');
+    Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback'])->name('login.google.callback');
+
+
+
 });
+ Auth::routes(['verify' => true]);
+
+ // Route yang butuh login + email terverifikasi
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    });
+
+    Route::get('/beranda', function () {
+        return view('beranda');
+    });
+});
+
+
+Route::post('/logout',[LoginController::class,'logout'])->middleware('auth');
 
 // =========================================================
 // 2. AUTH ROUTES (Sudah Login)
@@ -100,12 +122,7 @@ Route::middleware('auth')->group(function () {
         Route::post('minat-bakat/soal/import-bulk', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'importSoalBulk'])
     ->name('minatbakat.soal.importBulk');
 
-        Route::resource('minatBakat', AdminMinatBakatController::class)->names([
-            'index'   => 'minatbakat.index',
-            'store'   => 'minatbakat.kategori.store',
-            'update'  => 'minatbakat.kategori.update',
-            'destroy' => 'minatbakat.kategori.destroy',
-        ]);
+       Route::resource('minatBakat', AdminMinatBakatController::class);
     });
 
     // -----------------------------------------------------

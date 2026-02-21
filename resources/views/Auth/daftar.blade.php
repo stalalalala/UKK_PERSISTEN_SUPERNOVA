@@ -22,71 +22,102 @@
         </div>
     </nav>
 
-    <main class="relative z-10 flex-grow flex items-center py-10">
-        <div class="max-w-6xl mx-auto w-full px-4">
+  <main class="relative z-10 flex-grow flex items-center py-10">
+    <div class="max-w-6xl mx-auto w-full px-4">
+        
+        <div class="bg-[#E8F1FF] w-full rounded-[50px] p-8 md:p-16 shadow-2xl border-4 border-white/60 relative overflow-hidden">
             
-            <div class="bg-[#E8F1FF] w-full rounded-[50px] p-8 md:p-16 shadow-2xl border-4 border-white/60 relative overflow-hidden">
+            <div class="flex justify-between items-center mb-10">
+                <h1 class="text-4xl md:text-6xl font-black text-[#2E3B66]">Daftar</h1>
                 
-                <div class="flex justify-between items-center mb-10">
-                    <h1 class="text-4xl md:text-6xl font-black text-[#2E3B66]">Daftar</h1>
-                    
-                    <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl shadow-sm border border-gray-100">
-                        <span class="text-xs font-bold text-gray-400 uppercase leading-none">Daftar dengan</span>
-                        <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" alt="Google" class="w-6 h-6">
+                <a href="{{ route('login.google') }}" 
+                    class="flex items-center gap-3 bg-white px-4 py-2 rounded-2xl shadow-sm border border-gray-100">
+                    <span class="text-xs font-bold text-gray-400 uppercase leading-none">Daftar dengan</span>
+                    <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" alt="Google" class="w-6 h-6">
+                </a>
+            </div>
+
+            {{-- FORM REGISTER --}}
+            <form method="POST" action="{{ route('register') }}" class="grid md:grid-cols-2 gap-x-12 gap-y-6">
+                @csrf
+
+                {{-- Kolom kiri --}}
+                <div class="space-y-6">
+                    {{-- Nama --}}
+                    <div class="space-y-2">
+                        <label class="block text-gray-500 font-bold ml-1">Nama pengguna</label>
+                        <input type="text" name="name" value="{{ old('name') }}"
+                            placeholder="contoh" 
+                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white">
+                        @error('name')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- No HP --}}
+                    <div class="space-y-2">
+                        <label class="block text-gray-500 font-bold ml-1">No telepon</label>
+                        <input type="text" name="no_hp" value="{{ old('no_hp') }}"
+                            placeholder="081234567890" 
+                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white">
+                        @error('no_hp')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
-                <form action="#" class="grid md:grid-cols-2 gap-x-12 gap-y-6">
-                    
-                    <div class="space-y-6">
-                        <div class="space-y-2">
-                            <label class="block text-gray-500 font-bold ml-1">Nama pengguna</label>
-                            <input type="text" placeholder="contoh" 
-                                class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white">
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-gray-500 font-bold ml-1">No telepon</label>
-                            <input type="text" placeholder="081234567890" 
-                                class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white">
-                        </div>
+                {{-- Kolom kanan --}}
+                <div class="space-y-6">
+                    {{-- Email --}}
+                    <div class="space-y-2">
+                        <label class="block text-gray-500 font-bold ml-1">Email</label>
+                        <input type="email" name="email" value="{{ old('email') }}"
+                            placeholder="contoh@gmail.com" 
+                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white">
+                        @error('email')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div class="space-y-6">
-                        <div class="space-y-2">
-                            <label class="block text-gray-500 font-bold ml-1">Email</label>
-                            <input type="email" placeholder="contoh@gmail.com" 
-                                class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white">
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-gray-500 font-bold ml-1">Buat sandi</label>
-                            <input type="password" placeholder="xxxxxxxx" 
-                                class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white tracking-widest">
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-gray-500 font-bold ml-1">Konfirmasi sandi</label>
-                            <input type="password" placeholder="xxxxxxxx" 
-                                class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white tracking-widest">
-                        </div>
+                    {{-- Password --}}
+                    <div class="space-y-2">
+                        <label class="block text-gray-500 font-bold ml-1">Buat sandi</label>
+                        <input type="password" name="password"
+                            placeholder="xxxxxxxx" 
+                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white tracking-widest">
+                        @error('password')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div class="md:col-span-2 flex justify-center gap-6 pt-10">
-                      <a href="/masuk" 
+                    {{-- Konfirmasi Password --}}
+                    <div class="space-y-2">
+                        <label class="block text-gray-500 font-bold ml-1">Konfirmasi sandi</label>
+                        <input type="password" name="password_confirmation"
+                            placeholder="xxxxxxxx" 
+                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white tracking-widest">
+                    </div>
+                </div>
+
+                {{-- Tombol --}}
+                <div class="md:col-span-2 flex justify-center gap-6 pt-10">
+                    {{-- Login --}}
+                    <a href="{{ route('login') }}" 
                         class="w-full max-w-[240px] bg-[#FFB81C] text-white font-black py-4 rounded-3xl text-xl shadow-[0_6px_0_0_#d99c16] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center">
-                          Masuk
-                      </a>
+                        Masuk
+                    </a>
 
-                      <a href="#" 
+                    {{-- Daftar --}}
+                    <button type="submit"
                         class="w-full max-w-[240px] bg-[#4A9FFF] text-white font-black py-4 rounded-3xl text-xl shadow-[0_6px_0_0_#3a86db] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center">
-                          Daftar
-                      </a>
-                  </div>
-                </form>
-            </div>
+                        Daftar
+                    </button>
+                </div>
+
+            </form>
         </div>
-    </main>
+    </div>
+</main>
 
 </body>
 </html>

@@ -25,9 +25,9 @@
             <ul class="hidden lg:flex gap-12 text-gray-800 font-medium text-sm">
                 <li><a href="/" class="hover:text-blue-500">Beranda</a></li>
                 <li><a href="{{ route('streak.index') }}" class="hover:text-blue-500">Pet Streak</a></li>
-                <li><a href="{{ route('tryout.index') }}" class="font-bold hover:text-blue-500">Try Out</a></li>
+                <li><a href="{{ route('tryout.index') }}" class=" hover:text-blue-500">Try Out</a></li>
                 <li><a href="{{ route('latihan.index') }}" class="hover:text-blue-500">Latihan Soal</a></li>
-                <li><a href="{{ route('video.index') }}" class="hover:text-blue-500">Video Pembelajaran</a></li>
+                <li><a href="{{ route('video.index') }}" class="font-bold hover:text-blue-500">Video Pembelajaran</a></li>
             </ul>
 
             <div class="flex items-center gap-2">
