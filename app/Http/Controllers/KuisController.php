@@ -72,4 +72,20 @@ public function submit(Request $request, $id) {
     return redirect()->route('kuis.hasil', $id);
 }
 
+public function hasil($id) {
+    // 1. Ambil data kuis
+    $kuis = Kuis::findOrFail($id);
+    
+    // 2. Ambil data skor dari session yang dibuat di fungsi submit
+    $hasil = session('terakhir_kuis');
+
+    // 3. Validasi: Jika session kosong (misal user refresh halaman), kembalikan ke index
+    if (!$hasil || $hasil['kuis_id'] != $id) {
+        return redirect()->route('kuis.index');
+    }
+
+    // 4. Kirim data ke blade
+    return view('kuis.hasil', compact('kuis', 'hasil'));
+}
+
 }

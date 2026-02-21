@@ -41,26 +41,28 @@
     </style>
 </head>
 
-<body class="bg-slate-100 p-4 md:p-6 lg:p-10 desktop-fixed">
+<body class="bg-slate-100 p-4 md:p-6 pt-0 desktop-fixed">
 
-    <div x-data="kuisApp()" x-init="startTimer()" x-cloak class="h-full flex flex-col max-w-[1600px] mx-auto">
+    <div x-data="kuisApp()" x-init="startTimer()" x-cloak class="h-full flex flex-col w-full mx-auto">
 
-        <div class="flex flex-row items-center justify-between mb-6 shrink-0">
-            <h1 class="text-xl md:text-3xl font-bold text-[#2E3B66]">Set {{ $kuis->set_ke }} -
+        <div class="flex flex-row items-center justify-between mb-4 shrink-0">
+            <h1 class="text-lg md:text-xl font-bold text-[#2E3B66]">Set {{ $kuis->set_ke }} -
                 <span class="text-blue-500">{{ $kuis->category->name ?? 'Kuis' }}</span>
             </h1>
             <div class="flex items-center gap-2 md:gap-4">
                 <div
-                    class="flex items-center gap-2 bg-white border-2 border-[#4FAAFD] px-4 py-1.5 md:py-2 rounded-full shadow-sm">
+                    class="flex items-center gap-2 bg-blue-50 border-2 border-[#4FAAFD] px-2 h-8  rounded-full shadow-sm transition-all">
                     <svg class="w-5 h-5 text-[#4FAAFD]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    <p class="text-base md:text-lg font-bold text-[#4FAAFD] font-mono" x-text="formatTime(timeLeft)">
+                    <p class="text-base md:text-lg font-medium text-[#4FAAFD] leading-none"
+                        x-text="formatTime(timeLeft)">
                     </p>
                 </div>
+
                 <button @click="confirmExit()"
-                    class="bg-red-500 text-white px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-xs md:text-sm shadow-md hover:bg-red-600 transition-all">
+                    class="bg-red-500 hover:bg-red-600 text-white  border-2 border-red-600 px-3 h-8 rounded-full font-medium text-xs md:text-sm shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center">
                     Keluar Ujian
                 </button>
             </div>
@@ -71,12 +73,13 @@
 
             <div class="flex-1 flex flex-col min-h-0 border-b lg:border-b-0 lg:border-r-2 border-gray-100 bg-white">
 
-                <div class="p-6 pb-0">
+                <div class="pt-5 px-4 md:px-7">
                     <div class="flex justify-between items-center mb-4">
                         <p class="text-sm font-bold text-blue-500 uppercase tracking-widest">
                             {{ $kuis->kategori->name ?? 'Kuis Fundamental' }}</p>
-                        <p class="text-sm font-semibold text-gray-400">Soal <span x-text="soalAktifIdx + 1"></span> dari
-                            <span x-text="questions.length"></span></p>
+                        <p class="text-sm font-medium text-gray-400">Soal <span x-text="soalAktifIdx + 1"></span> dari
+                            <span x-text="questions.length"></span>
+                        </p>
                     </div>
                     <div class="w-full h-2.5 bg-gray-100 rounded-full mb-6">
                         <div class="h-full bg-blue-400 rounded-full transition-all duration-500"
@@ -85,17 +88,17 @@
                     </div>
                 </div>
 
-                <div class="flex-grow overflow-y-auto custom-scroll px-6 md:px-10">
-                    <div class="bg-blue-50/50 p-6 rounded-xl border border-blue-100 mb-6">
-                        <div class="text-[#2E3B66] leading-relaxed"
+                <div class="flex-grow overflow-y-auto custom-scroll px-4 md:px-6">
+                    <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-6">
+                        <div class="text-[#2E3B66] text-lg leading-relaxed whitespace-pre-line"
                             x-text="questions[soalAktifIdx].materi || 'Baca teks berikut untuk menjawab pertanyaan.'">
                         </div>
                     </div>
 
-                    <div class="mb-10">
-                        <h4 class="text-xs font-semibold text-gray-400 uppercase mb-2">Pertanyaan:</h4>
-                        <div class="text-[#2E3B66] font-bold text-lg md:text-xl leading-relaxed"
-                            x-text="questions[soalAktifIdx].pertanyaan"></div>
+                    <div class="px-4 mb-10">
+                        <div class="text-[#2E3B66] text-lg font-medium leading-relaxed"
+                            x-text="questions[soalAktifIdx].pertanyaan">
+                        </div>
                     </div>
 
                     <div class="hidden lg:block mb-10 pt-6 border-t border-gray-100">
@@ -119,7 +122,7 @@
                     </div>
                 </div>
 
-                <div class="p-6 md:p-8 bg-white border-t border-gray-50 shrink-0">
+                <div class="p-4 bg-white border-t border-gray-50 shrink-0">
                     <div class="flex items-center gap-4">
                         <button @click="prevSoal()" :disabled="soalAktifIdx === 0"
                             class="flex-1 py-3 md:py-4 border-2 border-gray-200 rounded-2xl font-bold text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all">
@@ -133,9 +136,9 @@
                 </div>
             </div>
 
-            <div class="w-full lg:w-[40%] bg-white p-6 md:p-10 flex flex-col overflow-y-auto custom-scroll">
-                <h3 class="text-lg font-semibold text-[#2E3B66] mb-6">Pilih Jawaban:</h3>
-                <div class="space-y-4">
+            <div class="w-full lg:w-[40%] bg-white p-4 flex flex-col ">
+                <h3 class="text-sm font-semibold text-[#2E3B66] mb-4">Pilih Jawaban:</h3>
+                <div class="space-y-4 overflow-y-auto custom-scroll">
                     <template x-for="opt in ['a', 'b', 'c', 'd', 'e']" :key="opt">
                         <div @click="pilihJawaban(questions[soalAktifIdx].id, opt)"
                             class="group flex items-center p-5 rounded-xl border-2 cursor-pointer transition-all duration-200"
@@ -143,13 +146,13 @@
                                 'bg-[#D6E9FF] border-blue-400 shadow-sm' :
                                 'bg-[#F8FBFF] border-transparent hover:border-blue-100'">
 
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-black mr-4 shrink-0 shadow-sm transition-all"
+                            <div class="w-10 h-10  rounded-full flex items-center justify-center font-black mr-4 shrink-0 shadow-sm transition-all"
                                 :class="jawabanTerpilih[questions[soalAktifIdx].id] === opt ? 'bg-blue-500 text-white' :
                                     'bg-white text-blue-500'">
                                 <span class="uppercase" x-text="opt"></span>
                             </div>
 
-                            <span class="text-sm md:text-base text-[#2E3B66] font-medium leading-snug"
+                            <span class="text-lg md:text-base text-[#2E3B66] leading-snug"
                                 x-text="questions[soalAktifIdx]['opsi_' + opt]"></span>
                         </div>
                     </template>
