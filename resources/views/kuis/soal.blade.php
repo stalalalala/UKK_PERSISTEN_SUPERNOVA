@@ -9,6 +9,7 @@
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         [x-cloak] {
             display: none !important;
@@ -43,7 +44,8 @@
 
 <body class="bg-slate-100 p-4 md:p-6 pt-0 desktop-fixed">
 
-    <div x-data="kuisApp()" x-init="startTimer()" x-cloak class="h-full flex flex-col w-full mx-auto">
+    <div x-data="kuisApp()" @keydown.window.enter="nextSoal()" x-init="startTimer()" x-cloak
+        class="h-full flex flex-col w-full mx-auto">
 
         <div class="flex flex-row items-center justify-between mb-4 shrink-0">
             <h1 class="text-lg md:text-xl font-bold text-[#2E3B66]">Set {{ $kuis->set_ke }} -
@@ -62,7 +64,7 @@
                 </div>
 
                 <button @click="confirmExit()"
-                    class="bg-red-500 hover:bg-red-600 text-white  border-2 border-red-600 px-3 h-8 rounded-full font-medium text-xs md:text-sm shadow-md shadow-red-100 transition-all active:scale-95 flex items-center justify-center">
+                    class="bg-red-500 hover:bg-red-600 text-white  border-2 border-red-600 px-3 h-8 rounded-full font-medium text-xs md:text-sm shadow-xl transition-all active:scale-95 flex items-center justify-center">
                     Keluar Ujian
                 </button>
             </div>
@@ -110,10 +112,12 @@
                                     :class="soalAktifIdx === index ? 'bg-[#4FAAFD] border-[#4FAAFD] text-white shadow-md' :
                                         (jawabanTerpilih[q.id] ? 'border-[#4FAAFD] text-[#4FAAFD] bg-blue-50' :
                                             'border-gray-100 text-gray-300 bg-white hover:bg-gray-50')">
+
                                     <span x-text="index + 1"></span>
+
                                     <template x-if="jawabanTerpilih[q.id]">
-                                        <div
-                                            class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white shadow-sm">
+                                        <div class="absolute -top-2 -right-2 w-5 h-5 bg-white text-blue-400 text-[10px] flex items-center justify-center rounded-full border-2 border-blue-400 shadow-sm uppercase"
+                                            x-text="jawabanTerpilih[q.id]">
                                         </div>
                                     </template>
                                 </button>
@@ -164,10 +168,17 @@
                         <template x-for="(q, index) in questions" :key="q.id">
                             <button @click="soalAktifIdx = index"
                                 class="relative aspect-square flex items-center justify-center rounded-lg font-bold text-xs border-2"
-                                :class="soalAktifIdx === index ? 'bg-[#4FAAFD] border-[#4FAAFD] text-white' : (jawabanTerpilih[q
-                                        .id] ? 'border-[#4FAAFD] text-[#4FAAFD] bg-blue-50' :
-                                    'border-gray-100 text-gray-300 bg-white')">
+                                :class="soalAktifIdx === index ? 'bg-[#4FAAFD] border-[#4FAAFD] text-white' :
+                                    (jawabanTerpilih[q.id] ? 'border-[#4FAAFD] text-[#4FAAFD] bg-blue-50' :
+                                        'border-gray-100 text-gray-300 bg-white')">
+
                                 <span x-text="index + 1"></span>
+
+                                <template x-if="jawabanTerpilih[q.id]">
+                                    <div class="absolute -top-2 -right-2 w-5 h-5 bg-white text-blue-400 text-[10px] flex items-center justify-center rounded-full border-2 border-blue-400 shadow-sm uppercase"
+                                        x-text="jawabanTerpilih[q.id]">
+                                    </div>
+                                </template>
                             </button>
                         </template>
                     </div>
@@ -183,49 +194,80 @@
 
     <script>
         function kuisApp() {
+            // Nama unik untuk storage berdasarkan ID kuis agar tidak bentrok antar set kuis
+            const storageTimerKey = 'timer_kuis_{{ $kuis->id }}';
+            const storageJawabanKey = 'jawaban_kuis_{{ $kuis->id }}';
+
             return {
                 soalAktifIdx: 0,
                 questions: @json($kuis->questions),
-                jawabanTerpilih: {},
-                timeLeft: {{ $kuis->durasi * 60 }},
+
+                // Ambil jawaban dari localStorage jika ada, kalau tidak ada set object kosong
+                jawabanTerpilih: JSON.parse(localStorage.getItem(storageJawabanKey)) || {},
+
+                // Ambil timer dari localStorage, jika tidak ada pakai durasi asli
+                timeLeft: localStorage.getItem(storageTimerKey) ?
+                    parseInt(localStorage.getItem(storageTimerKey)) : {{ $kuis->durasi * 60 }},
+
                 startTimer() {
                     let timer = setInterval(() => {
-                        if (this.timeLeft > 0) this.timeLeft--;
-                        else {
+                        if (this.timeLeft > 0) {
+                            this.timeLeft--;
+                            // Simpan sisa waktu ke storage setiap detik
+                            localStorage.setItem(storageTimerKey, this.timeLeft);
+                        } else {
                             clearInterval(timer);
                             this.submitKuis();
                         }
                     }, 1000);
                 },
+
                 formatTime(seconds) {
                     let min = Math.floor(seconds / 60);
                     let sec = seconds % 60;
                     return `${min}:${sec < 10 ? '0' : ''}${sec}`;
                 },
+
                 pilihJawaban(soalId, opsi) {
                     this.jawabanTerpilih[soalId] = opsi;
+                    // Simpan jawaban ke storage setiap kali user memilih
+                    localStorage.setItem(storageJawabanKey, JSON.stringify(this.jawabanTerpilih));
                 },
+
                 nextSoal() {
                     if (this.soalAktifIdx < this.questions.length - 1) {
                         this.soalAktifIdx++;
-                        // Scroll otomatis ke atas konten soal jika di HP saat ganti nomor
                         if (window.innerWidth < 1024) window.scrollTo({
                             top: 0,
                             behavior: 'smooth'
                         });
                     } else {
-                        if (confirm('Yakin ingin menyelesaikan kuis?')) this.submitKuis();
+                        if (confirm('Yakin ingin menyelesaikan kuis?')) {
+                            this.submitKuis();
+                        }
                     }
                 },
+
                 prevSoal() {
                     if (this.soalAktifIdx > 0) this.soalAktifIdx--;
                 },
+
                 submitKuis() {
+                    // Hapus semua jejak storage saat kuis disubmit
+                    localStorage.removeItem(storageTimerKey);
+                    localStorage.removeItem(storageJawabanKey);
+
                     document.getElementById('formKuis').submit();
                 },
+
                 confirmExit() {
-                    if (confirm('Progres akan hilang. Yakin ingin keluar?')) window.location.href =
-                        "{{ route('kuis.index') }}";
+                    if (confirm('Progres akan hilang. Yakin ingin keluar?')) {
+                        // Hapus storage jika user sengaja keluar/batal
+                        localStorage.removeItem(storageTimerKey);
+                        localStorage.removeItem(storageJawabanKey);
+
+                        window.location.href = "{{ route('kuis.index') }}";
+                    }
                 }
             }
         }
