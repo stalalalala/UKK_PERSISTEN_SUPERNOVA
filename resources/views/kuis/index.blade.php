@@ -91,10 +91,10 @@
                     @endphp
 
                     <div
-                        class="flex flex-col bg-white border-2 {{ $userHasil ? 'border-blue-100 shadow-md' : 'border-gray-100' }} rounded-[2.5rem] p-6 group hover:border-blue-300 hover:shadow-xl transition-all duration-300 h-full">
+                        class="bg-white border-2 {{ $userHasil ? 'border-blue-100 shadow-md' : 'border-gray-100' }} rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300 flex flex-col h-full">
 
-                        {{-- HEADER SECTION --}}
-                        <div class="flex justify-between items-start mb-4 gap-2">
+                        {{-- HEADER: Judul & Status --}}
+                        <div class="flex justify-between items-start mb-6 gap-2">
                             <div class="space-y-1">
                                 <h4
                                     class="font-bold text-blue-900 text-lg leading-tight group-hover:text-blue-600 transition-colors">
@@ -107,13 +107,14 @@
                             </div>
 
                             @if ($userHasil)
-                                {{-- SKOR PINDAH KE SINI: Di dalam badge Selesai --}}
-                                <div class="flex flex-col items-end gap-1 shrink-0">
-                                    <span
-                                        class="bg-green-500 text-white text-[10px] font-semibold px-3 py-1 rounded-full uppercase flex items-center gap-1 shadow-sm">
-                                        Selesai - SKOR {{ $userHasil->skor }}
-                                    </span>
-                                </div>
+                                <span
+                                    class="hidden sm:block bg-green-500 text-white text-[10px] font-semibold px-3 py-1 rounded-full uppercase shrink-0 shadow-sm">
+                                    Selesai • SKOR {{ $userHasil->skor }}
+                                </span>
+                                <span
+                                    class="block sm:hidden bg-green-500 text-white text-[10px] font-semibold px-3 py-1 rounded-full uppercase shrink-0 shadow-sm">
+                                    SKOR {{ $userHasil->skor }}
+                                </span>
                             @else
                                 <span
                                     class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-orange-100 shrink-0">
@@ -122,29 +123,26 @@
                             @endif
                         </div>
 
-                        {{-- INFO SECTION (Soal & Durasi) --}}
-                        {{-- Perubahan: 'flex-col' untuk urutan ke bawah, 'gap-2' untuk jarak antar baris --}}
-                        <div class="flex flex-col gap-2 mb-6">
-                            <div class="flex items-center gap-2">
+                        {{-- INFO SECTION: Soal & Durasi (Berderet ke bawah) --}}
+                        <div class="space-y-3 text-gray-500 text-sm mb-6">
+                            {{-- Baris Soal --}}
+                            <div class="flex items-center gap-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="2.5" stroke="currentColor" class="size-5 text-blue-500">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                                 </svg>
-                                <span class="text-sm font-semibold text-slate-500">
-                                    {{ $k->questions_count ?? '20' }} Soal
-                                </span>
+                                <span class="font-semibold text-slate-600">{{ $k->questions_count ?? '20' }} Soal</span>
                             </div>
 
-                            <div class="flex items-center gap-2">
+                            {{-- Baris Durasi --}}
+                            <div class="flex items-center gap-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="2.5" stroke="currentColor" class="size-5 text-blue-500">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                 </svg>
-                                <span class="text-sm font-semibold text-slate-500">
-                                    {{ $k->durasi }} Menit
-                                </span>
+                                <span class="font-semibold text-slate-600">{{ $k->durasi }} Menit</span>
                             </div>
                         </div>
 
@@ -163,7 +161,7 @@
                                 </div>
                             @else
                                 <a href="{{ route('kuis.intruksi', $k->id) }}"
-                                    class="block text-center w-full py-4 bg-blue-400 text-white font-bold rounded-2xl hover:bg-blue-500 hover:-translate-y-1 transition-all duration-300 shadow-lg shadow-blue-100 text-sm">
+                                    class="block text-center w-full py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 shadow-sm text-sm">
                                     Kerjakan Sekarang
                                 </a>
                             @endif

@@ -92,7 +92,7 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
                         <div
-                            class="bg-[#66cc66] rounded-2xl p-6 min-h-[150px] sm:min-h-[150px] md:min-h-[220px] flex flex-col items-center justify-between shadow-lg transition-transform active:scale-95">
+                            class="bg-[#66cc66] rounded-2xl p-6 min-h-[150px] sm:min-h-[150px] md:min-h-[220px] flex flex-col items-center justify-between shadow-lg transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-2xl active:scale-95">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 sm:h-10 sm:w-10 text-white/90"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -107,7 +107,7 @@
                         </div>
 
                         <div
-                            class="bg-[#7a869a] rounded-2xl p-6 min-h-[150px] sm:min-h-[150px] md:min-h-[220px] flex flex-col items-center justify-between shadow-lg transition-transform active:scale-95">
+                            class="bg-[#7a869a] rounded-2xl p-6 min-h-[150px] sm:min-h-[150px] md:min-h-[220px] flex flex-col items-center justify-between shadow-lg  transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-2xl active:scale-95">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 sm:h-10 sm:w-10 text-white/90"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -122,7 +122,7 @@
                         </div>
 
                         <div
-                            class="bg-[#e65c5c] rounded-2xl p-6 min-h-[150px] sm:min-h-[150px] md:min-h-[220px] flex flex-col items-center justify-between shadow-lg transition-transform active:scale-95">
+                            class="bg-[#e65c5c] rounded-2xl p-6 min-h-[150px] sm:min-h-[150px] md:min-h-[220px] flex flex-col items-center justify-between shadow-lg  transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-2xl active:scale-95">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 sm:h-10 sm:w-10 text-white/90"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -11,9 +11,7 @@ return new class extends Migration {
         Schema::create('kuis_questions', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('kuis_id')
-                ->constrained('kuis')
-                ->onDelete('cascade');
+            $table->foreignId('kuis_id')->constrained('kuis')->onDelete('cascade');
 
             $table->text('pertanyaan');
 

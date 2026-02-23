@@ -94,26 +94,31 @@ Route::middleware('auth')->group(function () {
         /* Manajemen Fitur UTBK */
         
         Route::resource('tryout', AdminTryoutController::class);
-        Route::resource('latihan', AdminLatihanController::class);
         Route::resource('videoPembelajaran', AdminVideoController::class);
-
+        
         // Kuis Fundamental
-         Route::get('/kuis', [AdminKuisController::class, 'index'])->name('kuis.index');
-         Route::get('/kuis/create', [AdminKuisController::class, 'create'])->name('kuis.create');
-         Route::post('/kuis/store', [AdminKuisController::class, 'store'])->name('kuis.store');
+        Route::get('/kuis', [AdminKuisController::class, 'index'])->name('kuis.index');
+        Route::get('/kuis/create', [AdminKuisController::class, 'create'])->name('kuis.create');
+        Route::post('/kuis/store', [AdminKuisController::class, 'store'])->name('kuis.store'); 
+        Route::get('/kuis/{id}/edit', [AdminKuisController::class, 'edit'])->name('kuis.edit');
+        Route::put('/kuis/{id}', [AdminKuisController::class, 'update'])->name('kuis.update'); 
+        Route::delete('/kuis/{id}', [AdminKuisController::class, 'destroy'])->name('kuis.destroy'); 
+        Route::post('/kuis/{id}/toggle', [AdminKuisController::class, 'toggle'])->name('kuis.toggle'); 
+        Route::post('/kuis/{id}/restore', [AdminKuisController::class, 'restore'])->name('kuis.restore'); 
+        Route::delete('/kuis/force-delete/{id}', [AdminKuisController::class, 'forceDelete'])->name('kuis.forceDelete'); 
+         
 
-         Route::get('/kuis/{id}/edit', [AdminKuisController::class, 'edit'])->name('kuis.edit');
-         Route::put('/kuis/{id}', [AdminKuisController::class, 'update'])->name('kuis.update');
-
-         Route::delete('/kuis/{id}', [AdminKuisController::class, 'destroy'])->name('kuis.destroy');
-
-         Route::post('/kuis/{id}/toggle', [AdminKuisController::class, 'toggle'])->name('kuis.toggle');
-
-         Route::post('/kuis/{id}/restore', [AdminKuisController::class, 'restore'])->name('kuis.restore');
-
-         Route::delete('/kuis/force-delete/{id}', [AdminKuisController::class, 'forceDelete'])->name('kuis.forceDelete');
-
-
+        // Latihan
+        // Latihan Soal
+         Route::get('/latihan', [AdminLatihanController::class, 'index'])->name('latihan.index');
+         Route::get('/latihan/create', [AdminLatihanController::class, 'create'])->name('latihan.create');
+         Route::post('/latihan/store', [AdminLatihanController::class, 'store'])->name('latihan.store'); 
+         Route::get('/latihan/{id}/edit', [AdminLatihanController::class, 'edit'])->name('latihan.edit');
+         Route::put('/latihan/{id}', [AdminLatihanController::class, 'update'])->name('latihan.update'); 
+         Route::delete('/latihan/{id}', [AdminLatihanController::class, 'destroy'])->name('latihan.destroy'); 
+         Route::post('/latihan/{id}/toggle', [AdminLatihanController::class, 'toggle'])->name('latihan.toggle'); 
+         Route::post('/latihan/{id}/restore', [AdminLatihanController::class, 'restore'])->name('latihan.restore'); 
+         Route::delete('/latihan/force-delete/{id}', [AdminLatihanController::class, 'forceDelete'])->name('latihan.forceDelete');
 
         /* Minat Bakat */
         Route::resource('minatBakat', AdminMinatBakatController::class);
