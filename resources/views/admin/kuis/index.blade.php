@@ -323,7 +323,7 @@
                                 </th>
 
                                 <th class="px-4 md:px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase">
-                                    Kategori
+                                    Subtes
                                 </th>
 
                                 <th
@@ -391,12 +391,12 @@
                                     <td class="px-3 md:px-6 py-4 text-center align-top whitespace-nowrap">
                                         @if ($item->is_active)
                                             <span
-                                                class="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-600 font-bold">
+                                                class="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-600 font-semibold">
                                                 Aktif
                                             </span>
                                         @else
                                             <span
-                                                class="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-500 font-bold">
+                                                class="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-500 font-semibold">
                                                 Hidden
                                             </span>
                                         @endif

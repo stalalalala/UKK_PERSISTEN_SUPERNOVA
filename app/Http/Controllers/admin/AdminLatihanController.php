@@ -7,174 +7,167 @@ use App\Models\Latihan;
 use App\Models\LatihanQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 
 class AdminLatihanController extends Controller
 {
-    /**
-     * Menampilkan daftar latihan dengan fitur filter subtes
-     */
+    // ============================
+    // INDEX
+    // ============================
     public function index(Request $request)
     {
         $query = Latihan::withCount('questions');
 
-        // Fitur Filter per Subtes atau Kategori
+        // Fitur Filter per Subtes
         if ($request->has('subtes') && $request->subtes != '') {
             $query->where('subtes', $request->subtes);
         }
 
-        // Urutkan berdasarkan yang terbaru (tergantung jam pembuatan sesuai request kamu)
-        $latihans = $query->orderBy('created_at', 'desc')->get();
+        $latihans = $query->orderBy('set_ke', 'desc')->get();
 
-        // Data untuk tab History (Data yang di-soft delete)
-        $history = Latihan::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
+        $trash = Latihan::onlyTrashed() 
+            ->withCount('questions')
+            ->latest()
+            ->get();
 
+        // Variabel tambahan agar sinkron dengan blade kuis (jika dibutuhkan)
         $allLatihan = Latihan::withCount('questions')->latest()->get();
 $historyData = Latihan::onlyTrashed()->withCount('questions')->latest()->get();
 
-        return view('admin.latihan.index', compact('latihans', 'history', 'allLatihan', 'historyData'));
+        return view('admin.latihan.index', compact('latihans', 'trash', 'allLatihan', 'historyData'));
     }
 
-    /**
-     * Proses simpan Set Latihan baru (Header)
-     */
+    // ============================
+    // CREATE FORM
+    // ============================
+    public function create()
+    {
+        // Ambil nomor set terakhir secara global
+        $lastSet = Latihan::max('set_ke');
+        $nextSet = $lastSet ? $lastSet + 1 : 1;
+
+        return view('admin.latihan.create', compact('nextSet'));
+    }
+
+    // ============================
+    // STORE SET + QUESTIONS (System Kayak Kuis)
+    // ============================
     public function store(Request $request)
     {
         $request->validate([
             'subtes' => 'required',
-            'set_ke' => 'required',
-            'durasi' => 'required|numeric',
+            'durasi' => 'required|integer',
+            'questions_json' => 'required'
         ]);
 
-        Latihan::create([
-            'subtes' => $request->subtes,
-            'set_ke' => $request->set_ke,
-            'durasi' => $request->durasi,
-            'is_active' => false,
-            'is_published' => false, // Default false sebelum 20 soal
-        ]);
+        $questions = json_decode($request->questions_json, true);
 
-        return redirect()->back()->with('success', 'Set Latihan berhasil dibuat. Silakan isi soal.');
-    }
-
-    /**
-     * Proses simpan butir soal (Pertanyaan, Materi, Pembahasan)
-     */
-    public function storeQuestion(Request $request, $latihan_id)
-    {
-        $request->validate([
-            'pertanyaan' => 'required',
-            'jawaban_benar' => 'required|max:1',
-            'pembahasan' => 'required',
-            'materi_file' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
-        $materi = $request->materi_teks;
-
-        // Jika ada input foto materi, simpan fotonya
-        if ($request->hasFile('materi_file')) {
-            $path = $request->file('materi_file')->store('materi_latihan', 'public');
-            $materi = $path;
+        if (!$questions || count($questions) < 20) {
+            return back()->with('error', 'Harus mengisi minimal 20 soal!');
         }
 
-        LatihanQuestion::create([
-            'latihan_id' => $latihan_id,
-            'materi' => $materi,
-            'pertanyaan' => $request->pertanyaan,
-            'opsi_a' => $request->opsi_a,
-            'opsi_b' => $request->opsi_b,
-            'opsi_c' => $request->opsi_c,
-            'opsi_d' => $request->opsi_d,
-            'opsi_e' => $request->opsi_e,
-            'jawaban_benar' => $request->jawaban_benar,
-            'pembahasan' => $request->pembahasan,
+        // Auto increment set_ke
+        $lastSet = Latihan::max('set_ke');
+        $setKe = $lastSet ? $lastSet + 1 : 1;
+
+        // Simpan Header Latihan
+        $latihan = Latihan::create([
+            'judul'        => "Latihan " . $request->subtes . " Set $setKe",
+            'subtes'       => $request->subtes,
+            'set_ke'       => $setKe,
+            'durasi'       => $request->durasi,
+            'is_active'    => true,
+            'is_published' => true,
         ]);
 
-        return redirect()->back()->with('success', 'Soal berhasil ditambahkan.');
-    }
-
-    /**
-     * Toggle Publish (Syarat Wajib 20 Soal)
-     */
-    public function togglePublish($id)
-    {
-        $latihan = Latihan::findOrFail($id);
-
-        // Cek apakah soal sudah 20
-        if (!$latihan->isComplete() && !$latihan->is_published) {
-            return redirect()->back()->with('error', 'Minimal harus ada 20 soal sebelum dipublikasikan!');
+        // Simpan Butir Soal
+        foreach ($questions as $q) {
+            $latihan->questions()->create([
+                'materi'        => $q['materi'] ?? null,
+                'pertanyaan'    => $q['pertanyaan'],
+                'opsi_a'        => $q['opsi_a'],
+                'opsi_b'        => $q['opsi_b'],
+                'opsi_c'        => $q['opsi_c'],
+                'opsi_d'        => $q['opsi_d'],
+                'opsi_e'        => $q['opsi_e'],
+                'jawaban_benar' => $q['jawaban_benar'],
+                'pembahasan'    => $q['pembahasan'] ?? null,
+            ]);
         }
 
-        $latihan->update([
-            'is_published' => !$latihan->is_published,
-            'is_active' => !$latihan->is_published ? true : $latihan->is_active
-        ]);
-
-        return redirect()->back()->with('success', 'Status publikasi berhasil diubah.');
+        return redirect()
+            ->route('admin.latihan.index')
+            ->with('success', 'Set Latihan berhasil dipublish!');
     }
 
-    /**
-     * Edit Soal
-     */
-    public function updateQuestion(Request $request, $id)
-    {
-        $question = LatihanQuestion::findOrFail($id);
-        
-        // Logika edit materi (Ganti foto atau update teks)
-        $materi = $request->materi_teks;
-        if ($request->hasFile('materi_file')) {
-            if ($question->materi && Storage::disk('public')->exists($question->materi)) {
-                Storage::disk('public')->delete($question->materi);
-            }
-            $materi = $request->file('materi_file')->store('materi_latihan', 'public');
-        }
-
-        $question->update([
-            'materi' => $materi,
-            'pertanyaan' => $request->pertanyaan,
-            'opsi_a' => $request->opsi_a,
-            'opsi_b' => $request->opsi_b,
-            'opsi_c' => $request->opsi_c,
-            'opsi_d' => $request->opsi_d,
-            'opsi_e' => $request->opsi_e,
-            'jawaban_benar' => $request->jawaban_benar,
-            'pembahasan' => $request->pembahasan,
-        ]);
-
-        return redirect()->back()->with('success', 'Soal berhasil diperbarui.');
-    }
-
-    /**
-     * Soft Delete (Masuk ke History)
-     */
+    // ============================
+    // DELETE (SOFT DELETE)
+    // ============================
     public function destroy($id)
     {
-        Latihan::findOrFail($id)->delete();
-        return redirect()->back()->with('success', 'Set Latihan dipindahkan ke sampah.');
+        $latihan = Latihan::findOrFail($id);
+        $deletedSetNumber = $latihan->set_ke;
+
+        $latihan->delete();
+
+        // Opsional: Geser nomor set (ikut sistem kuis)
+        Latihan::where('set_ke', '>', $deletedSetNumber)->decrement('set_ke');
+
+        return redirect()
+            ->route('admin.latihan.index')
+            ->with('success', 'Latihan dipindahkan ke sampah dan urutan diperbarui.');
     }
 
-    /**
-     * Restore dari History
-     */
+    // ============================
+    // RESTORE FROM TRASH
+    // ============================
     public function restore($id)
     {
-        Latihan::onlyTrashed()->findOrFail($id)->restore();
-        return redirect()->back()->with('success', 'Set Latihan berhasil dipulihkan.');
+        $latihan = Latihan::onlyTrashed()->findOrFail($id);
+        
+        $lastSet = Latihan::max('set_ke');
+        $newSet = $lastSet ? $lastSet + 1 : 1;
+
+        $latihan->restore();
+        $latihan->update([
+            'set_ke' => $newSet
+        ]);
+
+        return redirect()
+            ->route('admin.latihan.index')
+            ->with('success', 'Latihan berhasil dipulihkan sebagai Set terakhir.');
     }
 
-    /**
-     * Hapus Permanen
-     */
+    // ============================
+    // FORCE DELETE
+    // ============================
     public function forceDelete($id)
     {
         $latihan = Latihan::onlyTrashed()->findOrFail($id);
-        // Hapus juga file-file materi soalnya jika ada
+
+        // Hapus file materi jika ada di storage
         foreach($latihan->questions as $q) {
             if ($q->materi && Storage::disk('public')->exists($q->materi)) {
                 Storage::disk('public')->delete($q->materi);
             }
         }
+
         $latihan->forceDelete();
-        return redirect()->back()->with('success', 'Data dihapus permanen.');
+
+        return redirect()
+            ->route('admin.latihan.index')
+            ->with('success', 'Latihan dihapus permanen.');
+    }
+
+    // ============================
+    // TOGGLE STATUS
+    // ============================
+    public function toggle($id)
+    {
+        $latihan = Latihan::findOrFail($id);
+        $latihan->update([
+            'is_active' => !$latihan->is_active
+        ]);
+
+        return back()->with('success', 'Status latihan berhasil diubah!');
     }
 }

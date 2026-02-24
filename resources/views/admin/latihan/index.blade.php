@@ -280,6 +280,7 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-4 text-[11px] font-bold text-gray-400 uppercase">Set Latihan</th>
+                                <th class="px-6 py-4 text-[11px] font-bold text-gray-400 uppercase">Subtes</th>
                                 <th class="px-6 py-4 text-[11px] font-bold text-gray-400 uppercase text-center">Soal
                                 </th>
                                 <th class="px-6 py-4 text-[11px] font-bold text-gray-400 uppercase text-center">Durasi
@@ -294,97 +295,236 @@
                             @foreach ($latihans as $item)
                                 <tr class="hover:bg-blue-50/30 transition-colors">
                                     <td class="px-6 py-4">
-                                        <div class="font-bold text-gray-800">{{ $item->full_title }}</div>
-                                        <div class="text-[10px] text-gray-400 uppercase font-bold">{{ $item->subtes }}
+                                        <div class="font-semibold text-gray-800">{{ $item->full_title }}</div>
+                                        <div class="text-xs text-gray-400 "> Dibuat:
+                                            {{ $item->created_at->format('d M Y') }}
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 text-center">
+                                    <td
+                                        class="px-4 md:px-6 py-4 font-semibold text-gray-600 align-top whitespace-nowrap">
+                                        {{ $item->subtes }}
+                                        Menit
+                                    </td>
+                                    <td class="px-3 md:px-6 py-4 text-center align-top whitespace-nowrap">
                                         <span
-                                            class="bg-blue-50 text-blue-600 font-bold px-3 py-1 rounded-full text-xs">
-                                            {{ $item->questions_count }} / 20 Soal
+                                            class="inline-block bg-blue-50 text-blue-600 font-semibold px-3 py-1 rounded-full text-xs">
+                                            {{ $item->questions_count }} Soal
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-center">
-                                        <span class="text-gray-600 font-semibold text-xs">{{ $item->durasi }}
+                                    <td
+                                        class="px-3 md:px-6 py-4 text-center align-top whitespace-nowrap text-gray-700">
+                                        <span
+                                            class="inline-block bg-red-50 text-red-600 font-semibold px-3 py-1 rounded-full text-xs">{{ $item->durasi }}
                                             Menit</span>
                                     </td>
-                                    <td class="px-6 py-4 text-center">
-                                        @if ($item->is_published)
+                                    <td class="px-3 md:px-6 py-4 text-center align-top whitespace-nowrap">
+                                        @if ($item->is_active)
                                             <span
-                                                class="px-3 py-1 text-[10px] rounded-full bg-emerald-100 text-emerald-600 font-bold uppercase tracking-wider">Published</span>
+                                                class="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-600 font-semibold">
+                                                Aktif
+                                            </span>
                                         @else
                                             <span
-                                                class="px-3 py-1 text-[10px] rounded-full bg-gray-100 text-gray-500 font-bold uppercase tracking-wider">Draft</span>
+                                                class="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-500 font-semibold">
+                                                Hidden
+                                            </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <!-- Aksi -->
+                                    <td class="px-3 md:px-6 pt-1 pb-4 text-center align-top whitespace-nowrap">
                                         <div class="flex justify-center gap-2">
+
+                                            <!-- Edit -->
                                             <a href="{{ route('admin.latihan.edit', $item->id) }}"
-                                                class="p-2 text-blue-500 hover:bg-blue-100 rounded-lg transition">
-                                                <i class="fa-solid fa-pen-to-square text-lg"></i>
+                                                class="px-4 py-2 rounded-lg hover:bg-blue-100 text-blue-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                    class="size-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                                </svg>
+
                                             </a>
+
+                                            <!-- Toggle -->
                                             <form action="{{ route('admin.latihan.toggle', $item->id) }}"
                                                 method="POST">
                                                 @csrf
+
                                                 <button type="submit"
-                                                    class="p-2 {{ $item->is_published ? 'text-emerald-500 hover:bg-emerald-100' : 'text-gray-400 hover:bg-gray-100' }} rounded-lg transition">
-                                                    <i
-                                                        class="fa-solid {{ $item->is_published ? 'fa-eye' : 'fa-eye-slash' }} text-lg"></i>
+                                                    class="px-4 py-2 rounded-lg transition
+        {{ $item->is_active ? 'hover:bg-emerald-100 text-emerald-600' : 'hover:bg-gray-100 text-gray-500' }}">
+
+                                                    @if ($item->is_active)
+                                                        <!-- ICON: Mata Normal (Aktif) -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="2"
+                                                            stroke="currentColor" class="size-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                        </svg>
+                                                    @else
+                                                        <!-- ICON: Mata Dicoret (Hidden) -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="1.5"
+                                                            stroke="currentColor" class="size-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                                        </svg>
+                                                    @endif
+
                                                 </button>
                                             </form>
+
+
+                                            <!-- Delete -->
                                             <form action="{{ route('admin.latihan.destroy', $item->id) }}"
-                                                method="POST" onsubmit="return confirm('Pindahkan ke history?')">
-                                                @csrf @method('DELETE')
-                                                <button
-                                                    class="p-2 text-red-500 hover:bg-red-100 rounded-lg transition">
-                                                    <i class="fa-solid fa-trash-can text-lg"></i>
+                                                method="POST"
+                                                onsubmit="return confirm('Yakin ingin menghapus set latihan ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="px-4 py-2 rounded-lg hover:bg-red-100 text-red-500">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                        class="size-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+
                                                 </button>
                                             </form>
+
                                         </div>
                                     </td>
                                 </tr>
                             @endforeach
+                            <tr x-show="allLatihan.length === 0">
+                                <td colspan="6" class="px-8 py-10 text-center text-gray-400 italic">Tidak ada kuis
+                                    aktif.</td>
+                            </tr>
                         </tbody>
                     </table>
 
-                    <table x-show="activeTab === 'history'" class="w-full text-left border-separate border-spacing-0"
-                        x-cloak>
-                        <thead class="bg-orange-50">
+                    <table x-show="activeTab === 'history'"
+                        class="w-full text-left border-separate border-spacing-0 min-w-full">
+                        <thead class="bg-orange-50/50 sticky top-0 z-10 backdrop-blur-sm">
                             <tr>
-                                <th class="px-6 py-4 text-[11px] font-bold text-orange-400 uppercase">Set Terhapus</th>
-                                <th class="px-6 py-4 text-[11px] font-bold text-orange-400 uppercase text-center">Aksi
-                                    Pemulihan</th>
+                                <th class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                                    Judul Kuis (Terhapus)</th>
+                                <th class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                                    Kategori</th>
+                                <th class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+                                    Soal</th>
+                                <th
+                                    class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center">
+                                    Durasi</th>
+                                <th
+                                    class="px-8 py-4 text-[11px] font-bold text-gray-400 uppercase tracking-wider text-center">
+                                    Aksi Pemulihan</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-orange-50">
-                            @foreach ($history as $h)
-                                <tr>
-                                    <td class="px-6 py-4">
-                                        <div class="font-bold text-gray-800">{{ $h->full_title }}</div>
-                                        <div class="text-[10px] text-red-400 font-bold">Dihapus pada:
-                                            {{ $h->deleted_at->format('d/m/Y H:i') }}</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex justify-center gap-2">
-                                            <form action="{{ route('admin.latihan.restore', $h->id) }}"
-                                                method="POST">
-                                                @csrf
-                                                <button
-                                                    class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-emerald-600 transition">Restore</button>
-                                            </form>
-                                            <form action="{{ route('admin.latihan.forceDelete', $h->id) }}"
-                                                method="POST" onsubmit="return confirm('Hapus permanen?')">
-                                                @csrf @method('DELETE')
-                                                <button
-                                                    class="bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-600 transition">Hapus
-                                                    Permanen</button>
-                                            </form>
+                        <tbody class="divide-y divide-gray-100">
+
+                            @forelse ($trash as $trashItem)
+                                <tr class="hover:bg-orange-50/40 transition group">
+
+                                    <!-- Judul -->
+                                    <td class="px-4 md:px-8 py-4">
+                                        <div class="flex flex-col">
+                                            <span class="font-semibold text-gray-800">
+                                                {{ $trashItem->full_title }}
+                                            </span>
+                                            <span class="text-[10px] text-rose-400 font-bold uppercase">
+                                                Data di History
+                                            </span>
                                         </div>
                                     </td>
+
+                                    <!-- Kategori -->
+                                    <td
+                                        class="px-4 md:px-8 py-4 text-gray-600 font-semibold align-top whitespace-nowrap">
+                                        {{ $trashItem->subtes }}
+                                    </td>
+
+                                    <!-- Jumlah Soal -->
+                                    <td class="px-4 md:px-8 py-4 text-sm text-gray-600 align-top whitespace-nowrap">
+                                        <span
+                                            class="inline-block bg-blue-50 text-blue-600 font-semibold px-3 py-1 rounded-full text-xs">
+                                            {{ $trashItem->questions_count }} Soal
+                                        </span>
+                                    </td>
+
+                                    <!-- Durasi -->
+                                    <td class="px-4 md:px-8 py-4 text-center align-top whitespace-nowrap">
+                                        <span
+                                            class="inline-block bg-red-50 text-red-600 font-semibold px-3 py-1 rounded-full text-xs">
+                                            {{ $trashItem->durasi }} Menit
+                                        </span>
+                                    </td>
+
+                                    <!-- Aksi -->
+                                    <td class="px-4 md:px-8 py-4">
+                                        <div class="flex flex-col md:flex-row gap-2 justify-center">
+
+                                            <!-- RESTORE -->
+                                            <form action="{{ route('admin.latihan.restore', $trashItem->id) }}"
+                                                method="POST">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="w-full md:w-auto px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                        class="size-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                                    </svg>
+
+                                                </button>
+                                            </form>
+
+                                            <!-- FORCE DELETE -->
+                                            <form action="{{ route('admin.latihan.forceDelete', $trashItem->id) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Yakin ingin menghapus permanen kuis ini?')">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button type="submit"
+                                                    class="w-full md:w-auto px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                        class="size-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+
+                                                </button>
+                                            </form>
+
+                                        </div>
+                                    </td>
+
                                 </tr>
-                            @endforeach
+
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-8 py-10 text-center text-gray-400 italic">
+                                        History kosong.
+                                    </td>
+                                </tr>
+                            @endforelse
+
                         </tbody>
+
                     </table>
+                </div>
+                <div class="p-6 md:p-8 border-t border-gray-50 bg-white">
+                    <p class="text-sm text-gray-400 font-bold uppercase tracking-widest text-center sm:text-left">
+                        Menampilkan {{ $allLatihan->count() }}
+                        Set Kuis Fundamental
+                    </p>
                 </div>
             </div>
         </div>
