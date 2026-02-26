@@ -265,7 +265,7 @@
                 </a>
 
                 <a href="{{ route('admin.kuis.index') }}" x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -275,7 +275,7 @@
                 </a>
 
                 <a href="{{ route('admin.latihan.index') }}"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 bg-[#D4DEF7]  text-[#2E3B66]  rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-7">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -478,16 +478,7 @@
                                             </div>
                                         </div>
 
-                                        {{-- Set --}}
-                                        <div class="w-full md:w-32 flex flex-col gap-2">
-                                            <label
-                                                class="text-[10px] font-bold text-gray-400 uppercase ml-1">Set</label>
-                                            <div
-                                                class="bg-gray-50 px-4 py-3 rounded-2xl border border-gray-100 flex items-center h-full">
-                                                <span class="text-sm font-bold text-[#4A72D4]"
-                                                    x-text="'Set ' + currentSet"></span>
-                                            </div>
-                                        </div>
+
 
                                         {{-- Waktu --}}
                                         <div class="w-full md:w-48 flex flex-col gap-2" x-data="{ open: false }"
@@ -609,7 +600,7 @@
                                                     <textarea x-model="currentQuestion.opsi[i]" x-data="{
                                                         resize() {
                                                             $el.style.height = 'auto';
-                                                            $el.style.height = ($el.scrollHeight < 60 ? 60 : $el.scrollHeight) + 'px';
+                                                            $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
                                                         }
                                                     }" x-init="resize()" @input="resize()"
                                                         class="flex-1 bg-transparent border-none outline-none text-sm font-medium resize-none overflow-hidden leading-relaxed"

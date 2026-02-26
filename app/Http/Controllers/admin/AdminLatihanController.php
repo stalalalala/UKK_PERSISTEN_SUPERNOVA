@@ -22,7 +22,7 @@ class AdminLatihanController extends Controller
             $query->where('subtes', $request->subtes);
         }
 
-        $latihans = $query->orderBy('set_ke', 'desc')->get();
+        $latihans = $query->orderBy('created_at', 'desc')->get();
 
         $trash = Latihan::onlyTrashed() 
             ->withCount('questions')
@@ -33,8 +33,95 @@ class AdminLatihanController extends Controller
         $allLatihan = Latihan::withCount('questions')->latest()->get();
 $historyData = Latihan::onlyTrashed()->withCount('questions')->latest()->get();
 
-        return view('admin.latihan.index', compact('latihans', 'trash', 'allLatihan', 'historyData'));
+$subtesMap = [
+    'Penalaran Umum' => 'PU',
+    'Pengetahuan & Pemahaman Umum' => 'PPU',
+    'Pemahaman Bacaan & Menulis' => 'PBM',
+    'Pengetahuan Kuantitatif' => 'PK',
+    'Penalaran Matematika' => 'PM',
+    'Literasi Bahasa Indonesia' => 'LBI',
+    'Literasi Bahasa Inggris' => 'LBE',
+];
+
+        return view('admin.latihan.index', compact('latihans', 'trash', 'allLatihan', 'subtesMap', 'historyData'));
     }
+
+    // edit
+    public function edit($id)
+{
+    $latihans = Latihan::with('questions')->findOrFail($id);
+
+    $questions = $latihans->questions->map(function ($q) {
+    return [
+        'id' => $q->id,
+
+        'materi' => $q->materi,
+        'subtes' => $q->subtes,
+        'pertanyaan' => $q->pertanyaan,
+
+        'opsi_a' => $q->opsi_a,
+        'opsi_b' => $q->opsi_b,
+        'opsi_c' => $q->opsi_c,
+        'opsi_d' => $q->opsi_d,
+        'opsi_e' => $q->opsi_e,
+
+        'jawaban_benar' => $q->jawaban_benar,
+        'pembahasan' => $q->pembahasan,
+
+        'status' => 'original'
+    ];
+});
+
+
+    return view('admin.latihan.edit', compact('latihans', 'questions'));
+}
+
+// update
+
+public function update(Request $request, $id)
+{
+    $latihans = Latihan::findOrFail($id);
+
+    $latihans->update([
+    'durasi' => $request->durasi ?? $latihans->durasi,
+    'materi' => $request->materi ?? $latihans->materi,
+    'video_url' => $request->video_url ?? $latihans->video_url,
+    'subtes' => $request->subtes ?? $latihans->subtes,
+]);
+
+
+    if ($request->questions_json) {
+
+        $questions = json_decode($request->questions_json, true);
+
+        foreach ($questions as $q) {
+
+            $question = $latihans->questions()->where('id', $q['id'])->first();
+
+            if ($question) {
+                $question->update([
+    'materi'     => $q['materi'] ?? null,
+    'subtes'     => $q['subtes'] ?? null,
+    'pertanyaan' => $q['pertanyaan'],
+
+    'opsi_a' => $q['opsi_a'],
+    'opsi_b' => $q['opsi_b'],
+    'opsi_c' => $q['opsi_c'],
+    'opsi_d' => $q['opsi_d'],
+    'opsi_e' => $q['opsi_e'],
+
+    'jawaban_benar' => $q['jawaban_benar'],
+    'pembahasan' => $q['pembahasan'],
+]);
+
+            }
+        }
+    }
+
+    return redirect()
+        ->route('admin.latihan.index')
+        ->with('success', 'Kuis berhasil diperbarui!');
+}
 
     // ============================
     // CREATE FORM
@@ -65,9 +152,11 @@ $historyData = Latihan::onlyTrashed()->withCount('questions')->latest()->get();
             return back()->with('error', 'Harus mengisi minimal 20 soal!');
         }
 
-        // Auto increment set_ke
-        $lastSet = Latihan::max('set_ke');
-        $setKe = $lastSet ? $lastSet + 1 : 1;
+       // Auto increment set_ke PER SUBTES
+$lastSet = Latihan::where('subtes', $request->subtes)
+    ->max('set_ke');
+
+$setKe = $lastSet ? $lastSet + 1 : 1;
 
         // Simpan Header Latihan
         $latihan = Latihan::create([

@@ -319,7 +319,7 @@
                                             open: false,
                                             selectedSubtes: '',
                                             options: [
-                                                'Penalaran Umum', 'Pengetahuan & Pemahaman Umum', 'Pemahaman Bacaan & Menulis', 'Pengetahuan Kuantitatif', 'Penalaran Matematika', 'Literasi Bahasa Indonesia', 'Literasi Bahasa Ingris'
+                                                'Penalaran Umum', 'Pemahaman & Pengetahuan Umum', 'Pemahaman Bacaan & Menulis', 'Pengetahuan Kuantitatif', 'Penalaran Matematika', 'Literasi Bahasa Indonesia', 'Literasi Bahasa Ingris'
                                             ]
                                         }"
                                             x-effect="
@@ -471,10 +471,11 @@
                                     <textarea required x-model="currentQuestion.pertanyaan" x-data="{
                                         resize() {
                                             $el.style.height = 'auto';
-                                            $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
+                                            $el.style.height =
+                                                ($el.scrollHeight < 140 ? 140 : $el.scrollHeight) + 'px';
                                         }
                                     }" x-init="resize()"
-                                        @input="resize(); markChanged()"
+                                        x-effect="resize()" @input="resize(); markChanged()"
                                         class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm 
                focus:bg-white focus:ring-2 focus:ring-blue-100 
                outline-none shadow-inner transition-all 

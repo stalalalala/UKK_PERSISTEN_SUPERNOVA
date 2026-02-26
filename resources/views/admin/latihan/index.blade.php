@@ -37,6 +37,8 @@
 
 <body class="bg-[#E9EFFF] h-screen flex overflow-hidden text-[#2D3B61]" x-data="{
     mobileMenuOpen: false,
+    totalLatihan: {{ $allLatihan->count() }},
+    totalHistory: {{ $historyData->count() }},
     activeTab: 'list'
 }">
 
@@ -104,7 +106,7 @@
             </a>
 
             <a href="{{ route('admin.kuis.index') }}" x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }"
-                class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+                class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl  transition-all duration-200 group text-left">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                     stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -114,7 +116,7 @@
             </a>
 
             <a href="{{ route('admin.latihan.index') }}"
-                class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                class="w-full flex items-center gap-4 px-4 py-3 bg-[#D4DEF7]  text-[#2E3B66] rounded-2xl transition-all duration-200 group text-left">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                     stroke="currentColor" class="size-7">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -243,15 +245,36 @@
                 </div>
             </div>
 
+            @php
+                $subtesList = [
+                    'Penalaran Umum' => 'PU',
+                    'Pengetahuan & Pemahaman Umum' => 'PPU',
+                    'Pemahaman Bacaan & Menulis' => 'PBM',
+                    'Pengetahuan Kuantitatif' => 'PK',
+                    'Penalaran Matematika' => 'PM',
+                    'Literasi Bahasa Indonesia' => 'LBI',
+                    'Literasi Bahasa Inggris' => 'LBE',
+                ];
+            @endphp
+
             <div class="flex flex-wrap gap-2 mb-6">
+
+                {{-- Semua --}}
                 <a href="{{ route('admin.latihan.index') }}"
-                    class="px-5 py-2 rounded-full text-xs font-bold transition-all {{ !request('subtes') ? 'bg-[#4A72D4] text-white' : 'bg-white text-gray-500 hover:bg-blue-50' }}">Semua</a>
-                @foreach (['PU', 'PPU', 'PBM', 'PK', 'PM', 'LBI', 'LBE'] as $sub)
-                    <a href="{{ route('admin.latihan.index', ['subtes' => $sub]) }}"
-                        class="px-5 py-2 rounded-full text-xs font-bold transition-all {{ request('subtes') == $sub ? 'bg-[#4A72D4] text-white' : 'bg-white text-gray-500 hover:bg-blue-50' }}">
-                        {{ $sub }}
+                    class="px-5 py-2 rounded-full text-xs font-bold transition-all 
+        {{ !request('subtes') ? 'bg-[#4A72D4] text-white' : 'bg-white text-gray-500 hover:bg-blue-50' }}">
+                    Semua
+                </a>
+
+                {{-- Filter Subtes --}}
+                @foreach ($subtesList as $full => $short)
+                    <a href="{{ route('admin.latihan.index', ['subtes' => $full]) }}"
+                        class="px-5 py-2 rounded-full text-xs font-bold transition-all 
+            {{ request('subtes') == $full ? 'bg-[#4A72D4] text-white' : 'bg-white text-gray-500 hover:bg-blue-50' }}">
+                        {{ $short }}
                     </a>
                 @endforeach
+
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-blue-50 overflow-hidden flex flex-col">
@@ -259,8 +282,10 @@
                     class="p-6 md:p-8 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h3 class="text-xl font-bold text-gray-800"
-                            x-text="activeTab === 'list' ? 'Daftar Latihan Soal' : 'History Sampah'"></h3>
-                        <p class="text-sm text-gray-400">Total: {{ $latihans->count() }} Set Latihan</p>
+                            x-text="activeTab === 'list' ? 'Daftar Latihan Soal' : 'History'"></h3>
+                        <p class="text-sm text-gray-400"
+                            x-text="activeTab === 'list' ? 'Kelola Latihan Soal' : 'Data yang dihapus sementara dapat dipulihkan di sini'">
+                            ></p>
                     </div>
                     <div class="flex items-center gap-3">
                         <button @click="activeTab = activeTab === 'list' ? 'history' : 'list'"
@@ -295,7 +320,7 @@
                             @foreach ($latihans as $item)
                                 <tr class="hover:bg-blue-50/30 transition-colors">
                                     <td class="px-6 py-4">
-                                        <div class="font-semibold text-gray-800">{{ $item->full_title }}</div>
+                                        <div class="font-semibold text-gray-800">Set {{ $item->set_ke }}</div>
                                         <div class="text-xs text-gray-400 "> Dibuat:
                                             {{ $item->created_at->format('d M Y') }}
                                         </div>
@@ -303,7 +328,6 @@
                                     <td
                                         class="px-4 md:px-6 py-4 font-semibold text-gray-600 align-top whitespace-nowrap">
                                         {{ $item->subtes }}
-                                        Menit
                                     </td>
                                     <td class="px-3 md:px-6 py-4 text-center align-top whitespace-nowrap">
                                         <span
@@ -400,10 +424,13 @@
                                     </td>
                                 </tr>
                             @endforeach
-                            <tr x-show="allLatihan.length === 0">
-                                <td colspan="6" class="px-8 py-10 text-center text-gray-400 italic">Tidak ada kuis
-                                    aktif.</td>
-                            </tr>
+                            @if ($latihans->isEmpty())
+                                <tr>
+                                    <td colspan="6" class="px-8 py-10 text-center text-gray-400 text-sm">
+                                        Tidak ada latihan.
+                                    </td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
 
@@ -510,7 +537,7 @@
 
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-8 py-10 text-center text-gray-400 italic">
+                                    <td colspan="5" class="px-8 py-10 text-sm text-center text-gray-400">
                                         History kosong.
                                     </td>
                                 </tr>
@@ -521,9 +548,10 @@
                     </table>
                 </div>
                 <div class="p-6 md:p-8 border-t border-gray-50 bg-white">
-                    <p class="text-sm text-gray-400 font-bold uppercase tracking-widest text-center sm:text-left">
-                        Menampilkan {{ $allLatihan->count() }}
-                        Set Kuis Fundamental
+                    <p class="text-sm text-gray-400 font-bold uppercase tracking-widest text-center sm:text-left"
+                        x-text="activeTab === 'list' 
+        ? 'Menampilkan ' + totalLatihan + ' Set Latihan Soal' 
+        : 'Menampilkan ' + totalHistory + ' Set Latihan Soal yang dihapus'">
                     </p>
                 </div>
             </div>

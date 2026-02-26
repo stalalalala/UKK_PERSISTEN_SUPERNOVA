@@ -47,6 +47,8 @@
 <body class="bg-[#E9EFFF] h-screen flex overflow-hidden text-[#2D3B61]" x-data="{
     activeMenu: 'Manajemen Kuis',
     mobileMenuOpen: false,
+    totalKuis: {{ $allKuis->count() }},
+    totalHistory: {{ $historyData->count() }},
     showImportModal: false,
     activeTab: 'list',
 
@@ -294,9 +296,9 @@
                     class="p-6 md:p-8 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h3 class="text-xl font-bold text-gray-800"
-                            x-text="activeTab === 'list' ? 'Daftar Set Kuis' : 'History / Tempat Sampah'"></h3>
+                            x-text="activeTab === 'list' ? 'Daftar Set Kuis' : 'History'"></h3>
                         <p class="text-sm text-gray-400"
-                            x-text="activeTab === 'list' ? 'Kelola soal, waktu, dan kategori kuis' : 'Data yang dihapus sementara dapat dipulihkan di sini'">
+                            x-text="activeTab === 'list' ? 'Kelola Kuis Fundamental' : 'Data yang dihapus sementara dapat dipulihkan di sini'">
                         </p>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
@@ -596,9 +598,11 @@
                 </div>
 
                 <div class="p-6 md:p-8 border-t border-gray-50 bg-white">
-                    <p class="text-sm text-gray-400 font-bold uppercase tracking-widest text-center sm:text-left">
-                        Menampilkan {{ $allKuis->count() }}
-                        Set Kuis Fundamental
+                    <p class="text-sm text-gray-400 font-bold uppercase tracking-widest text-center sm:text-left"
+                        x-text="activeTab === 'list'
+                        ? 'Menampilkan ' + totalKuis + ' Set Kuis Fundamental'
+                        : 'Menampilkan ' + totalHistory + ' Set Kuis yang di hapus'">
+
                     </p>
                 </div>
 
