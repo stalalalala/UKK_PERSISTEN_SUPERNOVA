@@ -1,666 +1,203 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PERSISTEN - Video Pembelajaran</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <title>PERSISTEN - Hasil Try Out</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
     @vite('resources/css/app.css')
+    <style>
+        [x-cloak] { display: none !important; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        details summary::-webkit-details-marker { display: none; }
+    </style>
 </head>
+<body class="font-po bg-slate-50 text-slate-900 antialiased">
+    <div x-data="{ 
+        activeCategory: null,
+        allAnswers: {{ $userAnswers->toJson() }},
+        showModal: false,
+        init() {
+            Object.keys(localStorage).forEach(key => {
+                if (key.includes('jawaban_to_') || key.includes('last_soal_') || key.includes('jeda_timer_')) {
+                    localStorage.removeItem(key);
+                }
+            });
+            window.history.pushState(null, null, window.location.href);
+            window.onpopstate = () => {
+                this.showModal = true;
+                window.history.pushState(null, null, window.location.href);
+            };
+        }
+    }" x-init="init()" class="min-h-screen">
 
-<body class="font-po bg-white overflow-x-hidden">
-
-    <div class="max-w-[1440px] mx-10 md:mx-auto py-10 md:py-10 px-10 space-y-6">
-
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-lg md:text-2xl font-bold text-slate-700">Try Out UTBK – 1</h1>
-            <div class="flex gap-3">
-                <button
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-semibold transition">Cetak
-                    Hasil</button>
-                <button
-                    class="border border-blue-500 text-blue-500 px-6 py-2 rounded-full text-sm font-semibold hover:bg-blue-50 transition">Kembali</button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-            <div class="bg-white p-6 rounded-3xl border border-slate-100 card-shadow">
-                <div class="flex items-center gap-2 mb-6 text-blue-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                    <h2 class="text-xl font-bold text-slate-800">Nilai Per Subtes</h2>
-                </div>
-
-                <div class="space-y-4">
-                    <div>
-                        <div class="flex justify-between text-sm font-medium mb-4">
-                            <span class="text-slate-600">Penalaran Umum</span>
-                            <span class="text-slate-800">450</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-3.5 border border-blue-200">
-                            <div class="bg-blue-400 h-3.5 rounded-full" style="width: 45%"></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between text-sm font-medium mb-4">
-                            <span class="text-slate-600">Pemahaman Bacaan dan Menulis</span>
-                            <span class="text-slate-800">700</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-3.5 border border-green-200">
-                            <div class="bg-green-500 h-3.5 rounded-full" style="width: 70%"></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between text-sm font-medium mb-4">
-                            <span class="text-slate-600">Pengetahuan dan Pemahaman Umum</span>
-                            <span class="text-slate-800">850</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-3.5 border border-red-200">
-                            <div class="bg-red-400 h-3.5 rounded-full" style="width: 25%"></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between text-sm font-medium mb-4">
-                            <span class="text-slate-600">Pengetahuan Kuantitatif</span>
-                            <span class="text-slate-800">850</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-3.5 border border-green-200">
-                            <div class="bg-green-500 h-3.5 rounded-full" style="width: 85%"></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between text-sm font-medium mb-4">
-                            <span class="text-slate-600">Pengetahuan Matematika</span>
-                            <span class="text-slate-800">850</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-3.5 border border-green-200">
-                            <div class="bg-green-500 h-3.5 rounded-full" style="width: 85%"></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between text-sm font-medium mb-4">
-                            <span class="text-slate-600">Literasi Bahasa Indonesia</span>
-                            <span class="text-slate-800">850</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-3.5 border border-red-200">
-                            <div class="bg-red-400 h-3.5 rounded-full" style="width: 10%"></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between text-sm font-medium mb-4">
-                            <span class="text-slate-600">Literasi Bahasa Inggris</span>
-                            <span class="text-slate-800">850</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-3.5 border border-blue-200">
-                            <div class="bg-blue-400 h-3.5 rounded-full" style="width: 50%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-center gap-6 mt-14">
-                    <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
-                        <span class="w-14 h-3.5 bg-red-400 rounded-full"></span>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
-                        <span class="w-14 h-3.5 bg-blue-400 rounded-full"></span>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
-                        <span class="w-14 h-3.5 bg-green-500 rounded-full"></span>
-                    </div>
-                </div>
-
-                <div class="flex justify-center gap-7 mt-2">
-                    <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
-                        <p>Rendah</p>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
-                        <p>Rata-rata</p>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs font-medium text-slate-400">
-                        <p>Tinggi</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-blue-50 p-6 rounded-3xl border border-blue-100 card-shadow">
-                <div class="flex items-center gap-2 mb-2 text-blue-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                    </svg>
-                    <h2 class="text-xl font-bold text-slate-800">Peringkat Try Out</h2>
-                </div>
-                <p class="text-sm text-slate-500 mb-8">Peringkat ke <span class="text-green-600 font-bold">#3</span>
-                    dari 2.756 peserta, selamat!</p>
-
-                <div class="flex items-end justify-center gap-2 md:gap-4 mb-6 pt-10">
-
-                    <div class="flex flex-col items-center flex-1 max-w-[120px]">
-                        <div
-                            class="w-14 h-14 md:w-20 md:h-20 rounded-full border-4 border-white overflow-hidden shadow-md z-10 mb-[-25px] md:mb-[-35px]">
-                            <img src="https://i.pravatar.cc/150?u=2" class="w-full h-full object-cover">
-                        </div>
-                        <div class="bg-white pt-8 md:pt-10 pb-2 w-full rounded-t-[20px] text-center shadow-sm">
-                            <span class="text-[10px] md:text-xs font-bold text-slate-600">Third</span>
-                        </div>
-                        <div
-                            class="bg-yellow-400 w-full h-28 md:h-36 rounded-b-2xl flex flex-col items-center justify-center text-white p-2 shadow-inner">
-                            <div class="flex items-baseline gap-1">
-                                <span class="text-xl md:text-3xl font-bold">#2</span>
-                                <span class="text-[8px] md:text-[10px] text-[#3B455E] font-medium leading-none">dengan
-                                    skor</span>
-                            </div>
-                            <span class="font-black text-[#3B455E] text-lg md:text-2xl mt-1">804.98</span>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col items-center flex-1 max-w-[140px]">
-                        <div
-                            class="w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-white overflow-hidden shadow-lg z-10 mb-[-30px] md:mb-[-40px]">
-                            <img src="https://i.pravatar.cc/150?u=1" class="w-full h-full object-cover">
-                        </div>
-                        <div class="bg-white pt-10 md:pt-12 pb-2 w-full rounded-t-[20px] text-center shadow-sm">
-                            <span class="text-[10px] md:text-xs font-bold text-slate-600">Sean</span>
-                        </div>
-                        <div
-                            class="bg-yellow-400 w-full h-40 md:h-52 rounded-b-2xl flex flex-col items-center justify-center text-white p-2 shadow-xl">
-                            <div class="flex items-baseline gap-1">
-                                <span class="text-2xl md:text-4xl font-bold">#1</span>
-                                <span class="text-[8px] md:text-[10px] text-[#3B455E] font-medium leading-none">dengan
-                                    skor</span>
-                            </div>
-                            <span class="font-black text-[#3B455E] text-xl md:text-3xl mt-1">981.52</span>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col items-center flex-1 max-w-[120px]">
-                        <div
-                            class="w-14 h-14 md:w-20 md:h-20 rounded-full border-4 border-white overflow-hidden shadow-md z-10 mb-[-25px] md:mb-[-35px]">
-                            <img src="https://i.pravatar.cc/150?u=3" class="w-full h-full object-cover">
-                        </div>
-                        <div class="bg-white pt-8 md:pt-10 pb-2 w-full rounded-t-[20px]  text-center shadow-sm">
-                            <span class="text-[10px] md:text-xs font-bold text-slate-600">Bang Jeemin</span>
-                        </div>
-                        <div
-                            class="bg-yellow-400 w-full h-24 md:h-32 rounded-b-2xl flex flex-col items-center justify-center text-white p-2 shadow-inner">
-                            <div class="flex items-baseline gap-1">
-                                <span class="text-xl md:text-3xl font-bold">#3</span>
-                                <span class="text-[8px] md:text-[10px] text-[#3B455E] font-medium leading-none">dengan
-                                    skor</span>
-                            </div>
-                            <span class="font-black text-[#3B455E] text-lg md:text-2xl mt-1">542.85</span>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="bg-white rounded-xl overflow-hidden shadow-sm text-[11px] md:text-sm">
-                    <div class="flex items-center justify-between p-3 border-b text-blue-500 font-bold">
-                        <div class="flex gap-2">
-                            <span>#4</span>
-                            <span>Jennie Blackping</span>
-                        </div>
-
-                        <span>532.99</span>
-                    </div>
-
-                    <div class="flex items-center justify-between p-3 border-b text-blue-500 font-bold">
-                        <div class="flex gap-2">
-                            <span>#5</span>
-                            <span>Sora</span>
-                        </div>
-
-                        <span>532.99</span>
-                    </div>
-
-                    <div class="flex items-center justify-between p-3 border-b text-blue-500 font-bold">
-                        <div class="flex gap-2">
-                            <span>#6</span>
-                            <span>Thipakorn</span>
-                        </div>
-
-                        <span>532.99</span>
-                    </div>
-
-                    <div class="flex items-center justify-between p-3 border-b text-blue-500 font-bold">
-                        <div class="flex gap-2">
-                            <span>#7</span>
-                            <span>Elsa</span>
-                        </div>
-
-                        <span>532.99</span>
-                    </div>
-                    <button
-                        class="w-full py-3 bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 hover:bg-blue-600 transition">
-                        Lihat Papan Peringkat
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
+        <div class="container mx-auto max-w-7xl px-4 md:px-6 lg:px-8 py-6 md:py-10 space-y-6">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <h1 class="text-xl md:text-3xl font-extrabold text-slate-800 tracking-tight">
+                    Hasil <span class="text-blue-600">{{ $tryout->nama_tryout }}</span>
+                </h1>
+                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <a href="{{ route('tryout.sertifikat', $tryout->id) }}" 
+                       target="_blank" 
+                       class="w-full sm:w-auto bg-emerald-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-md hover:bg-emerald-700 transition-colors duration-200 active:scale-[0.98] text-center flex items-center justify-center gap-2.5">
+                        <i class="fa-solid fa-print text-lg"></i>
+                        <span>Cetak Sertifikat</span>
+                    </a>
+                    
+                    <button @click="showModal = true" 
+                            class="w-full sm:w-auto bg-blue-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-md hover:bg-blue-700 transition-colors duration-200 active:scale-[0.98]">
+                        Kembali Ke Menu
                     </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-4 bg-[#3171CD] rounded-[2.5rem] p-8 text-white flex flex-col justify-between shadow-xl min-h-[420px]">
+                    <div>
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-black uppercase tracking-widest text-[10px] text-blue-100">Top Rankings</h3>
+                            <i class="fa-solid fa-trophy text-yellow-400"></i>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            @for($i = 0; $i < 3; $i++)
+                                @php $rank = $rankings->get($i); @endphp
+                                <div class="flex items-center justify-between bg-white/10 p-4 rounded-2xl border border-white/10 backdrop-blur-sm transition-all hover:bg-white/20">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center font-black text-[#3171CD] text-[10px]">
+                                            @if($i == 0) <i class="fa-solid fa-crown text-yellow-500 text-sm"></i> @else #{{ $i + 1 }} @endif
+                                        </div>
+                                        <span class="text-xs font-bold truncate max-w-[150px]">
+                                            {{ $rank ? ($rank->user->name ?? 'User') : 'Belum ada data' }}
+                                        </span>
+                                    </div>
+                                    <span class="text-xs font-black">{{ $rank ? number_format($rank->skor_total, 0) : '-' }}</span>
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-5 border-t border-white/20">
+                        <div class="flex justify-between items-end mb-4 px-2">
+                            <div>
+                                <span class="text-[9px] font-black uppercase text-blue-100 block mb-1">Peringkat Anda</span>
+                                <span class="text-3xl font-black italic tracking-tighter">Rank #{{ $userRankNumber }}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[9px] font-black uppercase text-blue-100 block mb-1">Skor Anda</span>
+                                <p class="text-3xl font-black tracking-tighter">{{ $skorTotal }}</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('tryout.ranking', $tryout->id) }}" class="w-full bg-white text-[#3171CD] py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest text-center block shadow-lg hover:bg-blue-50 transition">
+                            Lihat Selengkapnya <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8 bg-white rounded-[2.5rem] p-6 md:p-8 border border-slate-100 shadow-sm flex flex-col justify-center">
+                    <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-pie text-blue-500"></i> Ringkasan Performa
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-slate-50 p-4 rounded-3xl border border-slate-100 text-center">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Benar</p>
+                            <p class="text-2xl font-black text-green-500">{{ $benar }}</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-3xl border border-slate-100 text-center">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Salah</p>
+                            <p class="text-2xl font-black text-red-500">{{ $salah }}</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-3xl border border-slate-100 text-center">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Kosong</p>
+                            <p class="text-2xl font-black text-slate-400">{{ $kosong }}</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-3xl border border-slate-100 text-center">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Akurasi</p>
+                            <p class="text-2xl font-black text-blue-500">{{ $akurasi }}%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 space-y-4">
+                    <h3 class="text-lg font-bold text-slate-700 px-2 flex items-center justify-between">
+                        Skor Per Subtes
+                    </h3>
+                    @foreach($categories as $category)
+                    <div @click="activeCategory = {{ $category->id }}" 
+                         :class="activeCategory === {{ $category->id }} ? 'ring-2 ring-blue-500 bg-blue-50 border-transparent shadow-md' : 'bg-white border-slate-100 shadow-sm'"
+                         class="flex items-center justify-between p-5 rounded-3xl cursor-pointer border hover:border-blue-300 transition-all group">
+                        <div class="overflow-hidden">
+                            <p class="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors truncate">{{ $category->nama_kategori }}</p>
+                            <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Potensi Skolastik</p>
+                        </div>
+                        <p class="text-xl font-black text-blue-600 ml-2">{{ $category->skor }}</p>
+                    </div>
+                    @endforeach
+                </div>
+
+                <div class="lg:col-span-2 space-y-4">
+                    <h3 class="text-lg font-bold text-slate-700 px-2">Pembahasan Soal</h3>
+                    <div x-show="activeCategory === null" class="flex flex-col items-center justify-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-200">
+                        <i class="fa-solid fa-mouse-pointer text-2xl text-slate-400 animate-bounce mb-4"></i>
+                        <p class="text-slate-500 font-bold text-center px-6">Silahkan pilih salah satu subtes di kiri</p>
+                    </div>
+
+                    <template x-for="(jawaban, index) in allAnswers.filter(j => j.category_id == activeCategory)" :key="index">
+                        <details class="group bg-white border border-slate-100 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-md mb-4">
+                            <summary class="flex items-center justify-between p-5 md:p-6 cursor-pointer list-none">
+                                <div class="flex items-center gap-4 min-w-0">
+                                    <div class="flex-shrink-0 w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-sm"
+                                         :class="jawaban.is_correct ? 'bg-green-100 text-green-600' : (jawaban.pilihan_user ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-400')">
+                                        <span x-text="index + 1"></span>
+                                    </div>
+                                    <div class="text-sm font-bold text-slate-600 truncate pr-4" x-html="jawaban.pertanyaan.replace(/<[^>]*>?/gm, '')"></div>
+                                </div>
+                                <span class="flex-shrink-0 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest"
+                                      :class="jawaban.is_correct ? 'bg-green-100 text-green-600' : (jawaban.pilihan_user ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-400')"
+                                      x-text="jawaban.is_correct ? 'Benar' : (jawaban.pilihan_user ? 'Salah' : 'Kosong')">
+                                </span>
+                            </summary>
+                            <div class="px-5 md:px-8 pb-6 pt-2 border-t border-slate-50 space-y-5">
+                                <div class="bg-slate-50 p-5 rounded-3xl text-slate-700 text-sm leading-relaxed" x-html="jawaban.pertanyaan"></div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="p-4 rounded-2xl border text-sm font-bold flex flex-col gap-1"
+                                         :class="jawaban.is_correct ? 'border-green-100 bg-green-50/50 text-green-700' : (jawaban.pilihan_user ? 'border-red-100 bg-red-50/50 text-red-700' : 'border-slate-100 bg-slate-50 text-slate-500')">
+                                        <span class="text-[10px] opacity-60 uppercase">Jawaban Anda</span>
+                                        <span x-text="jawaban.pilihan_user || 'Tidak Dijawab'"></span>
+                                    </div>
+                                    <div class="p-4 rounded-2xl border border-blue-100 bg-blue-50/50 text-blue-700 text-sm font-bold flex flex-col gap-1">
+                                        <span class="text-[10px] opacity-60 uppercase">Kunci Jawaban</span>
+                                        <span x-text="jawaban.kunci_jawaban"></span>
+                                    </div>
+                                </div>
+                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-5 rounded-r-3xl text-sm italic text-slate-600" x-html="jawaban.pembahasan || 'Penjelasan belum tersedia.'"></div>
+                            </div>
+                        </details>
+                    </template>
                 </div>
             </div>
         </div>
 
-        <div class="mt-10 mx-auto">
-            <h2 class="text-2xl font-bold text-slate-700 mb-6">Pembahasan Try Out</h2>
-
-            <div class="bg-[#eef4ff] rounded-3xl p-4 md:p-6 border border-blue-100 shadow-sm">
-
-                <div class="flex justify-between items-center mb-4 px-2">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="bg-[#3b82f6] text-white w-12 h-10 flex items-center justify-center rounded-xl font-bold shadow-lg">
-                            PU</div>
-                        <div class="flex gap-2 text-[10px] md:text-xs">
-                            <span
-                                class="bg-green-100 text-green-600 px-3 py-1.5 rounded-full font-bold flex items-center gap-1">
-                                <span class="text-[10px]">✓</span> 15 benar
-                            </span>
-                            <span
-                                class="bg-red-100 text-red-600 px-3 py-1.5 rounded-full font-bold flex items-center gap-1">
-                                <span class="text-[10px]">✕</span> 5 Salah
-                            </span>
-                        </div>
-                    </div>
-                    <button class="text-blue-500 hover:bg-blue-100 p-1 rounded-full transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 15l7-7 7 7" />
-                        </svg>
-                    </button>
+        <div x-show="showModal" class="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-cloak>
+            <div @click.away="showModal = false" class="bg-white rounded-[3rem] p-8 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
+                <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                    <i class="fa-solid fa-house-chimney"></i>
                 </div>
-
-                <div class="space-y-4 max-h-[520px] overflow-y-auto pr-2 custom-scrollbar">
-
-                    <details
-                        class="group bg-white rounded-2xl shadow-sm border border-transparent open:border-blue-200 transition-all duration-300"
-                        open>
-                        <summary class="list-none cursor-pointer p-5 flex items-start gap-4">
-                            <div
-                                class="bg-blue-500 text-white min-w-[28px] h-7 flex items-center justify-center rounded-full text-sm font-bold mt-0.5">
-                                1</div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-center">
-                                    <p class="font-bold text-slate-700">Soal:</p>
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <p
-                                    class="text-slate-500 leading-relaxed text-sm mt-2 line-clamp-2 group-open:line-clamp-none">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor. amet
-                                    adipiscing elit. Sed do eiusmod tempor.
-                                </p>
-                            </div>
-                        </summary>
-
-                        <div class="px-5 pb-6 ml-11 border-t border-slate-50 pt-4">
-                            <div class="flex items-center gap-2 text-green-600 font-bold py-2">
-                                <span
-                                    class="bg-green-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]">✓</span>
-                                Jawaban : B
-                            </div>
-
-                            <div class="mt-4 space-y-2">
-                                <p class="font-bold text-slate-700 text-sm">Pembahasan:</p>
-                                <p class="text-slate-400 italic text-sm leading-relaxed">
-                                    Lorem ipsum dolor sit amet, consectetur sit amet adipiscing elit. Sed do eiusmod
-                                    tempor. amet adipiscing elit. Sed do eiusmod tempor. Pembahasan ini menjelaskan
-                                    secara detail kenapa jawaban B adalah yang paling tepat berdasarkan logika penalaran
-                                    umum.
-                                </p>
-                            </div>
-                        </div>
-                    </details>
-
-                    <details
-                        class="group bg-white rounded-2xl shadow-sm border border-transparent open:border-blue-200 transition-all duration-300">
-                        <summary class="list-none cursor-pointer p-5 flex items-start gap-4">
-                            <div
-                                class="bg-blue-500 text-white min-w-[28px] h-7 flex items-center justify-center rounded-full text-sm font-bold mt-0.5">
-                                2</div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-center">
-                                    <p class="font-bold text-slate-700">Soal:</p>
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <p
-                                    class="text-slate-500 leading-relaxed text-sm mt-2 line-clamp-2 group-open:line-clamp-none">
-                                    Manakah pernyataan berikut yang paling benar sesuai dengan isi teks di atas?
-                                </p>
-                            </div>
-                        </summary>
-                        <div class="px-5 pb-6 ml-11 border-t border-slate-50 pt-4">
-                            <div class="flex items-center gap-2 text-green-600 font-bold py-2">
-                                <span
-                                    class="bg-green-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]">✓</span>
-                                Jawaban : A
-                            </div>
-                            <div class="mt-4 space-y-2">
-                                <p class="font-bold text-slate-700 text-sm">Pembahasan:</p>
-                                <p class="text-slate-400 italic text-sm leading-relaxed">Penjelasan mendalam mengenai
-                                    korelasi antara paragraf satu dan dua.</p>
-                            </div>
-                        </div>
-                    </details>
-
-                    <details
-                        class="group bg-white rounded-2xl shadow-sm border border-transparent open:border-blue-200 transition-all duration-300">
-                        <summary class="list-none cursor-pointer p-5 flex items-start gap-4">
-                            <div
-                                class="bg-blue-500 text-white min-w-[28px] h-7 flex items-center justify-center rounded-full text-sm font-bold mt-0.5">
-                                2</div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-center">
-                                    <p class="font-bold text-slate-700">Soal:</p>
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <p
-                                    class="text-slate-500 leading-relaxed text-sm mt-2 line-clamp-2 group-open:line-clamp-none">
-                                    Manakah pernyataan berikut yang paling benar sesuai dengan isi teks di atas?
-                                </p>
-                            </div>
-                        </summary>
-                        <div class="px-5 pb-6 ml-11 border-t border-slate-50 pt-4">
-                            <div class="flex items-center gap-2 text-green-600 font-bold py-2">
-                                <span
-                                    class="bg-green-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]">✓</span>
-                                Jawaban : A
-                            </div>
-                            <div class="mt-4 space-y-2">
-                                <p class="font-bold text-slate-700 text-sm">Pembahasan:</p>
-                                <p class="text-slate-400 italic text-sm leading-relaxed">Penjelasan mendalam mengenai
-                                    korelasi antara paragraf satu dan dua.</p>
-                            </div>
-                        </div>
-                    </details>
-
-                    <details
-                        class="group bg-white rounded-2xl shadow-sm border border-transparent open:border-blue-200 transition-all duration-300">
-                        <summary class="list-none cursor-pointer p-5 flex items-start gap-4">
-                            <div
-                                class="bg-blue-500 text-white min-w-[28px] h-7 flex items-center justify-center rounded-full text-sm font-bold mt-0.5">
-                                2</div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-center">
-                                    <p class="font-bold text-slate-700">Soal:</p>
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <p
-                                    class="text-slate-500 leading-relaxed text-sm mt-2 line-clamp-2 group-open:line-clamp-none">
-                                    Manakah pernyataan berikut yang paling benar sesuai dengan isi teks di atas?
-                                </p>
-                            </div>
-                        </summary>
-                        <div class="px-5 pb-6 ml-11 border-t border-slate-50 pt-4">
-                            <div class="flex items-center gap-2 text-green-600 font-bold py-2">
-                                <span
-                                    class="bg-green-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]">✓</span>
-                                Jawaban : A
-                            </div>
-                            <div class="mt-4 space-y-2">
-                                <p class="font-bold text-slate-700 text-sm">Pembahasan:</p>
-                                <p class="text-slate-400 italic text-sm leading-relaxed">Penjelasan mendalam mengenai
-                                    korelasi antara paragraf satu dan dua.</p>
-                            </div>
-                        </div>
-                    </details>
-
-                </div>
-            </div>
-
-            {{-- PPU --}}
-
-            <div class="bg-[#eef4ff] rounded-3xl mt-10 p-4 md:p-6 border border-blue-100 shadow-sm">
-
-                <div class="flex justify-between items-center mb-4 px-2">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="bg-[#3b82f6] text-white w-12 h-10 flex items-center justify-center rounded-xl font-bold shadow-lg">
-                            PPU</div>
-                        <div class="flex gap-2 text-[10px] md:text-xs">
-                            <span
-                                class="bg-green-100 text-green-600 px-3 py-1.5 rounded-full font-bold flex items-center gap-1">
-                                <span class="text-[10px]">✓</span> 15 benar
-                            </span>
-                            <span
-                                class="bg-red-100 text-red-600 px-3 py-1.5 rounded-full font-bold flex items-center gap-1">
-                                <span class="text-[10px]">✕</span> 5 Salah
-                            </span>
-                        </div>
-                    </div>
-                    <button class="text-blue-500 hover:bg-blue-100 p-1 rounded-full transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 15l7-7 7 7" />
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="space-y-4 max-h-[520px] overflow-y-auto pr-2 custom-scrollbar">
-
-                    <details
-                        class="group bg-white rounded-2xl shadow-sm border border-transparent open:border-blue-200 transition-all duration-300"
-                        open>
-                        <summary class="list-none cursor-pointer p-5 flex items-start gap-4">
-                            <div
-                                class="bg-blue-500 text-white min-w-[28px] h-7 flex items-center justify-center rounded-full text-sm font-bold mt-0.5">
-                                1</div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-center">
-                                    <p class="font-bold text-slate-700">Soal:</p>
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <p
-                                    class="text-slate-500 leading-relaxed text-sm mt-2 line-clamp-2 group-open:line-clamp-none">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor. amet
-                                    adipiscing elit. Sed do eiusmod tempor.
-                                </p>
-                            </div>
-                        </summary>
-
-                        <div class="px-5 pb-6 ml-11 border-t border-slate-50 pt-4">
-                            <div class="flex items-center gap-2 text-green-600 font-bold py-2">
-                                <span
-                                    class="bg-green-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]">✓</span>
-                                Jawaban : B
-                            </div>
-
-                            <div class="mt-4 space-y-2">
-                                <p class="font-bold text-slate-700 text-sm">Pembahasan:</p>
-                                <p class="text-slate-400 italic text-sm leading-relaxed">
-                                    Lorem ipsum dolor sit amet, consectetur sit amet adipiscing elit. Sed do eiusmod
-                                    tempor. amet adipiscing elit. Sed do eiusmod tempor. Pembahasan ini menjelaskan
-                                    secara detail kenapa jawaban B adalah yang paling tepat berdasarkan logika penalaran
-                                    umum.
-                                </p>
-                            </div>
-                        </div>
-                    </details>
-
-                    <details
-                        class="group bg-white rounded-2xl shadow-sm border border-transparent open:border-blue-200 transition-all duration-300">
-                        <summary class="list-none cursor-pointer p-5 flex items-start gap-4">
-                            <div
-                                class="bg-blue-500 text-white min-w-[28px] h-7 flex items-center justify-center rounded-full text-sm font-bold mt-0.5">
-                                2</div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-center">
-                                    <p class="font-bold text-slate-700">Soal:</p>
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <p
-                                    class="text-slate-500 leading-relaxed text-sm mt-2 line-clamp-2 group-open:line-clamp-none">
-                                    Manakah pernyataan berikut yang paling benar sesuai dengan isi teks di atas?
-                                </p>
-                            </div>
-                        </summary>
-                        <div class="px-5 pb-6 ml-11 border-t border-slate-50 pt-4">
-                            <div class="flex items-center gap-2 text-green-600 font-bold py-2">
-                                <span
-                                    class="bg-green-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]">✓</span>
-                                Jawaban : A
-                            </div>
-                            <div class="mt-4 space-y-2">
-                                <p class="font-bold text-slate-700 text-sm">Pembahasan:</p>
-                                <p class="text-slate-400 italic text-sm leading-relaxed">Penjelasan mendalam mengenai
-                                    korelasi antara paragraf satu dan dua.</p>
-                            </div>
-                        </div>
-                    </details>
-
-                    <details
-                        class="group bg-white rounded-2xl shadow-sm border border-transparent open:border-blue-200 transition-all duration-300">
-                        <summary class="list-none cursor-pointer p-5 flex items-start gap-4">
-                            <div
-                                class="bg-blue-500 text-white min-w-[28px] h-7 flex items-center justify-center rounded-full text-sm font-bold mt-0.5">
-                                2</div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-center">
-                                    <p class="font-bold text-slate-700">Soal:</p>
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <p
-                                    class="text-slate-500 leading-relaxed text-sm mt-2 line-clamp-2 group-open:line-clamp-none">
-                                    Manakah pernyataan berikut yang paling benar sesuai dengan isi teks di atas?
-                                </p>
-                            </div>
-                        </summary>
-                        <div class="px-5 pb-6 ml-11 border-t border-slate-50 pt-4">
-                            <div class="flex items-center gap-2 text-green-600 font-bold py-2">
-                                <span
-                                    class="bg-green-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]">✓</span>
-                                Jawaban : A
-                            </div>
-                            <div class="mt-4 space-y-2">
-                                <p class="font-bold text-slate-700 text-sm">Pembahasan:</p>
-                                <p class="text-slate-400 italic text-sm leading-relaxed">Penjelasan mendalam mengenai
-                                    korelasi antara paragraf satu dan dua.</p>
-                            </div>
-                        </div>
-                    </details>
-
-                    <details
-                        class="group bg-white rounded-2xl shadow-sm border border-transparent open:border-blue-200 transition-all duration-300">
-                        <summary class="list-none cursor-pointer p-5 flex items-start gap-4">
-                            <div
-                                class="bg-blue-500 text-white min-w-[28px] h-7 flex items-center justify-center rounded-full text-sm font-bold mt-0.5">
-                                2</div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-center">
-                                    <p class="font-bold text-slate-700">Soal:</p>
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="h-5 w-5 text-slate-400 group-open:rotate-180 transition-transform"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                                <p
-                                    class="text-slate-500 leading-relaxed text-sm mt-2 line-clamp-2 group-open:line-clamp-none">
-                                    Manakah pernyataan berikut yang paling benar sesuai dengan isi teks di atas?
-                                </p>
-                            </div>
-                        </summary>
-                        <div class="px-5 pb-6 ml-11 border-t border-slate-50 pt-4">
-                            <div class="flex items-center gap-2 text-green-600 font-bold py-2">
-                                <span
-                                    class="bg-green-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px]">✓</span>
-                                Jawaban : A
-                            </div>
-                            <div class="mt-4 space-y-2">
-                                <p class="font-bold text-slate-700 text-sm">Pembahasan:</p>
-                                <p class="text-slate-400 italic text-sm leading-relaxed">Penjelasan mendalam mengenai
-                                    korelasi antara paragraf satu dan dua.</p>
-                            </div>
-                        </div>
-                    </details>
-
+                <h3 class="text-2xl font-black text-slate-800 mb-2">Selesai Review?</h3>
+                <div class="flex flex-col gap-3">
+                    <a href="{{ route('tryout.index') }}" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold uppercase tracking-widest text-xs">Ya, Keluar Sekarang</a>
+                    <button @click="showModal = false" class="w-full py-4 text-slate-400 font-bold uppercase text-xs">Batal</button>
                 </div>
             </div>
         </div>
-
-        <style>
-            /* Styling Scrollbar agar cantik seperti di gambar */
-            .custom-scrollbar::-webkit-scrollbar {
-                width: 6px;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar-track {
-                background: transparent;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: #bfdbfe;
-                /* Warna biru muda */
-                border-radius: 10px;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background: #3b82f6;
-            }
-
-            /* Menghilangkan marker default chrome/safari pada <details> */
-            details summary::-webkit-details-marker {
-                display: none;
-            }
-        </style>
-
+    </div>
 </body>
-
 </html>
