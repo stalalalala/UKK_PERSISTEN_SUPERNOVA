@@ -114,34 +114,34 @@ Route::middleware(['auth'])->group(function () {
 
         // minat bakat
         Route::get('minat-bakat/manajemen', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'manajemenSoal'])
-    ->name('minatbakat.manajemen');
+    ->name('minatBakat.manajemen');
 
         Route::post('minat-bakat/soal', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'storeSoal'])
-            ->name('minatbakat.soal.store');
+            ->name('minatBBakat.soal.store');
 
         Route::post('minat-bakat/soal/restore', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'restoreSoal'])
-            ->name('minatbakat.soal.restore');
+            ->name('minatBakat.soal.restore');
 
         Route::delete('minat-bakat/soal/{id}', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'destroySoal'])
-            ->name('minatbakat.soal.destroy');
+            ->name('minatBakat.soal.destroy');
         
         Route::get('minat-bakat/export', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'exportPartisipan'])
-        ->name('minatbakat.export');
+        ->name('minatBakat.export');
 
         Route::post('minat-bakat/reset', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'resetPartisipan'])
-        ->name('minatbakat.reset');
+        ->name('minatBakat.reset');
 
         Route::get('minat-bakat/pdf/{id}', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'generatePdf'])
-    ->name('minatbakat.pdf');
+    ->name('minatBakat.pdf');
 
         Route::post('minat-bakat/soal/import-bulk', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'importSoalBulk'])
-    ->name('minatbakat.soal.importBulk');
+    ->name('minatBakat.soal.importBulk');
 
     Route::resource('minatBakat', AdminMinatBakatController::class)->names([
-            'index'   => 'minatbakat.index',
-            'store'   => 'minatbakat.kategori.store',
-            'update'  => 'minatbakat.kategori.update',
-            'destroy' => 'minatbakat.kategori.destroy',
+            'index'   => 'minatBakat.index',
+            'store'   => 'minatBakat.kategori.store',
+            'update'  => 'minatakat.kategori.update',
+            'destroy' => 'minatBakat.kategori.destroy',
         ]);
         
         // Kuis Fundamental
