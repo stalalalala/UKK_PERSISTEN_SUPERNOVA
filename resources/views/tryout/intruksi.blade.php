@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>intruksi</title>
+    <title>PERSISTEN - Instruksi {{ $tryout->nama_tryout }}</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -19,102 +19,87 @@
 <body class="bg-white font-po overflow-x-hidden">
 
     <div class="max-w-[1440px] mx-auto">
-        <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4">
+        <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4 relative z-10">
             <div class="w-20 md:w-28 h-12 bg-blue-400 rounded-full flex-shrink-0"></div>
 
             <ul class="hidden lg:flex gap-12 text-gray-800 font-medium text-sm">
-                <li><a href="/" class="font-medium hover:text-blue-500">Beranda</a></li>
-                <li><a href="/streak" class="hover:text-blue-500 cursor-pointer">Pet Streak</a></li>
-                <li><a href="/tryout" class="hover:text-blue-500 font-bold cursor-pointer">Try Out</a></li>
-                <li><a href="/latihan" class="hover:text-blue-500 cursor-pointer">Latihan Soal</a></li>
-                <li><a href="/video" class="hover:text-blue-500 cursor-pointer">Video Pembelajaran</a></li>
+                <li><a href="/" class="hover:text-blue-500">Beranda</a></li>
+                <li><a href="{{ route('streak.index') }}" class="hover:text-blue-500">Pet Streak</a></li>
+                <li><a href="{{ route('tryout.index') }}" class="hover:text-blue-500 font-bold">Try Out</a></li>
+                <li><a href="{{ route('latihan.index') }}" class="hover:text-blue-500">Latihan Soal</a></li>
+                <li><a href="{{ route('video.index') }}" class="hover:text-blue-500">Video Pembelajaran</a></li>
             </ul>
 
-            <div class="flex gap-2">
-                <div class="flex items-center gap-3 bg-[#FBBA16] rounded-full">
-                    <button
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full">
+                    <a href="{{ route('profile.index') }}"
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" class="size-5 md:size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                         </svg>
-                    </button>
-                    <button
-                        class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white">
-                        <svg xmlns="http://www.w3.org/2000/xml" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="size-5 md:size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-                        </svg>
-                    </button>
+                    </a>
+                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit"
+                            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                            </svg>
+                        </button>
+                    </form>
                 </div>
             </div>
         </nav>
 
-        <main class=" flex-1 flex items-center justify-center p-4 md:p-10">
-            <div
-                class="bg-white border-2 border-gray-200 w-full max-w-[1440px] mx-auto rounded-[3rem] flex flex-col max-h-[85vh]">
-
+        <main class="flex-1 flex items-center justify-center p-4 md:p-10">
+            <div class="bg-white border-2 border-gray-200 w-full max-w-[1440px] mx-auto rounded-[3rem] flex flex-col max-h-[85vh]">
                 <div class="flex-1 flex flex-col md:flex-row p-8 md:p-12 gap-10 overflow-y-auto">
-
                     <div class="w-full md:w-2/5 flex items-start justify-center">
-                        <div
-                            class="w-full aspect-square bg-gray-200 rounded-[2.5rem] border-8 border-gray-300 flex items-center justify-center relative">
+                        <div class="w-full aspect-square bg-gray-200 rounded-[2.5rem] border-8 border-gray-300 flex items-center justify-center relative">
                             <div class="text-center p-4">
                                 <div class="w-20 h-20 bg-gray-400 rounded-2xl mx-auto mb-4"></div>
-
+                                <p class="text-gray-500 font-bold uppercase tracking-widest text-xs">Informasi Paket</p>
+                                <h3 class="text-xl font-black text-[#2E3B66] mt-2">{{ $tryout->nama_tryout }}</h3>
                             </div>
                         </div>
                     </div>
 
                     <div class="w-full md:w-3/5 flex flex-col">
-                        <h2 class="text-2xl md:text-3xl font-extrabold text-[#2E3B66] mb-8">Instruksi Pengerjaan Soal
-                        </h2>
-
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-[#2E3B66] mb-8">Instruksi Pengerjaan Soal</h2>
                         <div class="space-y-6">
                             <div class="flex items-start gap-4">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-[#FEA33A] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">
-                                    1</div>
+                                <div class="w-10 h-10 rounded-full bg-[#FEA33A] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">1</div>
                                 <p class="text-gray-600 font-semibold pt-2">Kerjakan setiap soal dengan teliti.</p>
                             </div>
                             <div class="flex items-start gap-4">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-[#9885FB] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">
-                                    2</div>
-                                <p class="text-gray-600 font-semibold pt-2">Terdapat batas waktu pada setiap sesi,
-                                    pantau
-                                    timer untuk mengetahui sisa waktu pengerjaan.</p>
+                                <div class="w-10 h-10 rounded-full bg-[#9885FB] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">2</div>
+                                <p class="text-gray-600 font-semibold pt-2">Terdapat batas waktu pada setiap sesi, pantau timer untuk mengetahui sisa waktu pengerjaan.</p>
                             </div>
                             <div class="flex items-start gap-4">
-                                <div
-                                    class="w-10 h-10 rounded-full bg-[#FF908E] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">
-                                    3</div>
-                                <p class="text-gray-600 font-semibold pt-2">Fokus mengerjakan soal, pilih jawaban
-                                    terbaik,
-                                    dan manfaatkan waktu yang tersedia sebaik mungkin.</p>
+                                <div class="w-10 h-10 rounded-full bg-[#FF908E] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">3</div>
+                                <p class="text-gray-600 font-semibold pt-2">Fokus mengerjakan soal, pilih jawaban terbaik, dan manfaatkan waktu yang tersedia sebaik mungkin.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="px-12 py-8 bg-gray-50 flex justify-end gap-4 shrink-0">
+                <div class="px-12 py-8 bg-gray-50 flex justify-end gap-4 shrink-0 rounded-b-[3rem]">
                     <a href="{{ route('tryout.index') }}">
-
-                        <button
-                            class="px-8 py-3 rounded-full font-bold text-gray-400 bg-gray-200 hover:bg-gray-300 transition">Batal</button>
+                        <button class="px-8 py-3 rounded-full font-bold text-gray-400 bg-gray-200 hover:bg-gray-300 transition">Batal</button>
                     </a>
-                    <a href="{{ route('tryout.soal') }}">
-                        <button
-                            class="px-10 py-3 rounded-full font-bold text-white bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-200 transition">Mulai
-                            Mengerjakan</button>
+                    
+                    @if($firstCategory)
+                    <a href="{{ route('tryout.soal', [$tryout->id, $firstCategory->id]) }}">
+                        <button class="px-10 py-3 rounded-full font-bold text-white bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-200 transition">Mulai Mengerjakan</button>
                     </a>
+                    @endif
                 </div>
-
             </div>
         </main>
     </div>
 </body>
-
 </html>

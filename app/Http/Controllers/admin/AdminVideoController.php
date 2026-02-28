@@ -8,59 +8,105 @@ use Illuminate\Http\Request;
 
 class AdminVideoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('admin.video.index');
+        $videos  = AdminVideo::all();              // Video aktif
+        $history = AdminVideo::onlyTrashed()->get(); // Video dihapus sementara
+
+        return view('admin.video.index', compact('videos', 'history'));
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Simpan video baru.
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'subtes'      => 'required',
+            'judul_video' => 'required',
+            'iframe'      => 'required', 
+        ]);
+
+        AdminVideo::create([
+            'subtes'      => $request->subtes,
+            'judul_video' => $request->judul_video,
+            'iframe'      => $request->iframe, 
+        ]);
+
+        return redirect()->back()->with('success', 'Video berhasil ditambahkan!');
+    }
+
+    public function import(Request $request)
+{
+    foreach ($request->data as $row) {
+
+        $iframe = trim($row['iframe'] ?? '');
+
+        // decode kalau sudah jadi entity (&lt; &gt;)
+        $iframe = html_entity_decode($iframe);
+
+        // hapus tanda kutip luar kalau ada
+        $iframe = preg_replace('/^"(.*)"$/', '$1', $iframe);
+
+        AdminVideo::create([
+            'subtes' => $row['subtes'] ?? '',
+            'judul_video' => $row['judul_video'] ?? '',
+            'iframe' => $iframe,
+        ]);
+    }
+
+    return response()->json(['success' => true]);
+}
+
+
+    /**
+     * Update video.
+     */
+    public function update(Request $request, $id)
+    {
+        $video = AdminVideo::findOrFail($id);
+
+        $request->validate([
+            'subtes'      => 'required',
+            'judul_video' => 'required',
+            'iframe'      => 'required', 
+        ]);
+
+        $video->update($request->only(['subtes', 'judul_video', 'iframe'])); 
+
+        return redirect()->back()->with('success', 'Video berhasil diperbarui!');
     }
 
     /**
-     * Display the specified resource.
+     * Hapus sementara (soft delete).
      */
-    public function show(AdminVideo $adminVideo)
+    public function destroy($id)
     {
-        //
+        $video = AdminVideo::findOrFail($id);
+        $video->delete();
+
+        return redirect()->back()->with('success', 'Video dipindahkan ke History.');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Pulihkan video dari history.
      */
-    public function edit(AdminVideo $adminVideo)
+    public function restore($id)
     {
-        //
+        $video = AdminVideo::withTrashed()->findOrFail($id);
+        $video->restore();
+
+        return redirect()->back()->with('success', 'Video berhasil dipulihkan!');
     }
 
     /**
-     * Update the specified resource in storage.
+     * Hapus permanen.
      */
-    public function update(Request $request, AdminVideo $adminVideo)
+    public function forceDelete($id)
     {
-        //
-    }
+        $video = AdminVideo::withTrashed()->findOrFail($id);
+        $video->forceDelete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(AdminVideo $adminVideo)
-    {
-        //
+        return redirect()->back()->with('success', 'Video dihapus permanen!');
     }
 }

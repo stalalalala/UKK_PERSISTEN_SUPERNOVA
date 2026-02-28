@@ -2,65 +2,45 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Models\admin\halaman_peluangPtn;
 use App\Http\Controllers\Controller;
+use App\Models\Universitas;
+use App\Models\Prodi;
 use Illuminate\Http\Request;
 
 class HalamanPeluangPtnController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('admin/peluangPtn.index');
+        // Mengambil data univ beserta prodi didalamnya
+        $univs = Universitas::with('prodis')->get();
+        return view('admin/peluangPtn.index', compact('univs'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        // Simpan Universitas baru atau update jika sudah ada
+        $univ = Universitas::updateOrCreate(['nama_univ' => $request->nama_univ]);
+
+        // Simpan Prodi
+        foreach ($request->prodis as $p) {
+            Prodi::updateOrCreate(
+                [
+                    'universitas_id' => $univ->id,
+                    'nama_prodi' => $p['nama']
+                ],
+                [
+                    'kuota' => $p['kuota'],
+                    'peminat' => $p['peminat']
+                ]
+            );
+        }
+
+        return response()->json(['message' => 'Data berhasil disimpan']);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(halaman_peluangPtn $halaman_peluangPtn)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(halaman_peluangPtn $halaman_peluangPtn)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, halaman_peluangPtn $halaman_peluangPtn)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(halaman_peluangPtn $halaman_peluangPtn)
-    {
-        //
+        Universitas::findOrFail($id)->delete();
+        return response()->json(['message' => 'Data dihapus']);
     }
 }

@@ -21,11 +21,10 @@ use App\Http\Controllers\TryoutController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\HasilKuisController;
 use App\Http\Controllers\HasilLatihanController;
-use App\Http\Controllers\HasilMinatbakatController;
 use App\Http\Controllers\HasilTryoutController;
 use App\Http\Controllers\IntruksiKuisController;
 use App\Http\Controllers\IntruksiLatihanController;
-use App\Http\Controllers\IntruksiMinatBakatController;
+use App\Http\Controllers\InstruksiMinatBakatController;
 use App\Http\Controllers\IntruksiTryoutController;
 use App\Http\Controllers\JedaTryoutController;
 use App\Http\Controllers\ProfileController;
@@ -60,15 +59,60 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('dashboard', DashboardController::class)->only(['index']);
         // Pastikan User model sudah di-import jika menggunakan resource
-        Route::resource('user', \App\Models\User::class); 
+        Route::resource('user', UserController::class); 
         Route::resource('streak', HalamanStreakController::class);
-        Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
         Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
-        Route::resource('tryout', AdminTryoutController::class);
         Route::resource('kuis', AdminKuisController::class);
         Route::resource('latihan', AdminLatihanController::class);
+
+        Route::get('videoPembelajaran/history', [AdminVideoController::class, 'history'])->name('videoPembelajaran.history');
+        Route::post('videoPembelajaran/{id}/restore', [AdminVideoController::class, 'restore'])->name('videoPembelajaran.restore');
+        Route::delete('videoPembelajaran/{id}/force-delete', [AdminVideoController::class, 'forceDelete'])->name('videoPembelajaran.force-delete');
+        Route::post('videoPembelajaran/import',
+            [AdminVideoController::class, 'import'])->name('videoPembelajaran.import');
+
         Route::resource('videoPembelajaran', AdminVideoController::class);
-        Route::resource('minatBakat', AdminMinatBakatController::class);
+
+        // Peluang PTN
+        Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
+        Route::post('/peluangPtn/store', [HalamanPeluangPtnController::class, 'store'])->name('peluangPtn.store');
+        Route::delete('/peluangPtn/{id}', [HalamanPeluangPtnController::class, 'destroy'])->name('peluangPtn.destroy');
+
+        // TRYOUT
+        Route::resource('tryout', AdminTryoutController::class);
+        Route::patch('tryout/{id}/toggle', [AdminTryoutController::class, 'toggleStatus'])->name('tryout.toggle');
+
+        // minat bakat
+        Route::get('minat-bakat/manajemen', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'manajemenSoal'])
+    ->name('minatbakat.manajemen');
+
+        Route::post('minat-bakat/soal', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'storeSoal'])
+            ->name('minatbakat.soal.store');
+
+        Route::post('minat-bakat/soal/restore', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'restoreSoal'])
+            ->name('minatbakat.soal.restore');
+
+        Route::delete('minat-bakat/soal/{id}', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'destroySoal'])
+            ->name('minatbakat.soal.destroy');
+        
+        Route::get('minat-bakat/export', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'exportPartisipan'])
+        ->name('minatbakat.export');
+
+        Route::post('minat-bakat/reset', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'resetPartisipan'])
+        ->name('minatbakat.reset');
+
+        Route::get('minat-bakat/pdf/{id}', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'generatePdf'])
+    ->name('minatbakat.pdf');
+
+        Route::post('minat-bakat/soal/import-bulk', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'importSoalBulk'])
+    ->name('minatbakat.soal.importBulk');
+
+        Route::resource('minatBakat', AdminMinatBakatController::class)->names([
+            'index'   => 'minatbakat.index',
+            'store'   => 'minatbakat.kategori.store',
+            'update'  => 'minatbakat.kategori.update',
+            'destroy' => 'minatbakat.kategori.destroy',
+        ]);
     });
 
     // -----------------------------------------------------
@@ -91,14 +135,20 @@ Route::middleware('auth')->group(function () {
 
         // Tryout
         Route::prefix('tryout')->name('tryout.')->group(function () {
-            Route::get('/', [TryoutController::class, 'index'])->name('index');
-            Route::get('/intruksi', [IntruksiTryoutController::class, 'index'])->name('intruksi');
-            Route::get('/jeda', [JedaTryoutController::class, 'index'])->name('jeda');
-            Route::get('/ranking', [RankingController::class, 'index'])->name('ranking');
-            Route::get('/soal', [SoalTryoutController::class, 'index'])->name('soal');
-            Route::get('/hasil', [HasilTryoutController::class, 'index'])->name('hasil');
-        });
-
+        Route::get('/', [TryoutController::class, 'index'])->name('index'); 
+        Route::get('/intruksi/{id}', [TryoutController::class, 'intruksi'])->name('intruksi');
+        // Tambahkan {category_id?} agar opsional
+        Route::get('/soal/{id}/{category_id?}', [TryoutController::class, 'soal'])->name('soal');
+        Route::post('/simpan-jawaban/{id}', [TryoutController::class, 'simpanJawaban'])->name('simpan');
+        
+        // Tambahkan {next_category_id} agar sinkron dengan Controller
+        Route::get('/jeda/{id}/{next_category_id}', [TryoutController::class, 'jeda'])->name('jeda');
+        
+        Route::get('/hasil/{id}', [TryoutController::class, 'hasil'])->name('hasil');
+        Route::get('/ranking/{id}', [TryoutController::class, 'ranking'])->name('ranking');
+        Route::get('/sertifikat/{id}', [TryoutController::class, 'generateSertifikat'])->name('sertifikat');
+    });
+        
         // Latihan
         Route::prefix('latihan')->name('latihan.')->group(function () {
             Route::get('/', [LatihanController::class, 'index'])->name('index');
@@ -116,86 +166,14 @@ Route::middleware('auth')->group(function () {
         });
 
         // Minat Bakat
-        Route::prefix('minatbakat')->name('minatbakat.')->group(function () {
-            Route::get('/', [MinatBakatController::class, 'index'])->name('soal');
-            Route::get('/hasil', [MinatBakatController::class, 'index'])->name('hasil'); // Perhatikan jika method di controller sama
-            Route::get('/intruksi', [IntruksiMinatBakatController::class, 'index'])->name('intruksi');
-        });
+        Route::get('minatbakat/hasil', [MinatBakatController::class, 'hasil'])->name('minatbakat.hasil');
+        Route::get('minatbakat/intruksi', [MinatBakatController::class, 'intruksi'])->name('minatbakat.intruksi');
 
-Route::get('/latihan/soal', [SoalLatihanController::class, 'index'])->name('latihan.soal');
+        Route::resource('minatbakat', MinatBakatController::class)->names([
+            'index' => 'minatbakat.soal',
+        ]);
 
-Route::get('/latihan/hasil', [HasilLatihanController::class, 'index'])->name('latihan.hasil');
-
-Route::get('/latihan/intruksi', [IntruksiLatihanController::class, 'index'])->name('latihan.intruksi');
-
-// video
-
-Route::get('/video', [VideoController::class, 'index'])->name('video.index');
-
-// kuis
-
-Route::get('/kuis', [KuisController::class, 'index'])->name('kuis.index');
-
-Route::get('/kuis/soal', [SoalKuisController::class, 'index'])->name('kuis.soal');
-
-Route::get('/kuis/hasil', [HasilKuisController::class, 'index'])->name('kuis.hasil');
-
-Route::get('/kuis/intruksi', [IntruksiKuisController::class, 'index'])->name('kuis.intruksi');
-
-
-
-// slime
-
-Route::get('/slime', function () {
-    return view('slime');
-});
-
-Route::get('/slime_login', function () {
-    return view('slime_login');
-});
-
-// masuk/daftar
-
-Route::get('/masuk', function () {
-    return view('Auth/masuk');
-});
-
-Route::get('/daftar', function () {
-    return view('Auth/daftar');
-});
-
-// minat bakat
-
-Route::get('/minatbakat', [MinatBakatController::class, 'index'])->name('minatbakat.soal');
-
-Route::get('/minatbakat/hasil', [HasilMinatbakatController::class, 'index'])->name('minatbakat.hasil');
-
-Route::get('/minatbakat/intruksi', [IntruksiMinatBakatController::class, 'index'])->name('minatbakat.intruksi');
-
-
-
-
-
-
-
-
-
-
-
-// admin //
-
-
-Route::prefix('admin')->name('admin.')->group(function () {
-    // Dashboard biasanya hanya index, kita bisa batasi pakai only()
-    Route::resource('dashboard', DashboardController::class)->only(['index']);
-
-    Route::resource('user', UserController::class);
-    Route::resource('streak', HalamanStreakController::class);
-    Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
-    Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
-    Route::resource('tryout', AdminTryoutController::class);
-    Route::resource('kuis', AdminKuisController::class);
-    Route::resource('latihan', AdminLatihanController::class);
-    Route::resource('videoPembelajaran', AdminVideoController::class);
-    Route::resource('minatBakat', AdminMinatBakatController::class);
+        Route::get('/slime', function () { return view('slime'); });
+        Route::get('/slime_login', function () { return view('slime_login'); });
+    });
 });

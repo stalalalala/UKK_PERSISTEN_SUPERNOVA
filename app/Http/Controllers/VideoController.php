@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Video;
+use App\Models\admin\AdminVideo;
 use Illuminate\Http\Request;
 
 class VideoController extends Controller
@@ -12,7 +13,8 @@ class VideoController extends Controller
      */
     public function index()
     {
-        return view('video.index');
+       $videos = \App\Models\admin\AdminVideo::latest()->get();
+       return view('video.index', compact('videos'));
     }
 
     /**
