@@ -31,7 +31,7 @@
 
             <div class="flex items-center gap-2">
                 <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full">
-                    <a href="/profile/index"
+                    <a href="{{ route('profile.index') }}"
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" class="size-5 md:size-6">

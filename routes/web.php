@@ -8,6 +8,12 @@ use App\Http\Controllers\Auth\LoginController;
 ================================ */
 use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\admin\UserController;
+
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\PasswordForgotController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use Illuminate\Support\Facades\Auth;
+
 use App\Http\Controllers\admin\AdminKuisController;
 use App\Http\Controllers\admin\AdminLatihanController;
 use App\Http\Controllers\admin\AdminTryoutController;
@@ -33,60 +39,59 @@ use App\Http\Controllers\RankingController;
 use App\Http\Controllers\SoalTryoutController;
 use App\Http\Controllers\HasilTryoutController;
 
-use App\Http\Controllers\LatihanController;
-use App\Http\Controllers\IntruksiLatihanController;
-use App\Http\Controllers\SoalLatihanController;
-use App\Http\Controllers\HasilLatihanController;
-
 use App\Http\Controllers\KuisController;
-use App\Http\Controllers\IntruksiKuisController;
-use App\Http\Controllers\SoalKuisController;
-use App\Http\Controllers\HasilKuisController;
-
+use App\Http\Controllers\LatihanController;
 use App\Http\Controllers\MinatBakatController;
+use App\Http\Controllers\SoalKuisController;
 
-/* =========================================================
-   1. ROUTES GUEST (Belum Login)
-========================================================= */
-Route::middleware('guest')->group(function () {
+// ==============================
+// Guest Routes (belum login)
+// ==============================
 
-    Route::get('/masuk', [LoginController::class, 'showLoginForm'])
-        ->name('login');
-
+Route::middleware('guest')->group(function(){
+    Route::get('/masuk', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/masuk', [LoginController::class, 'login']);
 
-    Route::get('/daftar', function () {
-        return view('Auth.daftar');
-    })->name('register');
+    Route::get('/daftar', [LoginController::class, 'showRegisterForm'])->name('register');
+    Route::post('/daftar', [LoginController::class, 'register']);
 
+    Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])
+        ->name('login.google');
+
+    Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback'])
+        ->name('login.google.callback');
 });
 
+Route::get('/lupa-password', [PasswordForgotController::class, 'showForm'])
+    ->name('password.request');
 
-/* =========================================================
-   2. ROUTES AUTH (Sudah Login)
-========================================================= */
-Route::middleware('auth')->group(function () {
+Route::post('/lupa-password', [PasswordForgotController::class, 'sendLink'])
+    ->name('password.email');
 
-    Route::post('/logout', [LoginController::class, 'logout'])
-        ->name('logout');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showForm'])
+    ->name('password.reset');
+
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])
+    ->name('password.update');
 
 
-    /* =====================================================
-       3. ROLE ADMIN ROUTES
-    ===================================================== */
-    Route::middleware('role:admin')
-        ->prefix('admin')
-        ->name('admin.')
-        ->group(function () {
+Route::middleware(['auth'])->group(function () {
 
-        /* Dashboard */
-        Route::get('/dashboard', [DashboardController::class, 'index'])
-            ->name('dashboard.index');
+    // ADMIN
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
 
-        /* User Management */
-        Route::resource('user', UserController::class);
+        Route::resource('dashboard', DashboardController::class)->only(['index']);
+         Route::get('user/history', [UserController::class, 'history'])
+            ->name('user.history');
 
-        /* Halaman Admin Tambahan */
+        Route::post('user/{id}/restore', [UserController::class, 'restore'])
+            ->name('user.restore');
+
+       Route::delete('user/{id}/force-delete', [UserController::class, 'forceDelete'])
+    ->name('user.forceDelete');
+
+            Route::resource('user', UserController::class);
+
         Route::resource('streak', HalamanStreakController::class);
         Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
 
@@ -132,7 +137,7 @@ Route::middleware('auth')->group(function () {
         Route::post('minat-bakat/soal/import-bulk', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'importSoalBulk'])
     ->name('minatbakat.soal.importBulk');
 
-        Route::resource('minatBakat', AdminMinatBakatController::class)->names([
+    Route::resource('minatBakat', AdminMinatBakatController::class)->names([
             'index'   => 'minatbakat.index',
             'store'   => 'minatbakat.kategori.store',
             'update'  => 'minatbakat.kategori.update',
@@ -166,22 +171,17 @@ Route::middleware('auth')->group(function () {
     });
 
 
-    /* =====================================================
-       4. ROLE PESERTA ROUTES
-    ===================================================== */
-    Route::middleware('role:peserta')->group(function () {
 
-        /* =======================
-           Beranda Peserta
-        ======================= */
-        Route::get('/', [BerandaController::class, 'index']) ->name('beranda');
+///////////////////////////////////
+    // PESERTA
+//////////////////////////////////
+    Route::middleware(['role:peserta','verified'])->group(function () {
 
+        Route::get('/', [BerandaController::class, 'index'])->name('beranda');
+        Route::get('/profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile.index');
 
-        /* =======================
-           Profile Peserta
-        ======================= */
-        Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-        Route::view('/profile/edit', 'profile.edit')->name('profile.edit');
+       Route::get('/profile/edit', [ProfileController::class, 'edit'])->middleware('auth')->name('profile.edit');
+       Route::post('/profile/update', [ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
 
 
         /* =======================
@@ -243,5 +243,24 @@ Route::middleware('auth')->group(function () {
         Route::get('/slime', function () { return view('slime'); });
         Route::get('/slime_login', function () { return view('slime_login'); });
     });
+});
 
+// ==============================
+// EMAIL VERIFICATION
+// ==============================
+Route::middleware('auth')->group(function () {
+
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])
+        ->name('verification.notice');
+
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+
+    Route::post('/logout', [LoginController::class,'logout'])
+        ->name('logout');
 });
