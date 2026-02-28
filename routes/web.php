@@ -61,9 +61,7 @@ Route::middleware('auth')->group(function () {
         // Pastikan User model sudah di-import jika menggunakan resource
         Route::resource('user', UserController::class); 
         Route::resource('streak', HalamanStreakController::class);
-        Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
         Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
-        Route::resource('tryout', AdminTryoutController::class);
         Route::resource('kuis', AdminKuisController::class);
         Route::resource('latihan', AdminLatihanController::class);
 
@@ -74,6 +72,15 @@ Route::middleware('auth')->group(function () {
             [AdminVideoController::class, 'import'])->name('videoPembelajaran.import');
 
         Route::resource('videoPembelajaran', AdminVideoController::class);
+
+        // Peluang PTN
+        Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
+        Route::post('/peluangPtn/store', [HalamanPeluangPtnController::class, 'store'])->name('peluangPtn.store');
+        Route::delete('/peluangPtn/{id}', [HalamanPeluangPtnController::class, 'destroy'])->name('peluangPtn.destroy');
+
+        // TRYOUT
+        Route::resource('tryout', AdminTryoutController::class);
+        Route::patch('tryout/{id}/toggle', [AdminTryoutController::class, 'toggleStatus'])->name('tryout.toggle');
 
         // minat bakat
         Route::get('minat-bakat/manajemen', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'manajemenSoal'])
@@ -128,14 +135,20 @@ Route::middleware('auth')->group(function () {
 
         // Tryout
         Route::prefix('tryout')->name('tryout.')->group(function () {
-            Route::get('/', [TryoutController::class, 'index'])->name('index');
-            Route::get('/intruksi', [IntruksiTryoutController::class, 'index'])->name('intruksi');
-            Route::get('/jeda', [JedaTryoutController::class, 'index'])->name('jeda');
-            Route::get('/ranking', [RankingController::class, 'index'])->name('ranking');
-            Route::get('/soal', [SoalTryoutController::class, 'index'])->name('soal');
-            Route::get('/hasil', [HasilTryoutController::class, 'index'])->name('hasil');
-        });
-
+        Route::get('/', [TryoutController::class, 'index'])->name('index'); 
+        Route::get('/intruksi/{id}', [TryoutController::class, 'intruksi'])->name('intruksi');
+        // Tambahkan {category_id?} agar opsional
+        Route::get('/soal/{id}/{category_id?}', [TryoutController::class, 'soal'])->name('soal');
+        Route::post('/simpan-jawaban/{id}', [TryoutController::class, 'simpanJawaban'])->name('simpan');
+        
+        // Tambahkan {next_category_id} agar sinkron dengan Controller
+        Route::get('/jeda/{id}/{next_category_id}', [TryoutController::class, 'jeda'])->name('jeda');
+        
+        Route::get('/hasil/{id}', [TryoutController::class, 'hasil'])->name('hasil');
+        Route::get('/ranking/{id}', [TryoutController::class, 'ranking'])->name('ranking');
+        Route::get('/sertifikat/{id}', [TryoutController::class, 'generateSertifikat'])->name('sertifikat');
+    });
+        
         // Latihan
         Route::prefix('latihan')->name('latihan.')->group(function () {
             Route::get('/', [LatihanController::class, 'index'])->name('index');
