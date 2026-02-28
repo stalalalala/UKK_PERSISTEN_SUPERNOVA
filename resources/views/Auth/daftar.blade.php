@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar - Web UTBK</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     @vite('resources/css/app.css')
 </head>
 
@@ -79,23 +80,67 @@
                         @enderror
                     </div>
 
-                    {{-- Password --}}
-                    <div class="space-y-2">
+                   
+                     <div x-data="{ showPassword: false, showConfirm: false }" class="space-y-6">
+                    <!-- Buat Sandi -->
+                    <div class="space-y-2 relative">
                         <label class="block text-gray-500 font-bold ml-1">Buat sandi</label>
-                        <input type="password" name="password"
-                            placeholder="xxxxxxxx" 
-                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white tracking-widest">
+                        <input :type="showPassword ? 'text' : 'password'" name="password"
+                            placeholder="xxxxxxxx"
+                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white tracking-widest pr-12">
+                        <button type="button" @click="showPassword = !showPassword"
+                            class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            <template x-if="!showPassword">
+                                <!-- Icon mata tertutup -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-9 0-1.135.204-2.22.575-3.225M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </template>
+                            <template x-if="showPassword">
+                                <!-- Icon mata terbuka -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </template>
+                        </button>
                         @error('password')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    {{-- Konfirmasi Password --}}
-                    <div class="space-y-2">
+                    <!-- Konfirmasi Sandi -->
+                    <div class="space-y-2 relative">
                         <label class="block text-gray-500 font-bold ml-1">Konfirmasi sandi</label>
-                        <input type="password" name="password_confirmation"
-                            placeholder="xxxxxxxx" 
-                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white tracking-widest">
+                        <input :type="showConfirm ? 'text' : 'password'" name="password_confirmation"
+                            placeholder="xxxxxxxx"
+                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white tracking-widest pr-12">
+                        <button type="button" @click="showConfirm = !showConfirm"
+                            class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                            <template x-if="!showConfirm">
+                                <!-- Icon mata tertutup -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-9 0-1.135.204-2.22.575-3.225M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </template>
+                            <template x-if="showConfirm">
+                                <!-- Icon mata terbuka -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </template>
+                        </button>
                     </div>
                 </div>
 

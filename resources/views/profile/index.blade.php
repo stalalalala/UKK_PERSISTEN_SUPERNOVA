@@ -19,32 +19,38 @@
 <body class="font-po bg-white overflow-x-hidden">
 
     <div class="max-w-[1440px] mx-auto" x-data="{ open: false }">
-        <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4 relative z-10">
+         <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4 relative z-10">
             <div class="w-20 md:w-28 h-12 bg-blue-400 rounded-full flex-shrink-0"></div>
 
             <ul class="hidden lg:flex gap-12 text-gray-800 font-medium text-sm">
-                <li><a href="/" class="font-bold hover:text-blue-500">Profile Peserta</a></li>
+                <li><a href="/" class=" hover:text-blue-500">Beranda</a></li>
+                <li><a href="{{ route('streak.index') }}" class="hover:text-blue-500">Pet Streak</a></li>
+                <li><a href="{{ route('tryout.index') }}" class="hover:text-blue-500">Try Out</a></li>
+                <li><a href="{{ route('latihan.index') }}" class="hover:text-blue-500">Latihan Soal</a></li>
+                <li><a href="{{ route('video.index') }}" class="hover:text-blue-500">Video Pembelajaran</a></li>
             </ul>
 
             <div class="flex items-center gap-2">
                 <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full">
-                    <a href="/"
+                    <a href="{{ route('profile.index') }}"
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="size-6">
+                            stroke="currentColor" class="size-5 md:size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
-                                d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                         </svg>
-
                     </a>
-                    <button
-                        class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-                        </svg>
-                    </button>
+                    <form action="{{ route('logout') }}" method="POST" class="inline" id="logout-form">
+                        @csrf
+                        <button type="submit" 
+                                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                            </svg>
+                        </button>
+                    </form>
                 </div>
 
                 <button @click="open = true"
@@ -108,11 +114,15 @@
 
             <div class="flex flex-col items-center gap-2 shrink-0">
                 <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-8 border-white overflow-hidden shadow-sm">
-                    <img src="https://i.pinimg.com/564x/07/33/ba/0733ba760b29378474dea0fdbcb97107.jpg" alt="Profile"
+                    <img @if($user->photo) 
+                src="{{ asset('storage/'.$user->photo) }}"  
+            @else  
+                src="https://via.placeholder.com/150?text=Belum+ada+foto"  
+            @endif  alt="Profile"
                         class="w-full h-full object-cover">
                 </div>
-                <h2 class="text-xl pt-2 font-bold text-[#2e3b66]">Bang Jeemin</h2>
-                <p class="text-xs text-gray-500 font-medium">contoh@gmail.com</p>
+                <h2 class="text-xl pt-2 font-bold text-[#2e3b66]">{{ $user->name }}</h2>
+                <p class="text-xs text-gray-500 font-medium">{{ $user->email }}</p>
             </div>
 
             <div class="flex-1 w-full overflow-hidden rounded-[30px] shadow-xs border border-gray-100">
@@ -120,8 +130,8 @@
                 <div class="bg-[#4375D1] p-8 pb-14 relative">
                     <div class="flex justify-between items-start text-white">
                         <div>
-                            <h3 class="text-3xl font-bold tracking-tight">Bang Jeemin</h3>
-                            <p class="text-sm opacity-90 font-medium">contoh@gmail.com</p>
+                            <h3 class="text-3xl font-bold tracking-tight">{{ $user->name }}</h3>
+                            <p class="text-sm opacity-90 font-medium">{{ $user->email }}</p>
                         </div><a href="/profile/edit">
                             <button
                                 class="bg-white/20 hover:bg-white/30 text-white px-5 py-2 rounded-2xl text-sm font-medium flex items-center gap-2 transition backdrop-blur-sm">

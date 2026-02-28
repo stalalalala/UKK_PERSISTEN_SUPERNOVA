@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\PasswordForgotController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\admin\AdminKuisController;
 use App\Http\Controllers\admin\AdminLatihanController;
@@ -34,54 +37,54 @@ use App\Http\Controllers\SoalKuisController;
 use App\Http\Controllers\SoalLatihanController;
 use App\Http\Controllers\SoalTryoutController;
 
-// =========================================================
-// 1. GUEST ROUTES (Belum Login)
-// =========================================================
+// ==============================
+// Guest Routes (belum login)
+// ==============================
 
 Route::middleware('guest')->group(function(){
-    Route::get('/masuk',[LoginController::class,'showLoginForm'])->name('login');
-    Route::post('/masuk',[LoginController::class,'login']);
+    Route::get('/masuk', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/masuk', [LoginController::class, 'login']);
 
-    Route::get('/daftar',[LoginController::class,'showRegisterForm'])->name('register');
-    Route::post('/daftar',[LoginController::class,'register']);
+    Route::get('/daftar', [LoginController::class, 'showRegisterForm'])->name('register');
+    Route::post('/daftar', [LoginController::class, 'register']);
 
-    Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])->name('login.google');
-    Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback'])->name('login.google.callback');
+    Route::get('auth/google', [LoginController::class, 'redirectToGoogle'])
+        ->name('login.google');
 
-
-
-});
- Auth::routes(['verify' => true]);
-
- // Route yang butuh login + email terverifikasi
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    });
-
-    Route::get('/beranda', function () {
-        return view('beranda');
-    });
+    Route::get('auth/google/callback', [LoginController::class, 'handleGoogleCallback'])
+        ->name('login.google.callback');
 });
 
+Route::get('/lupa-password', [PasswordForgotController::class, 'showForm'])
+    ->name('password.request');
 
-Route::post('/logout',[LoginController::class,'logout'])->middleware('auth');
+Route::post('/lupa-password', [PasswordForgotController::class, 'sendLink'])
+    ->name('password.email');
 
-// =========================================================
-// 2. AUTH ROUTES (Sudah Login)
-// =========================================================
-Route::middleware('auth')->group(function () {
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showForm'])
+    ->name('password.reset');
 
-    // Action Logout
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])
+    ->name('password.update');
 
-    // -----------------------------------------------------
-    // ROLE: ADMIN
-    // -----------------------------------------------------
+
+Route::middleware(['auth'])->group(function () {
+
+    // ADMIN
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+
         Route::resource('dashboard', DashboardController::class)->only(['index']);
-        // Pastikan User model sudah di-import jika menggunakan resource
-        Route::resource('user', UserController::class); 
+         Route::get('user/history', [UserController::class, 'history'])
+            ->name('user.history');
+
+        Route::post('user/{id}/restore', [UserController::class, 'restore'])
+            ->name('user.restore');
+
+       Route::delete('user/{id}/force-delete', [UserController::class, 'forceDelete'])
+    ->name('user.forceDelete');
+
+            Route::resource('user', UserController::class);
+
         Route::resource('streak', HalamanStreakController::class);
         Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
         Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
@@ -125,19 +128,18 @@ Route::middleware('auth')->group(function () {
        Route::resource('minatBakat', AdminMinatBakatController::class);
     });
 
-    // -----------------------------------------------------
-    // ROLE: PESERTA
-    // -----------------------------------------------------
-    Route::middleware('role:peserta')->group(function () {
-        
-        // Dashboard / Beranda Peserta
-        Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
-        // Profile
-        Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-        Route::get('/profile/edit', function () {
-            return view('profile.edit');
-        })->name('profile.edit');
+
+///////////////////////////////////
+    // PESERTA
+//////////////////////////////////
+    Route::middleware(['role:peserta','verified'])->group(function () {
+
+        Route::get('/', [BerandaController::class, 'index'])->name('beranda');
+        Route::get('/profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile.index');
+
+       Route::get('/profile/edit', [ProfileController::class, 'edit'])->middleware('auth')->name('profile.edit');
+       Route::post('/profile/update', [ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
 
         // Fitur Dasar
         Route::get('/streak', [StreakController::class, 'index'])->name('streak.index');
@@ -180,4 +182,25 @@ Route::middleware('auth')->group(function () {
         Route::get('/slime', function () { return view('slime'); });
         Route::get('/slime_login', function () { return view('slime_login'); });
     });
+
+});
+
+// ==============================
+// EMAIL VERIFICATION
+// ==============================
+Route::middleware('auth')->group(function () {
+
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])
+        ->name('verification.notice');
+
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+
+    Route::post('/logout', [LoginController::class,'logout'])
+        ->name('logout');
 });

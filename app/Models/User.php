@@ -6,19 +6,21 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+     use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
-        'no_hp',
         'email',
         'password',
         'role',
+        'no_hp',
         'google_id',
+        'email_verified_at',
+        'photo',
     ];
 
     protected $hidden = [
@@ -26,12 +28,15 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
-    protected function casts(): array
+    protected $appends = ['kode'];
+    public function getKodeAttribute()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->id . '-PGN';
     }
+
+    public function streak()
+{
+    return $this->hasOne(Streak::class);
+}
 }
 

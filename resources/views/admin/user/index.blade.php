@@ -164,21 +164,44 @@
                 </button>
             </div>
         </div>
-
-        <div class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 self-end md:self-auto">
-            <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
-            </div>
-            <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
+@php
+    use Illuminate\Support\Facades\Auth;
+    $user = Auth::user();
+@endphp
+        <div x-data="{ open: false }" class="relative inline-block">
+    <!-- Trigger -->
+    <div @click="open = !open" 
+         class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer shrink-0 self-end md:self-auto">
+        <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
+            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" alt="Admin">
         </div>
+        <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </div>
+
+    <!-- Dropdown -->
+    <div x-show="open" @click.away="open = false"
+         class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 transform scale-95"
+         x-transition:enter-end="opacity-100 transform scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 transform scale-100"
+         x-transition:leave-end="opacity-0 transform scale-95">
+        <div class="p-4">
+            <p class="font-semibold text-gray-700">{{ $user->name }}</p>
+            <p class="text-sm text-gray-500">{{ $user->email }}</p>
+            <p class="text-sm text-gray-500">{{ $user->no_hp ?? '-' }}</p>
+        </div>
+    </div>
+</div>
     </header>
 
     <h2 class="text-2xl font-semibold text-slate-700 mb-6">Manajemen User</h2>
 
-    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden">
+    <div x-data="userTableApp()" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden">
         
         <div class="flex gap-6 mb-6 border-b border-gray-100">
             <button @click="tab='admin'" :class="tab==='admin' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-400 hover:text-gray-600'" class="pb-3 text-sm font-bold transition-all">Admin</button>
@@ -189,8 +212,11 @@
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <div class="relative w-full md:w-80">
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input type="text" :placeholder="tab === 'admin' ? 'Search Admin....' : (tab === 'peserta' ? 'Search Peserta....' : 'Search History....')" class="w-full bg-[#F3F6FF] border border-transparent rounded-full py-2.5 pl-11 pr-4 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
-            </div>
+                <input type="text"
+                x-model="search"
+                :placeholder="tab === 'admin' ? 'Search Admin....' : (tab === 'peserta' ? 'Search Peserta....' : 'Search History....')"
+                class="w-full bg-[#F3F6FF] border border-transparent rounded-full py-2.5 pl-11 pr-4 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                        </div>
 
             <button x-show="tab==='admin'" @click="openModal=true; isEdit=false; resetForm()" class="w-full md:w-auto bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm">
                 <i class="fa-solid fa-plus text-xs"></i> Tambah Admin
@@ -201,6 +227,7 @@
             <table class="w-full text-sm min-w-[600px]">
                 <thead class="bg-[#F8FAFF] text-[#4A72D4]">
                     <tr>
+                        <th class="p-4 text-left font-bold">ID</th>
                         <th class="p-4 text-left font-bold">Nama</th>
                         <th class="p-4 text-left font-bold" x-text="tab === 'history' ? 'Status Hapus' : 'Status'">Status</th>
                         <th class="p-4 text-left font-bold" x-text="tab === 'history' ? 'Modul' : 'No HP'">No HP</th>
@@ -209,120 +236,394 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
-                    <template x-if="tab==='admin'">
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="p-4 font-semibold text-slate-700">Sean</td>
-                            <td class="p-4"><span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-[11px] font-bold">Aktif</span></td>
-                            <td class="p-4 text-gray-500">+62 812-3455-7890</td>
-                            <td class="p-4 text-gray-500">25 Februari 2026</td>
-                            <td class="p-4 space-x-2">
-                                <button @click="editData({nama: 'Sean', wa: '+62 812-3455-7890', email: 'sean@example.com'})" class="bg-blue-500 text-white px-3 py-1 rounded-md text-xs hover:bg-blue-600 transition-all shadow-sm">Ubah</button>
-                                <button @click="showDeleteConfirm=true; selectedName='Sean'" class="bg-red-500 text-white px-3 py-1 rounded-md text-xs hover:bg-red-600 transition-all shadow-sm">Hapus</button>
-                            </td>
-                        </tr>
-                    </template>
-                    
-                    <template x-if="tab==='peserta'">
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="p-4 font-semibold text-slate-700">User Peserta</td>
-                            <td class="p-4"><span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[11px] font-bold">Aktif</span></td>
-                            <td class="p-4 text-gray-500">+62 851-xxxx-xxxx</td>
-                            <td class="p-4 text-gray-500">10 Januari 2026</td>
-                            <td class="p-4">
-                                <button @click="showDeleteConfirm=true; selectedName='User Peserta'" class="bg-red-500 text-white px-3 py-1 rounded-md text-xs hover:bg-red-600 transition-all shadow-sm">Hapus</button>
-                            </td>
-                        </tr>
-                    </template>
 
-                    <template x-if="tab==='history'">
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="p-4 font-semibold text-slate-700">Andi Herlambang</td>
-                            <td class="p-4"><span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[11px] font-bold">Terhapus</span></td>
-                            <td class="p-4 text-gray-500 font-medium">USER_MANAGEMENT</td>
-                            <td class="p-4 text-gray-400">12 Feb 2026, 14:00</td>
-                            <td class="p-4 space-x-2">
-                                <button class="bg-green-500 text-white px-3 py-1 rounded-md text-xs hover:bg-green-600 transition-all shadow-sm">Pulihkan</button>
-                                <button @click="showDeleteConfirm=true; selectedName='Data Andi Herlambang'" class="bg-red-500 text-white px-3 py-1 rounded-md text-xs hover:bg-red-600 transition-all shadow-sm">Hapus Permanen</button>
-                            </td>
-                        </tr>
-                    </template>
-                </tbody>
+{{-- ================= ADMIN ================= --}}
+            <tbody x-show="tab==='admin'">
+    <template x-for="user in filteredAdmins" :key="user.id">
+        <tr class="hover:bg-slate-50 transition-colors">
+
+             <td class="p-4 font-semibold text-blue-600">
+                <span x-text="user.kode"></span>
+            </td>
+
+            <td class="p-4">
+                <div class="flex items-center gap-3">
+                    <img 
+                        :src="user.photo 
+                            ? '/storage/' + user.photo 
+                            : 'https://ui-avatars.com/api/?name=' + user.name + '&background=random'"
+                        :alt="user.name"
+                        class="w-10 h-10 rounded-full object-cover"
+                    >
+                    <span class="font-semibold text-slate-700" x-text="user.name"></span>
+                </div>
+            </td>
+
+            <td class="p-4">
+                <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-[11px] font-bold">
+                    Aktif
+                </span>
+            </td>
+
+            <td class="p-4 text-gray-500" x-text="user.no_hp"></td>
+
+            <td class="p-4 text-gray-500"
+                x-text="new Date(user.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })">
+            </td>
+
+            <td class="p-4">
+                <div class="flex gap-2">
+
+                    <button 
+                        @click="editData({
+                            id: user.id,
+                            nama: user.name,
+                            wa: user.no_hp,
+                            email: user.email
+                        })"
+                        class="px-3 py-1 bg-yellow-400 text-white rounded-lg text-xs font-semibold hover:bg-yellow-500">
+                        Edit
+                    </button>
+
+                    <button 
+                        @click="
+                            selectedId = user.id;
+                            selectedName = user.name;
+                            isTrashed = user.deleted_at ? true : false;
+                            showDeleteConfirm = true;
+                        "
+                        class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
+                        Hapus
+                    </button>
+
+                </div>
+            </td>
+
+        </tr>
+    </template>
+</tbody>
+
+
+{{-- ================= PESERTA ================= --}}
+          <tbody x-show="tab==='peserta'">
+    <template x-for="user in filteredPesertas" :key="user.id">
+        <tr class="hover:bg-slate-50 transition-colors">
+
+            
+            <td class="p-4 font-semibold text-blue-600">
+    <span x-text="user.kode"></span>
+</td>
+
+            <td class="p-4 font-semibold text-slate-700" x-text="user.name"></td>
+
+            <td class="p-4">
+                <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[11px] font-bold">
+                    Aktif
+                </span>
+            </td>
+
+            <td class="p-4 text-gray-500" x-text="user.no_hp"></td>
+
+            <td class="p-4 text-gray-500"
+                x-text="new Date(user.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })">
+            </td>
+
+            <td class="p-4">
+                <div class="flex gap-2">
+
+                    <button 
+                        @click="
+                            selectedId = user.id;
+                            selectedName = user.name;
+                            isTrashed = user.deleted_at ? true : false;
+                            showDeleteConfirm = true;
+                        "
+                        class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
+                        Hapus
+                    </button>
+
+                </div>
+            </td>
+
+        </tr>
+    </template>
+</tbody>
+
+
+{{-- ================= HISTORY ================= --}}
+            <tbody x-show="tab==='history'">
+    <template x-for="user in filteredHistory" :key="user.id">
+        <tr class="hover:bg-slate-50 transition-colors">
+
+            
+            <td class="p-4 font-semibold text-blue-600">
+    <span x-text="user.kode"></span>
+</td>
+
+            <td class="p-4 font-semibold text-slate-700" x-text="user.name"></td>
+
+            <td class="p-4">
+                <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[11px] font-bold">
+                    Terhapus
+                </span>
+            </td>
+
+            <td class="p-4 text-gray-500 font-medium"
+                x-text="user.role.toUpperCase()">
+            </td>
+
+            <td class="p-4 text-gray-400"
+                x-text="new Date(user.deleted_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })">
+            </td>
+
+            <td class="p-4">
+                <div class="flex gap-2">
+
+                    <!-- Restore -->
+                    <form :action="`/admin/user/restore/${user.id}`" method="POST">
+                        @csrf
+                        <button type="submit"
+                            class="px-3 py-1 bg-green-500 text-white rounded-lg text-xs font-semibold hover:bg-green-600">
+                            Restore
+                        </button>
+                    </form>
+
+                    <!-- Hapus Permanen -->
+                    <button
+                        @click="
+                            selectedId = user.id;
+                            selectedName = user.name;
+                            isTrashed = true;
+                            showDeleteConfirm = true;
+                        "
+                        class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
+                        Hapus Permanen
+                    </button>
+
+                </div>
+            </td>
+
+        </tr>
+    </template>
+</tbody>
             </table>
         </div>
+       <div x-show="openModal" x-cloak 
+     class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+     x-transition>
 
-        <div x-show="openModal" x-cloak class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" x-transition>
-                <div @click.away="openModal=false" class="bg-white w-full max-w-lg rounded-[32px] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all">
-                    
-                    <div class="p-8 pb-4 flex justify-between items-center border-b border-gray-50 shrink-0">
-                        <h3 class="text-xl font-extrabold text-slate-800" x-text="isEdit ? 'Ubah Data Admin' : 'Tambah Admin Baru'"></h3>
-                        <button @click="openModal=false" class="text-gray-300 hover:text-red-500 transition-colors"><i class="fa-solid fa-circle-xmark text-2xl"></i></button>
+    <div @click.away="openModal=false"
+         class="bg-white w-full max-w-lg rounded-[32px] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all">
+
+        <div class="p-8 pb-4 flex justify-between items-center border-b border-gray-50 shrink-0">
+            <h3 class="text-xl font-extrabold text-slate-800"
+                x-text="isEdit ? 'Ubah Data Admin' : 'Tambah Admin Baru'"></h3>
+            <button @click="openModal=false"
+                    class="text-gray-300 hover:text-red-500 transition-colors">
+                <i class="fa-solid fa-circle-xmark text-2xl"></i>
+            </button>
+        </div>
+
+        <div class="p-8 overflow-y-auto flex-1">
+            
+                {{-- Pesan sukses --}}
+                @if (session('success'))
+                    <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                {{-- Pesan error --}}
+                @if (session('error'))
+                    <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+                        {{ session('error') }}
+                    </div>
+                @endif
+            <form class="space-y-4 pr-1"
+                  method="POST"
+                  enctype="multipart/form-data"
+                  :action="isEdit 
+                    ? '/admin/user/' + form.id 
+                    : '{{ route('admin.user.store') }}'">
+
+                @csrf
+                <template x-if="isEdit">
+                    <input type="hidden" name="_method" value="PUT">
+                </template>
+
+                {{-- FOTO --}}
+                <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-3xl py-6 bg-slate-50 hover:bg-blue-50 transition-all cursor-pointer relative group">
+                    <input type="file" name="photo"
+                           class="absolute inset-0 opacity-0 cursor-pointer">
+                    <div class="bg-white p-3 rounded-full shadow-sm text-[#4A72D4] mb-2">
+                        <i class="fa-solid fa-camera text-xl"></i>
+                    </div>
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        Unggah Foto Profil
+                    </p>
+                </div>
+
+                {{-- NAMA & WA --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">
+                            Nama Lengkap
+                        </label>
+                        <input type="text" name="name"
+                               x-model="form.nama"
+                               class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
                     </div>
 
-                    <div class="p-8 overflow-y-auto flex-1
-                                [&::-webkit-scrollbar]:w-1.5
-                                [&::-webkit-scrollbar-track]:bg-transparent
-                                [&::-webkit-scrollbar-thumb]:bg-slate-200
-                                [&::-webkit-scrollbar-thumb]:rounded-full
-                                hover:[&::-webkit-scrollbar-thumb]:bg-slate-300">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">
+                            No HP
+                        </label>
+                        <input type="text" name="no_hp"
+                               x-model="form.wa"
+                               class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                    </div>
+                </div>
+
+                {{-- EMAIL --}}
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">
+                        Alamat Email
+                    </label>
+                    <input type="email" name="email"
+                           x-model="form.email"
+                           class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+
+                {{-- PASSWORD --}}
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Password -->
+                <div x-data="{ password: '', passwordError: '', show: false }" class="space-y-1 relative">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Kata Sandi</label>
+                    <input :type="show ? 'text' : 'password'" name="password" x-model="password"
+                        @input="passwordError = password.length >= 6 || password.length === 0 ? '' : 'Minimal 6 karakter'"
+                        class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none pr-10">
+                    <button type="button" @click="show = !show"
+                        class="absolute right-3 top-[32px] text-gray-400">
+                        <template x-if="!show">
+                            <!-- Icon mata tertutup -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-9 0-1.135.204-2.22.575-3.225M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </template>
+                        <template x-if="show">
+                            <!-- Icon mata terbuka -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </template>
+                    </button>
+                    <p x-text="passwordError" class="text-red-600 text-[11px] mt-1"></p>
+                </div>
+
+            <!-- Konfirmasi Password -->
+                    <div x-data="{ showConfirm: false }" class="space-y-1 relative">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Konfirmasi Sandi</label>
+                        <input :type="showConfirm ? 'text' : 'password'" name="password_confirmation"
+                            class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none pr-10">
+                        <button type="button" @click="showConfirm = !showConfirm"
+                            class="absolute right-3 top-[32px] text-gray-400">
+                            <template x-if="!showConfirm">
+                                <!-- Icon mata tertutup -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-9 0-1.135.204-2.22.575-3.225M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </template>
+                            <template x-if="showConfirm">
+                                <!-- Icon mata terbuka -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </template>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- FOOTER BUTTON --}}
+                <div class="pt-6 flex gap-3 border-t border-gray-50">
+                    <button type="button"
+                            @click="openModal=false"
+                            class="flex-1 bg-slate-50 text-slate-400 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition-all">
+                        Batal
+                    </button>
+
+                    <button type="submit"
                         
-                        <form class="space-y-4 pr-1"> 
-                            <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-3xl py-6 bg-slate-50 hover:bg-blue-50 transition-all cursor-pointer relative group">
-                                <input type="file" class="absolute inset-0 opacity-0 cursor-pointer">
-                                <div class="bg-white p-3 rounded-full shadow-sm text-[#4A72D4] mb-2 group-hover:scale-110 transition-transform">
-                                    <i class="fa-solid fa-camera text-xl"></i>
-                                </div>
-                                <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Unggah Foto Profil</p>
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="space-y-1">
-                                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Nama Lengkap</label>
-                                    <input type="text" x-model="form.nama" class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="Masukkan nama...">
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">No WhatsApp</label>
-                                    <input type="text" x-model="form.wa" class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="+62 8xxx...">
-                                </div>
-                            </div>
-
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Alamat Email</label>
-                                <input type="email" x-model="form.email" class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="admin@persisten.com">
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="space-y-1">
-                                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Kata Sandi</label>
-                                    <input type="password" class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="••••••••">
-                                </div>
-                                <div class="space-y-1">
-                                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Konfirmasi Sandi</label>
-                                    <input type="password" class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="••••••••">
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                <div class="p-8 pt-4 flex gap-3 border-t border-gray-50 bg-white shrink-0">
-                    <button type="button" @click="openModal=false" class="flex-1 bg-slate-50 text-slate-400 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition-all">Batal</button>
-                    <button type="submit" class="flex-1 bg-[#4A72D4] text-white font-bold py-3.5 rounded-2xl hover:bg-blue-600 shadow-lg shadow-blue-100 transition-all">Simpan Data</button>
+                        class="flex-1 bg-[#4A72D4] text-white font-bold py-3.5 rounded-2xl hover:bg-blue-600 shadow-lg shadow-blue-100 transition-all">
+                    Simpan Data
+                </button>
                 </div>
-            </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+      <div x-show="showDeleteConfirm" x-cloak class="fixed inset-0 z-[120] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+     x-transition>
+    <div @click.away="showDeleteConfirm = false"
+         class="bg-white w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl relative">
+
+        <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fa-solid fa-trash-can text-3xl"></i>
         </div>
 
-        <div x-show="showDeleteConfirm" x-cloak class="fixed inset-0 z-[120] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" x-transition>
-            <div @click.away="showDeleteConfirm = false" class="bg-white w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl relative">
-                <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="fa-solid fa-trash-can text-3xl"></i>
-                </div>
-                <h3 class="text-xl font-extrabold text-slate-800 mb-2">Konfirmasi Hapus</h3>
-                <p class="text-sm text-slate-500 mb-8 px-4">Apakah anda yakin ingin menghapus <span class="font-bold text-slate-800" x-text="selectedName"></span>? Tindakan ini tidak bisa dibatalkan.</p>
-                <div class="flex gap-3">
-                    <button @click="showDeleteConfirm = false" class="flex-1 bg-slate-50 text-slate-400 font-bold py-3 rounded-2xl hover:bg-slate-100 transition-all">Batal</button>
-                    <button @click="showDeleteConfirm = false" class="flex-1 bg-red-500 text-white font-bold py-3 rounded-2xl hover:bg-red-600 shadow-lg shadow-red-100 transition-all active:scale-95">Ya, Hapus</button>
-                </div>
-            </div>
+        <h3 class="text-xl font-extrabold text-slate-800 mb-2">
+            Konfirmasi Hapus
+        </h3>
+
+        <p class="text-sm text-slate-500 mb-8 px-4">
+            Apakah anda yakin ingin menghapus
+            <span class="font-bold text-slate-800" x-text="selectedName"></span>?
+        </p>
+
+        <div class="flex gap-3">
+            <button @click="showDeleteConfirm=false"
+                    class="flex-1 bg-slate-50 text-slate-400 font-bold py-3 rounded-2xl hover:bg-slate-100 transition-all">
+                Batal
+            </button>
+
+            <!-- Tombol hapus tergantung status -->
+            <template x-if="isTrashed">
+                <form :action="'/admin/user/' + selectedId + '/force-delete'" method="POST" class="flex-1">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                            class="w-full bg-red-500 text-white font-bold py-3 rounded-2xl hover:bg-red-600 shadow-lg shadow-red-100 transition-all">
+                        Hapus Permanen
+                    </button>
+                </form>
+            </template>
+
+            <template x-if="!isTrashed">
+                <form :action="'/admin/user/' + selectedId" method="POST" class="flex-1">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                            class="w-full bg-yellow-500 text-white font-bold py-3 rounded-2xl hover:bg-yellow-600 shadow-lg shadow-yellow-100 transition-all">
+                        Hapus Sementara
+                    </button>
+                </form>
+            </template>
         </div>
+    </div>
+</div>
 
     </div>
 </main>
@@ -331,28 +632,72 @@
 <script>
 function userApp() {
     return {
-        mobileMenuOpen: false,
-        tab: 'admin', 
-        openModal: false, 
-        isEdit: false, 
+        tab: 'admin',
+        search: '', 
+        admins: @json($admins),
+        pesertas: @json($pesertas),
+        history: @json($history),
+
+        openModal: false,
+        isEdit: false,
         showDeleteConfirm: false,
         selectedName: '',
-        // Objek Form untuk menampung data
-        form: { 
-            nama: '', 
-            wa: '', 
-            email: '' 
+        selectedId: '',
+        isTrashed: false,
+
+        form: {
+            id: '',
+            nama: '',
+            wa: '',
+            email: ''
         },
-        // Fungsi ambil data ke form saat Ubah diklik
+
+        //  FILTER ADMIN
+        get filteredAdmins() {
+            return this.admins.filter(u =>
+                u.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                (u.no_hp && u.no_hp.includes(this.search)) ||
+                u.id.toString().includes(this.search)
+            );
+        },
+
+        //  FILTER PESERTA
+        get filteredPesertas() {
+            return this.pesertas.filter(u =>
+                u.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                (u.no_hp && u.no_hp.includes(this.search)) ||
+                u.id.toString().includes(this.search)
+            );
+        },
+
+        //  FILTER HISTORY
+       get filteredHistory() {
+        return this.history.filter(u =>
+            u.name.toLowerCase().includes(this.search.toLowerCase()) ||
+            u.id.toString().includes(this.search) ||
+            (u.role && u.role.toLowerCase().includes(this.search.toLowerCase()))
+        );
+    },
+
         editData(data) {
             this.isEdit = true;
+            this.form.id = data.id;
             this.form.nama = data.nama;
             this.form.wa = data.wa;
             this.form.email = data.email;
             this.openModal = true;
         },
-        // Fungsi reset agar form kosong saat tambah baru
+
+        confirmDelete(user) {
+            this.selectedId = user.id;
+            this.selectedName = user.name;
+            this.isTrashed = user.deleted_at ? true : false;
+            this.showDeleteConfirm = true;
+        },
+
         resetForm() {
+            this.isEdit = false;
+            this.form.id = '';
             this.form.nama = '';
             this.form.wa = '';
             this.form.email = '';

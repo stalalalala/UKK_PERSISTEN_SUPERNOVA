@@ -11,119 +11,130 @@ use Laravel\Socialite\Facades\Socialite;
 
 
 class LoginController extends Controller
-{
+{    // ==============================
+    // REGISTER MANUAL
+    // ==============================
+    public function showRegisterForm()
+    {
+        return view('Auth.daftar');
+    }
 
-// daftar
-public function showRegisterForm()
-{
-    return view('Auth.daftar');
-}
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'no_hp'    => 'required|string|max:20',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:6|confirmed',
+        ]);
 
-public function register(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'no_hp' => 'required|string|max:20',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|min:6|confirmed',
-    ]);
-
-    User::create([
+        $user = User::create([
         'name' => $request->name,
         'no_hp' => $request->no_hp,
         'email' => $request->email,
         'password' => Hash::make($request->password),
-        'role' => 'peserta', // default peserta
-    ]);
+        'role' => 'peserta',
+]);
 
-    return redirect('/masuk')->with('success', 'Berhasil daftar, silakan login.');
-}
+$user->sendEmailVerificationNotification();
 
+return redirect()->route('verification.notice')
+    ->with('success', 'Silakan verifikasi email terlebih dahulu.');
+    }
 
-
-    // Menampilkan halaman login
+    // ==============================
+    // LOGIN MANUAL
+    // ==============================
     public function showLoginForm()
     {
         return view('Auth.masuk');
     }
 
-    // Proses login
     public function login(Request $request)
     {
-        // Validasi input
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required','email'],
             'password' => ['required'],
         ]);
 
-        // Coba login
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // CEK ROLE DI SINI
-            if (Auth::user()->role === 'admin') {
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+
+            // ✅ Kalau admin → langsung masuk dashboard tanpa verifikasi
+            if ($user->role === 'admin') {
                 return redirect()->intended('/admin/dashboard');
             }
 
-            return redirect()->intended('/'); // Redirect ke beranda peserta
+            // ✅ Kalau bukan admin dan belum verifikasi
+           if ($user->role === 'peserta' && !$user->hasVerifiedEmail()) {
+    return redirect()->route('verification.notice')
+        ->with('warning', 'Silakan verifikasi email terlebih dahulu.');
+}
+
+            // Default peserta
+            return redirect()->intended('/');
         }
 
-        // Jika gagal
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');
     }
 
-    
-
-public function redirectToGoogle()
+    // ==============================
+    // GOOGLE LOGIN / DAFTAR
+    // ==============================
+   public function redirectToGoogle()
 {
-    return Socialite::driver('google')->redirect();
+    return Socialite::driver('google')->stateless()->with(['prompt' => 'select_account'])->redirect();
 }
 
-public function handleGoogleCallback()
+   public function handleGoogleCallback()
 {
-    /** @var \Laravel\Socialite\Contracts\User $googleUser */
-$googleUser = Socialite::driver('google')->stateless()->user();
+    try {
+       $googleUser = Socialite::driver('google')->stateless()->user();
 
+        $user = User::where('email', $googleUser->email)->first();
 
-    $user = User::where('google_id', $googleUser->id)->first();
+        // Jika belum ada → buat user baru
+        if (!$user) {
+            $user = User::create([
+                'name'              => $googleUser->name,
+                'email'             => $googleUser->email,
+                'google_id'         => $googleUser->id,
+                'role'              => 'peserta',
+                'password'          => Hash::make(uniqid()),
+                'email_verified_at' => now(), // 🔥 penting
+            ]);
+        } else {
+            // Kalau user sudah ada tapi belum verified
+            if (!$user->email_verified_at) {
+                $user->email_verified_at = now();
+                $user->save();
+            }
+        }
 
-    if (!$user) {
-        $user = User::create([
-            'name' => $googleUser->name,
-            'email' => $googleUser->email,
-            'google_id' => $googleUser->id,
-            'role' => 'peserta',
-            'password' => Hash::make(uniqid()), // password dummy
-        ]);
+        Auth::login($user);
+        session()->regenerate();
+
+        return redirect('/'); // jangan pakai intended dulu
+
+    } catch (\Exception $e) {
+        dd($e->getMessage()); // kalau masih error kita bisa lihat penyebabnya
     }
-
-    Auth::login($user);
-
-    return redirect()->intended('/');
 }
 
-
-    // Logout
+    // ==============================
+    // LOGOUT
+    // ==============================
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/masuk');
-    }
-
-    public function store(Request $request)
-    {
-        $request->authenticate();
-        $request->session()->regenerate();
-
-        // Logika Pengalihan
-        if ($request->user()->role === 'admin') {
-            return redirect()->intended('/admin/dashboard');
-        }
-
-        return redirect()->intended('/');
     }
 }

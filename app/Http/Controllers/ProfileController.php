@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Profile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
@@ -12,54 +13,52 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        //
+       $user = Auth::user();
+       return view('profile.index', compact('user'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Profile $profile)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Profile $profile)
-    {
-        //
-    }
+    
+    public function edit()
+{
+    $user = Auth::user();
+    return view('profile.edit', compact('user'));
+}
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Profile $profile)
-    {
-        //
+    public function update(Request $request)
+{
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
+
+    $request->validate([
+        'name'     => 'required|string|max:255',
+        'no_hp'    => 'nullable|string|max:20',
+        'photo'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'password' => 'nullable|min:6|confirmed',
+    ]);
+
+    $user->name = $request->name;
+    $user->no_hp = $request->no_hp;
+
+    if ($request->password) {
+        $user->password = Hash::make($request->password);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Profile $profile)
-    {
-        //
+    if ($request->hasFile('photo')) {
+
+        if ($user->photo && file_exists(public_path('storage/'.$user->photo))) {
+            unlink(public_path('storage/'.$user->photo));
+        }
+
+        $path = $request->file('photo')->store('profile', 'public');
+        $user->photo = $path;
     }
+
+    $user->save();
+
+    return back()->with('success', 'Profil berhasil diperbarui');
+}
+
 }
