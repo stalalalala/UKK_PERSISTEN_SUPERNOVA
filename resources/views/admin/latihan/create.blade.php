@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persisten Dashboard - Manajemen Kuis</title>
+    <title>Persisten Dashboard - Manajemen Latihan Soal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,41 +33,38 @@
 </head>
 
 <script>
-    function kuisForm() {
+    function latihanForm() {
         return {
-            activeMenu: 'Manajemen Kuis',
+            activeMenu: 'Manajemen Latihan', // Sesuaikan nama menu
             mobileMenuOpen: false,
             showImportModal: false,
-            currentSet: @json($nextSet),
+            currentSet: @json($nextSet ?? 1),
             selectedSubtes: '',
-            selectedWaktu: 20,
+            selectedWaktu: 20, // Ini akan masuk ke kolom 'durasi' di DB
 
             soalTersimpan: 0,
             activeQuestion: 1,
-
             questions: [],
 
             currentQuestion: {
                 materi: '',
-                gambar: null,
                 pertanyaan: '',
                 opsi: ['', '', '', '', ''],
                 benar: null,
-                bobot: 1,
+                pembahasan: ''
             },
 
+            // Pastikan format import sesuai dengan kolom di Controller
             importExcel(event) {
                 const file = event.target.files[0];
                 if (!file) return;
 
                 const reader = new FileReader();
-
                 reader.onload = (e) => {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {
                         type: "array"
                     });
-
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(sheet);
 
@@ -76,159 +73,69 @@
                         return;
                     }
 
-                    // =========================================
-                    // ✅ 1. Ambil Subtes & Waktu dari BARIS PERTAMA SAJA
-                    // =========================================
-                    const globalSubtes = jsonData[0]["Kategori Subtes"] || "";
-                    const globalWaktu = jsonData[0]["Waktu"] || 20;
+                    // Ambil config dari baris pertama excel
+                    this.selectedSubtes = jsonData[0]["Kategori Subtes"] || "";
+                    this.selectedWaktu = jsonData[0]["Waktu"] || 20;
 
-                    // Set dropdown UI
-                    this.selectedSubtes = globalSubtes;
-                    this.selectedWaktu = globalWaktu;
-
-                    // =========================================
-                    // ✅ 2. Mapping soal TANPA ambil subtes per baris
-                    // =========================================
                     this.questions = jsonData.slice(0, 20).map((row) => ({
-
-                        // ❌ Jangan lagi ambil dari row
-                        subtes: globalSubtes,
-                        waktu: globalWaktu,
-
                         materi: row["Materi"] || "",
                         pertanyaan: row["Pertanyaan"] || "",
-
                         opsi_a: row["Opsi A"] || "",
                         opsi_b: row["Opsi B"] || "",
                         opsi_c: row["Opsi C"] || "",
                         opsi_d: row["Opsi D"] || "",
                         opsi_e: row["Opsi E"] || "",
-
-                        jawaban_benar: (row["Jawaban Benar"] || "")
-                            .toString()
-                            .trim()
-                            .toLowerCase(),
-
-                        bobot: row["Bobot"] || 1,
+                        jawaban_benar: (row["Jawaban Benar"] || "").toString().trim().toLowerCase(),
+                        pembahasan: row["Pembahasan"] || ""
                     }));
 
-                    // =========================================
-                    // ✅ 3. Reset state
-                    // =========================================
                     this.soalTersimpan = this.questions.length;
                     this.activeQuestion = 1;
                     this.loadQuestion();
-
                     this.showImportModal = false;
-
-                    alert("Berhasil import soal dari Excel!");
+                    alert("Berhasil import " + this.soalTersimpan + " soal!");
                 };
-
                 reader.readAsArrayBuffer(file);
             },
 
-
-            downloadTemplate() {
-
-                const data = [
-                    [
-                        "Kategori Subtes",
-                        "Waktu",
-                        "Materi",
-                        "Pertanyaan",
-                        "Opsi A",
-                        "Opsi B",
-                        "Opsi C",
-                        "Opsi D",
-                        "Opsi E",
-                        "Jawaban Benar",
-                        "Bobot"
-                    ],
-
-                    [
-                        "Penalaran Umum",
-                        20,
-                        "Teks bacaan atau materi soal",
-                        "Apa ibukota Indonesia?",
-                        "Jakarta",
-                        "Bandung",
-                        "Surabaya",
-                        "Medan",
-                        "Bali",
-                        "a",
-                        1
-                    ]
-                ];
-
-                const ws = XLSX.utils.aoa_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-
-                XLSX.utils.book_append_sheet(wb, ws, "Template Soal");
-
-                XLSX.writeFile(wb, "Template_Persisten_20_Soal.xlsx");
-            },
-
-
-
             simpanSoal() {
-
-                // ==========================
-                // VALIDASI
-                // ==========================
                 if (!this.selectedSubtes) {
-                    alert("Subtes wajib dipilih!");
+                    alert("Pilih Subtes dulu di bagian atas!");
                     return;
                 }
-
                 if (this.currentQuestion.pertanyaan.trim() === '') {
-                    alert("Pertanyaan wajib diisi!");
+                    alert("Pertanyaan tidak boleh kosong!");
                     return;
                 }
-
                 if (this.currentQuestion.benar === null) {
-                    alert("Pilih jawaban benar!");
+                    alert("Pilih kunci jawaban (A-E)!");
                     return;
                 }
 
-                // ==========================
-                // SIMPAN BERDASARKAN NOMOR
-                // ==========================
                 let index = this.activeQuestion - 1;
 
+                // Bungkus data agar sesuai dengan struktur database LatihanQuestion
                 this.questions[index] = {
-                    subtes: this.selectedSubtes,
-
                     materi: this.currentQuestion.materi,
-                    gambar: this.currentQuestion.gambar,
-
                     pertanyaan: this.currentQuestion.pertanyaan,
-
                     opsi_a: this.currentQuestion.opsi[0],
                     opsi_b: this.currentQuestion.opsi[1],
                     opsi_c: this.currentQuestion.opsi[2],
                     opsi_d: this.currentQuestion.opsi[3],
                     opsi_e: this.currentQuestion.opsi[4],
-
                     jawaban_benar: ['a', 'b', 'c', 'd', 'e'][this.currentQuestion.benar],
-                    bobot: this.currentQuestion.bobot,
+                    pembahasan: this.currentQuestion.pembahasan
                 };
 
-
-
-                // ==========================
-                // HITUNG TOTAL TERISI
-                // ==========================
                 this.soalTersimpan = this.questions.filter(q => q).length;
 
-                // ==========================
-                // PINDAH KE SOAL SELANJUTNYA
-                // ==========================
                 if (this.activeQuestion < 20) {
                     this.activeQuestion++;
                     this.loadQuestion();
+                    alert("Soal ke-" + (this.activeQuestion - 1) + " tersimpan sementara.");
+                } else {
+                    alert("Semua 20 soal sudah terisi! Silakan klik 'Publish Latihan'.");
                 }
-
-                alert("Soal berhasil disimpan (" + this.soalTersimpan + "/20)");
 
                 window.scrollTo({
                     top: 0,
@@ -236,45 +143,47 @@
                 });
             },
 
-
             loadQuestion() {
                 let index = this.activeQuestion - 1;
-
                 if (this.questions[index]) {
                     let q = this.questions[index];
-
-                    // ✅ Set dropdown ikut soal
-                    this.selectedSubtes = q.subtes;
-                    this.selectedWaktu = q.waktu;
-
                     this.currentQuestion = {
                         materi: q.materi,
-                        gambar: q.gambar,
                         pertanyaan: q.pertanyaan,
                         opsi: [q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e],
                         benar: ['a', 'b', 'c', 'd', 'e'].indexOf(q.jawaban_benar),
-                        bobot: q.bobot,
+                        pembahasan: q.pembahasan || ''
+                    };
+                } else {
+                    // Reset form untuk soal baru
+                    this.currentQuestion = {
+                        materi: '',
+                        pertanyaan: '',
+                        opsi: ['', '', '', '', ''],
+                        benar: null,
+                        pembahasan: ''
                     };
                 }
             },
 
-
-
             submitFinal() {
-
                 let totalTerisi = this.questions.filter(q => q).length;
 
-                if (totalTerisi < 2) {
-                    alert("Wajib isi 20 soal sebelum publish!");
+                // Di Controller Kuis, minimal harus 20 soal
+                if (totalTerisi < 20) {
+                    alert("Wajib isi 20 soal sebelum publish! Baru terisi: " + totalTerisi);
                     return;
                 }
 
-                // Masukkan JSON ke hidden input
-                document.getElementById("questions_json").value =
-                    JSON.stringify(this.questions);
+                if (!confirm("Apakah anda yakin ingin mempublish set ini?")) return;
 
-                // Submit form
-                document.getElementById("kuisForm").submit();
+                // Pastikan ID ini ada di HTML (lihat perbaikan di atas)
+                document.getElementById("questions_json").value = JSON.stringify(this.questions);
+                document.getElementById("subtes_input").value = this.selectedSubtes;
+                document.getElementById("durasi_input").value = this.selectedWaktu;
+
+                // Panggil ID form yang benar
+                document.getElementById("latihanForm").submit();
             }
         }
     }
@@ -282,7 +191,7 @@
 
 
 
-<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="kuisForm()">
+<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="latihanForm()">
 
     <div class="flex h-full w-full">
         <aside x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
@@ -356,7 +265,7 @@
                 </a>
 
                 <a href="{{ route('admin.kuis.index') }}" x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -366,7 +275,7 @@
                 </a>
 
                 <a href="{{ route('admin.latihan.index') }}"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 bg-[#D4DEF7]  text-[#2E3B66]  rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-7">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -421,15 +330,15 @@
 
             </nav>
 
-            <form action="{{ route('logout') }}" method="POST" class="w-full inline">
-    @csrf
-    <button type="submit" class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5 md:size-6 text-white">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-        </svg>
-        <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
-    </button>
-    </form>
+            <button
+                class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
+                <svg xmlns="http://www.w3.org/2000/xml" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" class="size-5 md:size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                </svg>
+                <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
+            </button>
         </aside>
 
         <div x-show="mobileMenuOpen" x-transition:enter="transition opacity-ease-out duration-300"
@@ -500,7 +409,7 @@
             </div>
 
             <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar pb-4 lg:pb-8">
-                <div x-show="activeMenu === 'Manajemen Kuis'" x-transition>
+                <div x-show="activeMenu === 'Manajemen Latihan'" x-transition>
 
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -516,14 +425,14 @@
                                     </div>
                                 </div>
 
-                                <form id="kuisForm" action="{{ route('admin.kuis.store') }}" method="POST"
+                                <form id="latihanForm" action="{{ route('admin.latihan.store') }}" method="POST"
                                     class="space-y-8">
 
 
                                     @csrf
 
-                                    <input type="hidden" name="set" :value="currentSet">
-                                    <input type="hidden" name="durasi" :value="selectedWaktu">
+                                    <input type="hidden" name="set_ke" :value="currentSet">
+                                    <input type="hidden" name="durasi" id="durasi_input" :value="selectedWaktu">
 
                                     <!-- Semua soal dikirim dalam JSON -->
                                     <input type="hidden" name="questions_json" id="questions_json">
@@ -563,21 +472,13 @@
                                                             x-text="item"></div>
                                                     </template>
                                                 </div>
-                                                <input type="hidden" name="kategori" :value="selectedSubtes">
+                                                <input type="hidden" name="subtes" id="subtes_input"
+                                                    :value="selectedSubtes">
 
                                             </div>
                                         </div>
 
-                                        {{-- Set --}}
-                                        <div class="w-full md:w-32 flex flex-col gap-2">
-                                            <label
-                                                class="text-[10px] font-bold text-gray-400 uppercase ml-1">Set</label>
-                                            <div
-                                                class="bg-gray-50 px-4 py-3 rounded-2xl border border-gray-100 flex items-center h-full">
-                                                <span class="text-sm font-bold text-[#4A72D4]"
-                                                    x-text="'Set ' + currentSet"></span>
-                                            </div>
-                                        </div>
+
 
                                         {{-- Waktu --}}
                                         <div class="w-full md:w-48 flex flex-col gap-2" x-data="{ open: false }"
@@ -699,7 +600,7 @@
                                                     <textarea x-model="currentQuestion.opsi[i]" x-data="{
                                                         resize() {
                                                             $el.style.height = 'auto';
-                                                            $el.style.height = ($el.scrollHeight < 60 ? 60 : $el.scrollHeight) + 'px';
+                                                            $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
                                                         }
                                                     }" x-init="resize()" @input="resize()"
                                                         class="flex-1 bg-transparent border-none outline-none text-sm font-medium resize-none overflow-hidden leading-relaxed"
@@ -712,6 +613,26 @@
 
                                                 </div>
                                             </template>
+                                        </div>
+
+                                        <!-- PEMBAHASAN -->
+                                        <div class="space-y-2 mt-8">
+                                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">
+                                                Pembahasan
+                                            </label>
+
+                                            <textarea x-model="currentQuestion.pembahasan" x-data="{
+                                                resize() {
+                                                    $el.style.height = 'auto';
+                                                    $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
+                                                }
+                                            }" x-init="resize()" @input="resize()"
+                                                class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm 
+               focus:bg-white focus:ring-2 focus:ring-blue-100 
+               outline-none shadow-inner transition-all 
+               resize-none overflow-hidden leading-relaxed"
+                                                placeholder="Masukkan pembahasan soal di sini..." style="min-height:120px;">
+    </textarea>
                                         </div>
 
                                     </div>
@@ -780,8 +701,7 @@
                                     </div>
                                 </div>
 
-                                <button type="button" @click="submitFinal()"
-                                    :disabled="questions.filter(q => q).length < 2"
+                                <button type="button" @click="submitFinal()" :disabled="questions.length < 20"
                                     class="w-full mt-6 bg-emerald-500 text-white py-3 rounded-xl font-bold disabled:opacity-40 disabled:cursor-not-allowed">
                                     Publikasikan Kuis
                                 </button>
@@ -839,7 +759,7 @@
                         <span class="text-[11px] font-bold text-blue-700 uppercase tracking-tight">Belum punya
                             formatnya?</span>
                     </div>
-                    <a href="https://docs.google.com/spreadsheets/d/1NteyIa-UdkroBZKt5IQzPyYD5TYDJVrFYABlRhJ-dnA/copy"
+                    <a href="https://docs.google.com/spreadsheets/d/1X4qNRhciTWbocmGl4IZ4DU5sH0v6LxukLgGMnfyPFLo/copy"
                         target="_blank" @click="downloadTemplate()"
                         class="text-[11px] font-black text-[#4A72D4] hover:underline">
                         DOWNLOAD TEMPLATE

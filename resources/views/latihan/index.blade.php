@@ -103,8 +103,16 @@
     </div>
 
     <main class="max-w-[1440px] mx-auto py-10" x-data="{
-        selectedSub: 'PU',
-        currentPage: 1
+        selectedSub: null,
+        pages: {
+            'Penalaran Umum': 1,
+            'Pemahaman Bacaan & Menulis': 1,
+            'Pengetahuan & Pemahaman Umum': 1,
+            'Pengetahuan Kuantitatif': 1,
+            'Penalaran Matematika': 1,
+            'Literasi Bahasa Indonesia': 1,
+            'Literasi Bahasa Inggris': 1,
+        }
     }">
 
         <section class="px-4 md:px-10 mb-10">
@@ -115,9 +123,9 @@
         <section class="px-4 md:px-10">
             <div class="grid justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-5">
 
-                <div @click="selectedSub = 'PU'; currentPage = 1"
+                <div @click="selectedSub = 'Penalaran Umum'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#FEA33A]"
-                    :class="selectedSub === 'PU' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Penalaran Umum' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -126,9 +134,10 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'PBM'; currentPage = 1"
+                <div @click="selectedSub = 'Pemahaman Bacaan & Menulis'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#9885FB]"
-                    :class="selectedSub === 'PBM' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Pemahaman Bacaan & Menulis' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -137,9 +146,10 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'PPU'; currentPage = 1"
+                <div @click="selectedSub = 'Pengetahuan & Pemahaman Umum'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#FF908E]"
-                    :class="selectedSub === 'PPU' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Pengetahuan & Pemahaman Umum' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -148,9 +158,10 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'PK'; currentPage = 1"
+                <div @click="selectedSub = 'Pengetahuan Kuantitatif'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#4CAA60]"
-                    :class="selectedSub === 'PK' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Pengetahuan Kuantitatif' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -159,9 +170,10 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'PM'; currentPage = 1"
+                <div @click="selectedSub = 'Penalaran Matematika'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#CEA4EC]"
-                    :class="selectedSub === 'PM' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Penalaran Matematika' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -170,9 +182,10 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'LBI'; currentPage = 1"
+                <div @click="selectedSub = 'Literasi Bahasa Indonesia'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#A5BBEC]"
-                    :class="selectedSub === 'LBI' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Literasi Bahasa Indonesia' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -181,9 +194,10 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'LBE'; currentPage = 1"
+                <div @click="selectedSub = 'Literasi Bahasa Inggris'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#4B8A81]"
-                    :class="selectedSub === 'LBE' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Literasi Bahasa Inggris' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -193,6 +207,8 @@
                 </div>
 
             </div>
+
+
         </section>
 
         <div class="px-4 md:px-10">
@@ -201,228 +217,155 @@
 
         <section class="px-4 md:px-10">
 
+            <!-- WELCOME STATE -->
+            <div x-show="!selectedSub"
+                class="col-span-full flex mt-6 flex-col items-center justify-center text-center py-20 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200 transition-all duration-300">
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 1'"></h4>
-                            <span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('latihan.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
+                <div
+                    class="w-20 h-20 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center text-3xl mb-6 shadow-md">
+                    <i class="fa-solid fa-circle-question"></i>
                 </div>
 
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 2'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('latihan.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
+                <h3 class="text-2xl font-bold text-blue-900 mb-3">
+                    Siap Latihan Soal Hari Ini?
+                </h3>
 
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 3'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
-                        </div>
-                        <span
-                            class="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-full">Selesai</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('latihan.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 4'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('latihan.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 5'"></h4>
-                            <span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('latihan.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 6'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('latihan.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 7'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
-                        </div>
-                        <span
-                            class="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-full">Selesai</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('latihan.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 8'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('latihan.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-
-                <div x-show="currentPage === 2"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 9'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">LATSOL</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('latihan.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
+                <p class="text-gray-500 max-w-md">
+                    Pilih subtes di atas dan mulai latih kemampuanmu.
+                    Sedikit demi sedikit, kamu makin dekat ke targetmu.
+                </p>
 
             </div>
 
-            <div class="flex justify-center items-center gap-3 mt-16">
-                <button @click="if(currentPage > 1) currentPage--"
-                    class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
-                </button>
-                <button @click="currentPage = 1"
-                    :class="currentPage === 1 ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
-                    class="w-10 h-10 rounded-full font-bold">1</button>
-                <button @click="currentPage = 2"
-                    :class="currentPage === 2 ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
-                    class="w-10 h-10 rounded-full font-bold">2</button>
-                <button @click="if(currentPage < 2) currentPage++"
-                    class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
+
+            <div x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-6" x-transition:enter-end="opacity-100 translate-y-0"
+                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                @foreach ($latihans as $subtes => $sets)
+                    @foreach ($sets as $index => $item)
+                        <div x-show="selectedSub === '{{ $subtes }}' && pages[selectedSub] === {{ ceil(($index + 1) / 8) }}"
+                            class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
+
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="space-y-1">
+                                    <h4 class="font-bold text-blue-900 text-lg">
+                                        {{ $subtesMap[$subtes] ?? $subtes }} - Set {{ $item->set_ke }}
+                                    </h4>
+
+                                    <span
+                                        class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">
+                                        LATIHAN SOAL
+                                    </span>
+                                </div>
+
+                                <span
+                                    class="bg-orange-50 text-orange-500 text-[10px] font-semibold px-3 py-1 rounded-full">
+                                    Belum
+                                </span>
+                            </div>
+
+                            <div class="space-y-3 text-gray-500 text-sm mb-4">
+                                <div class="flex items-center gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="size-6 text-blue-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                    </svg>
+
+                                    <span>{{ $item->questions_count }} Soal</span>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="size-6 text-blue-500">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+
+                                    <span>{{ $item->durasi }} Menit</span>
+                                </div>
+                            </div>
+
+                            <a href="{{ route('latihan.intruksi', $item->id) }}"
+                                class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                Kerjakan Sekarang
+                            </a>
+
+                        </div>
+                    @endforeach
+                @endforeach
+
             </div>
+
+            @foreach ($latihans as $subtes => $sets)
+                @php
+                    $totalPages = ceil(count($sets) / 8);
+                @endphp
+
+                @if ($totalPages > 1)
+                    <div x-show="selectedSub === '{{ $subtes }}'"
+                        class="flex justify-center items-center gap-3 mt-16">
+
+                        <button @click="if(pages[selectedSub] > 1) pages[selectedSub]--"
+                            class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
+                            <i class="fa-solid fa-chevron-left text-xs"></i>
+                        </button>
+
+                        @for ($i = 1; $i <= $totalPages; $i++)
+                            <button @click="pages[selectedSub] = {{ $i }}"
+                                :class="pages[selectedSub] === {{ $i }} ?
+                                    'bg-blue-500 text-white shadow-lg' :
+                                    'text-blue-500 hover:bg-blue-50'"
+                                class="w-10 h-10 rounded-full font-bold">
+                                {{ $i }}
+                            </button>
+                        @endfor
+
+                        <button @click="if(pages[selectedSub] < {{ $totalPages }}) pages[selectedSub]++"
+                            class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+
+                    </div>
+                @endif
+            @endforeach
+
+            <!-- EMPTY STATE -->
+            @php
+                $allSubtes = [
+                    'Penalaran Umum',
+                    'Pemahaman Bacaan & Menulis',
+                    'Pengetahuan & Pemahaman Umum',
+                    'Pengetahuan Kuantitatif',
+                    'Penalaran Matematika',
+                    'Literasi Bahasa Indonesia',
+                    'Literasi Bahasa Inggris',
+                ];
+            @endphp
+
+            @foreach ($allSubtes as $sub)
+                @if (!isset($latihans[$sub]))
+                    <div x-show="selectedSub === '{{ $sub }}'"
+                        class="col-span-full flex mt-6 flex-col items-center justify-center text-center py-20 bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200 transition-all duration-300">
+
+                        <div
+                            class="w-20 h-20 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center text-3xl mb-6 shadow-md">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+
+                        <h3 class="text-2xl font-bold text-blue-900 mb-3">
+                            Latihan Soal Belum Tersedia
+                        </h3>
+
+                        <p class="text-gray-500 max-w-md">
+                            Latihan untuk subtes ini sedang dalam proses penyusunan.
+                            Tunggu update berikutnya ya!
+                        </p>
+
+                    </div>
+                @endif
+            @endforeach
         </section>
     </main>
 

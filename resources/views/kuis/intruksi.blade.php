@@ -140,7 +140,7 @@
                         <button
                             class="px-8 py-3 rounded-full font-bold text-gray-400 bg-gray-200 hover:bg-gray-300 transition">Batal</button>
                     </a>
-                    <a href="{{ route('tryout.') }}">
+                    <a href="{{ route('kuis.soal', $kuis->id) }}">
                         <button
                             class="px-10 py-3 rounded-full font-bold text-white bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-200 transition">Mulai
                             Mengerjakan</button>

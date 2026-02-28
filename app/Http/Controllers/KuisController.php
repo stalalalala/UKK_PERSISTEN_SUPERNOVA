@@ -3,63 +3,147 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kuis;
+use App\Models\HasilKuis; 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class KuisController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar kuis untuk peserta
      */
-    public function index()
-    {
-        return view('kuis.index');
+    public function index() {
+        $allKuis = Kuis::withCount('questions')
+            ->with(['hasil' => function($query) {
+                // Mengambil hasil kuis milik user yang sedang login saja
+                $query->where('user_id', Auth::id());
+            }])
+            ->where('is_active', true)
+            ->orderBy('set_ke', 'asc') 
+            ->paginate(6);
+
+        return view('kuis.index', compact('allKuis'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Halaman instruksi sebelum mulai kuis
      */
-    public function create()
-    {
-        //
+    public function intruksi($id) {
+        $kuis = Kuis::findOrFail($id);
+
+        // BAGIAN PROTEKSI DIHAPUS/DIKOMENTARI 
+        // Agar user bisa masuk ke sini saat klik tombol "Ulang"
+        /*
+        $sudahDikerjakan = HasilKuis::where('user_id', Auth::id())
+                                    ->where('kuis_id', $id)
+                                    ->exists();
+
+        if ($sudahDikerjakan) {
+            return redirect()->route('kuis.index')->with('info', 'Kamu sudah mengerjakan kuis ini!');
+        }
+        */
+
+        return view('kuis.intruksi', compact('kuis'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Halaman pengerjaan soal
      */
-    public function store(Request $request)
-    {
-        //
+    public function kerjakan($id) {
+        $kuis = Kuis::with('questions')->findOrFail($id);
+        return view('kuis.soal', compact('kuis'));
     }
 
     /**
-     * Display the specified resource.
+     * Proses submit jawaban
      */
-    public function show(Kuis $kuis)
-    {
-        //
+    public function submit(Request $request, $id) {
+        $kuis = Kuis::with('questions')->findOrFail($id);
+        
+        // Decode JSON jawaban dari Alpine.js
+        $jawabanUser = json_decode($request->input('jawaban'), true) ?? []; 
+
+        $benar = 0;
+        $salah = 0;
+        $kosong = 0;
+        $detailHasil = [];
+
+        foreach ($kuis->questions as $q) {
+            $userAns = $jawabanUser[$q->id] ?? null;
+            
+            if (empty($userAns)) {
+                $kosong++;
+                $status = 'kosong';
+            } elseif (strtolower($userAns) == strtolower($q->jawaban_benar)) {
+                $benar++;
+                $status = 'benar';
+            } else {
+                $salah++;
+                $status = 'salah';
+            }
+
+            $detailHasil[] = [
+                'pertanyaan' => $q->pertanyaan,
+                'jawaban_user' => $userAns,
+                'kunci' => $q->jawaban_benar,
+                'status' => $status
+            ];
+        }
+
+        $totalSoal = $kuis->questions->count();
+        $skor = ($totalSoal > 0) ? ($benar / $totalSoal) * 100 : 0;
+
+        // --- SIMPAN KE DATABASE (PERMANEN) ---
+        // Menggunakan updateOrCreate agar jika user "Mengerjakan Ulang", 
+        // skor lama akan diganti dengan skor baru (tidak duplikat row)
+        HasilKuis::updateOrCreate(
+            ['user_id' => Auth::id(), 'kuis_id' => $id], 
+            [
+                'benar'  => $benar,
+                'salah'  => $salah,
+                'kosong' => $kosong,
+                'skor'   => round($skor),
+            ]
+        );
+
+        // --- SIMPAN KE SESSION (UNTUK HALAMAN HASIL) ---
+        session(['terakhir_kuis' => [
+            'kuis_id' => $id,
+            'benar'   => $benar,
+            'salah'   => $salah,
+            'kosong'  => $kosong,
+            'detail'  => $detailHasil,
+            'skor'    => round($skor)
+        ]]);
+
+        return redirect()->route('kuis.hasil', $id);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Menampilkan hasil setelah submit
      */
-    public function edit(Kuis $kuis)
-    {
-        //
-    }
+    public function hasil($id) {
+        $kuis = Kuis::findOrFail($id);
+        $hasil = session('terakhir_kuis');
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Kuis $kuis)
-    {
-        //
-    }
+        // Jika session hilang (karena refresh), ambil data dari Database sebagai backup
+        if (!$hasil || $hasil['kuis_id'] != $id) {
+            $dbHasil = HasilKuis::where('user_id', Auth::id())
+                                ->where('kuis_id', $id)
+                                ->first();
+            
+            if (!$dbHasil) return redirect()->route('kuis.index');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Kuis $kuis)
-    {
-        //
+            $hasil = [
+                'kuis_id' => $dbHasil->kuis_id,
+                'benar'   => $dbHasil->benar,
+                'salah'   => $dbHasil->salah,
+                'kosong'  => $dbHasil->kosong,
+                'skor'    => $dbHasil->skor,
+                'detail'  => [] // Detail soal tidak disimpan di DB untuk performa
+            ];
+        }
+
+        return view('kuis.hasil', compact('kuis', 'hasil'));
     }
 }

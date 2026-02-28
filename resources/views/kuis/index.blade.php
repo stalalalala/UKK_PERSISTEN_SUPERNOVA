@@ -19,15 +19,13 @@
 <body class="font-po bg-white overflow-x-hidden">
 
     <div class="max-w-[1440px] mx-auto" x-data="{ open: false }">
+        {{-- Navbar --}}
         <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4 relative z-10">
             <div class="w-20 md:w-28 h-12 bg-blue-400 rounded-full flex-shrink-0"></div>
-
             <ul class="hidden lg:flex gap-12 text-gray-800 font-medium text-sm">
                 <li><a href="/" class="font-bold hover:text-blue-500">Kuis Fundamental</a></li>
-
             </ul>
-
-            <div class="flex items-center  gap-2">
+            <div class="flex items-center gap-2">
                 <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full">
                     <a href="/profile/index"
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
@@ -46,9 +44,7 @@
                         </svg>
                     </button>
                 </div>
-
-                <button @click="open = true"
-                    class="lg:hidden p-2 text-gray-600 hover:bg-gray-200 rounded-full transition-colors">
+                <button @click="open = true" class="lg:hidden p-2 text-gray-600 hover:bg-gray-200 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -57,52 +53,9 @@
                 </button>
             </div>
         </nav>
-
-        <div x-show="open" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
-            <div x-show="open" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="open = false"
-                class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-
-            <div x-show="open" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-90"
-                x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90"
-                class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-bold text-gray-800">Menu Utama</h2>
-                    <button @click="open = false" class="text-gray-400 hover:text-gray-600">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-
-                <ul class="space-y-3">
-                    <li><a href="/"
-                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Beranda</a>
-                    </li>
-                    <li><a href="{{ route('streak.index') }}"
-                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Pet
-                            Streak</a></li>
-                    <li><a href="{{ route('tryout.index') }}"
-                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Try
-                            Out</a></li>
-                    <li><a href="{{ route('latihan.index') }}"
-                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Latihan
-                            Soal</a></li>
-                    <li><a href="{{ route('video.index') }}"
-                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Video
-                            Pembelajaran</a></li>
-                </ul>
-            </div>
-        </div>
     </div>
 
-    <main class="max-w-[1440px] mx-auto py-10" x-data="{
-        selectedSub: 'Kuis Fundamental',
-        currentPage: 1
-    }">
+    <main class="max-w-[1440px] mx-auto py-10">
 
         <section class="px-4 md:px-10 mb-10">
             <h1 class="text-3xl md:text-4xl font-extrabold text-[#2E3B66]">Kuis Fundamental</h1>
@@ -115,239 +68,145 @@
         </div>
 
         <section class="px-4 md:px-10">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
 
+                @php
+                    $warnaTag = [
+                        'Penalaran Umum' => ['light' => 'bg-[#FFF2E1]', 'text' => 'text-[#E67E00]'],
+                        'Pemahaman Bacaan dan Menulis' => ['light' => 'bg-[#F0EEFF]', 'text' => 'text-[#7C69EF]'],
+                        'Pengetahuan dan Pemahaman Umum' => ['light' => 'bg-[#FFF0F1]', 'text' => 'text-[#F86D7D]'],
+                        'Pengetahuan Kuantitatif' => ['light' => 'bg-[#EEF7EE]', 'text' => 'text-[#4E934C]'],
+                        'Penalaran Matematika' => ['light' => 'bg-[#F6EFFF]', 'text' => 'text-[#A66EEF]'],
+                        'Literasi Bahasa Inggris' => ['light' => 'bg-[#EFF3FD]', 'text' => 'text-[#6D8CD8]'],
+                        'Literasi Bahasa Indonesia' => ['light' => 'bg-[#EEF5F5]', 'text' => 'text-[#4D8487]'],
+                    ];
+                    $tagDefault = ['light' => 'bg-blue-50', 'text' => 'text-blue-600'];
+                @endphp
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                @foreach ($allKuis as $k)
+                    @php
+                        $subtes = $k->category->name ?? ($k->kategori ?? 'Kuis');
+                        $temaTag = $warnaTag[$subtes] ?? $tagDefault;
+                        $userHasil = $k->hasil->first();
+                    @endphp
 
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 1'"></h4>
-                            <span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
+                    <div
+                        class="bg-white border-2 {{ $userHasil ? 'border-blue-100 shadow-md' : 'border-gray-100' }} rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300 flex flex-col h-full">
+
+                        {{-- HEADER: Judul & Status --}}
+                        <div class="flex justify-between items-start mb-6 gap-2">
+                            <div class="space-y-1">
+                                <h4
+                                    class="font-bold text-blue-900 text-lg leading-tight group-hover:text-blue-600 transition-colors">
+                                    Kuis Fundamental - Set {{ $k->set_ke }}
+                                </h4>
+                                <span
+                                    class="{{ $temaTag['light'] }} {{ $temaTag['text'] }} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider block w-fit">
+                                    {{ $subtes }}
+                                </span>
+                            </div>
+
+                            @if ($userHasil)
+                                <span
+                                    class="hidden sm:block bg-green-500 text-white text-[10px] font-semibold px-3 py-1 rounded-full uppercase shrink-0 shadow-sm">
+                                    Selesai • SKOR {{ $userHasil->skor }}
+                                </span>
+                                <span
+                                    class="block sm:hidden bg-green-500 text-white text-[10px] font-semibold px-3 py-1 rounded-full uppercase shrink-0 shadow-sm">
+                                    SKOR {{ $userHasil->skor }}
+                                </span>
+                            @else
+                                <span
+                                    class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-orange-100 shrink-0">
+                                    Belum
+                                </span>
+                            @endif
                         </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30
-                                Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('kuis.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
 
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 2'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
+                        {{-- INFO SECTION: Soal & Durasi (Berderet ke bawah) --}}
+                        <div class="space-y-3 text-gray-500 text-sm mb-6">
+                            {{-- Baris Soal --}}
+                            <div class="flex items-center gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="2.5" stroke="currentColor" class="size-5 text-blue-500">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                </svg>
+                                <span class="font-semibold text-slate-600">{{ $k->questions_count ?? '20' }} Soal</span>
+                            </div>
+
+                            {{-- Baris Durasi --}}
+                            <div class="flex items-center gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="2.5" stroke="currentColor" class="size-5 text-blue-500">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <span class="font-semibold text-slate-600">{{ $k->durasi }} Menit</span>
+                            </div>
                         </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30
-                                Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('kuis.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
 
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 3'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
+                        {{-- ACTION BUTTONS --}}
+                        <div class="mt-auto">
+                            @if ($userHasil)
+                                <div class="flex gap-3">
+                                    <a href="{{ route('kuis.hasil', $k->id) }}"
+                                        class="flex-1 text-center py-3 bg-white border-2 border-blue-400 text-blue-400 font-bold rounded-2xl hover:bg-blue-50 transition-all duration-300 text-sm">
+                                        Hasil
+                                    </a>
+                                    <a href="{{ route('kuis.intruksi', $k->id) }}"
+                                        class="flex-1 text-center py-3 bg-blue-400 text-white font-bold rounded-2xl hover:bg-blue-500 transition-all duration-300 text-sm shadow-md shadow-blue-100">
+                                        Ulang
+                                    </a>
+                                </div>
+                            @else
+                                <a href="{{ route('kuis.intruksi', $k->id) }}"
+                                    class="block text-center w-full py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 shadow-sm text-sm">
+                                    Kerjakan Sekarang
+                                </a>
+                            @endif
                         </div>
-                        <span
-                            class="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-full">Selesai</span>
                     </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30
-                                Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('kuis.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 4'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30
-                                Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('kuis.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 5'"></h4>
-                            <span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('kuis.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-                <div x-show="currentPage === 1"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 6'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('kuis.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-                <div x-show="currentPage === 2"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 7'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
-                        </div>
-                        <span
-                            class="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-full">Selesai</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('kuis.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-                <div x-show="currentPage === 2"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 8'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('kuis.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
-
-                <div x-show="currentPage === 2"
-                    class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-1">
-                            <h4 class="font-bold text-blue-900 text-lg" x-text="selectedSub + ' - Set 9'"></h4><span
-                                class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">KUIS</span>
-                        </div>
-                        <span
-                            class="bg-orange-50 text-orange-500 text-[10px] font-bold px-3 py-1 rounded-full">Belum</span>
-                    </div>
-                    <div class="space-y-3 text-gray-500 text-sm mb-4">
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-file-signature text-blue-500"></i><span>20 Soal</span></div>
-                        <div class="flex items-center gap-3"><i
-                                class="fa-solid fa-stopwatch text-blue-500"></i><span>30 Menit</span></div>
-                    </div>
-                    <a :href="'{{ route('kuis.intruksi') }}' + '?set=1'"
-                        class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        Kerjakan Sekarang
-                    </a>
-                </div>
-
+                @endforeach
             </div>
 
-            <div class="flex justify-center items-center gap-3 mt-16">
-                <button @click="if(currentPage > 1) currentPage--"
-                    class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
-                </button>
-                <button @click="currentPage = 1"
-                    :class="currentPage === 1 ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
-                    class="w-10 h-10 rounded-full font-bold">1</button>
-                <button @click="currentPage = 2"
-                    :class="currentPage === 2 ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
-                    class="w-10 h-10 rounded-full font-bold">2</button>
-                <button @click="if(currentPage < 2) currentPage++"
-                    class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
+            {{-- PAGINATION --}}
+            <div class="flex justify-center items-center gap-3 mt-16 mb-10">
+                @if ($allKuis->onFirstPage())
+                    <span
+                        class="w-10 h-10 rounded-full border border-gray-200 text-gray-300 flex items-center justify-center cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </span>
+                @else
+                    <a href="{{ $allKuis->previousPageUrl() }}"
+                        class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white flex items-center justify-center">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </a>
+                @endif
 
+                @foreach ($allKuis->getUrlRange(1, $allKuis->lastPage()) as $page => $url)
+                    <a href="{{ $url }}"
+                        class="w-10 h-10 rounded-full font-bold flex items-center justify-center {{ $page == $allKuis->currentPage() ? 'bg-blue-500 text-white' : 'text-blue-500 hover:bg-blue-50' }}">
+                        {{ $page }}
+                    </a>
+                @endforeach
+
+                @if ($allKuis->hasMorePages())
+                    <a href="{{ $allKuis->nextPageUrl() }}"
+                        class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white flex items-center justify-center">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </a>
+                @else
+                    <span
+                        class="w-10 h-10 rounded-full border border-gray-200 text-gray-300 flex items-center justify-center cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </span>
+                @endif
             </div>
         </section>
     </main>
 
     @include('layouts.footer')
-
 </body>
 
 </html>

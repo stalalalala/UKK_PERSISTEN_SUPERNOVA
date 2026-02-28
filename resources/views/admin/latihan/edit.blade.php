@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         body {
@@ -32,249 +31,30 @@
     </style>
 </head>
 
+
 <script>
-    function kuisForm() {
+    function editKuisData() {
         return {
-            activeMenu: 'Manajemen Kuis',
             mobileMenuOpen: false,
             showImportModal: false,
-            currentSet: @json($nextSet),
-            selectedSubtes: '',
-            selectedWaktu: 20,
+            activeMenu: "Manajemen Kuis",
+            currentSet: @json($latihans->set_ke),
 
-            soalTersimpan: 0,
-            activeQuestion: 1,
+            // 🔥 INI YANG PENTING
+            selectedSubtes: @json($latihans->subtes),
+            selectedWaktu: @json($latihans->durasi),
 
-            questions: [],
+            activeQuestion: @json($questions->first()['id'] ?? null),
+            questions: @json($questions),
 
-            currentQuestion: {
-                materi: '',
-                gambar: null,
-                pertanyaan: '',
-                opsi: ['', '', '', '', ''],
-                benar: null,
-                bobot: 1,
+            get currentQuestion() {
+                return this.questions.find(q => q.id === this.activeQuestion);
             },
 
-            importExcel(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-
-                reader.onload = (e) => {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {
-                        type: "array"
-                    });
-
-                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(sheet);
-
-                    if (jsonData.length === 0) {
-                        alert("File Excel kosong!");
-                        return;
-                    }
-
-                    // =========================================
-                    // ✅ 1. Ambil Subtes & Waktu dari BARIS PERTAMA SAJA
-                    // =========================================
-                    const globalSubtes = jsonData[0]["Kategori Subtes"] || "";
-                    const globalWaktu = jsonData[0]["Waktu"] || 20;
-
-                    // Set dropdown UI
-                    this.selectedSubtes = globalSubtes;
-                    this.selectedWaktu = globalWaktu;
-
-                    // =========================================
-                    // ✅ 2. Mapping soal TANPA ambil subtes per baris
-                    // =========================================
-                    this.questions = jsonData.slice(0, 20).map((row) => ({
-
-                        // ❌ Jangan lagi ambil dari row
-                        subtes: globalSubtes,
-                        waktu: globalWaktu,
-
-                        materi: row["Materi"] || "",
-                        pertanyaan: row["Pertanyaan"] || "",
-
-                        opsi_a: row["Opsi A"] || "",
-                        opsi_b: row["Opsi B"] || "",
-                        opsi_c: row["Opsi C"] || "",
-                        opsi_d: row["Opsi D"] || "",
-                        opsi_e: row["Opsi E"] || "",
-
-                        jawaban_benar: (row["Jawaban Benar"] || "")
-                            .toString()
-                            .trim()
-                            .toLowerCase(),
-
-                        bobot: row["Bobot"] || 1,
-                    }));
-
-                    // =========================================
-                    // ✅ 3. Reset state
-                    // =========================================
-                    this.soalTersimpan = this.questions.length;
-                    this.activeQuestion = 1;
-                    this.loadQuestion();
-
-                    this.showImportModal = false;
-
-                    alert("Berhasil import soal dari Excel!");
-                };
-
-                reader.readAsArrayBuffer(file);
-            },
-
-
-            downloadTemplate() {
-
-                const data = [
-                    [
-                        "Kategori Subtes",
-                        "Waktu",
-                        "Materi",
-                        "Pertanyaan",
-                        "Opsi A",
-                        "Opsi B",
-                        "Opsi C",
-                        "Opsi D",
-                        "Opsi E",
-                        "Jawaban Benar",
-                        "Bobot"
-                    ],
-
-                    [
-                        "Penalaran Umum",
-                        20,
-                        "Teks bacaan atau materi soal",
-                        "Apa ibukota Indonesia?",
-                        "Jakarta",
-                        "Bandung",
-                        "Surabaya",
-                        "Medan",
-                        "Bali",
-                        "a",
-                        1
-                    ]
-                ];
-
-                const ws = XLSX.utils.aoa_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-
-                XLSX.utils.book_append_sheet(wb, ws, "Template Soal");
-
-                XLSX.writeFile(wb, "Template_Persisten_20_Soal.xlsx");
-            },
-
-
-
-            simpanSoal() {
-
-                // ==========================
-                // VALIDASI
-                // ==========================
-                if (!this.selectedSubtes) {
-                    alert("Subtes wajib dipilih!");
-                    return;
+            markChanged() {
+                if (this.currentQuestion) {
+                    this.currentQuestion.status = "changed";
                 }
-
-                if (this.currentQuestion.pertanyaan.trim() === '') {
-                    alert("Pertanyaan wajib diisi!");
-                    return;
-                }
-
-                if (this.currentQuestion.benar === null) {
-                    alert("Pilih jawaban benar!");
-                    return;
-                }
-
-                // ==========================
-                // SIMPAN BERDASARKAN NOMOR
-                // ==========================
-                let index = this.activeQuestion - 1;
-
-                this.questions[index] = {
-                    subtes: this.selectedSubtes,
-
-                    materi: this.currentQuestion.materi,
-                    gambar: this.currentQuestion.gambar,
-
-                    pertanyaan: this.currentQuestion.pertanyaan,
-
-                    opsi_a: this.currentQuestion.opsi[0],
-                    opsi_b: this.currentQuestion.opsi[1],
-                    opsi_c: this.currentQuestion.opsi[2],
-                    opsi_d: this.currentQuestion.opsi[3],
-                    opsi_e: this.currentQuestion.opsi[4],
-
-                    jawaban_benar: ['a', 'b', 'c', 'd', 'e'][this.currentQuestion.benar],
-                    bobot: this.currentQuestion.bobot,
-                };
-
-
-
-                // ==========================
-                // HITUNG TOTAL TERISI
-                // ==========================
-                this.soalTersimpan = this.questions.filter(q => q).length;
-
-                // ==========================
-                // PINDAH KE SOAL SELANJUTNYA
-                // ==========================
-                if (this.activeQuestion < 20) {
-                    this.activeQuestion++;
-                    this.loadQuestion();
-                }
-
-                alert("Soal berhasil disimpan (" + this.soalTersimpan + "/20)");
-
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            },
-
-
-            loadQuestion() {
-                let index = this.activeQuestion - 1;
-
-                if (this.questions[index]) {
-                    let q = this.questions[index];
-
-                    // ✅ Set dropdown ikut soal
-                    this.selectedSubtes = q.subtes;
-                    this.selectedWaktu = q.waktu;
-
-                    this.currentQuestion = {
-                        materi: q.materi,
-                        gambar: q.gambar,
-                        pertanyaan: q.pertanyaan,
-                        opsi: [q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e],
-                        benar: ['a', 'b', 'c', 'd', 'e'].indexOf(q.jawaban_benar),
-                        bobot: q.bobot,
-                    };
-                }
-            },
-
-
-
-            submitFinal() {
-
-                let totalTerisi = this.questions.filter(q => q).length;
-
-                if (totalTerisi < 2) {
-                    alert("Wajib isi 20 soal sebelum publish!");
-                    return;
-                }
-
-                // Masukkan JSON ke hidden input
-                document.getElementById("questions_json").value =
-                    JSON.stringify(this.questions);
-
-                // Submit form
-                document.getElementById("kuisForm").submit();
             }
         }
     }
@@ -282,7 +62,9 @@
 
 
 
-<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="kuisForm()">
+
+
+<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="editKuisData()">
 
     <div class="flex h-full w-full">
         <aside x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
@@ -356,7 +138,7 @@
                 </a>
 
                 <a href="{{ route('admin.kuis.index') }}" x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl  transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -366,7 +148,7 @@
                 </a>
 
                 <a href="{{ route('admin.latihan.index') }}"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 bg-[#D4DEF7]  text-[#2E3B66] rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-7">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -421,15 +203,15 @@
 
             </nav>
 
-            <form action="{{ route('logout') }}" method="POST" class="w-full inline">
-    @csrf
-    <button type="submit" class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5 md:size-6 text-white">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-        </svg>
-        <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
-    </button>
-    </form>
+            <button
+                class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
+                <svg xmlns="http://www.w3.org/2000/xml" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" class="size-5 md:size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                </svg>
+                <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
+            </button>
         </aside>
 
         <div x-show="mobileMenuOpen" x-transition:enter="transition opacity-ease-out duration-300"
@@ -491,6 +273,11 @@
 
                 <div class="flex flex-wrap gap-3 w-full lg:w-auto">
 
+                    <a href="{{ route('kuis.index') }}"
+                        class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-white hover:bg-white-600 text-emerald-600 px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95">
+                        Kembali ke kuis
+                    </a>
+
 
                     <button @click="showImportModal = true"
                         class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95">
@@ -499,7 +286,7 @@
                 </div>
             </div>
 
-            <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar pb-4 lg:pb-8">
+            <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar pb-4 lg:pb-8">
                 <div x-show="activeMenu === 'Manajemen Kuis'" x-transition>
 
 
@@ -511,73 +298,71 @@
                                         <div class="p-3 bg-blue-50 rounded-2xl text-[#4A72D4]">
                                             <i class="fa-solid fa-pen-nib text-xl"></i>
                                         </div>
-                                        <h3 class="text-xl font-bold text-gray-800">Input Soal Nomor <span
-                                                x-text="activeQuestion"></span></h3>
+                                        <h3 class="text-xl font-bold text-gray-800">Ubah Soal Nomor <span
+                                                x-text="questions.findIndex(q => q.id === activeQuestion) + 1"></span>
+                                        </h3>
                                     </div>
                                 </div>
 
-                                <form id="kuisForm" action="{{ route('admin.kuis.store') }}" method="POST"
-                                    class="space-y-8">
-
+                                <form id="formUpdateKuis" action="{{ route('admin.latihan.update', $latihans->id) }}"
+                                    method="POST" class="space-y-8">
 
                                     @csrf
+                                    @method('PUT')
 
-                                    <input type="hidden" name="set" :value="currentSet">
-                                    <input type="hidden" name="durasi" :value="selectedWaktu">
-
-                                    <!-- Semua soal dikirim dalam JSON -->
-                                    <input type="hidden" name="questions_json" id="questions_json">
-
-
+                                    <!-- Hidden JSON -->
+                                    <input type="hidden" name="questions_json" :value="JSON.stringify(questions)">
 
                                     <div class="grid grid-cols-1 md:flex md:items-stretch gap-4 mb-8">
 
                                         {{-- Subtes --}}
-                                        <div class="flex-1 min-w-0 flex flex-col gap-2" x-data="{ open: false }"
+                                        <div class="flex-1 min-w-0 flex flex-col gap-2" x-data="{
+                                            open: false,
+                                            options: [
+                                                'Penalaran Umum',
+                                                'Pengetahuan & Pemahaman Umum',
+                                                'Pemahaman Bacaan & Menulis',
+                                                'Pengetahuan Kuantitatif',
+                                                'Penalaran Matematika',
+                                                'Literasi Bahasa Indonesia',
+                                                'Literasi Bahasa Inggris'
+                                            ]
+                                        }"
                                             @click.away="open = false">
-                                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Kategori
-                                                Subtes</label>
+
+                                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">
+                                                Kategori Subtes
+                                            </label>
+
                                             <div
                                                 class="bg-white px-4 py-3 rounded-2xl shadow-sm border border-blue-50 flex items-center relative h-full">
+
                                                 <button type="button" @click="open = !open"
-                                                    class="w-full flex items-center justify-between text-sm font-bold text-[#4A72D4] focus:outline-none">
-                                                    <span x-text="selectedSubtes || 'Pilih Subtes'"
-                                                        class="truncate"></span>
-                                                    <i class="fa-solid fa-chevron-down text-[10px] transition-transform duration-200"
+                                                    class="w-full flex items-center justify-between text-sm font-bold text-[#4A72D4]">
+
+                                                    <span x-text="selectedSubtes"></span>
+                                                    <i class="fa-solid fa-chevron-down text-[10px]"
                                                         :class="open ? 'rotate-180' : ''"></i>
                                                 </button>
+
                                                 <div x-show="open" x-transition
-                                                    class="absolute z-50 w-full mt-2 top-full left-0 bg-white border border-blue-50 shadow-xl rounded-2xl overflow-hidden py-2">
-                                                    <template
-                                                        x-for="item in [
-                                                        'Penalaran Umum',
-                                                        'Penalaran & Pemahaman Umum',
-                                                        'Pemahaman Bacaan & Menulis',
-                                                        'Pengetahuan Kuantitatif',
-                                                        'Penalaran Matematika',
-                                                        'Literasi Bahasa Indonesia',
-                                                        'Literasi Bahasa Inggris'
-                                                        ]">
-                                                        <div @click="selectedSubtes = item; open = false"
-                                                            class="px-4 py-3 text-sm text-gray-600 hover:bg-blue-50 hover:text-[#4A72D4] cursor-pointer transition-colors font-medium"
-                                                            x-text="item"></div>
+                                                    class="absolute z-50 w-full mt-2 top-full left-0 bg-white border border-blue-50 shadow-xl rounded-2xl py-2">
+
+                                                    <template x-for="item in options" :key="item">
+                                                        <div @click="selectedSubtes = item; open = false;"
+                                                            class="px-4 py-3 text-sm text-gray-600 hover:bg-blue-50 cursor-pointer"
+                                                            x-text="item">
+                                                        </div>
                                                     </template>
+                                                    <input type="hidden" name="subtes" :value="selectedSubtes">
                                                 </div>
-                                                <input type="hidden" name="kategori" :value="selectedSubtes">
-
                                             </div>
                                         </div>
 
-                                        {{-- Set --}}
-                                        <div class="w-full md:w-32 flex flex-col gap-2">
-                                            <label
-                                                class="text-[10px] font-bold text-gray-400 uppercase ml-1">Set</label>
-                                            <div
-                                                class="bg-gray-50 px-4 py-3 rounded-2xl border border-gray-100 flex items-center h-full">
-                                                <span class="text-sm font-bold text-[#4A72D4]"
-                                                    x-text="'Set ' + currentSet"></span>
-                                            </div>
-                                        </div>
+
+
+                                        <input type="hidden" name="durasi" :value="selectedWaktu">
+
 
                                         {{-- Waktu --}}
                                         <div class="w-full md:w-48 flex flex-col gap-2" x-data="{ open: false }"
@@ -611,47 +396,51 @@
                                             <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi
                                                 atau Teks (Opsional)</label>
 
-                                            <div class="relative group">
-                                                <textarea x-model="currentQuestion.materi" name="materi" x-data="{
-                                                    resize() {
-                                                        $el.style.height = 'auto';
-                                                        $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
-                                                    }
-                                                }" x-init="resize()"
-                                                    @input="resize()"
-                                                    class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm 
-           focus:bg-white focus:ring-2 focus:ring-blue-100 
-           outline-none shadow-inner transition-all 
+                                            <div x-show="currentQuestion" x-cloak>
+
+                                                <div class="relative group">
+                                                    <textarea x-model="currentQuestion.materi" name="materi" x-data="{
+                                                        resize() {
+                                                            $el.style.height = 'auto';
+                                                            $el.style.height =
+                                                                ($el.scrollHeight < 140 ? 140 : $el.scrollHeight) + 'px';
+                                                        }
+                                                    }" x-init="resize()"
+                                                        x-effect="resize()" @input="resize(); markChanged()"
+                                                        class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm
+           focus:bg-white focus:ring-2 focus:ring-blue-100
+           outline-none shadow-inner transition-all
            resize-none overflow-hidden leading-relaxed"
-                                                    placeholder="Masukkan teks soal di sini..." style="min-height:120px;">
+                                                        placeholder="Masukkan materi atau teks pendukung di sini..." style="min-height:140px;">
 </textarea>
 
 
-                                                <div class="absolute right-4 bottom-4">
-                                                    <label
-                                                        class="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-100 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all">
-                                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                                            class="h-4 w-4 text-blue-500" fill="none"
-                                                            viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                        </svg>
-                                                        <span
-                                                            class="text-[10px] font-bold text-blue-600 uppercase">Tambah
-                                                            Foto</span>
-                                                        <input type="file" class="hidden" accept="image/*"
-                                                            @change="
-                                                            const file = $event.target.files[0];
-                                                            if(file){
-                                                                currentQuestion.gambar = file.name;
-                                                                imageUrl = URL.createObjectURL(file);
-                                                            }
-                                                        ">
+                                                    <div class="absolute right-4 bottom-4">
+                                                        <label
+                                                            class="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-100 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all">
 
-                                                    </label>
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                class="h-4 w-4 text-blue-500" fill="none"
+                                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                            </svg>
+
+                                                            <span
+                                                                class="text-[10px] font-bold text-blue-600 uppercase">
+                                                                Ubah Foto
+                                                            </span>
+
+                                                            <input type="file" class="hidden" accept="image/*"
+                                                                @change="const file = $event.target.files[0];
+                    if (file) { imageUrl = URL.createObjectURL(file) }">
+                                                        </label>
+                                                    </div>
                                                 </div>
+
                                             </div>
+
 
                                             <template x-if="imageUrl">
                                                 <div class="relative mt-3 inline-block">
@@ -670,49 +459,94 @@
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label
-                                                class="text-[10px] font-bold text-gray-400 uppercase ml-1">Pertanyaan</label>
-                                            <textarea x-model="currentQuestion.pertanyaan" required x-data="{
+                                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">
+                                                Pertanyaan
+                                            </label>
+
+                                            <textarea required x-model="currentQuestion.pertanyaan" x-data="{
                                                 resize() {
                                                     $el.style.height = 'auto';
-                                                    $el.style.height = ($el.scrollHeight < 120 ? 120 : $el.scrollHeight) + 'px';
+                                                    $el.style.height =
+                                                        ($el.scrollHeight < 140 ? 140 : $el.scrollHeight) + 'px';
                                                 }
                                             }" x-init="resize()"
-                                                @input="resize()"
-                                                class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none shadow-inner transition-all overflow-hidden resize-none"
-                                                placeholder="Masukkan teks pertanyaan di sini..." style="min-height: 120px;"></textarea>
+                                                x-effect="resize()" @input="resize(); markChanged()"
+                                                class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm 
+               focus:bg-white focus:ring-2 focus:ring-blue-100 
+               outline-none shadow-inner transition-all 
+               overflow-hidden resize-none"
+                                                placeholder="Masukkan teks pertanyaan di sini..." style="min-height: 120px;">
+    </textarea>
                                         </div>
 
-                                        <div class="grid grid-cols-1 gap-4">
-                                            <template x-for="(opt, i) in ['a','b','c','d','e']">
-                                                <div :class="currentQuestion.benar === i ?
+
+                                        <div x-show="currentQuestion" x-cloak class="grid grid-cols-1 gap-4">
+
+                                            <template x-for="(opt, i) in ['a','b','c','d','e']" :key="opt">
+
+                                                <div :class="currentQuestion.jawaban_benar === opt ?
                                                     'bg-emerald-50 border-emerald-200' :
                                                     'bg-gray-50 border-transparent'"
                                                     class="flex items-start gap-4 p-4 rounded-2xl border-2 transition-all">
 
-                                                    <!-- Label A B C -->
+                                                    <!-- Label -->
                                                     <span
-                                                        class="w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm font-black text-[#4A72D4]"
-                                                        x-text="opt"></span>
+                                                        class="w-10 h-10 shrink-0 flex items-center justify-center
+                       bg-white rounded-xl shadow-sm font-black text-[#4A72D4]"
+                                                        x-text="opt">
+                                                    </span>
 
                                                     <!-- Textarea Jawaban Auto Resize -->
-                                                    <textarea x-model="currentQuestion.opsi[i]" x-data="{
+                                                    <textarea x-model="currentQuestion['opsi_' + opt.toLowerCase()]" name="opsi[]" x-data="{
                                                         resize() {
                                                             $el.style.height = 'auto';
-                                                            $el.style.height = ($el.scrollHeight < 60 ? 60 : $el.scrollHeight) + 'px';
+                                                            $el.style.height =
+                                                                ($el.scrollHeight < 60 ? 60 : $el.scrollHeight) + 'px';
                                                         }
-                                                    }" x-init="resize()" @input="resize()"
-                                                        class="flex-1 bg-transparent border-none outline-none text-sm font-medium resize-none overflow-hidden leading-relaxed"
-                                                        placeholder="Tulis jawaban di sini..." style="min-height:60px;"></textarea>
+                                                    }"
+                                                        x-init="resize()" x-effect="resize()" @input="resize(); markChanged()"
+                                                        class="flex-1 bg-white/40 rounded-xl px-4 py-3
+                       border-none outline-none text-sm font-medium
+                       resize-none overflow-hidden leading-relaxed
+                       focus:ring-2 focus:ring-blue-100 transition-all"
+                                                        placeholder="Tulis jawaban di sini..." style="min-height:60px;">
+            </textarea>
 
-                                                    <!-- Radio Button -->
-                                                    <input type="radio" @click="currentQuestion.benar = i"
-                                                        :checked="currentQuestion.benar === i"
-                                                        class="w-5 h-5 mt-3 accent-emerald-500 cursor-pointer">
+                                                    <!-- Radio Jawaban Benar -->
+                                                    <div class="pt-3">
+                                                        <input type="radio" name="jawaban_benar"
+                                                            :value="opt"
+                                                            x-model="currentQuestion.jawaban_benar"
+                                                            @change="markChanged()"
+                                                            class="w-5 h-5 accent-emerald-500 cursor-pointer">
+                                                    </div>
 
                                                 </div>
+
                                             </template>
                                         </div>
+
+                                        <div class="space-y-2 mt-6">
+                                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">
+                                                Pembahasan
+                                            </label>
+
+                                            <textarea x-model="currentQuestion.pembahasan" x-data="{
+                                                resize() {
+                                                    $el.style.height = 'auto';
+                                                    $el.style.height =
+                                                        ($el.scrollHeight < 140 ? 140 : $el.scrollHeight) + 'px';
+                                                }
+                                            }" x-init="resize()" x-effect="resize()"
+                                                @input="resize(); markChanged()"
+                                                class="w-full bg-yellow-50 border-none rounded-[25px] p-6 text-sm
+               focus:bg-white focus:ring-2 focus:ring-yellow-200
+               outline-none shadow-inner transition-all
+               resize-none overflow-hidden leading-relaxed"
+                                                placeholder="Masukkan pembahasan lengkap jawaban di sini..." style="min-height:120px;">
+    </textarea>
+                                        </div>
+
 
                                     </div>
 
@@ -724,23 +558,15 @@
                                         </p>
 
                                         <div class="flex items-center gap-2 w-full md:w-auto order-1 md:order-2">
-                                            <button type="button"
-                                                @click="currentQuestion = {
-                                                        materi: '',
-                                                        gambar: null,
-                                                        pertanyaan: '',
-                                                        opsi: ['', '', '', '', ''],
-                                                        benar: null,
-                                                        bobot: 1
-                                                    }"
-                                                class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-red-400">
+                                            <button type="reset" @click="selected = null"
+                                                class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-red-400 transition-colors">
                                                 Reset
                                             </button>
 
-                                            <button type="button" @click="simpanSoal()"
-                                                :disabled="soalTersimpan >= 20"
-                                                class="flex-1 md:flex-none bg-[#4A72D4] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg">
-                                                <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Soal
+                                            <button type="submit"
+                                                class="bg-[#4A72D4] hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-md active:scale-95">
+
+                                                Simpan Soal
                                             </button>
 
                                         </div>
@@ -755,45 +581,66 @@
                                     Navigasi Soal</h4>
 
                                 <div class="grid grid-cols-5 gap-3">
-                                    <template x-for="n in 20">
-                                        <button @click="activeQuestion = n; loadQuestion()"
+                                    <template x-for="q in questions" :key="q.id">
+                                        <button @click="activeQuestion = q.id"
                                             :class="{
-                                                'bg-blue-500 text-white': activeQuestion === n,
-                                                'bg-emerald-500 text-white': questions[n - 1]?.pertanyaan,
-                                                'bg-gray-50 text-gray-400': !questions[n - 1]?.pertanyaan
+                                                // Warna Biru jika Aktif
+                                                'bg-[#4A72D4] text-white shadow-lg shadow-blue-200 ring-2 ring-offset-2 ring-blue-400': activeQuestion ===
+                                                    q.id,
+                                            
+                                                // Warna Hijau jika Original (Belum diubah)
+                                                'bg-emerald-500 text-white border-emerald-500': q
+                                                    .status === 'original' && activeQuestion !== q.id,
+                                            
+                                                // Warna Orange jika Ada Perubahan
+                                                'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-100': q
+                                                    .status === 'changed' && activeQuestion !== q.id,
+                                            
+                                                // Warna Abu jika Kosong (jika ada soal baru)
+                                                'bg-gray-50 text-gray-400 border-gray-100': q.status === 'empty' &&
+                                                    activeQuestion !== q.id
                                             }"
-                                            class="aspect-square rounded-xl border-2 flex items-center justify-center font-bold text-xs transition-all hover:scale-110">
-                                            <span x-text="n"></span>
-                                        </button>
+                                            class="aspect-square rounded-xl border-2 flex items-center justify-center font-bold text-xs transition-all hover:scale-110 relative">
+                                            <span x-text="questions.indexOf(q)+1"></span>
 
+
+                                            <template x-if="q.status === 'changed'">
+                                                <span
+                                                    class="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full flex items-center justify-center">
+                                                    <div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                                                </span>
+                                            </template>
+                                        </button>
                                     </template>
                                 </div>
 
                                 <div class="mt-8 space-y-3 pt-6 border-t border-gray-50">
                                     <div class="flex items-center gap-3">
                                         <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
-                                        <span class="text-[10px] font-bold text-gray-500 uppercase">Terisi</span>
+                                        <span class="text-[10px] font-bold text-gray-500 uppercase">Data Asli
+                                            (Tersimpan)</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                        <span class="text-[10px] font-bold text-gray-500 uppercase">Ada
+                                            Perubahan</span>
                                     </div>
                                     <div class="flex items-center gap-3">
                                         <div class="w-3 h-3 bg-[#4A72D4] rounded-full"></div>
-                                        <span class="text-[10px] font-bold text-gray-500 uppercase">Aktif</span>
+                                        <span class="text-[10px] font-bold text-gray-500 uppercase">Sedang
+                                            Diedit</span>
                                     </div>
                                 </div>
 
-                                <button type="button" @click="submitFinal()"
-                                    :disabled="questions.filter(q => q).length < 2"
-                                    class="w-full mt-6 bg-emerald-500 text-white py-3 rounded-xl font-bold disabled:opacity-40 disabled:cursor-not-allowed">
-                                    Publikasikan Kuis
+                                <button type="submit" form="formUpdateKuis"
+                                    class="w-full mt-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-orange-100 transition-all active:scale-95">
+                                    Update Perubahan Kuis
                                 </button>
-
-
-
-
                             </div>
                         </div>
                     </div>
                 </div>
-        </main>
+            </main>
     </div>
 
     <div x-show="showImportModal" class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
@@ -825,12 +672,10 @@
                     </div>
                     <p class="text-sm font-bold text-gray-600">Klik atau seret file Excel ke sini</p>
                     <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 5MB (.xlsx, .xls)</p>
-                    <input type="file" class="hidden" id="excel_upload" @change="importExcel($event)"
-                        accept=".xlsx, .xls">
+                    <input type="file" class="hidden" id="excel_upload">
                     <button onclick="document.getElementById('excel_upload').click()"
-                        class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">
-                        Pilih File
-                    </button>
+                        class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">Pilih
+                        File</button>
                 </div>
 
                 <div class="mt-8 p-4 bg-blue-50 rounded-2xl flex items-center justify-between">
@@ -839,11 +684,8 @@
                         <span class="text-[11px] font-bold text-blue-700 uppercase tracking-tight">Belum punya
                             formatnya?</span>
                     </div>
-                    <a href="https://docs.google.com/spreadsheets/d/1NteyIa-UdkroBZKt5IQzPyYD5TYDJVrFYABlRhJ-dnA/copy"
-                        target="_blank" @click="downloadTemplate()"
-                        class="text-[11px] font-black text-[#4A72D4] hover:underline">
-                        DOWNLOAD TEMPLATE
-                    </a>
+                    <a href="#" class="text-[11px] font-black text-[#4A72D4] hover:underline">DOWNLOAD
+                        TEMPLATE</a>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mt-8">
