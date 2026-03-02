@@ -245,53 +245,61 @@
                 @foreach ($latihans as $subtes => $sets)
                     @foreach ($sets as $index => $item)
                         <div x-show="selectedSub === '{{ $subtes }}' && pages[selectedSub] === {{ ceil(($index + 1) / 8) }}"
-                            class="bg-white border-2 border-gray-100 rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
+                            class="bg-white border-2 {{ $item->userHasil ? 'border-green-200 shadow-md' : 'border-gray-100' }} rounded-[2.5rem] p-6 relative group hover:border-blue-300 hover:shadow-xl transition-all duration-300">
 
                             <div class="flex justify-between items-start mb-6">
                                 <div class="space-y-1">
                                     <h4 class="font-bold text-blue-900 text-lg">
                                         {{ $subtesMap[$subtes] ?? $subtes }} - Set {{ $item->set_ke }}
                                     </h4>
-
                                     <span
                                         class="bg-blue-100 text-blue-600 text-[10px] font-semibold px-3 py-1 rounded-full">
                                         LATIHAN SOAL
                                     </span>
                                 </div>
 
-                                <span
-                                    class="bg-orange-50 text-orange-500 text-[10px] font-semibold px-3 py-1 rounded-full">
-                                    Belum
-                                </span>
+                                @if ($item->userHasil)
+                                    <span
+                                        class="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-full">
+                                        SKOR: {{ $item->userHasil->skor }}
+                                    </span>
+                                @else
+                                    <span
+                                        class="bg-orange-50 text-orange-500 text-[10px] font-semibold px-3 py-1 rounded-full">
+                                        Belum
+                                    </span>
+                                @endif
                             </div>
 
                             <div class="space-y-3 text-gray-500 text-sm mb-4">
                                 <div class="flex items-center gap-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="2" stroke="currentColor" class="size-6 text-blue-500">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                                    </svg>
-
+                                    <i class="fa-solid fa-file-lines text-blue-500"></i>
                                     <span>{{ $item->questions_count }} Soal</span>
                                 </div>
-
                                 <div class="flex items-center gap-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="2" stroke="currentColor" class="size-6 text-blue-500">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                    </svg>
-
+                                    <i class="fa-solid fa-clock text-blue-500"></i>
                                     <span>{{ $item->durasi }} Menit</span>
                                 </div>
                             </div>
 
-                            <a href="{{ route('latihan.intruksi', $item->id) }}"
-                                class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                Kerjakan Sekarang
-                            </a>
+                            @if ($item->userHasil)
+                                <div class="flex flex-row gap-2 mt-2">
+                                    <a href="{{ route('latihan.hasil', $item->id) }}"
+                                        class="flex-1 flex items-center justify-center py-3 bg-green-500 text-white text-xs font-bold rounded-2xl hover:bg-green-600 transition-all shadow-sm">
+                                        <i class="fa-solid fa-chart-simple mr-1"></i> Hasil
+                                    </a>
 
+                                    <a href="{{ route('latihan.intruksi', $item->id) }}"
+                                        class="flex-1 flex items-center justify-center py-3 bg-gray-100 text-gray-600 text-xs font-bold rounded-2xl hover:bg-blue-500 hover:text-white transition-all border border-gray-200">
+                                        <i class="fa-solid fa-rotate-right mr-1"></i> Ulang
+                                    </a>
+                                </div>
+                            @else
+                                <a href="{{ route('latihan.intruksi', $item->id) }}"
+                                    class="block text-center w-full mt-2 py-3 bg-blue-50 text-blue-600 font-bold rounded-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                    Kerjakan Sekarang
+                                </a>
+                            @endif
                         </div>
                     @endforeach
                 @endforeach

@@ -42,7 +42,7 @@
     </style>
 </head>
 
-<body class="bg-slate-100 p-4 md:p-6 pt-0 desktop-fixed">
+<body class="p-4 md:p-6 pt-0 desktop-fixed">
 
     <div x-data="latihanApp()" @keydown.window.enter="nextSoal()" x-init="startTimer()" x-cloak
         class="h-full flex flex-col max-w-[1440px] mx-auto">
@@ -52,7 +52,7 @@
             </h1>
             <div class="flex items-center gap-2 md:gap-4">
                 <div
-                    class="flex items-center gap-2 bg-blue-50 border-2 border-[#4FAAFD] px-2 h-8  rounded-full shadow-sm transition-all">
+                    class="flex items-center gap-2 bg-blue-50 border-2 border-[#4FAAFD] px-2 h-8  rounded-full transition-all">
                     <svg class="w-5 h-5 text-[#4FAAFD]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>

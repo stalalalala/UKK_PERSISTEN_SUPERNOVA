@@ -13,27 +13,28 @@ class LatihanController extends Controller
        INDEX - LIST PER SUBTES
     ========================== */
     public function index()
-    {
-        $latihans = Latihan::where('is_published', true)
-            ->where('is_active', true)
-            ->withCount('questions')
-            ->orderBy('subtes')
-            ->orderBy('set_ke')
-            ->get()
-            ->groupBy('subtes'); // tetap per subtes
+{
+    $latihans = Latihan::where('is_published', true)
+        ->where('is_active', true)
+        ->withCount('questions')
+        ->with('userHasil') // Memanggil relasi hasil milik user login
+        ->orderBy('subtes')
+        ->orderBy('set_ke')
+        ->get()
+        ->groupBy('subtes');
 
-        $subtesMap = [
-            'Penalaran Umum' => 'PU',
-            'Pengetahuan & Pemahaman Umum' => 'PPU',
-            'Pemahaman Bacaan & Menulis' => 'PBM',
-            'Pengetahuan Kuantitatif' => 'PK',
-            'Penalaran Matematika' => 'PM',
-            'Literasi Bahasa Indonesia' => 'LBI',
-            'Literasi Bahasa Inggris' => 'LBE',
-        ];
+    $subtesMap = [
+        'Penalaran Umum' => 'PU',
+        'Pengetahuan & Pemahaman Umum' => 'PPU',
+        'Pemahaman Bacaan & Menulis' => 'PBM',
+        'Pengetahuan Kuantitatif' => 'PK',
+        'Penalaran Matematika' => 'PM',
+        'Literasi Bahasa Indonesia' => 'LBI',
+        'Literasi Bahasa Inggris' => 'LBE',
+    ];
 
-        return view('latihan.index', compact('latihans', 'subtesMap'));
-    }
+    return view('latihan.index', compact('latihans', 'subtesMap'));
+}
 
     /* =========================
        INTRUKSI PER SUBTES
@@ -63,69 +64,80 @@ class LatihanController extends Controller
         return view('latihan.soal', compact('latihan'));
     }
 
-    /* =========================
-       SUBMIT PER SUBTES
-    ========================== */
-    public function submit(Request $request, $id)
+   /* =========================
+   SUBMIT PER SUBTES
+========================== */
+public function submit(Request $request, $id)
 {
-    $latihan = Latihan::with('questions')
-        ->where('is_active', true)
-        ->where('is_published', true)
-        ->findOrFail($id);
+    $latihan = Latihan::with('questions')->findOrFail($id);
 
-    $jawabanUser = $request->input('jawaban', []);
-
-if (!is_array($jawabanUser)) {
-    $jawabanUser = [];
-}
+    // Decode jawaban dari Alpine
+    $jawabanUser = json_decode($request->input('jawaban'), true) ?? [];
 
     $benar = 0;
-    $total = $latihan->questions->count();
+    $salah = 0;
+    $kosong = 0;
 
-    foreach ($latihan->questions as $soal) {
-        if (
-            isset($jawabanUser[$soal->id]) &&
-            $jawabanUser[$soal->id] === $soal->jawaban_benar
-        ) {
+    foreach ($latihan->questions as $q) {
+        $userAns = $jawabanUser[$q->id] ?? null;
+
+        if (empty($userAns)) {
+            $kosong++;
+        } elseif (strtolower(trim($userAns)) == strtolower(trim($q->jawaban_benar))) {
             $benar++;
+        } else {
+            $salah++;
         }
     }
 
-    $salah = $total - $benar;
-    $kosong = $total - count($jawabanUser);
+    $totalSoal = $latihan->questions->count();
+    $skor = $totalSoal > 0 ? round(($benar / $totalSoal) * 100) : 0;
 
-    $skor = $total > 0 ? round(($benar / $total) * 100) : 0;
+    // SIMPAN KE DATABASE (Termasuk detail jawabannya)
+    $hasilRecord = HasilLatihan::updateOrCreate(
+        [
+            'user_id'    => Auth::id(),
+            'latihan_id' => $id
+        ],
+        [
+            'benar'         => $benar,
+            'salah'         => $salah,
+            'kosong'        => $kosong,
+            'skor'          => $skor,
+            'list_jawaban'  => json_encode($jawabanUser), // SIMPAN DISINI BIAR GA ILANG
+        ]
+    );
 
-    // 🔥 SIMPAN KE DATABASE
-    HasilLatihan::create([
-        'user_id'    => Auth::id(),
-        'latihan_id' => $latihan->id,
-        'skor'       => $skor,
-        'benar'      => $benar,
-        'salah'      => $salah,
-        'kosong'     => $kosong,
+    // Kirim data ke view hasil (langsung setelah submit)
+    return view('latihan.hasil', [
+        'latihan'     => $latihan,
+        'hasil'       => $hasilRecord,
+        'jawabanUser' => $jawabanUser
     ]);
-
-    return redirect()->route('latihan.hasil', $latihan->id);
 }
 
-    /* =========================
-       HASIL PER SUBTES
-    ========================== */
-
+/* =========================
+   HASIL PER SUBTES (View History)
+========================== */
 public function hasil($id)
 {
-    $latihan = Latihan::findOrFail($id);
+    $latihan = Latihan::with('questions')->findOrFail($id);
 
     $hasil = HasilLatihan::where('user_id', Auth::id())
                 ->where('latihan_id', $id)
-                ->latest()
                 ->first();
 
     if (!$hasil) {
         return redirect()->route('latihan.index');
     }
 
-    return view('latihan.hasil', compact('latihan', 'hasil'));
+    // AMBIL KEMBALI JAWABAN YANG DISIMPAN DI DATABASE
+    $jawabanUser = json_decode($hasil->list_jawaban, true) ?? [];
+
+    return view('latihan.hasil', [
+        'latihan'     => $latihan, 
+        'hasil'       => $hasil,
+        'jawabanUser' => $jawabanUser // Sekarang data tidak akan null lagi
+    ]);
 }
 }
