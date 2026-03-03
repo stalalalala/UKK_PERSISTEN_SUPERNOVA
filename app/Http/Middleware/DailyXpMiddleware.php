@@ -73,36 +73,36 @@ class DailyXpMiddleware
             // =========================
 
             // Contoh level ranges
-            $levelRanges = [
-                1 => ['maxXp' => 300, 'pet' => 'pet_level1'],
-                6 => ['maxXp' => 600, 'pet' => 'pet_level2'],
-                11 => ['maxXp' => 1000, 'pet' => 'pet_level3'], // dst
-            ];
+            // $levelRanges = [
+            //     1 => ['maxXp' => 300, 'pet' => 'pet_level1'],
+            //     6 => ['maxXp' => 600, 'pet' => 'pet_level2'],
+            //     11 => ['maxXp' => 1000, 'pet' => 'pet_level3'], // dst
+            // ];
 
             // Tentukan level & pet awal
-            foreach ($levelRanges as $startLevel => $data) {
-                if ($streak->level >= $startLevel) {
-                    $maxXpCurrent = $data['maxXp'];
-                    $petCurrent = $data['pet'];
-                }
-            }
+            // foreach ($levelRanges as $startLevel => $data) {
+            //     if ($streak->level >= $startLevel) {
+            //         $maxXpCurrent = $data['maxXp'];
+            //         $petCurrent = $data['pet'];
+            //     }
+            // }
 
             // Naik level jika total_xp melebihi maxXp
-            while ($streak->total_xp >= $maxXpCurrent) {
-                $streak->total_xp -= $maxXpCurrent;
-                $streak->level += 1;
+            // while ($streak->total_xp >= $maxXpCurrent) {
+            //     $streak->total_xp -= $maxXpCurrent;
+            //     $streak->level += 1;
 
-                // update maxXp & pet sesuai level baru
-                foreach ($levelRanges as $startLevel => $data) {
-                    if ($streak->level >= $startLevel) {
-                        $maxXpCurrent = $data['maxXp'];
-                        $petCurrent = $data['pet'];
-                    }
-                }
-            }
+            //     // update maxXp & pet sesuai level baru
+            //     foreach ($levelRanges as $startLevel => $data) {
+            //         if ($streak->level >= $startLevel) {
+            //             $maxXpCurrent = $data['maxXp'];
+            //             $petCurrent = $data['pet'];
+            //         }
+            //     }
+            // }
 
             // Simpan pet sesuai level
-            $streak->pet = $petCurrent;
+            // $streak->pet = $petCurrent;
 
             // Simpan semua perubahan
             $streak->save();
