@@ -27,7 +27,7 @@ class AdminMinatBakatController extends Controller
     
     $participants = MinatBakatPartisipan::latest()->get();
 
-    return view('admin.minatbakat.index', compact('categories', 'participants'));
+    return view('admin.minatBakat.index', compact('categories', 'participants'));
 }
 
     /**
@@ -111,7 +111,7 @@ class AdminMinatBakatController extends Controller
         // Ambil soal yang hanya sesuai kategori ini
         $questions = MinatBakatSoal::where('kategori_name', $categoryName)->latest()->get();
         
-        return view('admin.minatbakat.soal', compact('questions', 'categoryName'));
+        return view('admin.minatBakat.soal', compact('questions', 'categoryName'));
     }
 
     public function storeSoal(Request $request)
@@ -218,7 +218,7 @@ public function generatePdf($id)
         'top_categories' => $top_categories
     ];
 
-    $pdf = Pdf::loadView('admin.minatbakat.cetak_pdf', $data);
+    $pdf = Pdf::loadView('admin.minatBakat.cetak_pdf', $data);
     return $pdf->stream('Laporan_'.$participant->name.'.pdf');
 }
 
