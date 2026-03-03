@@ -7,6 +7,8 @@
     <title>Hasil Kuis - {{ $kuis->category->name ?? 'Kuis' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -44,27 +46,20 @@
             }
         }
     </style>
+
+    @vite('resources/css/app.css')
 </head>
 
-<body class="bg-slate-50 min-h-screen flex items-center justify-center relative overflow-x-hidden">
-
-    <div class="blob top-0 left-0"></div>
-    <div class="blob bottom-0 right-0"
-        style="background: linear-gradient(180deg, rgba(255, 200, 0, 0.1) 0%, rgba(255, 200, 0, 0) 100%);"></div>
+<body class="min-h-screen flex font-po relative overflow-x-hidden">
 
     <div
-        class="bg-[#DAEDFE] w-full min-h-screen lg:h-screen flex flex-col items-center justify-center p-4 md:p-6 relative shadow-inner overflow-y-auto lg:overflow-hidden">
+        class="w-full max-w-[1440px] mx-auto p-4 md:p-6 min-h-screen flex flex-col relative shadow-inner overflow-y-auto lg:overflow-hidden">
 
-        <div class="relative w-full max-w-4xl flex flex-col items-center">
-
-            <div
-                class="hidden sm:block absolute bottom-[-10px] w-[80%] h-12 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 rounded-full shadow-lg z-0">
-            </div>
+        <div class="relative w-full flex flex-col items-center flex-1 min-h-0">
 
             <div
-                class="relative z-10 bg-white glass-effect w-full rounded-3xl shadow-sm border border-white overflow-hidden">
-                <div class="p-5 md:p-8 flex flex-col">
-
+                class="relative z-10 bg-white glass-effect w-full rounded-3xl shadow-sm border border-white overflow-hidden flex flex-col flex-1">
+                <div class="p-5 md:p-8 flex flex-col flex-1">
                     <div class="flex flex-col items-center justify-center gap-2 mb-4 text-[#2d4a85]">
                         <div class="bg-blue-50 p-2 rounded-xl animate-bounce">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none"
@@ -74,7 +69,7 @@
                             </svg>
                         </div>
                         <h2 class="text-xl md:text-2xl font-extrabold tracking-tight text-center">
-                            Hasil {{ $kuis->category->name ?? 'Kuis' }}
+                            HASIL KUIS FUNDAMENTAL
                             <span class="block text-blue-500 text-base md:text-lg font-bold">Kuis Fundamental - Set
                                 {{ $kuis->set_ke }}</span>
                         </h2>
@@ -137,7 +132,7 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-center">
+                    <div class="flex justify-center mt-auto">
                         <a href="{{ route('kuis.index') }}"
                             class="w-full py-4 bg-blue-500 text-white rounded-xl font-black text-xs hover:bg-blue-600 active:translate-y-1 transition-all text-center uppercase tracking-widest shadow-md">
                             Selesai & Keluar

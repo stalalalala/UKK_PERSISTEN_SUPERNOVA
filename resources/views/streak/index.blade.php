@@ -173,6 +173,11 @@
                                 <p class="text-[9px] font-black text-gray-500 uppercase mb-1">Kuis</p><span
                                     class="bg-[#FF908E] text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-[0_3px_0_0_#e57373]">20XP</span>
                             </div>
+                            <div class="w-px h-8 bg-orange-200/50"></div>
+                            <div class="flex-1">
+                                <p class="text-[9px] font-black text-gray-500 uppercase mb-1">Kuis</p><span
+                                    class="bg-[#FF908E] text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-[0_3px_0_0_#e57373]">20XP</span>
+                            </div>
                         </div>
                     </div>
                 </div>

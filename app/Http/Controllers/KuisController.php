@@ -28,23 +28,12 @@ class KuisController extends Controller
     /**
      * Halaman instruksi sebelum mulai kuis
      */
-    public function intruksi($id) {
-        $kuis = Kuis::findOrFail($id);
+    public function intruksi($id)
+{
+    $kuis = Kuis::withCount('questions')->findOrFail($id);
 
-        // BAGIAN PROTEKSI DIHAPUS/DIKOMENTARI 
-        // Agar user bisa masuk ke sini saat klik tombol "Ulang"
-        /*
-        $sudahDikerjakan = HasilKuis::where('user_id', Auth::id())
-                                    ->where('kuis_id', $id)
-                                    ->exists();
-
-        if ($sudahDikerjakan) {
-            return redirect()->route('kuis.index')->with('info', 'Kamu sudah mengerjakan kuis ini!');
-        }
-        */
-
-        return view('kuis.intruksi', compact('kuis'));
-    }
+    return view('kuis.intruksi', compact('kuis'));
+}
 
     /**
      * Halaman pengerjaan soal

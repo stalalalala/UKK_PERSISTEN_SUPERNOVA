@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PERSISTEN - Kuis {{ $kuis->set_ke }}</title>
+    <title>PERSISTEN - Kuis Fundamental - Set {{ $kuis->set_ke }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,14 +42,13 @@
     </style>
 </head>
 
-<body class="bg-slate-100 p-4 md:p-6 pt-0 desktop-fixed">
+<body class="p-4 md:p-6 pt-0 desktop-fixed">
 
     <div x-data="kuisApp()" @keydown.window.enter="nextSoal()" x-init="startTimer()" x-cloak
-        class="h-full flex flex-col w-full mx-auto">
+        class="h-full flex flex-col max-w-[1440px] mx-auto">
 
         <div class="flex flex-row items-center justify-between mb-4 shrink-0">
-            <h1 class="text-lg md:text-xl font-bold text-[#2E3B66]">Set {{ $kuis->set_ke }} -
-                <span class="text-blue-500">{{ $kuis->category->name ?? 'Kuis' }}</span>
+            <h1 class="text-lg md:text-xl font-bold text-[#2E3B66]">KUIS FUNDAMENTAL</span>
             </h1>
             <div class="flex items-center gap-2 md:gap-4">
                 <div
@@ -65,7 +64,7 @@
 
                 <button @click="confirmExit()"
                     class="bg-red-500 hover:bg-red-600 text-white  border-2 border-red-600 px-3 h-8 rounded-full font-medium text-xs md:text-sm shadow-xl transition-all active:scale-95 flex items-center justify-center">
-                    Keluar Ujian
+                    KELUAR
                 </button>
             </div>
         </div>
@@ -75,11 +74,12 @@
 
             <div class="flex-1 flex flex-col min-h-0 border-b lg:border-b-0 lg:border-r-2 border-gray-100 bg-white">
 
-                <div class="pt-5 px-4 md:px-7">
+                <div class="pt-4 px-4 md:px-7">
                     <div class="flex justify-between items-center mb-4">
                         <p class="text-sm font-bold text-blue-500 uppercase tracking-widest">
-                            {{ $kuis->kategori->name ?? 'Kuis Fundamental' }}</p>
-                        <p class="text-sm font-medium text-gray-400">Soal <span x-text="soalAktifIdx + 1"></span> dari
+                            Set {{ $kuis->set_ke }} - Kuis Fundamental </p>
+                        <p class="text-sm font-medium uppercase text-gray-400">Soal <span
+                                x-text="soalAktifIdx + 1"></span> dari
                             <span x-text="questions.length"></span>
                         </p>
                     </div>
@@ -141,7 +141,8 @@
             </div>
 
             <div class="w-full lg:w-[40%] bg-white p-4 flex flex-col ">
-                <h3 class="text-sm font-semibold text-[#2E3B66] mb-4">Pilih Jawaban:</h3>
+                <h3 class="text-sm font-bold text-blue-500 uppercase tracking-widest mb-3">Pilih Jawaban</h3>
+                <p class="text-xs font-medium text-gray-400">Pilih satu jawaban yang paling tepat.</p>
                 <div class="space-y-4 overflow-y-auto custom-scroll">
                     <template x-for="opt in ['a', 'b', 'c', 'd', 'e']" :key="opt">
                         <div @click="pilihJawaban(questions[soalAktifIdx].id, opt)"
