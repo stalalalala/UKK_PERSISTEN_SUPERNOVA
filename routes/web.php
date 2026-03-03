@@ -175,7 +175,7 @@ Route::middleware(['auth'])->group(function () {
 ///////////////////////////////////
     // PESERTA
 //////////////////////////////////
-    Route::middleware(['role:peserta','verified'])->group(function () {
+    Route::middleware(['role:peserta','verified','dailyxp'])->group(function () {
 
         Route::get('/', [BerandaController::class, 'index'])->name('beranda');
         Route::get('/profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile.index');

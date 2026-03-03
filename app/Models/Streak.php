@@ -15,8 +15,8 @@ class Streak extends Model
         'last_recovery'
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    public function streak()
+{
+    return $this->hasOne(\App\Models\Streak::class);
+}
 }
