@@ -115,7 +115,7 @@
         <div class="flex flex-col items-center mb-12">
             <div
                 class="bg-blue-600 text-white px-8 py-1.5 rounded-full font-bold shadow-lg -mb-10 z-20 tracking-widest text-sm italic">
-                • Level 1 •
+                • Level {{ auth()->user()->streak->level ?? 1 }} •
             </div>
 
             <div class="slime relative z-10 w-full max-w-[320px] md:max-w-[500px] lg:max-w-[600px]"
@@ -124,16 +124,40 @@
                     class="pointer-events-none select-none w-full h-auto"></object>
             </div>
 
-            <div class="w-full max-w-md -mt-5 md:-mt-10 relative z-20">
-                <div
-                    class="bg-blue-400/30 rounded-full h-8 md:h-9 p-1 border-2 border-blue-400/50 shadow-inner relative overflow-hidden">
+            @php
+            $streak = auth()->user()->streak;
+            $xp = $streak->total_xp ?? 0;
+            $level = $streak->level ?? 1;
+            $pet = $streak->pet ?? 'default_pet.png';
+
+            // Tentukan maxXp sesuai level
+            $levelRanges = [
+                1 => 300,
+                6 => 600,
+                11 => 1000
+            ];
+            $maxXp = 300;
+            foreach ($levelRanges as $start => $max) {
+                if ($level >= $start) {
+                    $maxXp = $max;
+                }
+            }
+            @endphp
+
+            <div x-data="{ xp: {{ $xp }}, maxXp: {{ $maxXp }}, level: {{ $level }}, pet: '{{ $pet }}' }" class="w-full max-w-md relative z-20">
+                <div class="bg-blue-400/30 rounded-full h-8 md:h-9 p-1 border-2 border-blue-400/50 shadow-inner relative overflow-hidden">
                     <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full transition-all duration-700"
-                        :style="`width: ${(xp/maxXp)*100}%`"></div>
-                    <div
-                        class="absolute inset-0 flex items-center justify-center text-white font-black text-sm md:text-lg drop-shadow-md">
-                        <span x-text="xp"></span>/<span x-text="maxXp"></span>
+                        :style="`width: ${(xp/maxXp)*100}%`">
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center text-white font-black text-sm md:text-lg drop-shadow-md">
+                        <span x-text="xp"></span>/<span x-text="maxXp">
                     </div>
                 </div>
+
+            
+                {{-- <div class="mt-4 flex justify-center">
+                    <img :src="`/images/pets/${pet}.png`" alt="Pet" class="w-16 h-16">
+                </div> --}}
             </div>
         </div>
 
@@ -146,7 +170,7 @@
                         <div class="relative md:absolute md:-left-12 md:-top-20 drop-shadow-2xl w-48 md:w-80">
                             <img src="{{ asset('img/api.png') }}" class="w-full h-auto object-contain">
                             <span
-                                class="absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-black text-4xl md:text-5xl italic tracking-tighter drop-shadow-md">X7</span>
+                                class="absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-black text-4xl md:text-5xl italic tracking-tighter drop-shadow-md">X{{ auth()->user()->streak->jumlah_hari ?? 0 }}</span>
                         </div>
                         <div class="md:ml-48 text-center md:text-left">
                             <span
