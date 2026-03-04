@@ -104,9 +104,6 @@
     }
 }">
 
-<<<<<<< HEAD
-    <aside x-data="{ currentPage: 'tryout' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-=======
     @foreach($tryouts as $t)
     <form id="delete-form-{{ $t->id }}" action="{{ route('admin.tryout.destroy', $t->id) }}" method="POST" class="hidden">
         @csrf
@@ -114,29 +111,33 @@
     </form>
     @endforeach
 
-    <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
->>>>>>> FiturTryout
-        class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
+      <aside x-data="{ currentPage: 'tryout' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+    class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
-        <div class="flex items-center justify-between mb-10 px-2">
-            <div class="flex items-center gap-3">
-                <div class="bg-white p-2 rounded-xl">
-                    <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                            d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                </div>
-                <h1 class="text-2xl font-bold tracking-tight uppercase">Persisten</h1>
+    <div class="flex items-center justify-between mb-10 px-2">
+        <div class="flex items-center gap-3">
+            <div class="bg-white p-2 rounded-xl">
+                <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
             </div>
-            <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+            <h1 class="text-2xl font-bold tracking-tight">P E R S I S T E N</h1>
         </div>
+        <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
 
-        <nav class="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
-<<<<<<< HEAD
-             <a href="{{ route('admin.dashboard.index') }}" 
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl  transition-all duration-200 group text-left">
+    <nav class="flex-1 space-y-1 overflow-y-auto pr-2 
+                [&::-webkit-scrollbar]:w-1 
+                [&::-webkit-scrollbar-track]:bg-transparent 
+                [&::-webkit-scrollbar-thumb]:bg-white/20 
+                [&::-webkit-scrollbar-thumb]:rounded-full">
+        
+        <a href="{{ route('admin.dashboard.index') }}" 
+            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
                 </svg>
@@ -161,7 +162,7 @@
         </a>
 
          <a href="{{ route('admin.tryout.index') }}" x-init="if(currentPage === 'tryout') { $el.scrollIntoView({ block: 'center' }) }"
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left bg-[#D4DEF7]  text-[#2E3B66] ">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
             </svg>
@@ -222,9 +223,11 @@ PTN</span>
             <span class="text-md font-regular">Monitoring dan
 laporan</span>
         </a>
+
+        
         </nav>
 
-         <form action="{{ route('logout') }}" method="POST" class="w-full inline">
+    <form action="{{ route('logout') }}" method="POST" class="w-full inline">
     @csrf
     <button type="submit" class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5 md:size-6 text-white">
@@ -233,55 +236,7 @@ laporan</span>
         <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
     </button>
     </form>
-=======
-            <a href="#" class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                <i class="fa-solid fa-chart-pie w-6 shrink-0 text-center"></i>
-                <span class="text-md font-regular">Dashboard</span>
-            </a>
-            <a href="#" class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                <i class="fa-solid fa-users w-6 shrink-0 text-center"></i>
-                <span class="text-md font-regular">Manajemen user</span>
-            </a>
-            <a href="#" class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                <i class="fa-solid fa-bolt w-6 shrink-0 text-center"></i>
-                <span class="text-md font-regular">Manajemen streak</span>
-            </a>
-            <a href="{{ route('admin.tryout.index') }}" class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7] text-[#2E3B66] transition-all duration-200 group text-left">
-                <i class="fa-solid fa-file-signature w-6 shrink-0 text-center"></i>
-                <span class="text-md font-regular">Manajemen tryout</span>
-            </a>
-            <a href="#" class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                <i class="fa-solid fa-book-open w-6 shrink-0 text-center"></i>
-                <span class="text-md font-regular">Manajemen kuis</span>
-            </a>
-            <a href="#" class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                <i class="fa-solid fa-pencil w-6 shrink-0 text-center"></i>
-                <span class="text-md font-regular">Manajemen latihan soal</span>
-            </a>
-            <a href="#" class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                <i class="fa-solid fa-video w-6 shrink-0 text-center"></i>
-                <span class="text-md font-regular">Manajemen video</span>
-            </a>
-            <a href="#" class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                <i class="fa-solid fa-brain w-6 shrink-0 text-center"></i>
-                <span class="text-md font-regular">Manajemen minat bakat</span>
-            </a>
-            <a href="#" class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                <i class="fa-solid fa-graduation-cap w-6 shrink-0 text-center"></i>
-                <span class="text-md font-regular">Manajemen peluang PTN</span>
-            </a>
-            <a href="#" class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                <i class="fa-solid fa-chart-line w-6 shrink-0 text-center"></i>
-                <span class="text-md font-regular">Monitoring dan laporan</span>
-            </a>
-        </nav>
-
-        <button class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
-            <i class="fa-solid fa-right-from-bracket text-lg"></i>
-            <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
-        </button>
->>>>>>> FiturTryout
-    </aside>
+</aside>
 
     <div x-show="mobileMenuOpen" x-transition x-cloak @click="mobileMenuOpen = false" class="fixed inset-0 bg-black/50 z-40 lg:hidden"></div>
 

@@ -85,7 +85,6 @@
         reader.onload = (e) => {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
-            let count = 0;
             workbook.SheetNames.forEach(sheetName => {
                 const sIdx = this.subtesList.findIndex(s => s.name.toLowerCase() === sheetName.toLowerCase());
                 if (sIdx !== -1) {
@@ -108,7 +107,6 @@
                         });
                         current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
                         current.completed = (current.soalTerisi >= this.targetSoal); 
-                        count++;
                     }
                 }
             });
@@ -232,16 +230,72 @@
                 <h3 class="font-bold text-lg text-[#4A72D4]">Tambah Gambar</h3>
                 <button type="button" @click="showImageModal = false" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
             </div>
+            <div class="space-y-6">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Upload File</label>
+                    <label class="flex items-center justify-center w-full h-24 border-2 border-dashed border-blue-100 rounded-2xl bg-blue-50/50 cursor-pointer hover:bg-blue-50 transition-all text-center">
+                        <div><i class="fa-solid fa-cloud-arrow-up text-blue-400 text-xl mb-1"></i><p class="text-[10px] font-bold text-blue-400 uppercase">Pilih File</p></div>
+                        <input type="file" class="hidden" @change="handleImageFile">
+                    </label>
+                </div>
+                <div class="relative flex items-center py-2"><div class="flex-grow border-t border-gray-100"></div><span class="mx-4 text-[10px] font-bold text-gray-300 uppercase">Atau</span><div class="flex-grow border-t border-gray-100"></div></div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Link Gambar (URL)</label>
+                    <div class="flex gap-2">
+                        <input type="text" x-model="tempImageUrl" placeholder="https://..." class="flex-1 bg-gray-50 rounded-xl py-3 px-4 text-xs outline-none">
+                        <button type="button" @click="applyImageUrl" class="bg-[#4A72D4] text-white px-4 rounded-xl text-xs font-bold">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            <nav
-                class="flex-1 space-y-1 overflow-y-auto pr-2 
+    <div x-show="showImportModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" x-transition>
+        <div class="bg-white w-full max-w-md rounded-[30px] p-8 shadow-2xl" @click.away="showImportModal = false">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-lg text-[#4A72D4]">Import Soal via Sheet</h3>
+                <button type="button" @click="showImportModal = false" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-6 text-center">
+                <p class="text-xs text-gray-400 font-medium">Pastikan nama Sheet di Excel sesuai dengan nama Subtes.</p>
+                <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-emerald-100 rounded-[30px] bg-emerald-50/50 cursor-pointer hover:bg-emerald-50 transition-all">
+                    <i class="fa-solid fa-file-excel text-emerald-400 text-3xl mb-3"></i>
+                    <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Klik untuk pilih file Excel</p>
+                    <input type="file" class="hidden" accept=".xlsx, .xls" @change="importSheet">
+                </label>
+                <button type="button" @click="unduhTemplate()" class="text-[10px] font-bold text-[#4A72D4] uppercase hover:underline">Belum punya template? Unduh di sini</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex h-full w-full">
+        <aside x-data="{ currentPage: 'tryout' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+    class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
+
+    <div class="flex items-center justify-between mb-10 px-2">
+        <div class="flex items-center gap-3">
+            <div class="bg-white p-2 rounded-xl">
+                <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight">P E R S I S T E N</h1>
+        </div>
+        <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    <nav class="flex-1 space-y-1 overflow-y-auto pr-2 
                 [&::-webkit-scrollbar]:w-1 
                 [&::-webkit-scrollbar-track]:bg-transparent 
                 [&::-webkit-scrollbar-thumb]:bg-white/20 
                 [&::-webkit-scrollbar-thumb]:rounded-full">
-
-                 <a href="{{ route('admin.dashboard.index') }}" 
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl  transition-all duration-200 group text-left">
+        
+        <a href="{{ route('admin.dashboard.index') }}"
+            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
                 </svg>
@@ -266,7 +320,7 @@
         </a>
 
          <a href="{{ route('admin.tryout.index') }}" x-init="if(currentPage === 'tryout') { $el.scrollIntoView({ block: 'center' }) }"
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left bg-[#D4DEF7]  text-[#2E3B66]">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
             </svg>
@@ -328,11 +382,10 @@ PTN</span>
 laporan</span>
         </a>
 
-              
+        
+        </nav>
 
-            </nav>
-
-            <form action="{{ route('logout') }}" method="POST" class="w-full inline">
+    <form action="{{ route('logout') }}" method="POST" class="w-full inline">
     @csrf
     <button type="submit" class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5 md:size-6 text-white">
@@ -341,68 +394,7 @@ laporan</span>
         <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
     </button>
     </form>
-        </aside>
-
-        <div x-show="mobileMenuOpen" x-transition:enter="transition opacity-ease-out duration-300"
-            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-            x-transition:leave="transition opacity-ease-in duration-300" x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0" @click="mobileMenuOpen = false"
-            class="fixed inset-0 bg-black/50 z-40 lg:hidden">
-
-            <div class="space-y-6">
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Upload File</label>
-                    <label class="flex items-center justify-center w-full h-24 border-2 border-dashed border-blue-100 rounded-2xl bg-blue-50/50 cursor-pointer hover:bg-blue-50 transition-all text-center">
-                        <div><i class="fa-solid fa-cloud-arrow-up text-blue-400 text-xl mb-1"></i><p class="text-[10px] font-bold text-blue-400 uppercase">Pilih File</p></div>
-                        <input type="file" class="hidden" @change="handleImageFile">
-                    </label>
-                </div>
-                <div class="relative flex items-center py-2"><div class="flex-grow border-t border-gray-100"></div><span class="mx-4 text-[10px] font-bold text-gray-300 uppercase">Atau</span><div class="flex-grow border-t border-gray-100"></div></div>
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Link Gambar (URL)</label>
-                    <div class="flex gap-2">
-                        <input type="text" x-model="tempImageUrl" placeholder="https://..." class="flex-1 bg-gray-50 rounded-xl py-3 px-4 text-xs outline-none">
-                        <button type="button" @click="applyImageUrl" class="bg-[#4A72D4] text-white px-4 rounded-xl text-xs font-bold">OK</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div x-show="showImportModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" x-transition>
-        <div class="bg-white w-full max-w-md rounded-[30px] p-8 shadow-2xl" @click.away="showImportModal = false">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold text-lg text-[#4A72D4]">Import Soal via Sheet</h3>
-                <button type="button" @click="showImportModal = false" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-6 text-center">
-                <p class="text-xs text-gray-400 font-medium">Pastikan nama Sheet di Excel sesuai dengan nama Subtes.</p>
-                <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-emerald-100 rounded-[30px] bg-emerald-50/50 cursor-pointer hover:bg-emerald-50 transition-all">
-                    <i class="fa-solid fa-file-excel text-emerald-400 text-3xl mb-3"></i>
-                    <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Klik untuk pilih file Excel</p>
-                    <input type="file" class="hidden" accept=".xlsx, .xls" @change="importSheet">
-                </label>
-                <button type="button" @click="unduhTemplate()" class="text-[10px] font-bold text-[#4A72D4] uppercase hover:underline">Belum punya template? Unduh di sini</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="flex h-full w-full">
-        <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-            class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-all lg:static shrink-0 h-full">
-            <div class="flex items-center justify-between mb-10 px-2">
-                <div class="flex items-center gap-3">
-                    <div class="bg-white p-2 rounded-xl text-[#4A72D4]"><i class="fa-solid fa-bolt"></i></div>
-                    <h1 class="text-2xl font-bold uppercase tracking-tighter">Persisten</h1>
-                </div>
-                <button @click="mobileMenuOpen = false" class="lg:hidden p-2 text-white"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <nav class="flex-1 space-y-1">
-                <div class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7] text-[#2E3B66]">
-                    <i class="fa-solid fa-file-pen"></i><span class="font-bold text-sm">Manajemen tryout</span>
-                </div>
-            </nav>
-        </aside>
+</aside>
 
         <main class="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
             <form id="formTryout" action="{{ route('admin.tryout.store') }}" method="POST">
@@ -531,7 +523,7 @@ laporan</span>
                         </div>
 
                         <div class="space-y-6">
-                            <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 text-center">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-50 text-center sticky top-8">
                                 <h4 class="text-[10px] font-bold text-gray-400 uppercase mb-6 tracking-widest">Navigasi Soal</h4>
                                 <div class="grid grid-cols-4 gap-2 mb-8">
                                     <template x-for="n in targetSoal">
