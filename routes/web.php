@@ -190,6 +190,7 @@ Route::middleware(['auth'])->group(function () {
            Streak & Video
         ======================= */
         Route::get('/streak', [StreakController::class, 'index'])->name('streak.index');
+        Route::post('/streak/restore', [StreakController::class,'restore'])->name('streak.restore');
         Route::get('/video', [VideoController::class, 'index'])->name('video.index');
 
 

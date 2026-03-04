@@ -43,7 +43,7 @@ class XpService
         $user->total_xp += $amount;
 
         // Update level
-        $user->level = floor($user->total_xp / self::XP_PER_LEVEL);
+        $user->level = floor($user->total_xp / self::XP_PER_LEVEL) + 1;
 
         // Update streak
         $this->updateStreak($user);
@@ -111,8 +111,10 @@ class XpService
 
     public function getCurrentCharacter($user)
     {
-        return Character::where('min_level', '<=', $user->level)
-            ->orderByDesc('min_level')
-            ->first();
+        // return Character::where('min_level', '<=', $user->level)
+        //     ->orderByDesc('min_level')
+        //     ->first();
+
+        return null;
     }
 }

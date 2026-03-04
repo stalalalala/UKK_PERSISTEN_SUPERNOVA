@@ -72,7 +72,6 @@ public function submit(Request $request, $id)
 {
     $latihan = Latihan::with('questions')->findOrFail($id);
 
-    // Decode jawaban dari Alpine
     $jawabanUser = json_decode($request->input('jawaban'), true) ?? [];
 
     $benar = 0;
@@ -94,7 +93,6 @@ public function submit(Request $request, $id)
     $totalSoal = $latihan->questions->count();
     $skor = $totalSoal > 0 ? round(($benar / $totalSoal) * 100) : 0;
 
-    // SIMPAN KE DATABASE (Termasuk detail jawabannya)
     $hasilRecord = HasilLatihan::updateOrCreate(
         [
             'user_id'    => Auth::id(),
@@ -105,22 +103,19 @@ public function submit(Request $request, $id)
             'salah'         => $salah,
             'kosong'        => $kosong,
             'skor'          => $skor,
-            'list_jawaban'  => json_encode($jawabanUser), // SIMPAN DISINI BIAR GA ILANG
+            'list_jawaban'  => json_encode($jawabanUser),
         ]
     );
 
-    // Kirim data ke view hasil (langsung setelah submit)
+    // 🔥 TAMBAHKAN XP DI SINI (SEBELUM RETURN)
+    $xpService = new XpService();
+    $xpService->addXp(Auth::user(), 'latihan', 20);
+
     return view('latihan.hasil', [
         'latihan'     => $latihan,
         'hasil'       => $hasilRecord,
         'jawabanUser' => $jawabanUser
     ]);
-
-    $xpService = new XpService();
-    $xpService->addXp(Auth::user(), 'latihan', 20);
-
-    return redirect()->route('latihan.index')
-        ->with('success','Latihan selesai +20 XP');
 }
 
 /* =========================
