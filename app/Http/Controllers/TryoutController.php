@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\AdminTryout;
 use App\Models\SoalTryout;
 use App\Services\XpService;
+use App\Models\Universitas;
+use App\Models\Prodi;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -21,11 +23,39 @@ class TryoutController extends Controller
         $now = Carbon::now();
         $userId = Auth::id();
 
-        // 1. Ambil semua tryout
+        // 1. Ambil target tryout user dari tabel baru: user_target_tryouts
+        $userTarget = DB::table('user_target_tryouts')
+            ->join('prodis', 'user_target_tryouts.prodi_id', '=', 'prodis.id')
+            ->join('universitas', 'prodis.universitas_id', '=', 'universitas.id')
+            ->where('user_id', $userId)
+            ->select(
+                'universitas.nama_univ', 
+                'prodis.nama_prodi', 
+                'prodis.id as prodi_id', 
+                'prodis.kuota', 
+                'prodis.peminat',
+                'universitas.id as universitas_id'
+            )
+            ->first();
+
+        // 2. Hitung Peluang Lolos (Logika: Kuota / Peminat * 100)
+        $peluangLolos = 0;
+        if ($userTarget && $userTarget->peminat > 0) {
+            $peluangLolos = round(($userTarget->kuota / $userTarget->peminat) * 100);
+            if ($peluangLolos > 100) $peluangLolos = 100;
+        }
+
+        // 3. Ambil data Universitas & Prodi untuk Dropdown
+        $allUnivs = Universitas::with(['prodis' => function($q) {
+                $q->where('is_deleted', false);
+            }])
+            ->where('is_deleted', false)
+            ->get();
+
+        // 4. Ambil semua tryout
         $tryouts = AdminTryout::orderBy('id', 'asc')->get();
 
-        // 2. Ambil ID tryout yang sudah pernah dikerjakan oleh user ini
-        // Kita cek lewat tabel tryout_jawaban_peserta
+        // 5. Ambil ID tryout yang sudah pernah dikerjakan
         $userResults = DB::table('tryout_jawaban_peserta')
             ->join('soal_tryouts', 'tryout_jawaban_peserta.soal_id', '=', 'soal_tryouts.id')
             ->join('tryout_categories', 'soal_tryouts.category_id', '=', 'tryout_categories.id')
@@ -34,21 +64,43 @@ class TryoutController extends Controller
             ->distinct()
             ->get();
 
-        // 3. Tentukan status ketersediaan (is_available)
-        $tryouts->transform(function ($item) use ($now, $userResults) {
+        // 6. Tentukan status ketersediaan & Kunci Tryout
+        $tryouts->transform(function ($item) use ($now, $userResults, $userTarget) {
             $isWithinDate = ($now >= $item->tanggal && $now <= $item->tanggal_akhir);
-            
-            // Cek apakah user sudah mengerjakan TO ini
             $sudahDikerjakan = $userResults->contains('tryout_id', $item->id);
 
-            // TO tersedia JIKA: Aktif AND Dalam rentang tanggal AND Belum pernah dikerjakan
-            $item->is_available = ($item->is_active && $isWithinDate && !$sudahDikerjakan);
+            // LOGIKA UTAMA: Tersedia jika aktif, di dalam tanggal, belum dikerjakan, DAN SUDAH ISI TARGET
+            $item->is_available = ($item->is_active && $isWithinDate && !$sudahDikerjakan && $userTarget);
             
+            $item->is_locked_by_target = !$userTarget;
+            $item->sudah_dikerjakan = $sudahDikerjakan;
+
             return $item;
         });
 
-        // Kirim $userResults ke view agar index.blade.php tidak error lagi
-        return view('tryout.index', compact('tryouts', 'userResults'));
+        return view('tryout.index', compact('tryouts', 'userResults', 'userTarget', 'peluangLolos', 'allUnivs'));
+    }
+
+    /**
+     * Simpan atau Update Target Tryout Peserta
+     */
+    public function updateTarget(Request $request)
+    {
+        $request->validate([
+            'prodi_id' => 'required|exists:prodis,id'
+        ]);
+        
+        // Simpan ke tabel user_target_tryouts
+        DB::table('user_target_tryouts')->updateOrInsert(
+            ['user_id' => Auth::id()],
+            [
+                'prodi_id' => $request->prodi_id,
+                'updated_at' => now(),
+                'created_at' => now()
+            ]
+        );
+
+        return response()->json(['status' => 'success', 'message' => 'Target Tryout berhasil diperbarui']);
     }
 
     /**
@@ -57,9 +109,14 @@ class TryoutController extends Controller
     public function intruksi($id) 
     {
         $tryout = AdminTryout::findOrFail($id);
-        
-        // Proteksi: Jika sudah pernah mengerjakan, lempar ke halaman hasil
         $userId = Auth::id();
+
+        // Keamanan: Cek apakah user sudah mengisi target tryout
+        $hasTarget = DB::table('user_target_tryouts')->where('user_id', $userId)->exists();
+        if (!$hasTarget) {
+            return redirect()->route('tryout.index')->with('error', 'Silakan pilih Universitas & Jurusan terlebih dahulu.');
+        }
+        
         $sudahDikerjakan = DB::table('tryout_jawaban_peserta')
             ->join('soal_tryouts', 'tryout_jawaban_peserta.soal_id', '=', 'soal_tryouts.id')
             ->join('tryout_categories', 'soal_tryouts.category_id', '=', 'tryout_categories.id')
@@ -79,9 +136,8 @@ class TryoutController extends Controller
         return view('tryout.intruksi', compact('tryout', 'firstCategory'));
     }
 
-    // ... (Fungsi soal, jeda, hasil, ranking, simpanJawaban, dan generateSertifikat tetap sama seperti kode Anda)
-    // Saya tidak mengubahnya agar logika pengerjaan Anda tidak rusak.
-    
+    // --- Fungsi lainnya (soal, jeda, hasil, ranking, simpanJawaban, generateSertifikat) 
+    // tetap sama persis dengan kode awal Anda tanpa perubahan fitur ---
     public function soal($id, $category_id = null) 
     {
         $tryout = AdminTryout::findOrFail($id);

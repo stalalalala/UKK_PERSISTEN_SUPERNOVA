@@ -104,9 +104,11 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('videoPembelajaran', AdminVideoController::class);
 
         // Peluang PTN
+        Route::post('/peluangPtn/{id}/restore', [HalamanPeluangPtnController::class, 'restore'])->name('peluang.restore');
+        Route::delete('/peluangPtn/{id}/force', [HalamanPeluangPtnController::class, 'forceDelete'])->name('peluang.forceDelete');
+        Route::post('/peluangPtn/import', [HalamanPeluangPtnController::class, 'importExcel'])->name('peluang.import');
+
         Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
-        Route::post('/peluangPtn/store', [HalamanPeluangPtnController::class, 'store'])->name('peluangPtn.store');
-        Route::delete('/peluangPtn/{id}', [HalamanPeluangPtnController::class, 'destroy'])->name('peluangPtn.destroy');
 
         // TRYOUT
         Route::resource('tryout', AdminTryoutController::class);
@@ -117,7 +119,7 @@ Route::middleware(['auth'])->group(function () {
     ->name('minatBakat.manajemen');
 
         Route::post('minat-bakat/soal', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'storeSoal'])
-            ->name('minatBBakat.soal.store');
+            ->name('minatBakat.soal.store');
 
         Route::post('minat-bakat/soal/restore', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'restoreSoal'])
             ->name('minatBakat.soal.restore');
@@ -137,10 +139,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('minat-bakat/soal/import-bulk', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'importSoalBulk'])
     ->name('minatBakat.soal.importBulk');
 
-    Route::resource('minatBakat', AdminMinatBakatController::class)->names([
+        Route::resource('minatBakat', AdminMinatBakatController::class)->names([
             'index'   => 'minatBakat.index',
             'store'   => 'minatBakat.kategori.store',
-            'update'  => 'minatakat.kategori.update',
+            'update'  => 'minatBakat.kategori.update',
             'destroy' => 'minatBakat.kategori.destroy',
         ]);
         
@@ -208,6 +210,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/hasil/{id}', [TryoutController::class, 'hasil'])->name('hasil');
         Route::get('/ranking/{id}', [TryoutController::class, 'ranking'])->name('ranking');
         Route::get('/sertifikat/{id}', [TryoutController::class, 'generateSertifikat'])->name('sertifikat');
+        Route::post('/update-target', [TryoutController::class, 'updateTarget'])->name('updateTarget');
     });
         
         // Latihan

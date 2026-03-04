@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PERSISTEN - Try Out</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -15,35 +14,62 @@
     <style>
         body { font-family: 'Poppins', sans-serif; }
         [x-cloak] { display: none !important; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 
 <body class="bg-white min-h-screen" x-data="{
     currentPage: 1,
     itemsPerPage: 8,
-    /* Logika: is_open hanya true jika tersedia DAN belum pernah dikerjakan */
-    allTO: {{ $tryouts->map(function($t, $index) use ($userResults) {
-        $sudahDikerjakan = $userResults->contains('tryout_id', $t->id);
+    allUnivs: {{ $allUnivs->toJson() }},
+    univSelectedId: '{{ $userTarget->universitas_id ?? '' }}',
+    univSelectedName: '{{ $userTarget->nama_univ ?? 'Pilih Universitas' }}',
+    jurusanSelectedId: '{{ $userTarget->prodi_id ?? '' }}',
+    jurusanSelectedName: '{{ $userTarget->nama_prodi ?? 'Pilih Jurusan' }}',
+
+    allTryouts: {{ $tryouts->map(function($t, $index) {
         return [
             'id' => $t->id,
             'nomor' => $index + 1,
             'nama' => $t->nama_tryout,
-            'is_open' => (bool)$t->is_available && !$sudahDikerjakan, 
-            'sudah_dikerjakan' => $sudahDikerjakan,
-            'tanggal' => $t->tanggal ? $t->tanggal->format('d-M') : '-',
-            'tanggal_akhir' => $t->tanggal_akhir ? $t->tanggal_akhir->format('d-M') : '-',
+            'is_open' => (bool)$t->is_available, 
+            'is_locked' => (bool)$t->is_locked_by_target,
+            'sudah_dikerjakan' => (bool)$t->sudah_dikerjakan,
+            'tanggal' => $t->tanggal ? \Carbon\Carbon::parse($t->tanggal)->format('d-M') : '-',
+            'tanggal_akhir' => $t->tanggal_akhir ? \Carbon\Carbon::parse($t->tanggal_akhir)->format('d-M') : '-',
             'url_mengerjakan' => route('tryout.intruksi', $t->id),
             'url_hasil' => route('tryout.hasil', $t->id)
         ];
     })->toJson() }},
-    get totalPages() { return Math.ceil(this.allTO.length / this.itemsPerPage) || 1; },
-    get paginatedTO() {
+
+    get totalPages() { return Math.ceil(this.allTryouts.length / this.itemsPerPage) || 1; },
+    get paginatedTryouts() {
         let start = (this.currentPage - 1) * this.itemsPerPage;
-        return this.allTO.slice(start, start + this.itemsPerPage);
+        return this.allTryouts.slice(start, start + this.itemsPerPage);
+    },
+
+    async saveTargetTryout() {
+        if(!this.jurusanSelectedId) return;
+        try {
+            const response = await fetch('{{ route('tryout.updateTarget') }}', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ prodi_id: this.jurusanSelectedId })
+            });
+            if(response.ok) {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Error saving target:', error);
+        }
     }
 }">
 
-    <div class="max-w-[1440px] mx-auto" x-data="{ open: false }">
+    <div class="max-w-[1440px] mx-auto">
         <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4 relative z-10">
             <div class="w-20 md:w-28 h-12 bg-blue-400 rounded-full flex-shrink-0"></div>
             <ul class="hidden lg:flex gap-12 text-gray-800 font-medium text-sm">
@@ -70,75 +96,96 @@
     </div>
 
     <main class="max-w-[1440px] mx-auto px-4 md:px-10 py-8">
-        <section x-data="{ openUniv: false, openJurusan: false, univSelected: 'Universitas Indonesia', jurusanSelected: 'Teknik Informatika' }" class="border-2 border-gray-200 rounded-[2.5rem] p-6 mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+        <section x-data="{ openUniv: false, openJurusan: false }" class="border-2 border-gray-200 rounded-[2.5rem] p-6 mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
             <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="relative">
                     <div @click="openUniv = !openUniv; openJurusan = false" class="border border-gray-200 rounded-[2rem] px-6 py-8 cursor-pointer hover:border-blue-300 transition-all bg-white shadow-sm">
                         <p class="text-gray-500 text-sm font-semibold mb-1">Pilih Universitas</p>
                         <div class="flex justify-between items-center font-bold text-lg text-[#2E3B66]">
-                            <span x-text="univSelected"></span>
+                            <span x-text="univSelectedName"></span>
                             <i class="fa-solid fa-chevron-down text-gray-400 text-sm transition-transform" :class="openUniv ? 'rotate-180' : ''"></i>
                         </div>
                     </div>
+                    <div x-show="openUniv" @click.away="openUniv = false" x-cloak class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl max-h-64 overflow-y-auto custom-scrollbar p-2">
+                        <template x-for="univ in allUnivs" :key="univ.id">
+                            <div @click="univSelectedId = univ.id; univSelectedName = univ.nama_univ; openUniv = false; jurusanSelectedName = 'Pilih Jurusan'; jurusanSelectedId = ''" 
+                                 class="p-4 hover:bg-blue-50 rounded-xl cursor-pointer font-bold text-[#2E3B66] transition-colors" x-text="univ.nama_univ"></div>
+                        </template>
+                    </div>
                 </div>
+
                 <div class="relative">
-                    <div @click="openJurusan = !openJurusan; openUniv = false" class="border border-gray-200 rounded-[2rem] px-6 py-8 cursor-pointer hover:border-blue-300 transition-all bg-white shadow-sm">
+                    <div @click="if(univSelectedId) openJurusan = !openJurusan; openUniv = false" 
+                         :class="!univSelectedId ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'bg-white cursor-pointer hover:border-blue-300'"
+                         class="border border-gray-200 rounded-[2rem] px-6 py-8 transition-all shadow-sm">
                         <p class="text-gray-500 text-sm font-semibold mb-1">Pilih Jurusan</p>
                         <div class="flex justify-between items-center font-bold text-lg text-[#2E3B66]">
-                            <span x-text="jurusanSelected"></span>
+                            <span x-text="jurusanSelectedName"></span>
                             <i class="fa-solid fa-chevron-down text-gray-400 text-sm transition-transform" :class="openJurusan ? 'rotate-180' : ''"></i>
                         </div>
                     </div>
+                    <div x-show="openJurusan" @click.away="openJurusan = false" x-cloak class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl max-h-64 overflow-y-auto custom-scrollbar p-2">
+                        <template x-if="univSelectedId">
+                            <template x-for="prodi in allUnivs.find(u => u.id == univSelectedId)?.prodis || []" :key="prodi.id">
+                                <div @click="jurusanSelectedId = prodi.id; jurusanSelectedName = prodi.nama_prodi; openJurusan = false; saveTargetTryout()" 
+                                     class="p-4 hover:bg-blue-50 rounded-xl cursor-pointer font-bold text-[#2E3B66] transition-colors" x-text="prodi.nama_prodi"></div>
+                            </template>
+                        </template>
+                    </div>
                 </div>
             </div>
+
             <div class="bg-blue-500 rounded-[2rem] p-5 text-white relative overflow-hidden shadow-lg shadow-blue-200">
-                <div class="flex justify-between items-center mb-3"><span class="font-medium text-xl">Peluang Lolos</span><span class="text-3xl font-semibold">60%</span></div>
-                <div class="w-full bg-blue-700/40 h-5 rounded-full flex p-1 border border-white/20"><div class="bg-white w-[60%] h-full rounded-full transition-all duration-1000"></div></div>
-                <p class="text-md mt-3 opacity-90">Hasil dari 2 sesi Try Out!</p>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-medium text-xl">Peluang Lolos</span>
+                    <span class="text-3xl font-semibold">{{ $peluangLolos }}%</span>
+                </div>
+                <div class="w-full bg-blue-700/40 h-5 rounded-full flex p-1 border border-white/20">
+                    <div class="bg-white h-full rounded-full transition-all duration-1000" style="width: {{ $peluangLolos }}%"></div>
+                </div>
+                <p class="text-md mt-3 opacity-90 text-center">Isi target prodi untuk aktifkan Tryout!</p>
             </div>
         </section>
 
         <section class="border-2 border-gray-200 rounded-[3rem] p-8 md:p-10 mb-20">
             <div class="mb-10">
                 <h2 class="text-3xl font-black text-[#2E3B66]">Try Out UTBK</h2>
-                <p class="text-gray-500 font-medium">Simulasikan ujian UTBK mu dengan berbagai sesi Try Out disini!</p>
+                <p class="text-gray-500 font-medium text-sm">Pilih universitas terlebih dahulu untuk membuka sesi tryout.</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <template x-for="to in paginatedTO" :key="to.id">
-                    <a :href="to.is_open ? to.url_mengerjakan : (to.sudah_dikerjakan ? to.url_hasil : '#')">
-                        <div :class="to.is_open ? 'bg-blue-50 border-blue-100 hover:shadow-lg' : (to.sudah_dikerjakan ? 'bg-emerald-50 border-emerald-100 hover:shadow-lg' : 'bg-gray-50 opacity-60 border-gray-200 cursor-not-allowed')"
-                            class="rounded-[2rem] p-6 flex flex-col items-center relative transition-all group border">
+                <template x-for="to in paginatedTryouts" :key="to.id">
+                    <a :href="to.is_open ? to.url_mengerjakan : (to.sudah_dikerjakan ? to.url_hasil : '#')" 
+                       @click="if(to.is_locked) alert('Silakan pilih Universitas & Jurusan terlebih dahulu!')">
+                        
+                        <div :class="to.is_open ? 'bg-blue-50 border-blue-100 hover:shadow-lg' : (to.sudah_dikerjakan ? 'bg-emerald-50 border-emerald-100 hover:shadow-lg' : 'bg-gray-100 opacity-60 border-gray-200 cursor-not-allowed grayscale')"
+                            class="rounded-[2rem] p-6 flex flex-col items-center relative transition-all group border h-full">
                             
+                            <template x-if="to.is_locked">
+                                <div class="absolute -top-3 bg-red-500 text-white text-[10px] px-4 py-1 rounded-full font-black uppercase tracking-widest shadow-md z-20">Terkunci</div>
+                            </template>
+
                             <div class="w-full flex justify-between items-start mb-2">
                                 <span :class="to.is_open ? 'text-blue-400' : (to.sudah_dikerjakan ? 'text-emerald-400' : 'text-gray-400')" class="font-bold pt-1 text-lg uppercase tracking-tighter">Try Out</span>
                                 <span :class="to.is_open ? 'bg-blue-600' : (to.sudah_dikerjakan ? 'bg-emerald-600' : 'bg-gray-400')" class="text-white text-lg px-4 py-1 rounded-full font-bold">UTBK</span>
                             </div>
                             
-                            <div :class="to.is_open ? 'text-blue-500 group-hover:scale-110' : (to.sudah_dikerjakan ? 'text-emerald-500 group-hover:scale-110' : 'text-gray-300')" 
+                            <div :class="to.is_open ? 'text-blue-500 group-hover:scale-110' : (to.sudah_dikerjakan ? 'text-emerald-500' : 'text-gray-300')" 
                                  class="text-[100px] font-black leading-none mt-6 mb-1 transition-transform" x-text="to.nomor"></div>
                             
                             <div class="w-full mb-6 text-center">
                                 <div :class="to.is_open ? 'text-[#2E3B66]' : (to.sudah_dikerjakan ? 'text-[#2E3B66]' : 'text-gray-400')" 
-                                     class="text-sm font-black uppercase tracking-[0.15em] line-clamp-2 px-2" 
-                                     x-text="to.nama">
-                                </div>
+                                     class="text-sm font-black uppercase tracking-[0.15em] line-clamp-2 px-2" x-text="to.nama"></div>
                             </div>
 
-                            <div class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium shadow-sm w-full justify-center" 
+                            <div class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium shadow-sm w-full justify-center mt-auto" 
                                  :class="to.is_open ? 'text-blue-500' : (to.sudah_dikerjakan ? 'text-emerald-500' : 'text-gray-400')">
                                 
-                                <template x-if="to.is_open">
-                                    <i class="fa-solid fa-clock text-[10px]"></i>
-                                </template>
-                                <template x-if="to.sudah_dikerjakan">
-                                    <i class="fa-solid fa-circle-check text-[10px]"></i>
-                                </template>
-                                <template x-if="!to.is_open && !to.sudah_dikerjakan">
-                                    <i class="fa-solid fa-lock text-[10px]"></i>
-                                </template>
+                                <template x-if="to.is_open"><i class="fa-solid fa-clock text-[10px]"></i></template>
+                                <template x-if="to.sudah_dikerjakan"><i class="fa-solid fa-circle-check text-[10px]"></i></template>
+                                <template x-if="!to.is_open && !to.sudah_dikerjakan"><i class="fa-solid fa-lock text-[10px]"></i></template>
 
-                                <span class="text-[11px] font-bold" x-text="to.is_open ? (to.tanggal + ' - ' + to.tanggal_akhir) : (to.sudah_dikerjakan ? 'Lihat Hasil' : 'Belum Tersedia')"></span>
+                                <span class="text-[11px] font-bold" x-text="to.is_open ? (to.tanggal + ' - ' + to.tanggal_akhir) : (to.sudah_dikerjakan ? 'Lihat Hasil' : (to.is_locked ? 'Pilih Jurusan' : 'Belum Tersedia'))"></span>
                             </div>
                         </div>
                     </a>
@@ -157,4 +204,5 @@
 
     @include('layouts.footer')
 </body>
+
 </html>
