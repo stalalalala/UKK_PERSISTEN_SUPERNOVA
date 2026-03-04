@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\XpService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,44 +52,36 @@ return redirect()->route('verification.notice')
     }
 
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email'    => ['required','email'],
-            'password' => ['required'],
-        ]);
+{
+    $credentials = $request->validate([
+        'email'    => ['required','email'],
+        'password' => ['required'],
+    ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
 
-            /** @var \App\Models\User $user */
-            $user = Auth::user();
+        $user = Auth::user();
 
-            // ✅ Kalau admin → langsung masuk dashboard tanpa verifikasi
-            if ($user->role === 'admin') {
-                return redirect()->intended('/admin/dashboard');
-            }
-
-            // ✅ Kalau bukan admin dan belum verifikasi
-           if ($user->role === 'peserta' && !$user->hasVerifiedEmail()) {
-    return redirect()->route('verification.notice')
-        ->with('warning', 'Silakan verifikasi email terlebih dahulu.');
-}
-
-            // Default peserta
-            return redirect()->intended('/');
+        if ($user->role === 'admin') {
+            return redirect()->intended('/admin/dashboard');
         }
 
-        return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ])->onlyInput('email');
+        if ($user->role === 'peserta' && !$user->hasVerifiedEmail()) {
+            return redirect()->route('verification.notice')
+                ->with('warning', 'Silakan verifikasi email terlebih dahulu.');
+        }
+
+        // 🔥 XP LOGIN
+        $xpService = new XpService();
+        $xpService->addXp($user, 'login', 50);
+
+        return redirect()->intended('/');
     }
 
-    // ==============================
-    // GOOGLE LOGIN / DAFTAR
-    // ==============================
-   public function redirectToGoogle()
-{
-    return Socialite::driver('google')->stateless()->with(['prompt' => 'select_account'])->redirect();
+    return back()->withErrors([
+        'email' => 'Email atau password salah.',
+    ])->onlyInput('email');
 }
 
    public function handleGoogleCallback()
@@ -118,6 +111,9 @@ return redirect()->route('verification.notice')
 
         Auth::login($user);
         session()->regenerate();
+
+        $xpService = new \App\Services\XpService();
+$xpService->addXp($user, 'login', 50);
 
         return redirect('/'); // jangan pakai intended dulu
 

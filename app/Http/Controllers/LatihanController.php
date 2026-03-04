@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\HasilLatihan;
 use App\Models\Latihan;
+use App\Services\XpService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -114,6 +115,12 @@ public function submit(Request $request, $id)
         'hasil'       => $hasilRecord,
         'jawabanUser' => $jawabanUser
     ]);
+
+    $xpService = new XpService();
+    $xpService->addXp(Auth::user(), 'latihan', 20);
+
+    return redirect()->route('latihan.index')
+        ->with('success','Latihan selesai +20 XP');
 }
 
 /* =========================

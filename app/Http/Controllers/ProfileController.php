@@ -13,12 +13,9 @@ class ProfileController extends Controller
      */
     public function index()
     {
-<<<<<<< HEAD
         return view('profile.index');
-=======
        $user = Auth::user();
        return view('profile.index', compact('user'));
->>>>>>> peserta
     }
 
     

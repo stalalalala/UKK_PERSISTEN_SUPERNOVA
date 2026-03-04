@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kuis;
-use App\Models\HasilKuis; 
+use App\Models\HasilKuis;
+use App\Services\XpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -105,7 +106,12 @@ class KuisController extends Controller
             'skor'    => round($skor)
         ]]);
 
-        return redirect()->route('kuis.hasil', $id);
+        $xpService = new XpService();
+    $xpService->addXp(Auth::user(), 'kuis', 20);
+
+    return redirect()->route('kuis.hasil')
+        ->with('success','Kuis selesai +20 XP');
+
     }
 
     /**

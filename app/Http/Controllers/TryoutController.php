@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AdminTryout;
 use App\Models\SoalTryout;
+use App\Services\XpService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -135,6 +136,10 @@ class TryoutController extends Controller
         $userRankIndex = $rankingsFull->search(fn($r) => $r->user_id == $userId);
         $userRankNumber = ($userRankIndex !== false) ? $userRankIndex + 1 : 1;
         $rankings = $rankingsFull; 
+
+        $xpService = new XpService();
+$xpService->addXp(Auth::user(), 'tryout', 50);
+
         return view('tryout.hasil', compact('tryout', 'categories', 'userAnswers', 'benar', 'salah', 'kosong', 'akurasi', 'skorTotal', 'rankings', 'userRankNumber'));
     }
 
