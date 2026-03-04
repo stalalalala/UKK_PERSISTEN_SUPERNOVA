@@ -84,6 +84,11 @@ return redirect()->route('verification.notice')
     ])->onlyInput('email');
 }
 
+public function redirectToGoogle()
+{
+    return Socialite::driver('google')->stateless()->redirect();
+}
+
    public function handleGoogleCallback()
 {
     try {
