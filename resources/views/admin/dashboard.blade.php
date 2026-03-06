@@ -184,294 +184,251 @@
                         </svg>
                     </button>
 
-                    <div class="relative w-full group flex items-center gap-2">
+                   <div class="relative w-full group flex items-center gap-2">
+    
                         <div class="relative w-full">
+                            
+                            <!-- ICON -->
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                <svg xmlns="http://www.w3.org/2000/svg" 
+                                    class="w-5 h-5 text-gray-500" 
+                                    fill="none"
+                                    viewBox="0 0 24 24" 
+                                    stroke="currentColor" 
+                                    stroke-width="2">
+                                    <path stroke-linecap="round" 
+                                        stroke-linejoin="round"
                                         d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                                 </svg>
                             </div>
-                            <input type="text" placeholder="Search...."
+
+                            <input 
+                                type="text" 
+                                id="pageSearch"
+                                placeholder="Cari halaman..."
                                 class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
                         </div>
-                        <button
+
+                        <button 
+                            onclick="goToPage()" 
                             class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                             Cari
                         </button>
+
                     </div>
                 </div>
 
-                <div
-                    class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 self-end md:self-auto">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
+                @php
+                use Illuminate\Support\Facades\Auth;
+                $user = Auth::user();
+            @endphp
+                    <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
+    
+                    <div @click="open = !open" 
+                        class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
+                                ml-auto md:ml-0 cursor-pointer">
+                        
+                        <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
+                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" alt="Admin">
+                        </div>
+                        
+                        <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
+                        
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                     </div>
-                    <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
+
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 transform scale-100"
+                        x-transition:leave-end="opacity-0 transform scale-95">
+                        <div class="p-4">
+                            <p class="font-semibold text-gray-700">{{ $user->name }}</p>
+                            <p class="text-sm text-gray-500">{{ $user->email }}</p>
+                            <p class="text-sm text-gray-500">{{ $user->no_hp ?? '-' }}</p>
+                        </div>
+                    </div>
                 </div>
             </header>
 
-            <div class="grid grid-cols-12 gap-6 pb-8">
-                <div
-                    class="col-span-12 bg-white rounded-[20px] p-6 lg:p-8 lg:pb-12 shadow-sm border border-blue-50 relative overflow-hidden">
-                    <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
-                        <h2 class="text-xl font-bold text-[#4A72D4]">Perbandingan Pendaftar akun <span
-                                class="text-[#3B455E] font-medium text-lg">dalam sebulan</span></h2>
-                        <div class="flex bg-blue-50 p-1 rounded-full overflow-hidden">
-                            <h1 class="px-5 py-1.5 bg-[#87A7F3] text-white rounded-full text-xs font-bold shadow-sm">
-                                Line</h1>
+          <div class="grid grid-cols-12 gap-6 pb-8">
+    <div class="col-span-12 bg-white rounded-[20px] p-6 lg:p-8 lg:pb-12 shadow-sm border border-blue-50 relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+            <h2 class="text-xl font-bold text-[#4A72D4]">
+                Perbandingan Pendaftar akun
+                <span class="text-[#3B455E] font-medium text-lg">dalam setahun</span>
+            </h2>
+        </div>
 
-                        </div>
-                    </div>
+        @php
+            $barWidth = 33;   
+            $spacing = 40;  
+            $offset = 50;    
+            $chartHeight = 165;
+            $totalData = count($months);
+            $chartWidth = ($totalData * ($barWidth + $spacing)) + $offset;
+            $maxValue = max($months);
+            $steps = 5;
+            $stepValue = $maxValue > 0 ? ceil($maxValue / ($steps - 1)) : 1;
+            $chartMax = $stepValue * ($steps - 1);
+        @endphp
 
-                    <div class="w-full h-48 lg:h-64 mt-4 relative px-2">
-                        <svg viewBox="0 0 800 200" class="w-full h-full" preserveAspectRatio="none">
-                            <g stroke="#F1F5F9" stroke-width="1">
-                                <line x1="0" y1="180" x2="800" y2="180" />
-                                <line x1="0" y1="145" x2="800" y2="145" />
-                                <line x1="0" y1="110" x2="800" y2="110" />
-                                <line x1="0" y1="75" x2="800" y2="75" />
-                                <line x1="0" y1="40" x2="800" y2="40" />
-                                <line x1="0" y1="5" x2="800" y2="5" />
-                            </g>
+        <div class="w-full mt-4 relative">
+            <div class="overflow-x-auto pb-4 scrollbar-hide lg:overflow-visible">
+                <div style="min-width: {{ $chartWidth }}px;" class="h-64 px-6">
+                    <svg viewBox="0 0 {{ $chartWidth }} 240" class="w-full h-full" preserveAspectRatio="xMinYMid meet">
+                        <g stroke="#F1F5F9" stroke-width="1">
+                            <line x1="0" y1="180" x2="{{ $chartWidth }}" y2="180" />
+                            <line x1="0" y1="140" x2="{{ $chartWidth }}" y2="140" />
+                            <line x1="0" y1="100" x2="{{ $chartWidth }}" y2="100" />
+                            <line x1="0" y1="60" x2="{{ $chartWidth }}" y2="60" />
+                            <line x1="0" y1="20" x2="{{ $chartWidth }}" y2="20" />
+                        </g>
 
-                            <defs>
-                                <linearGradient id="chartGrad" x1="0" y1="0" x2="0"
-                                    y2="1">
-                                    <stop offset="0%" stop-color="#4A72D4" stop-opacity="0.4" />
-                                    <stop offset="100%" stop-color="#4A72D4" stop-opacity="0" />
-                                </linearGradient>
-                            </defs>
+                        @php $i = 0; @endphp
+                        @foreach($months as $index => $value)
+                            @php
+                                $x = $i * ($barWidth + $spacing) + $offset;
+                                $height = $chartMax > 0 ? ($value / $chartMax) * $chartHeight : 0;
+                                $y = 180 - $height;
+                                $i++;
+                            @endphp
 
-                            <path
-                                d="M0 160 L 100 150 Q 200 145, 300 120 T 500 135 T 700 80 L 800 70 L 800 200 L 0 200 Z"
-                                fill="url(#chartGrad)" />
+                            <rect x="{{ $x }}" y="{{ $y }}" width="{{ $barWidth }}" height="{{ $height }}" rx="8" fill="#4A72D4" class="hover:opacity-80 transition" />
+                            <text x="{{ $x + ($barWidth/2) }}" y="230" text-anchor="middle" class="text-[10px] font-bold fill-gray-400 uppercase tracking-widest">
+                                {{ \Carbon\Carbon::create()->month($index)->format('M') }}
+                            </text>
+                        @endforeach
+                    </svg>
+                </div>
+            </div>
 
-                            <path d="M0 160 L 100 150 Q 200 145, 300 120 T 500 135 T 700 80 L 800 70" stroke="#4A72D4"
-                                stroke-width="4" fill="none" stroke-linecap="round" />
+            <div class="absolute inset-y-0 left-0 flex flex-col justify-between text-[10px] text-gray-400 font-bold py-2 pointer-events-none bg-white/80 pr-2" style="height: 180px; top: 16px;">
+                @php
+                    $ySteps = 4;
+                    $yStepValue = $maxValue > 0 ? ceil($maxValue / $ySteps) : 1;
+                @endphp
+                @for ($i = $ySteps; $i >= 0; $i--)
+                    <span>{{ $i * $yStepValue }}</span>
+                @endfor
+            </div>
+        </div>
 
-                            <circle cx="100" cy="150" r="6" fill="white" stroke="#4A72D4"
-                                stroke-width="3" />
-                            <circle cx="300" cy="120" r="6" fill="white" stroke="#4A72D4"
-                                stroke-width="3" />
-                            <circle cx="500" cy="135" r="6" fill="white" stroke="#4A72D4"
-                                stroke-width="3" />
-                            <circle cx="700" cy="80" r="6" fill="white" stroke="#4A72D4"
-                                stroke-width="3" />
+        <div class="mt-10 flex items-center justify-between bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+            <div class="flex items-center gap-3">
+                <div class="w-4 h-4 bg-[#4A72D4] rounded-full"></div>
+                <span class="text-sm font-medium text-gray-600">Total pendaftar tahun ini</span>
+            </div>
+            <span class="text-lg font-bold text-[#4A72D4]">{{ array_sum($months) }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-12 gap-6">
+    <div class="col-span-12 lg:col-span-7 space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-[20px] p-6 shadow-sm flex items-center gap-6 border border-blue-50">
+                <div class="w-14 h-14 bg-[#A6C1FF] rounded-full shrink-0 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#4A72D4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9.003 9.003 0 0112 15c2.21 0 4.21.896 5.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[#4A72D4] text-xl font-bold">Total Peserta</p>
+                    <h3 class="text-2xl font-bold text-gray-700"> {{ number_format($totalUsers) }}</h3>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[20px] p-6 shadow-sm border border-blue-50">
+                <div class="flex items-center gap-6">
+                    <div class="w-14 h-14 bg-[#5BB58D] rounded-full shrink-0 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l7 4v6c0 5.25-3.75 10-7 10s-7-4.75-7-10V6l7-4z" />
                         </svg>
-
-                        <div
-                            class="absolute inset-y-0 -left-6 flex flex-col justify-between text-[10px] text-gray-400 font-bold py-1">
-                            <span>300</span><span>250</span><span>200</span><span>150</span><span>100</span><span>50</span>
-                        </div>
-
-                        <div
-                            class="flex justify-around text-[10px] font-bold text-gray-400 mt-4 uppercase tracking-widest px-[6.25%]">
-                            <span class="w-0 flex justify-center overflow-visible">Januari</span>
-                            <span class="w-0 flex justify-center overflow-visible">Februari</span>
-                            <span class="w-0 flex justify-center overflow-visible">Maret</span>
-                            <span class="w-0 flex justify-center overflow-visible">April</span>
-                        </div>
                     </div>
-
-                    <div
-                        class="mt-16 flex items-center justify-between bg-blue-50/50 p-3 rounded-2xl border border-blue-100">
-                        <div class="flex items-center gap-3 pl-2">
-                            <div class="w-5 h-5 bg-[#A6C1FF] rounded-full"></div>
-                            <span class="text-[11px] font-medium text-gray-500">Pendaftar akun baru</span>
-                        </div>
-                        <div class="flex items-center gap-4 pr-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-5 h-5 bg-[#A6C1FF] rounded-full opacity-60"></div>
-                                <span class="text-sm font-bold text-[#4A72D4]">230</span>
-                            </div>
-                            <span class="text-[10px] font-medium text-gray-400 uppercase tracking-tighter">• Minggu
-                                ke-1</span>
-                        </div>
+                    <div>
+                        <p class="text-[#5BB58D] text-xl font-bold">Total Admin</p>
+                        <h3 class="text-2xl font-bold text-gray-700">{{ number_format($totalAdmins) }}</h3>
                     </div>
-                </div>
-
-            </div>
-
-            <div class="grid grid-cols-12 gap-6">
-                <div class="col-span-12 lg:col-span-7 space-y-6">
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div
-                            class="bg-white rounded-[20px] p-6 shadow-sm flex items-center gap-6 border border-blue-50">
-                            <div class="w-14 h-14 bg-[#A6C1FF] rounded-full shrink-0"></div>
-                            <div>
-                                <p class="text-[#4A72D4] text-xl font-bold">Total User</p>
-                                <h3 class="text-2xl font-bold text-gray-700">2.124</h3>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-[20px] p-6 shadow-sm border border-blue-50">
-                            <div class="flex items-center gap-6 mb-4">
-                                <div class="w-14 h-14 bg-[#5BB58D] rounded-full shrink-0"></div>
-                                <div>
-                                    <p class="text-[#5BB58D] text-xl font-bold">Total Try Out Aktif</p>
-                                    <h3 class="text-2xl font-bold text-gray-700">12</h3>
-                                </div>
-                            </div>
-                            <div class="w-full bg-blue-50 h-3 rounded-full overflow-hidden">
-                                <div class="bg-[#4A72D4] h-full w-1/2 rounded-full"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-[20px] p-8 shadow-sm border border-blue-50">
-                        <h2 class="text-xl font-bold mb-8 text-[#4A72D4]">Total Pendaftar <span
-                                class="text-gray-400 font-normal">dalam sebulan</span></h2>
-
-                        <div class="bg-gray-50 rounded-2xl p-6 text-center mb-8">
-                            <span class="text-4xl font-black text-[#4A72D4] mr-3">777</span>
-                            <span class="text-gray-400 font-bold uppercase text-xs tracking-widest">pendaftar
-                                baru</span>
-                        </div>
-
-                        <div class="space-y-5">
-                            <div class="flex items-center justify-between border-b border-gray-150 pb-3">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-6 h-6 bg-[#A6C1FF] rounded-full"></div>
-                                    <span class="font-bold text-gray-500">April</span>
-                                </div>
-                                <span class="font-black text-gray-700">234</span>
-                            </div>
-                            <div class="flex items-center justify-between border-b border-gray-150 pb-3">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-6 h-6 bg-[#A6C1FF] rounded-full"></div>
-                                    <span class="font-bold text-gray-500">Mei</span>
-                                </div>
-                                <span class="font-black text-gray-700">567</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-6 h-6 bg-[#A6C1FF] rounded-full"></div>
-                                    <span class="font-bold text-gray-500">Juni</span>
-                                </div>
-                                <span class="font-black text-gray-700">892</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    class="col-span-12 lg:col-span-5 bg-white rounded-[20px] p-6 shadow-sm border border-blue-50 flex flex-col">
-                    <h2 class="text-xl font-bold mb-4 text-[#4A72D4]">Aktivitas Admin Terbaru</h2>
-
-                    <div class="space-y-2 relative flex-1">
-                        <div class="absolute left-6 top-2 bottom-10 w-0.5 bg-blue-50"></div>
-
-                        <div class="relative flex items-start gap-4 mb-8 group">
-                            <div
-                                class="w-12 h-12 bg-blue-100 text-[#4A72D4] rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm group-hover:bg-[#4A72D4] group-hover:text-white transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                            </div>
-                            <div class="pt-1">
-                                <p class="text-sm font-bold text-gray-600 leading-tight">Admin menambahkan <span
-                                        class="text-[#4A72D4]">20 user</span></p>
-                                <span class="text-[11px] font-medium text-gray-400">2 mins ago</span>
-                            </div>
-                        </div>
-
-                        <div class="relative flex items-start gap-4 group">
-                            <div
-                                class="w-12 h-12 bg-indigo-100 text-indigo-500 rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm group-hover:bg-indigo-500 group-hover:text-white transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <div class="pt-1">
-                                <p class="text-sm font-bold text-gray-600 leading-tight">Admin mengupdate jadwal
-                                    <span class="text-indigo-600">Try Out 3</span>
-                                </p>
-                                <span class="text-[11px] font-medium text-gray-400">1 hour ago</span>
-                            </div>
-                        </div>
-
-                        <div class="relative flex items-start gap-4 mb-8 group">
-                            <div
-                                class="w-12 h-12 bg-teal-100 text-teal-500 rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm group-hover:bg-teal-500 group-hover:text-white transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
-                                </svg>
-                            </div>
-                            <div class="pt-1">
-                                <p class="text-sm font-bold text-gray-600 leading-tight">Admin menpublish hasil Try Out
-                                </p>
-                                <span class="text-[11px] font-medium text-gray-400">2 hours ago</span>
-                            </div>
-                        </div>
-
-                        <div class="relative flex items-start gap-4 mb-8 group">
-                            <div
-                                class="w-12 h-12 bg-blue-100 text-[#4A72D4] rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm group-hover:bg-[#4A72D4] group-hover:text-white transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                            </div>
-                            <div class="pt-1">
-                                <p class="text-sm font-bold text-gray-600 leading-tight">Admin menambahkan <span
-                                        class="text-[#4A72D4]">20 user</span></p>
-                                <span class="text-[11px] font-medium text-gray-400">2 mins ago</span>
-                            </div>
-                        </div>
-
-                        <div class="relative flex items-start gap-4 mb-8 group">
-                            <div
-                                class="w-12 h-12 bg-indigo-100 text-indigo-500 rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm group-hover:bg-indigo-500 group-hover:text-white transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <div class="pt-1">
-                                <p class="text-sm font-bold text-gray-600 leading-tight">Admin mengupdate jadwal
-                                    <span class="text-indigo-600">Try Out 3</span>
-                                </p>
-                                <span class="text-[11px] font-medium text-gray-400">1 hour ago</span>
-                            </div>
-                        </div>
-
-                        <div class="relative flex items-start gap-4 mb-8 group">
-                            <div
-                                class="w-12 h-12 bg-teal-100 text-teal-500 rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm group-hover:bg-teal-500 group-hover:text-white transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
-                                </svg>
-                            </div>
-                            <div class="pt-1">
-                                <p class="text-sm font-bold text-gray-600 leading-tight">Admin menpublish hasil Try Out
-                                </p>
-                                <span class="text-[11px] font-medium text-gray-400">2 hours ago</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button
-                        class="w-full py-3 mt-4 bg-blue-50/50 hover:bg-blue-100 text-[#4A72D4] text-sm font-bold rounded-2xl transition-colors border border-blue-100/50">
-                        Lihat Semua
-                    </button>
                 </div>
             </div>
+        </div>
+
+        <div class="bg-white rounded-[20px] p-8 shadow-sm border border-blue-50">
+            <h2 class="text-xl font-bold mb-8 text-[#4A72D4]">
+                Total Konten <span class="text-gray-400 font-normal">dalam sistem</span>
+            </h2>
+
+            <div class="space-y-5">
+                <div class="flex items-center justify-between border-b border-gray-150 pb-3">
+                    <div class="flex items-center gap-4">
+                        <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
+                            <i class="fas fa-file-alt text-white text-xs"></i>
+                        </div>
+                        <span class="font-bold text-gray-500">Tryout</span>
+                    </div>
+                    <span class="font-black text-gray-700">{{ number_format($totalTryout) }}</span>
+                </div>
+
+                <div class="flex items-center justify-between border-b border-gray-150 pb-3">
+                    <div class="flex items-center gap-4">
+                        <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
+                            <i class="fas fa-pencil-alt text-white text-xs"></i>
+                        </div>
+                        <span class="font-bold text-gray-500">Latihan Soal</span>
+                    </div>
+                    <span class="font-black text-gray-700">{{ number_format($totalLatihan) }}</span>
+                </div>
+
+                <div class="flex items-center justify-between border-b border-gray-150 pb-3">
+                    <div class="flex items-center gap-4">
+                        <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
+                            <i class="fas fa-video text-white text-xs"></i>
+                        </div>
+                        <span class="font-bold text-gray-500">Video</span>
+                    </div>
+                    <span class="font-black text-gray-700">{{ number_format($totalVideo) }}</span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
+                            <i class="fas fa-question text-white text-xs"></i>
+                        </div>
+                        <span class="font-bold text-gray-500">Kuis</span>
+                    </div>
+                    <span class="font-black text-gray-700">{{ number_format($totalKuis) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-span-12 lg:col-span-5 bg-white rounded-[20px] p-6 shadow-sm border border-blue-50 flex flex-col overflow-hidden">
+        <h2 class="text-xl font-bold mb-4 text-[#4A72D4]">Aktivitas Admin Terbaru</h2>
+        <div class="space-y-2 relative flex-1">
+            <div class="absolute left-6 top-2 bottom-10 w-0.5 bg-blue-50"></div>
+            @foreach(range(1, 3) as $index) 
+            <div class="relative flex items-start gap-4 mb-8 group">
+                <div class="w-12 h-12 bg-blue-100 text-[#4A72D4] rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm group-hover:bg-[#4A72D4] group-hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                </div>
+                <div class="pt-1">
+                    <p class="text-sm font-bold text-gray-600 leading-tight">Admin menambahkan <span class="text-[#4A72D4]">20 user</span></p>
+                    <span class="text-[11px] font-medium text-gray-400">2 mins ago</span>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        <button class="w-full py-3 mt-4 bg-blue-50/50 hover:bg-blue-100 text-[#4A72D4] text-sm font-bold rounded-2xl transition-colors border border-blue-100/50">
+            Lihat Semua
+        </button>
+    </div>
+</div>
         </main>
     </div>
 
@@ -485,6 +442,33 @@
             border-radius: 10px;
         }
     </style>
+    <script>
+function goToPage() {
+    let keyword = document.getElementById('pageSearch').value.toLowerCase();
+
+    let routes = {
+        "dashboard": "{{ route('admin.dashboard.index') }}",
+        "user": "{{ route('admin.user.index') }}",
+        "streak": "{{ route('admin.streak.index') }}",
+        "monitoring": "{{ route('admin.laporan.index') }}",
+        "video": "{{ route('admin.videoPembelajaran.index') }}",
+        "peluang": "{{ route('admin.peluang.index') }}",
+        "tryout": "{{ route('admin.tryout.index') }}",
+        "minat bakat": "{{ route('admin.minatBakat.index') }}",
+        "kuis": "{{ route('admin.kuis.index') }}",
+        "latihan": "{{ route('admin.latihan.index') }}"
+    };
+
+    for (let key in routes) {
+        if (key.includes(keyword)) {
+            window.location.href = routes[key];
+            return;
+        }
+    }
+
+    alert("Halaman tidak ditemukan");
+}
+</script>
 </body>
 
 
