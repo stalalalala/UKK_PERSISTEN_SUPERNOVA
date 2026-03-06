@@ -70,7 +70,7 @@
     }
 }">
 
-    <form action="{{ route('minatbakat.store') }}" method="POST" x-ref="minatBakatForm"
+    <form action="{{ route('minatBakat.store') }}" method="POST" x-ref="minatBakatForm"
         class="w-full flex justify-center">
         @csrf
 
