@@ -19,11 +19,12 @@ use App\Http\Controllers\admin\AdminLatihanController;
 use App\Http\Controllers\admin\AdminTryoutController;
 use App\Http\Controllers\admin\AdminVideoController;
 use App\Http\Controllers\admin\AdminMinatBakatController;
+use App\Http\Controllers\admin\AdminStreakController;
 
 use App\Http\Controllers\admin\HalamanStreakController;
 use App\Http\Controllers\admin\HalamanPeluangPtnController;
 use App\Http\Controllers\admin\HalamanMonitoringLaporanController;
-
+use App\Http\Controllers\Admin\SlimeController;
 /* ===============================
    PESERTA CONTROLLERS
 ================================ */
@@ -158,7 +159,6 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/kuis/force-delete/{id}', [AdminKuisController::class, 'forceDelete'])->name('kuis.forceDelete'); 
          
 
-        // Latihan
         // Latihan Soal
          Route::get('/latihan', [AdminLatihanController::class, 'index'])->name('latihan.index');
          Route::get('/latihan/create', [AdminLatihanController::class, 'create'])->name('latihan.create');
@@ -170,6 +170,14 @@ Route::middleware(['auth'])->group(function () {
          Route::post('/latihan/{id}/restore', [AdminLatihanController::class, 'restore'])->name('latihan.restore'); 
          Route::delete('/latihan/force-delete/{id}', [AdminLatihanController::class, 'forceDelete'])->name('latihan.forceDelete');
 
+        
+        //slime
+        Route::get('/streak', [AdminStreakController::class,'index'])->name('streak.index');
+        Route::get('/streak/create', [AdminStreakController::class,'create'])->name('streak.create');
+        Route::post('/streak/store', [AdminStreakController::class,'store'])->name('streak.store');
+        Route::get('/streak/edit/{id}', [AdminStreakController::class,'edit'])->name('streak.edit');
+        Route::put('/streak/update/{id}', [AdminStreakController::class,'update'])->name('streak.update');
+        Route::delete('/streak/delete/{id}', [AdminStreakController::class,'destroy'])->name('streak.delete');
     });
 
 

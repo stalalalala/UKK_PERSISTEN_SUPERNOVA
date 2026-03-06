@@ -10,7 +10,7 @@ use Carbon\Carbon;
 class XpService
 {
     const DAILY_MAX = 140;
-    const XP_PER_LEVEL = 400;
+    // const XP_PER_LEVEL = 200;
 
     public function addXp($user, $source, $amount)
     {
@@ -29,7 +29,7 @@ class XpService
             ->whereDate('xp_date', $today)
             ->sum('xp');
 
-        if ($todayTotal >= self::DAILY_MAX) return false;
+        if (($todayTotal + $amount) > self::DAILY_MAX) return false;
 
         // Simpan log
         UserXpLog::create([
@@ -39,11 +39,12 @@ class XpService
             'xp_date' => $today
         ]);
 
+
         // Tambah XP
         $user->total_xp += $amount;
 
         // Update level
-        $user->level = floor($user->total_xp / self::XP_PER_LEVEL) + 1;
+        $user->level = $this->calculateLevel($user->total_xp);
 
         // Update streak
         $this->updateStreak($user);
@@ -117,4 +118,37 @@ class XpService
 
         return null;
     }
+
+    private function calculateLevel($xp)
+{
+    $level = 1;
+
+    while ($xp >= ($level * 200)) {
+        $xp -= ($level * 200);
+        $level++;
+    }
+
+    return $level;
+}
+
+public function getXpForNextLevel($user)
+{
+    return $user->level * 200;
+}
+
+public function getXpProgress($user)
+{
+    $xp = $user->total_xp;
+    $level = 1;
+
+    while ($xp >= ($level * 200)) {
+        $xp -= ($level * 200);
+        $level++;
+    }
+
+    return [
+        'xp' => $xp,
+        'maxXp' => $level * 200
+    ];
+}
 }

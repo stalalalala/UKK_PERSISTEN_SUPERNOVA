@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PERSISTEN - Instruksi {{ $tryout->nama_tryout }}</title>
+    <title>PERSISTEN - Instruksi Pengerjaan Tryout</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -13,93 +13,361 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    @vite('resources/css/app.css')
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .font-po {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Smooth Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #E2E8F0;
+            border-radius: 10px;
+        }
+
+        .instruction-card:hover .icon-number {
+            transform: scale(1.1);
+        }
+
+        /* Glassmorphism subtle effect */
+        .glass-subtest {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
 </head>
 
-<body class="bg-white font-po overflow-x-hidden">
+<body class="bg-white font-po overflow-x-hidden ">
 
-    <div class="max-w-[1440px] mx-auto">
-        <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4 relative z-10">
-            <div class="w-20 md:w-28 h-12 bg-blue-400 rounded-full flex-shrink-0"></div>
+    <div class="max-w-[1440px] mx-auto min-h-screen flex flex-col ">
+        <div class="max-w-[1440px] mx-auto min-h-screen flex flex-col">
+            <main class="flex-1 flex ">
+                <div class="bg-white border border-gray-100 w-full flex flex-col overflow-hidden md:max-h-[100vh]">
 
-            <ul class="hidden lg:flex gap-12 text-gray-800 font-medium text-sm">
-                <li><a href="/" class="hover:text-blue-500">Beranda</a></li>
-                <li><a href="{{ route('streak.index') }}" class="hover:text-blue-500">Pet Streak</a></li>
-                <li><a href="{{ route('tryout.index') }}" class="hover:text-blue-500 font-bold">Try Out</a></li>
-                <li><a href="{{ route('latihan.index') }}" class="hover:text-blue-500">Latihan Soal</a></li>
-                <li><a href="{{ route('video.index') }}" class="hover:text-blue-500">Video Pembelajaran</a></li>
-            </ul>
+                    <div class="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden">
 
-            <div class="flex items-center gap-2">
-                <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full">
-                    <a href="{{ route('profile.index') }}"
-                        class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="size-5 md:size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                        </svg>
-                    </a>
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit"
-                            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                                stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-                            </svg>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </nav>
+                        <div
+                            class="w-full md:w-[42%] bg-slate-50 p-3 px-0 md:p-5 md:pb-0 flex flex-col items-center justify-start border-b md:border-b-0 md:border-r border-gray-100">
 
-        <main class="flex-1 flex items-center justify-center p-4 md:p-10">
-            <div class="bg-white border-2 border-gray-200 w-full max-w-[1440px] mx-auto rounded-[3rem] flex flex-col max-h-[85vh]">
-                <div class="flex-1 flex flex-col md:flex-row p-8 md:p-12 gap-10 overflow-y-auto">
-                    <div class="w-full md:w-2/5 flex items-start justify-center">
-                        <div class="w-full aspect-square bg-gray-200 rounded-[2.5rem] border-8 border-gray-300 flex items-center justify-center relative">
-                            <div class="text-center p-4">
-                                <div class="w-20 h-20 bg-gray-400 rounded-2xl mx-auto mb-4"></div>
-                                <p class="text-gray-500 font-bold uppercase tracking-widest text-xs">Informasi Paket</p>
-                                <h3 class="text-xl font-black text-[#2E3B66] mt-2">{{ $tryout->nama_tryout }}</h3>
+                            <div class="w-full space-y-6 px-2">
+                                <div class="align-top md:text-left mb-8">
+                                    <div
+                                        class="inline-flex items-center  gap-2 px-4 py-1 bg-blue-100/50 text-blue-600 rounded-lg text-xs font-bold uppercase tracking-widest mb-3">
+                                        <i class="fa-solid fa-layer-group"></i> Kategori Ujian
+                                    </div>
+                                    <h3 class="text-2xl md:text-2xl font-black text-[#2E3B66] leading-tight mb-2">
+                                        {{ $tryout->nama_tryout }}
+
+                                    </h3>
+                                    <p class="text-xs text-gray-400 font-medium">Pastikan Anda siap sebelum memulai sesi
+                                        latihan ini.</p>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <div
+                                        class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:border-orange-200 transition-all group">
+                                        <div
+                                            class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <i class="fa-solid fa-clipboard-list text-orange-400 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                                                Jumlah
+                                                Pertanyaan</p>
+                                            <p class="text-xl font-extrabold text-[#2E3B66]">
+                                                {{ $totalSoal ?? '0' }} <span
+                                                    class="text-xs font-medium text-gray-400 block tracking-normal">Soal</span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:border-blue-200 transition-all group">
+                                        <div
+                                            class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <i class="fa-solid fa-stopwatch text-blue-400 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                                                Alokasi
+                                                Waktu</p>
+                                            <p class="text-xl font-extrabold text-[#2E3B66]">
+                                                {{ $totalDurasi }} <span
+                                                    class="text-xs font-medium text-gray-400 block tracking-normal">Menit
+                                                    Pengerjaan</span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:border-green-200 transition-all group">
+                                        <div
+                                            class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <i class="fa-solid fa-circle-check text-green-500 text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                                                Metode
+                                                Ujian</p>
+                                            <p class="text-lg font-extrabold text-[#2E3B66]">Pilihan Ganda <span
+                                                    class="text-xs font-medium text-gray-400 block tracking-normal">Single
+                                                    Answer Selection</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full md:w-[58%] flex flex-col p-6 md:p-5 overflow-hidden bg-white">
+                            <div class="mb-2">
+                                <div
+                                    class="inline-block px-4 py-1 bg-blue-50 text-blue-500 rounded-full text-xs font-bold uppercase tracking-widest mb-3">
+                                    Penting!
+                                </div>
+                                <h2 class="text-xl md:text-2xl font-black text-[#2E3B66] leading-tight">
+                                    Intruksi <span class="text-blue-500">Pengerjaan Latihan Soal</span>
+                                </h2>
+                            </div>
+
+                            <div x-data="{ open: null }" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-6">
+                                <div class="flex items-start gap-5 instruction-card transition cursor-pointer"
+                                    @click="if (window.innerWidth < 768) open === 1 ? open = null : open = 1">
+
+                                    <div
+                                        class="icon-number w-6 sm:w-12 sm:h-12 shrink-0 rounded-md sm:rounded-2xl bg-[#FEA33A] shadow-lg shadow-orange-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300">
+                                        1
+                                    </div>
+
+                                    <div class="w-full">
+
+                                        <!-- Header + Chevron -->
+                                        <div class="flex items-center justify-between">
+                                            <h4 class="font-bold text-[#2E3B66]">
+                                                Mekanisme Pemilihan Jawaban
+                                            </h4>
+
+                                            <!-- Chevron hanya HP -->
+                                            <i class="fa-solid fa-chevron-down md:hidden transition-transform duration-300"
+                                                :class="open === 1 ? 'rotate-180 text-blue-500' : 'text-gray-400'">
+                                            </i>
+                                        </div>
+
+                                        <!-- Isi -->
+                                        <p class="text-sm text-gray-500 leading-relaxed font-medium  overflow-hidden"
+                                            x-show="open === 1 || window.innerWidth >= 768"
+                                            x-transition:enter="transition ease-out duration-500"
+                                            x-transition:enter-start="opacity-0 -translate-y-2 scale-y-95"
+                                            x-transition:enter-end="opacity-100 translate-y-0 scale-y-100"
+                                            x-transition:leave="transition ease-in duration-300"
+                                            x-transition:leave-start="opacity-100 translate-y-0 scale-y-100"
+                                            x-transition:leave-end="opacity-0 -translate-y-2 scale-y-95"
+                                            style="transform-origin: top;">
+                                            Bacalah setiap butir soal dengan teliti sebelum menentukan pilihan.
+                                            Klik pada salah satu opsi jawaban yang kamu anggap paling benar.
+                                            Sistem akan menandai pilihanmu secara otomatis, dan kamu dapat
+                                            mengubah jawaban tersebut selama durasi pengerjaan masih tersedia.
+                                            Pastikan memahami setiap konteks pertanyaan agar poin dapat diberikan
+                                            secara maksimal sesuai akurasi jawabanmu.
+                                        </p>
+
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-5 instruction-card transition cursor-pointer"
+                                    @click="if (window.innerWidth < 768) open === 2 ? open = null : open = 2">
+
+                                    <div
+                                        class="icon-number w-6 sm:w-12 sm:h-12 shrink-0 rounded-md sm:rounded-2xl bg-[#9885FB] shadow-lg shadow-purple-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300">
+                                        2
+                                    </div>
+
+                                    <div class="w-full">
+
+                                        <div class="flex items-center justify-between">
+                                            <h4 class="font-bold text-[#2E3B66]">Manajemen Waktu Pengerjaan</h4>
+
+                                            <i class="fa-solid fa-chevron-down md:hidden transition-transform duration-300"
+                                                :class="open === 2 ? 'rotate-180 text-blue-500' : 'text-gray-400'">
+                                            </i>
+                                        </div>
+
+                                        <p class="text-sm text-gray-500 leading-relaxed font-medium  overflow-hidden"
+                                            x-show="open === 2 || window.innerWidth >= 768"
+                                            x-transition:enter="transition ease-out duration-400"
+                                            x-transition:enter-start="opacity-0 -translate-y-2 scale-y-95"
+                                            x-transition:enter-end="opacity-100 translate-y-0 scale-y-100"
+                                            x-transition:leave="transition ease-in duration-300"
+                                            x-transition:leave-start="opacity-100 translate-y-0 scale-y-100"
+                                            x-transition:leave-end="opacity-0 -translate-y-2 scale-y-95"
+                                            style="transform-origin: top;">
+                                            Timer atau penghitung waktu mundur akan segera aktif begitu kamu menekan
+                                            tombol
+                                            mulai. Perhatikan sisa waktu yang tertera di pojok layar secara berkala
+                                            untuk
+                                            mengatur ritme pengerjaan soal. Apabila waktu habis sebelum kamu menekan
+                                            tombol
+                                            selesai, sistem akan secara otomatis mengunci seluruh jawaban terakhir yang
+                                            tersimpan dan menutup sesi pengerjaan secara permanen.
+                                        </p>
+
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-5 instruction-card transition cursor-pointer"
+                                    @click="if (window.innerWidth < 768) open === 3 ? open = null : open = 3">
+
+                                    <div
+                                        class="icon-number w-6 sm:w-12 sm:h-12 shrink-0 rounded-md sm:rounded-2xl bg-[#FF908E] shadow-lg shadow-red-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300">
+                                        3
+                                    </div>
+
+                                    <div class="w-full">
+
+                                        <div class="flex items-center justify-between">
+                                            <h4 class="font-bold text-[#2E3B66]">Optimasi Tampilan Soal</h4>
+
+                                            <i class="fa-solid fa-chevron-down md:hidden transition-transform duration-300"
+                                                :class="open === 3 ? 'rotate-180 text-blue-500' : 'text-gray-400'">
+                                            </i>
+                                        </div>
+
+                                        <p class="text-sm text-gray-500 leading-relaxed font-medium  overflow-hidden"
+                                            x-show="open === 3 || window.innerWidth >= 768"
+                                            x-transition:enter="transition ease-out duration-400"
+                                            x-transition:enter-start="opacity-0 -translate-y-2 scale-y-95"
+                                            x-transition:enter-end="opacity-100 translate-y-0 scale-y-100"
+                                            x-transition:leave="transition ease-in duration-300"
+                                            x-transition:leave-start="opacity-100 translate-y-0 scale-y-100"
+                                            x-transition:leave-end="opacity-0 -translate-y-2 scale-y-95"
+                                            style="transform-origin: top;">
+                                            Beberapa soal mungkin dilengkapi dengan teks bacaan yang panjang, tabel,
+                                            atau
+                                            gambar pendukung. Anda dapat melakukan scroll pada area soal atau
+                                            memperbesar
+                                            gambar jika diperlukan untuk melihat detail informasi. Pastikan Anda membaca
+                                            seluruh premis yang diberikan sebelum menentukan pilihan akhir.
+                                        </p>
+
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-5 instruction-card transition cursor-pointer"
+                                    @click="if (window.innerWidth < 768) open === 4 ? open = null : open = 4">
+
+                                    <div
+                                        class="icon-number w-6 sm:w-12 sm:h-12 shrink-0 rounded-md sm:rounded-2xl bg-[#4B8A81] shadow-lg shadow-teal-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300">
+                                        4
+                                    </div>
+
+                                    <div class="w-full">
+
+                                        <div class="flex items-center justify-between">
+                                            <h4 class="font-bold text-[#2E3B66]">Navigasi dan Panel Kontrol Soal</h4>
+
+                                            <i class="fa-solid fa-chevron-down md:hidden transition-transform duration-300"
+                                                :class="open === 4 ? 'rotate-180 text-blue-500' : 'text-gray-400'">
+                                            </i>
+                                        </div>
+
+                                        <p class="text-sm text-gray-500 leading-relaxed font-medium  overflow-hidden"
+                                            x-show="open === 4 || window.innerWidth >= 768"
+                                            x-transition:enter="transition ease-out duration-400"
+                                            x-transition:enter-start="opacity-0 -translate-y-2 scale-y-95"
+                                            x-transition:enter-end="opacity-100 translate-y-0 scale-y-100"
+                                            x-transition:leave="transition ease-in duration-300"
+                                            x-transition:leave-start="opacity-100 translate-y-0 scale-y-100"
+                                            x-transition:leave-end="opacity-0 -translate-y-2 scale-y-95"
+                                            style="transform-origin: top;">
+                                            Kamu memiliki kebebasan penuh untuk melompat antar soal menggunakan panel
+                                            nomor
+                                            yang tersedia. Gunakan fitur ini untuk mendahulukan pertanyaan yang dianggap
+                                            lebih mudah atau memberikan tanda ragu-ragu pada soal yang memerlukan
+                                            pemikiran
+                                            lebih lanjut. Warna pada panel navigasi akan berubah secara dinamis untuk
+                                            memudahkanmu membedakan soal yang sudah dijawab, belum dijawab, atau
+                                            ditandai.
+                                        </p>
+
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-5 instruction-card transition cursor-pointer"
+                                    @click="if (window.innerWidth < 768) open === 5 ? open = null : open = 5">
+
+                                    <div
+                                        class="icon-number w-6 sm:w-12 sm:h-12 shrink-0 rounded-md sm:rounded-2xl bg-[#3171CD] shadow-lg shadow-blue-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300">
+                                        5
+                                    </div>
+
+                                    <div class="w-full">
+
+                                        <div class="flex items-center justify-between">
+                                            <h4 class="font-bold text-[#2E3B66]">Verifikasi Akhir dan Pengiriman</h4>
+
+                                            <i class="fa-solid fa-chevron-down md:hidden transition-transform duration-300"
+                                                :class="open === 5 ? 'rotate-180 text-blue-500' : 'text-gray-400'">
+                                            </i>
+                                        </div>
+
+                                        <p class="text-sm text-gray-500 leading-relaxed font-medium  overflow-hidden"
+                                            x-show="open === 5 || window.innerWidth >= 768"
+                                            x-transition:enter="transition ease-out duration-400"
+                                            x-transition:enter-start="opacity-0 -translate-y-2 scale-y-95"
+                                            x-transition:enter-end="opacity-100 translate-y-0 scale-y-100"
+                                            x-transition:leave="transition ease-in duration-300"
+                                            x-transition:leave-start="opacity-100 translate-y-0 scale-y-100"
+                                            x-transition:leave-end="opacity-0 -translate-y-2 scale-y-95"
+                                            style="transform-origin: top;">
+                                            Sebelum mengakhiri sesi, lakukan verifikasi ulang pada seluruh daftar soal
+                                            untuk
+                                            memastikan tidak ada pertanyaan yang terlewat. Setelah merasa yakin dengan
+                                            semua
+                                            jawaban, tekan tombol 'Selesai' atau 'Kumpulkan'. Setelah konfirmasi
+                                            pengiriman
+                                            dilakukan, kamu tidak akan bisa kembali ke halaman soal dan hasil skor akhir
+                                            akan segera diproses oleh sistem untuk ditampilkan di halaman ringkasan.
+                                        </p>
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="w-full md:w-3/5 flex flex-col">
-                        <h2 class="text-2xl md:text-3xl font-extrabold text-[#2E3B66] mb-8">Instruksi Pengerjaan Soal</h2>
-                        <div class="space-y-6">
-                            <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 rounded-full bg-[#FEA33A] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">1</div>
-                                <p class="text-gray-600 font-semibold pt-2">Kerjakan setiap soal dengan teliti.</p>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 rounded-full bg-[#9885FB] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">2</div>
-                                <p class="text-gray-600 font-semibold pt-2">Terdapat batas waktu pada setiap sesi, pantau timer untuk mengetahui sisa waktu pengerjaan.</p>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <div class="w-10 h-10 rounded-full bg-[#FF908E] flex-shrink-0 flex items-center justify-center text-white font-bold text-lg">3</div>
-                                <p class="text-gray-600 font-semibold pt-2">Fokus mengerjakan soal, pilih jawaban terbaik, dan manfaatkan waktu yang tersedia sebaik mungkin.</p>
-                            </div>
-                        </div>
+                    <div
+                        class="px-6 md:px-12 py-4 bg-slate-50 border-t border-gray-100 flex flex-col md:flex-row justify-end gap-3 md:gap-4 shrink-0">
+                        <a href="{{ route('tryout.index') }}" class="w-full md:w-auto order-2 md:order-1">
+                            <button
+                                class="w-full px-10 py-2 rounded-xl font-semibold text-gray-400 bg-white border border-gray-200 hover:bg-gray-100 transition duration-300">
+                                Kembali
+                            </button>
+                        </a>
+                        @if ($firstCategory)
+                            <a href="{{ route('tryout.soal', [$tryout->id, $firstCategory->id]) }}"
+                                class="w-full md:w-auto order-1 md:order-2">
+                                <button
+                                    class="w-full px-12 py-2 rounded-xl font-semibold text-white bg-blue-500 hover:bg-blue-600 shadow-xl shadow-blue-200 transition duration-300 flex items-center justify-center gap-2">
+                                    Mulai Sekarang <i class="fa-solid fa-chevron-right text-xs"></i>
+                                </button>
+                            </a>
+                        @endif
                     </div>
-                </div>
 
-                <div class="px-12 py-8 bg-gray-50 flex justify-end gap-4 shrink-0 rounded-b-[3rem]">
-                    <a href="{{ route('tryout.index') }}">
-                        <button class="px-8 py-3 rounded-full font-bold text-gray-400 bg-gray-200 hover:bg-gray-300 transition">Batal</button>
-                    </a>
-                    
-                    @if($firstCategory)
-                    <a href="{{ route('tryout.soal', [$tryout->id, $firstCategory->id]) }}">
-                        <button class="px-10 py-3 rounded-full font-bold text-white bg-blue-500 hover:bg-blue-600 shadow-lg shadow-blue-200 transition">Mulai Mengerjakan</button>
-                    </a>
-                    @endif
                 </div>
-            </div>
-        </main>
-    </div>
+            </main>
+        </div>
 </body>
+
 </html>

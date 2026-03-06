@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Streak;
+use App\Models\UserXpLog;
 use App\Services\XpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,15 +24,47 @@ class StreakController extends Controller
     // Ambil karakter evolusi
     // $character = $xpService->getCurrentCharacter($user);
 
-    // Hitung XP hari ini
-    $todayXp = \App\Models\UserXpLog::where('user_id',$user->id)
-        ->whereDate('xp_date', now())
+    // XP hari ini
+    $todayXp = UserXpLog::where('user_id', $user->id)
+        ->whereDate('xp_date', today())
         ->sum('xp');
+
+    $targetXp = 140;
+
+    $xpPercent = min(100, ($todayXp / $targetXp) * 100);
+
+    // Hitung XP hari ini
+    $todayXp = UserXpLog::where('user_id',$user->id)->whereDate('xp_date', now())->sum('xp');
+
+    // cek aktivitas
+    $loginDone = UserXpLog::where('user_id',$user->id)
+        ->where('source','login')
+        ->whereDate('xp_date', today())
+        ->exists();
+
+    $kuisDone = UserXpLog::where('user_id',$user->id)
+        ->where('source','kuis')
+        ->whereDate('xp_date', today())
+        ->exists();
+
+    $latihanDone = UserXpLog::where('user_id',$user->id)
+        ->where('source','latihan')
+        ->whereDate('xp_date', today())
+        ->exists();
+
+    $tryoutDone = UserXpLog::where('user_id',$user->id)
+        ->where('source','tryout')
+        ->whereDate('xp_date', today())
+        ->exists();
 
     return view('streak.index', compact(
         'user',
-        // 'character',
-        'todayXp'
+        'todayXp',
+        'xpPercent',
+        'loginDone',
+        'kuisDone',
+        'latihanDone',
+        'tryoutDone'
     ));
 }
 

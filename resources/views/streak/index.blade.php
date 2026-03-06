@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link rel="stylesheet" href="{{ asset('css/pet.css') }}">
     @vite('resources/css/app.css')
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -107,14 +108,26 @@
         $user = auth()->user();
 
         $xp = $user->total_xp ?? 0;
-        $level = $user->level ?? 1;
         $jumlahHari = $user->streak_days ?? 0;
 
-        // XP per level (samain dengan XpService)
-        $xpPerLevel = 400;
+        /*
+|-----------------------------------------
+| Hitung level dari total XP
+|-----------------------------------------
+*/
 
-        $maxXp = $xpPerLevel;
-        $currentXpInLevel = $xp % $xpPerLevel;
+        $level = 1;
+        $sisaXp = $xp;
+        $xpNeed = 200;
+
+        while ($sisaXp >= $xpNeed) {
+            $sisaXp -= $xpNeed;
+            $level++;
+            $xpNeed += 200;
+        }
+
+        $currentXpInLevel = $sisaXp;
+        $maxXp = $xpNeed;
     @endphp
 
     <main class="max-w-[1300px] mx-auto mt-10 px-4 md:px-6 pb-20" x-data="{
@@ -130,7 +143,7 @@
 
         <div class="flex flex-col items-center mb-12">
             <div
-                class="bg-blue-600 text-white px-8 py-1.5 rounded-full font-bold shadow-lg -mb-10 z-20 tracking-widest text-sm italic">
+                class="bg-blue-600 text-white px-8 py-1.5 rounded-full font-bold shadow-lg -mb-10 z-20 tracking-widest text-sm">
                 • Level {{ $level }} •
             </div>
 
@@ -150,7 +163,12 @@
                     </div>
                     <div
                         class="absolute inset-0 flex items-center justify-center text-white font-black text-sm md:text-lg drop-shadow-md">
-                        <span x-text="xp"></span>/<span x-text="maxXp">
+                        <div class="flex items-center gap-1">
+                            <span x-text="xp"></span>
+                            <span>/</span>
+                            <span x-text="maxXp"></span>
+                            <span>XP</span>
+                        </div>
                     </div>
                 </div>
 
@@ -184,23 +202,31 @@
                     <div class="mt-8 bg-orange-100/60 rounded-[2rem] p-4 border-2 border-orange-200">
                         <div class="flex justify-between items-center text-center">
                             <div class="flex-1">
-                                <p class="text-[9px] font-black text-gray-500 uppercase mb-1">Login</p><span
-                                    class="bg-green-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-[0_3px_0_0_#16a34a]">50XP</span>
+                                <p class="text-[9px] font-bold text-gray-500 uppercase mb-1">Login</p><span
+                                    class="{{ $loginDone ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600' }} text-[10px] font-bold px-3 py-1.5 rounded-full">
+                                    50XP
+                                </span>
                             </div>
                             <div class="w-px h-8 bg-orange-200/50"></div>
                             <div class="flex-1">
-                                <p class="text-[9px] font-black text-gray-500 uppercase mb-1">Latihan</p><span
-                                    class="bg-[#FF908E] text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-[0_3px_0_0_#e57373]">20XP</span>
+                                <p class="text-[9px] font-bold text-gray-500 uppercase mb-1">Latihan</p><span
+                                    class="{{ $latihanDone ? 'bg-green-500 text-white' : 'bg-[#FF908E] text-white' }} text-[10px] font-bold px-3 py-1.5 rounded-full">
+                                    20XP
+                                </span>
                             </div>
                             <div class="w-px h-8 bg-orange-200/50"></div>
                             <div class="flex-1">
-                                <p class="text-[9px] font-black text-gray-500 uppercase mb-1">Kuis</p><span
-                                    class="bg-[#FF908E] text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-[0_3px_0_0_#e57373]">20XP</span>
+                                <p class="text-[9px] font-bold text-gray-500 uppercase mb-1">Kuis</p><span
+                                    class="{{ $kuisDone ? 'bg-green-500 text-white' : 'bg-[#FF908E] text-white' }} text-[10px] font-bold px-3 py-1.5 rounded-full">
+                                    20XP
+                                </span>
                             </div>
                             <div class="w-px h-8 bg-orange-200/50"></div>
                             <div class="flex-1">
-                                <p class="text-[9px] font-black text-gray-500 uppercase mb-1">Kuis</p><span
-                                    class="bg-[#FF908E] text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-[0_3px_0_0_#e57373]">20XP</span>
+                                <p class="text-[9px] font-bold text-gray-500 uppercase mb-1">Tryout</p><span
+                                    class="{{ $tryoutDone ? 'bg-green-500 text-white' : 'bg-[#FF908E] text-white' }} text-[10px] font-bold px-3 py-1.5 rounded-full">
+                                    50XP
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -210,61 +236,128 @@
             <div class="glass-card rounded-[3rem] p-2 border-4 border-white/50 shadow-2xl relative">
                 <div
                     class="bg-white/20 backdrop-blur-sm rounded-[2.5rem] p-6 md:p-8 border-2 border-blue-200 shadow-inner h-full flex flex-col overflow-hidden">
+
                     <div
                         class="absolute -right-8 top-0 md:right-4 md:top-4 opacity-30 md:opacity-80 pointer-events-none">
                         <img src="{{ asset('img/slime-tp.png') }}" class="w-32 md:w-64 h-auto object-contain">
                     </div>
+
                     <div class="mb-4 relative z-10">
                         <div
                             class="bg-blue-600 text-white px-5 py-1.5 rounded-2xl font-black text-xs inline-block shadow-md uppercase tracking-wider">
-                            Misi Harian</div>
+                            Misi Harian
+                        </div>
                     </div>
+
                     <ul class="mt-4 space-y-4 flex-grow relative z-10">
-                        <li class="flex items-center gap-4"><input type="checkbox" checked
-                                class="w-6 h-6 rounded-lg border-2 border-blue-300 text-blue-600 focus:ring-0"><span
-                                class="text-[#2E3B66] font-bold text-sm md:text-base opacity-40 line-through">Login
-                                Harian</span></li>
-                        <li class="flex items-center gap-4"><input type="checkbox"
-                                class="w-6 h-6 rounded-lg border-2 border-blue-300 text-blue-600 focus:ring-0"><span
-                                class="text-[#2E3B66] font-bold text-sm md:text-base">Kuis Fundamental</span></li>
-                        <li class="flex items-center gap-4"><input type="checkbox"
-                                class="w-6 h-6 rounded-lg border-2 border-blue-300 text-blue-600 focus:ring-0"><span
-                                class="text-[#2E3B66] font-bold text-sm md:text-base">Latihan Soal</span></li>
+
+                        <!-- LOGIN -->
+                        <li class="flex items-center gap-4">
+
+                            <div
+                                class="w-7 h-7 flex items-center justify-center rounded-full 
+{{ $loginDone ? 'bg-green-500 text-white' : 'bg-white border border-gray-300 text-gray-300' }}">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+
+                            <span
+                                class="text-[#2E3B66] font-bold text-sm md:text-base {{ $loginDone ? 'opacity-40 line-through' : '' }}">
+                                Login Harian
+                            </span>
+
+                        </li>
+
+
+                        <!-- LATIHAN -->
+                        <li class="flex items-center gap-4">
+                            <div
+                                class="w-7 h-7 flex items-center justify-center rounded-full 
+{{ $latihanDone ? 'bg-green-500 text-white' : 'bg-white border border-gray-300 text-gray-300' }}">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+
+                            <span
+                                class="text-[#2E3B66] font-bold text-sm md:text-base
+                            {{ $latihanDone ? 'opacity-40 line-through' : '' }}">
+                                Latihan Soal
+                            </span>
+                        </li>
+
+                        <!-- KUIS -->
+                        <li class="flex items-center gap-4">
+                            <div
+                                class="w-7 h-7 flex items-center justify-center rounded-full 
+{{ $kuisDone ? 'bg-green-500 text-white' : 'bg-white border border-gray-300 text-gray-300' }}">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+
+                            <span
+                                class="text-[#2E3B66] font-bold text-sm md:text-base
+            {{ $kuisDone ? 'opacity-40 line-through' : '' }}">
+                                Kuis Fundamental
+                            </span>
+                        </li>
+
+                        <!-- TRYOUT -->
+                        <li class="flex items-center gap-4">
+                            <div
+                                class="w-7 h-7 flex items-center justify-center rounded-full 
+{{ $tryoutDone ? 'bg-green-500 text-white' : 'bg-white border border-gray-300 text-gray-300' }}">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+
+                            <span
+                                class="text-[#2E3B66] font-bold text-sm md:text-base
+                {{ $tryoutDone ? 'opacity-40 line-through' : '' }}">
+                                Tryout
+                            </span>
+                        </li>
+
                     </ul>
+
+                    <!-- XP PROGRESS -->
                     <div class="mt-10 bg-blue-50/50 rounded-[2rem] p-5 border-2 border-blue-100 relative z-10">
+
                         <div
                             class="flex justify-between text-[10px] font-black text-blue-600 mb-2 uppercase tracking-widest">
-                            <span>Capai XP harian</span><span
-                                class="bg-blue-600 text-white px-3 py-0.5 rounded-full">25/75</span>
+                            <span>Capai XP harian</span>
+                            <span class="bg-blue-600 text-white px-3 py-0.5 rounded-full">
+                                {{ $todayXp }}/140
+                            </span>
                         </div>
+
                         <div class="bg-white/50 rounded-full h-4 p-1 border border-blue-200 overflow-hidden">
-                            <div
-                                class="bg-blue-600 h-full w-[33%] rounded-full shadow-sm transition-all duration-1000">
+
+                            <div class="bg-blue-600 h-full rounded-full shadow-sm transition-all duration-1000"
+                                style="width: {{ $xpPercent }}%">
                             </div>
+
                         </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div
+                class="mt-10 glass-card rounded-[2rem] p-4 md:p-6 border-2 border-white/40 flex flex-col md:flex-row items-center justify-between group hover:border-blue-300 transition-all shadow-lg relative overflow-hidden">
+                <div class="flex items-center gap-5 relative z-10 w-full md:w-auto">
+                    <div class="bg-blue-100 p-3 md:p-4 rounded-2xl"><i
+                            class="fa-solid fa-lock text-blue-400 text-xl md:text-2xl"></i></div>
+                    <div>
+                        <h3 class="text-[#2E3B66] font-black text-base md:text-lg leading-none">Evolusi Berikutnya
+                            <span class="text-xs font-bold text-gray-500 ml-2">(Lv 5)</span>
+                        </h3>
+                        <p class="text-blue-800/60 text-xs md:text-sm font-semibold mt-1">Capai <span
+                                class="text-blue-600 font-black">Level 5</span> untuk membuka bentuk baru!</p>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div
-            class="mt-10 glass-card rounded-[2rem] p-4 md:p-6 border-2 border-white/40 flex flex-col md:flex-row items-center justify-between group hover:border-blue-300 transition-all shadow-lg relative overflow-hidden">
-            <div class="flex items-center gap-5 relative z-10 w-full md:w-auto">
-                <div class="bg-blue-100 p-3 md:p-4 rounded-2xl"><i
-                        class="fa-solid fa-lock text-blue-400 text-xl md:text-2xl"></i></div>
-                <div>
-                    <h3 class="text-[#2E3B66] font-black text-base md:text-lg leading-none">Evolusi Berikutnya <span
-                            class="text-xs font-bold text-gray-500 ml-2">(Lv 5)</span></h3>
-                    <p class="text-blue-800/60 text-xs md:text-sm font-semibold mt-1">Capai <span
-                            class="text-blue-600 font-black">Level 5</span> untuk membuka bentuk baru!</p>
+                <div
+                    class="absolute right-[-10px] md:right-[15%] pointer-events-none transition-all duration-700 group-hover:scale-110 opacity-20 md:opacity-100">
+                    <img src="{{ asset('img/slime-tp2.png') }}"
+                        class="w-32 md:w-64 lg:w-80 h-auto object-contain grayscale group-hover:grayscale-0">
                 </div>
             </div>
-            <div
-                class="absolute right-[-10px] md:right-[15%] pointer-events-none transition-all duration-700 group-hover:scale-110 opacity-20 md:opacity-100">
-                <img src="{{ asset('img/slime-tp2.png') }}"
-                    class="w-32 md:w-64 lg:w-80 h-auto object-contain grayscale group-hover:grayscale-0">
-            </div>
-        </div>
     </main>
 
     @include('layouts.footer')

@@ -107,10 +107,9 @@ class KuisController extends Controller
         ]]);
 
         $xpService = new XpService();
-    $xpService->addXp(Auth::user(), 'kuis', 20);
+        $xpService->addXp(Auth::user(), 'kuis', 20);
 
-    return redirect()->route('kuis.hasil')
-        ->with('success','Kuis selesai +20 XP');
+    return redirect()->route('kuis.hasil', $id)->with('success', 'Kuis selesai +20 XP');
 
     }
 
