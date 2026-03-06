@@ -145,40 +145,84 @@
 
     <!-- ================= MAIN ================= -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
-         <header
-            class="flex flex-col md:flex-row items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0">
-            <div class="flex items-center w-full gap-4">
-                <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
-                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-
-                <div class="relative w-full group flex items-center gap-2">
-                    <div class="relative w-full">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
-                        </div>
-                        <input type="text" placeholder="Search Tryout...."
-                            class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
-                    </div>
-                    <button
-                        class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
-                        Cari
+         <header class="flex flex-col md:flex-row items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0">
+                <div class="flex items-center w-full gap-4">
+                    <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
+                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
                     </button>
-                </div>
-            </div>
 
-            <div
-                class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 self-end md:self-auto">
-                <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
+                   <div class="relative w-full group flex items-center gap-2">
+    
+                        <div class="relative w-full">
+                            
+                            <!-- ICON -->
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" 
+                                    class="w-5 h-5 text-gray-500" 
+                                    fill="none"
+                                    viewBox="0 0 24 24" 
+                                    stroke="currentColor" 
+                                    stroke-width="2">
+                                    <path stroke-linecap="round" 
+                                        stroke-linejoin="round"
+                                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                </svg>
+                            </div>
+
+                            <input 
+                                type="text" 
+                                id="pageSearch"
+                                placeholder="Cari halaman..."
+                                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
+                        </div>
+
+                        <button 
+                            onclick="goToPage()" 
+                            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
+                            Cari
+                        </button>
+
+                    </div>
                 </div>
-                <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-            </div>
-        </header>
+
+                @php
+                use Illuminate\Support\Facades\Auth;
+                $user = Auth::user();
+            @endphp
+                    <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
+    
+                    <div @click="open = !open" 
+                        class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
+                                ml-auto md:ml-0 cursor-pointer">
+                        
+                        <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
+                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" alt="Admin">
+                        </div>
+                        
+                        <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
+                        
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                    </div>
+
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 transform scale-100"
+                        x-transition:leave-end="opacity-0 transform scale-95">
+                        <div class="p-4">
+                            <p class="font-semibold text-gray-700">{{ $user->name }}</p>
+                            <p class="text-sm text-gray-500">{{ $user->email }}</p>
+                            <p class="text-sm text-gray-500">{{ $user->no_hp ?? '-' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
  <section class="flex-1 p-4 lg:p-6 xl:p-8 overflow-y-auto">
         <h2 class="text-2xl font-semibold text-slate-700 mb-6">Manajemen Video Pembelajaran</h2>
 
@@ -303,8 +347,8 @@
                             <td class="p-4 text-center space-x-2">
                                 <button @click="handleRestore('{{ $item->id }}')"
                                     class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
-    </svg></button>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                    </svg></button>
                                 <button @click="handleForceDelete('{{ $item->id }}')"
                                     class=" text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -493,7 +537,6 @@ handleFileUpload(event) {
 
         console.log(jsonData);
 
-        // Kirim ke backend Laravel
         fetch("{{ route('admin.videoPembelajaran.import') }}", {
             method: "POST",
             headers: {
@@ -583,6 +626,37 @@ handleForceDelete(id) {
     }
 }
 </script>
+
+@if(session('success'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: '{{ session('success') }}',
+
+    width: '340px',
+    padding: '1.8rem',
+
+    background: '#ffffff',
+    color: '#334155',
+
+    confirmButtonText: 'Oke',
+    confirmButtonColor: '#4A72D4',
+
+    customClass: {
+        popup: 'rounded-3xl shadow-xl',
+        title: 'text-lg font-bold',
+        confirmButton: 'rounded-xl px-6 py-2'
+    },
+
+    showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+    },
+    hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+    }
+});
+</script>
+@endif
 
 </body>
 </html>

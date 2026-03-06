@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Models\admin\Dashboard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\admin\AdminTryout;
+use App\Models\Latihan;
+use App\Models\admin\AdminVideo;
+use App\Models\Kuis;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -12,55 +17,36 @@ class DashboardController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        return view('admin.dashboard');
+{
+    $totalUsers = User::where('role', 'peserta')->count(); 
+    $totalAdmins = User::where('role', 'admin')->count(); 
+
+    $totalTryout  = AdminTryout::count();
+    $totalLatihan = Latihan::count();
+    $totalVideo   = AdminVideo::count();
+    $totalKuis    = Kuis::count();
+
+
+    $usersPerMonth = User::where('role', 'peserta') 
+        ->select(
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('COUNT(*) as total')
+        )
+        ->whereYear('created_at', date('Y'))
+        ->groupBy('month')
+        ->orderBy('month')
+        ->get();
+
+    // Format supaya semua bulan ada (meski 0)
+    $months = [];
+    for ($i = 1; $i <= 12; $i++) {
+        $months[$i] = 0;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    foreach ($usersPerMonth as $data) {
+        $months[$data->month] = $data->total;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Dashboard $dashboard)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Dashboard $dashboard)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Dashboard $dashboard)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Dashboard $dashboard)
-    {
-        //
-    }
+    return view('admin.dashboard', compact('months', 'totalUsers','totalAdmins','totalTryout','totalLatihan','totalVideo','totalKuis'));
+}
 }
