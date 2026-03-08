@@ -138,17 +138,9 @@ public function getXpForNextLevel($user)
 
 public function getXpProgress($user)
 {
-    $xp = $user->total_xp;
-    $level = 1;
-
-    while ($xp >= ($level * 200)) {
-        $xp -= ($level * 200);
-        $level++;
-    }
-
     return [
-        'xp' => $xp,
-        'maxXp' => $level * 200
+        'xp' => $user->total_xp,
+        'maxXp' => $user->level * 200
     ];
 }
 }

@@ -4,35 +4,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persisten</title>
+    <title>Tambah Karakter Streak</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            letter-spacing: -0.01em;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #4A72D4;
-            border-radius: 10px;
+            background: #F4F7FF;
         }
 
         .main-content {
             height: 100vh;
             overflow-y: auto;
+        }
+
+        /* ===== ANIMATION ===== */
+
+        .animate-bounce {
+            animation: bounce 1.2s infinite;
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-wiggle {
+            animation: wiggle 1s ease-in-out infinite;
+        }
+
+        .animate-spin {
+            animation: spin 3s linear infinite;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+
+        @keyframes wiggle {
+
+            0%,
+            100% {
+                transform: rotate(-5deg)
+            }
+
+            50% {
+                transform: rotate(5deg)
+            }
         }
     </style>
 </head>
@@ -211,192 +244,159 @@
 
 
         <!-- CONTENT -->
-        <main class="flex-1 main-content custom-scrollbar">
+        <main class="flex-1 main-content p-10">
 
-            <header
-                class="flex flex-col md:flex-row items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0">
-                <div class="flex items-center w-full gap-4">
-                    <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                    <div class="relative w-full group flex items-center gap-2">
-                        <div class="relative w-full">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+            <div class="w-full mx-auto">
+
+                <div class="mb-10">
+                    <h1 class="text-3xl font-bold text-[#2D3B61]">Tambah Karakter Streak</h1>
+                    <p class="text-gray-500 mt-1">Buat karakter evolusi baru untuk sistem streak siswa</p>
+                </div>
+
+
+                <form action="{{ route('admin.streak.store') }}" method="POST" enctype="multipart/form-data"
+                    x-data="streakForm()">
+
+                    @csrf
+
+                    <div class="grid grid-cols-2 gap-10">
+
+                        <!-- FORM -->
+                        <div class="bg-white p-8 rounded-3xl shadow-sm border">
+
+                            <h2 class="font-bold text-lg mb-6">Informasi Karakter</h2>
+
+                            <div class="space-y-6">
+
+                                <!-- NAMA -->
+                                <div>
+                                    <label class="font-semibold text-sm">Nama Karakter</label>
+                                    <input type="text" name="nama" required
+                                        class="mt-2 w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none"
+                                        placeholder="Contoh: Baby Slime">
+                                </div>
+
+                                <!-- LEVEL -->
+                                <div>
+                                    <label class="font-semibold text-sm">Level Muncul</label>
+                                    <input type="number" name="min_level" required min="1"
+                                        class="mt-2 w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none">
+                                </div>
+
+                                <!-- SVG -->
+                                <div>
+                                    <label class="font-semibold text-sm">Upload SVG</label>
+
+                                    <input type="file" name="svg" accept=".svg" @change="previewSvg($event)"
+                                        class="mt-2 w-full border rounded-xl px-4 py-3 bg-gray-50">
+
+                                    <p class="text-xs text-gray-400 mt-1">
+                                        Format: SVG saja
+                                    </p>
+
+                                </div>
+
+                                <!-- ANIMATION -->
+                                <div>
+
+                                    <label class="font-semibold text-sm">Animasi Karakter</label>
+
+                                    <select name="animation" x-model="animation"
+                                        class="mt-2 w-full border rounded-xl px-4 py-3">
+
+                                        <option value="">Pilih Animasi</option>
+                                        <option value="bounce">Bounce</option>
+                                        <option value="float">Float</option>
+                                        <option value="wiggle">Wiggle</option>
+                                        <option value="spin">Spin</option>
+                                        <option value="pulse">Pulse</option>
+
+                                    </select>
+
+                                </div>
+
                             </div>
-                            <input type="text" placeholder="Search Tryout...."
-                                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
-                        </div>
-                        <button
-                            class="bg-[#4A72D4] text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
-                            Cari
-                        </button>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full border-2 border-white">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
-                    </div>
-                    <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-                    <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-                </div>
-            </header>
 
+                            <div class="mt-8 flex gap-4">
 
-            <div class="p-4 lg:px-8 " x-show="currentView==='main'">
+                                <a href="{{ route('admin.streak.index') }}"
+                                    class="px-6 py-3 bg-gray-200 rounded-xl font-semibold">
+                                    Batal
+                                </a>
 
-                <div
-                    class="bg-white p-4 lg:px-8  rounded-[35px] shadow-sm border border-blue-100 overflow-hidden mb-10">
+                                <button type="submit"
+                                    class="px-6 py-3 bg-[#4A72D4] text-white rounded-xl font-semibold shadow">
+                                    Simpan Karakter
+                                </button>
 
-                    <div class="p-8 border-b flex justify-between items-center">
+                            </div>
 
-                        <div class="flex items-center gap-4">
-                            <h3 class="font-black text-lg">Pet Aktif</h3>
-
-                            <button @click="currentView='history'"
-                                class="text-[10px] font-black uppercase text-[#4A72D4] bg-blue-50 px-4 py-2 rounded-full">
-                                <i class="fa-solid fa-trash-can mr-1"></i> Lihat History
-                            </button>
                         </div>
 
-                        <a href="{{ route('admin.streak.create') }}"
-                            class="bg-[#4A72D4] text-white px-6 py-3 rounded-2xl font-black text-xs uppercase shadow-lg">
-                            Tambah Pet
-                        </a>
+
+                        <!-- PREVIEW -->
+                        <div
+                            class="bg-white p-8 rounded-3xl shadow-sm border flex flex-col items-center justify-center">
+
+                            <h2 class="font-bold text-lg mb-6">Preview Karakter</h2>
+
+                            <div class="w-56 h-56 flex items-center justify-center bg-blue-50 rounded-3xl">
+
+                                <img x-show="svgPreview" :src="svgPreview" :class="'w-40 h-40 ' + animationClass">
+
+                                <span x-show="!svgPreview" class="text-gray-400 text-sm">
+                                    Upload SVG untuk preview
+                                </span>
+
+                            </div>
+
+                            <p class="text-sm text-gray-500 mt-4">
+                                Preview animasi akan muncul saat dipilih
+                            </p>
+
+                        </div>
 
                     </div>
 
-                    <div class="overflow-x-auto">
-
-                        <table class="w-full text-left">
-
-                            <thead class="bg-blue-50/30 text-[#4A72D4] text-[10px] uppercase font-black">
-                                <tr>
-                                    <th class="px-10 py-6 text-center">Visual Pet</th>
-                                    <th class="px-10 py-6 text-center">Level Perubahan</th>
-                                    <th class="px-10 py-6 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-
-                            <tbody class="divide-y divide-gray-100">
-
-                                @foreach ($streaks as $streak)
-                                    <tr class="hover:bg-blue-50/20">
-
-                                        <td class="px-10 py-8 text-center">
-                                            <div class="w-20 h-20 bg-white rounded-3xl p-3 mx-auto border">
-                                                <img src="{{ asset('storage/' . $streak->svg) }}"
-                                                    class="w-full h-full object-contain">
-                                            </div>
-                                        </td>
-
-                                        <td class="px-10 py-8 text-center">
-                                            <span
-                                                class="bg-indigo-50 text-[#4A72D4] px-6 py-3 rounded-2xl font-black text-lg">
-                                                {{ $streak->level }}
-                                            </span>
-                                        </td>
-
-                                        <td class="px-10 py-8 text-center">
-
-                                            <div class="flex justify-center gap-2">
-
-                                                <a href="{{ route('admin.streak.edit', $streak->id) }}"
-                                                    class="h-11 px-5 bg-blue-50 text-[#4A72D4] rounded-xl font-black text-[10px] uppercase">
-                                                    Edit
-                                                </a>
-
-                                                <button @click="confirmSoftDelete({{ $streak->id }})"
-                                                    class="h-11 px-5 bg-red-50 text-red-500 rounded-xl font-black text-[10px] uppercase">
-                                                    Hapus
-                                                </button>
-
-                                                <form id="delete-{{ $streak->id }}"
-                                                    action="{{ route('admin.streak.destroy', $streak->id) }}"
-                                                    method="POST" class="hidden">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                </form>
-
-                                            </div>
-
-                                        </td>
-
-                                    </tr>
-                                @endforeach
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
+                </form>
 
             </div>
-
-
-            <div x-show="currentView==='history'">
-
-                <button @click="currentView='main'"
-                    class="mb-6 flex items-center gap-2 text-[#4A72D4] font-bold text-sm">
-                    <i class="fa-solid fa-arrow-left"></i> Kembali
-                </button>
-
-                <div class="bg-white rounded-[35px] shadow-sm border border-red-50 overflow-hidden">
-
-                    <div class="p-8 bg-red-50/20 border-b border-red-100">
-                        <h3 class="font-black text-lg text-red-500 uppercase">
-                            History Sampah
-                        </h3>
-                    </div>
-
-                    <table class="w-full text-left">
-
-                        <tbody class="divide-y divide-gray-100">
-
-                            @foreach ($trash as $streak)
-                                <tr>
-
-                                    <td class="px-10 py-6 text-center">
-                                        <img src="{{ asset('storage/' . $streak->svg) }}"
-                                            class="w-12 h-12 grayscale opacity-50 mx-auto">
-                                    </td>
-
-                                    <td class="px-10 py-6 font-black text-slate-400">
-                                        Level {{ $streak->level }}
-                                    </td>
-
-                                    <td class="px-10 py-6 text-right">
-
-                                        <button @click="confirmPermanentDelete({{ $streak->id }})"
-                                            class="bg-red-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase">
-                                            Hapus Permanen
-                                        </button>
-
-                                        <form id="force-{{ $streak->id }}"
-                                            action="{{ route('admin.streak.forceDelete', $streak->id) }}"
-                                            method="POST" class="hidden">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
-
-                                    </td>
-
-                                </tr>
-                            @endforeach
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
 
         </main>
     </div>
+
+
+
+    <script>
+        function streakForm() {
+
+            return {
+
+                svgPreview: null,
+                animation: '',
+
+                previewSvg(event) {
+
+                    const file = event.target.files[0]
+
+                    if (file) {
+                        this.svgPreview = URL.createObjectURL(file)
+                    }
+
+                },
+
+                get animationClass() {
+
+                    if (!this.animation) return ''
+
+                    return 'animate-' + this.animation
+
+                }
+
+            }
+
+        }
+    </script>
 
 </body>
 

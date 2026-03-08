@@ -1,90 +1,141 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Slime;
+use App\Models\StreakCharacter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AdminStreakController extends Controller
 {
-
+    /**
+     * LIST SEMUA KARAKTER
+     */
     public function index()
-{
-    $slimes = Slime::latest()->get();
-    $activeSlimes = Slime::where('is_active',1)->get();
-    $inactiveSlimes = Slime::where('is_active',0)->get();
-
-    return view('admin.streak.index', compact(
-        'slimes',
-        'activeSlimes',
-        'inactiveSlimes'
-    ));
-}
-
-
-    public function create()
     {
-        return view('admin.streak.create');
+        $streaks = StreakCharacter::orderBy('min_level', 'asc')->get();
+    $trash = StreakCharacter::onlyTrashed()->orderBy('min_level')->get();
+
+    return view('admin.streak.index', compact('streaks','trash'));
     }
 
+    /**
+     * FORM TAMBAH KARAKTER
+     */
+    public function create()
+    {
+        $animations = [
+            'bounce',
+            'float',
+            'wiggle',
+            'spin',
+            'pulse'
+        ];
 
+        return view('admin.streak.create', compact('animations'));
+    }
+
+    /**
+     * SIMPAN KARAKTER BARU
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
-            'level_min' => 'required|integer',
-            'animasi' => 'required'
+            'nama' => 'required|string|max:100',
+            'svg' => 'required|mimes:svg|max:2048',
+            'min_level' => 'required|integer|min:1',
+            'animation' => 'required|in:bounce,float,wiggle,spin,pulse'
         ]);
 
-        Slime::create([
+        $svgPath = null;
+
+        if ($request->hasFile('svg')) {
+            $svgPath = $request->file('svg')->store('streak', 'public');
+        }
+
+        StreakCharacter::create([
             'nama' => $request->nama,
-            'gambar' => $request->gambar,
-            'level_min' => $request->level_min,
-            'animasi' => $request->animasi,
-            'is_active' => $request->is_active ? 1 : 0
+            'svg_path' => $svgPath,
+            'min_level' => $request->min_level,
+            'animation' => $request->animation
         ]);
 
-        return redirect()->route('admin.streak.index')
-            ->with('success','Slime berhasil dibuat');
+        return redirect()
+            ->route('admin.streak.index')
+            ->with('success', 'Karakter streak berhasil ditambahkan');
     }
 
-
+    /**
+     * FORM EDIT KARAKTER
+     */
     public function edit($id)
     {
-        $slime = Slime::findOrFail($id);
-        return view('admin.streak.edit', compact('slime'));
+        $character = StreakCharacter::findOrFail($id);
+
+        $animations = [
+            'bounce',
+            'float',
+            'wiggle',
+            'spin',
+            'pulse'
+        ];
+
+        return view('admin.streak.edit', compact('character', 'animations'));
     }
 
-
+    /**
+     * UPDATE KARAKTER
+     */
     public function update(Request $request, $id)
     {
-        $slime = Slime::findOrFail($id);
+        $character = StreakCharacter::findOrFail($id);
 
         $request->validate([
-            'nama' => 'required',
-            'level_min' => 'required|integer',
-            'animasi' => 'required'
+            'nama' => 'required|string|max:100',
+            'svg' => 'nullable|mimes:svg|max:2048',
+            'min_level' => 'required|integer|min:1',
+            'animation' => 'required|in:bounce,float,wiggle,spin,pulse'
         ]);
 
-        $slime->update([
+        $svgPath = $character->svg_path;
+
+        if ($request->hasFile('svg')) {
+
+            if ($character->svg_path && Storage::disk('public')->exists($character->svg_path)) {
+                Storage::disk('public')->delete($character->svg_path);
+            }
+
+            $svgPath = $request->file('svg')->store('streak', 'public');
+        }
+
+        $character->update([
             'nama' => $request->nama,
-            'gambar' => $request->gambar,
-            'level_min' => $request->level_min,
-            'animasi' => $request->animasi,
-            'is_active' => $request->is_active ? 1 : 0
+            'svg_path' => $svgPath,
+            'min_level' => $request->min_level,
+            'animation' => $request->animation
         ]);
 
-        return redirect()->route('admin.streak.index')
-            ->with('success','Slime berhasil diupdate');
+        return redirect()
+            ->route('admin.streak.index')
+            ->with('success', 'Karakter streak berhasil diperbarui');
     }
 
-
+    /**
+     * HAPUS KARAKTER
+     */
     public function destroy($id)
     {
-        Slime::destroy($id);
+        $character = StreakCharacter::findOrFail($id);
 
-        return back()->with('success','Slime berhasil dihapus');
+        if ($character->svg_path && Storage::disk('public')->exists($character->svg_path)) {
+            Storage::disk('public')->delete($character->svg_path);
+        }
+
+        $character->delete();
+
+        return redirect()
+            ->route('admin.streak.index')
+            ->with('success', 'Karakter streak berhasil dihapus');
     }
-
 }

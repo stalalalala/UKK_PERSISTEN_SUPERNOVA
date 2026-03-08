@@ -117,16 +117,14 @@
 */
 
         $level = 1;
-        $sisaXp = $xp;
         $xpNeed = 200;
 
-        while ($sisaXp >= $xpNeed) {
-            $sisaXp -= $xpNeed;
+        while ($xp >= $xpNeed) {
             $level++;
             $xpNeed += 200;
         }
 
-        $currentXpInLevel = $sisaXp;
+        $currentXpInLevel = $xp; // pakai total xp
         $maxXp = $xpNeed;
     @endphp
 
