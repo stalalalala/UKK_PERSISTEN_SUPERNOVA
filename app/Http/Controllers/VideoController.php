@@ -17,51 +17,13 @@ class VideoController extends Controller
        return view('video.index', compact('videos'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+  public function tonton($id)
+{
+    $video = AdminVideo::findOrFail($id);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    $video->ditonton = 1;
+    $video->save();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Video $video)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Video $video)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Video $video)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Video $video)
-    {
-        //
-    }
+    return response()->json(['success' => true]);
+}
 }

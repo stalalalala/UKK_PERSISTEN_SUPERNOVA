@@ -195,6 +195,7 @@ Route::middleware(['auth'])->group(function () {
         ======================= */
         Route::get('/streak', [StreakController::class, 'index'])->name('streak.index');
         Route::get('/video', [VideoController::class, 'index'])->name('video.index');
+        Route::post('/video/ditonton/{id}', [VideoController::class, 'tonton']);
 
 
         /* =======================
@@ -204,11 +205,11 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/', [TryoutController::class, 'index'])->name('index'); 
         Route::get('/intruksi/{id}', [TryoutController::class, 'intruksi'])->name('intruksi');
-        // Tambahkan {category_id?} agar opsional
+        
         Route::get('/soal/{id}/{category_id?}', [TryoutController::class, 'soal'])->name('soal');
         Route::post('/simpan-jawaban/{id}', [TryoutController::class, 'simpanJawaban'])->name('simpan');
         
-        // Tambahkan {next_category_id} agar sinkron dengan Controller
+       
         Route::get('/jeda/{id}/{next_category_id}', [TryoutController::class, 'jeda'])->name('jeda');
         
         Route::get('/hasil/{id}', [TryoutController::class, 'hasil'])->name('hasil');
@@ -220,12 +221,12 @@ Route::middleware(['auth'])->group(function () {
         // Latihan
 
         Route::prefix('latihan')->name('latihan.')->group(function () {
-    Route::get('/', [LatihanController::class, 'index'])->name('index');
-    Route::get('/intruksi/{id}', [LatihanController::class, 'intruksi'])->name('intruksi');
-    Route::get('/soal/{id}', [LatihanController::class, 'soal'])->name('soal');
-    Route::post('/submit/{id}', [LatihanController::class, 'submit'])->name('submit');
-    Route::get('/hasil/{id}', [LatihanController::class, 'hasil'])->name('hasil');
-});
+        Route::get('/', [LatihanController::class, 'index'])->name('index');
+        Route::get('/intruksi/{id}', [LatihanController::class, 'intruksi'])->name('intruksi');
+        Route::get('/soal/{id}', [LatihanController::class, 'soal'])->name('soal');
+        Route::post('/submit/{id}', [LatihanController::class, 'submit'])->name('submit');
+        Route::get('/hasil/{id}', [LatihanController::class, 'hasil'])->name('hasil');
+    });
 
 
         /* =======================

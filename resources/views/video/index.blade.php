@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>PERSISTEN - Video Pembelajaran</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
@@ -235,35 +236,61 @@
     <section class="px-4 md:px-10">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             @foreach($videos as $index => $video)
-                <div 
-                    x-show="shouldShow('{{ $video->subtes }}', {{ $index }})"
-                    x-transition
-                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-                    
-                    <div class="flex-1 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-blue-600 font-bold text-xl mb-3">{{ $video->subtes }}</h3>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold">
-                                    <i class="fa-solid fa-book-open"></i>
-                                    <span>{{ $video->judul_video }}</span>
-                                </div>
-                                <div class="flex items-center gap-3 text-blue-500 font-semibold">
-                                    <span>Video Pembelajaran</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <span class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Belum Ditonton</span>
-                        </div>
-                    </div>
+              <div 
+            x-data="{ ditonton: {{ $video->ditonton ? 'true' : 'false' }} }"
+            x-show="shouldShow('{{ $video->subtes }}', {{ $index }})"
+            x-transition
+            @click="ditonton = true; tontonVideo({{ $video->id }})"
+            class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group cursor-pointer">
 
-                    <div class="w-full sm:w-56 h-36 rounded-3xl overflow-hidden bg-gray-100 relative">
-                        <div class="absolute inset-0">
-                            {!! preg_replace( ['/width=".*?"/', '/height=".*?"/'], ['width="100%"', 'height="100%"'], $video->iframe ) !!}
-                        </div>
-                    </div>
-                </div>
+            <div class="flex-1 flex flex-col justify-between">
+
+            <div>
+            <h3 class="text-blue-600 font-bold text-xl mb-3">{{ $video->subtes }}</h3>
+
+            <div class="space-y-3">
+
+            <div class="flex items-center gap-3 text-blue-500 font-semibold">
+            <i class="fa-solid fa-book-open"></i>
+            <span>{{ $video->judul_video }}</span>
+            </div>
+
+            <div class="flex items-center gap-3 text-blue-500 font-semibold">
+            <span>Video Pembelajaran</span>
+            </div>
+
+            </div>
+            </div>
+
+            <div class="mt-6">
+
+            <span 
+            x-show="!ditonton"
+            class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
+            Belum Ditonton
+            </span>
+
+            <span 
+            x-show="ditonton"
+            class="bg-green-500 text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
+            Ditonton
+            </span>
+
+            </div>
+            </div>
+
+            <!-- VIDEO -->
+            <div 
+            @click="ditonton = true; tontonVideo({{ $video->id }})"
+            class="w-full sm:w-56 h-36 rounded-3xl overflow-hidden bg-gray-100 relative cursor-pointer">
+
+            <div class="absolute inset-0">
+            {!! preg_replace(['/width=".*?"/','/height=".*?"/'],['width="100%"','height="100%"'],$video->iframe) !!}
+            </div>
+
+            </div>
+
+            </div>
             @endforeach
         </div>
 
@@ -287,7 +314,24 @@
     </section>
 </main>
     @include('layouts.footer')
+<script>
+        function tontonVideo(id){
 
+        console.log("klik video", id)
+
+        fetch(`/video/ditonton/${id}`,{
+        method:'POST',
+        headers:{
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        'Content-Type':'application/json'
+        }
+        })
+        .then(res => res.json())
+        .then(data => console.log(data))
+        .catch(err => console.log(err))
+
+        }
+</script>
 
 </body>
 
