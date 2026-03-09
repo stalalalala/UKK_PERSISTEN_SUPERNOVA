@@ -438,25 +438,47 @@
         <h2 class="text-xl font-bold mb-4 text-[#4A72D4]">Aktivitas Admin Terbaru</h2>
         <div class="space-y-2 relative flex-1">
             <div class="absolute left-6 top-2 bottom-10 w-0.5 bg-blue-50"></div>
-            @foreach(range(1, 3) as $index) 
-            <div class="relative flex items-start gap-4 mb-8 group">
-                <div class="w-12 h-12 bg-blue-100 text-[#4A72D4] rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm group-hover:bg-[#4A72D4] group-hover:text-white transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                </div>
-                <div class="pt-1">
-                    <p class="text-sm font-bold text-gray-600 leading-tight">Admin menambahkan <span class="text-[#4A72D4]">20 user</span></p>
-                    <span class="text-[11px] font-medium text-gray-400">2 mins ago</span>
-                </div>
+            @forelse($recentLogs as $log)
+        <div class="relative flex items-start gap-4 mb-8 group">
+            <div class="w-12 h-12 bg-blue-100 text-[#4A72D4] rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm group-hover:bg-[#4A72D4] group-hover:text-white transition-colors">
+                @if(str_contains(strtoupper($log->category), 'TAMBAH'))
+                    <i class="fa-solid fa-plus text-sm"></i>
+                @elseif(str_contains(strtoupper($log->category), 'HAPUS'))
+                    <i class="fa-solid fa-trash-can text-sm"></i>
+                @elseif(str_contains(strtoupper($log->category), 'UPDATE') || str_contains(strtoupper($log->category), 'EDIT'))
+                    <i class="fa-solid fa-pen-to-square text-sm"></i>
+                @else
+                    <i class="fa-solid fa-bolt text-sm"></i>
+                @endif
             </div>
-            @endforeach
+
+            <div class="pt-1 overflow-hidden">
+                <p class="text-sm font-bold text-gray-600 leading-tight">
+                    {{ $log->user->name ?? 'Admin' }} 
+                    <span class="text-[#4A72D4] lowercase font-medium">
+                        {{ str_replace('TRYOUT', '', $log->category) }}
+                    </span> 
+                    <span class="block text-gray-400 font-medium truncate italic mt-0.5">
+                        {{ $log->title }}
+                    </span>
+                </p>
+                <span class="text-[11px] font-medium text-gray-400">
+                    {{ $log->created_at->diffForHumans() }}
+                </span>
+            </div>
         </div>
-        <button class="w-full py-3 mt-4 bg-blue-50/50 hover:bg-blue-100 text-[#4A72D4] text-sm font-bold rounded-2xl transition-colors border border-blue-100/50">
-            Lihat Semua
-        </button>
+    @empty
+        <div class="py-10 text-center opacity-30">
+            <p class="text-[10px] font-bold uppercase tracking-widest">Belum Ada Riwayat</p>
+        </div>
+    @endforelse
+        </div>
+        <a href="{{ route('admin.laporan.index') }}" 
+       class="w-full py-4 mt-8 bg-blue-50/50 hover:bg-[#4A72D4] hover:text-white text-[#4A72D4] text-[10px] font-black rounded-2xl transition-all border border-blue-100/50 text-center uppercase tracking-[0.2em]">
+        Semua Aktivitas
+    </a>
     </div>
-</div>
+    </div>
         </main>
     </div>
 

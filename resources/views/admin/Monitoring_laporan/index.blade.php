@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Rinci - Persisten</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         * { font-family: 'Poppins', sans-serif !important; }
@@ -136,7 +138,7 @@
         </a>
 
         <a href="{{ route('admin.laporan.index') }}" x-init="if(currentPage === 'laporan') { $el.scrollIntoView({ block: 'center' }) }"
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left hover:bg-white/10 bg-[#D4DEF7] text-[#2E3B66]">
+            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left bg-[#D4DEF7] text-[#2E3B66]">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
             </svg>
@@ -167,9 +169,6 @@
                         </svg>
                     </button>
 
-<<<<<<< HEAD
-                    <div class="relative w-full group flex items-center gap-2">
-=======
                   <div 
                     x-data="{
                         keyword: '',
@@ -201,16 +200,10 @@
                     class="relative w-full group flex items-center gap-2"
                     >
 
->>>>>>> 9f1523811615d39451a11b03a3226e96edf86548
                         <div class="relative w-full">
                             
                             <!-- ICON -->
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-<<<<<<< HEAD
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-=======
                                 <svg xmlns="http://www.w3.org/2000/svg" 
                                     class="w-5 h-5 text-gray-500" 
                                     fill="none"
@@ -219,7 +212,6 @@
                                     stroke-width="2">
                                     <path stroke-linecap="round" 
                                         stroke-linejoin="round"
->>>>>>> 9f1523811615d39451a11b03a3226e96edf86548
                                         d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                                 </svg>
                             </div>
@@ -231,13 +223,9 @@
                                 @keydown.enter="goToPage()"
                                 class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
                         </div>
-<<<<<<< HEAD
-                        <button
-=======
 
                         <button 
                             @click="goToPage()"
->>>>>>> 9f1523811615d39451a11b03a3226e96edf86548
                             class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                             Cari
                         </button>
@@ -245,12 +233,6 @@
                     </div>
                 </div>
 
-<<<<<<< HEAD
-                <div
-                    class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 self-end md:self-auto">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
-=======
                 @php
                 use Illuminate\Support\Facades\Auth;
                 $user = Auth::user();
@@ -267,7 +249,9 @@
                         
                         <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
                         
-                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 text-gray-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
                     </div>
 
                     <div x-show="open" @click.away="open = false"
@@ -283,7 +267,6 @@
                             <p class="text-sm text-gray-500">{{ $user->email }}</p>
                             <p class="text-sm text-gray-500">{{ $user->no_hp ?? '-' }}</p>
                         </div>
->>>>>>> 9f1523811615d39451a11b03a3226e96edf86548
                     </div>
                 </div>
             </header>
@@ -456,6 +439,7 @@
                 selectedDraftTitle: '',
                 selectedCriteria: { year: null, month: null, week: null },
                 mobileMenuOpen: false,
+                adminDropdownOpen: false,
                 searchQuery: '',
                 logs: @json($logs),
 

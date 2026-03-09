@@ -10,6 +10,7 @@ use App\Models\Latihan;
 use App\Models\admin\AdminVideo;
 use App\Models\Kuis;
 use Illuminate\Support\Facades\DB;
+use App\Models\SystemLog;
 
 class DashboardController extends Controller
 {
@@ -47,6 +48,8 @@ class DashboardController extends Controller
         $months[$data->month] = $data->total;
     }
 
-    return view('admin.dashboard', compact('months', 'totalUsers','totalAdmins','totalTryout','totalLatihan','totalVideo','totalKuis'));
+    $recentLogs = \App\Models\SystemLog::with('user')->latest()->take(3)->get();
+
+    return view('admin.dashboard', compact('months', 'totalUsers','totalAdmins','totalTryout','totalLatihan','totalVideo','totalKuis','recentLogs'));
 }
 }

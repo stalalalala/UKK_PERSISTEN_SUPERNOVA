@@ -268,33 +268,6 @@ laporan</span>
 
         <main class="flex-1 flex flex-col h-screen overflow-hidden">
             <header class="flex flex-col md:flex-row items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0">
-<<<<<<< HEAD
-            <div class="flex items-center w-full gap-4">
-                <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-                <div class="relative w-full group flex items-center gap-2">
-                    <div class="relative w-full">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
-                        </div>
-                        <input type="text" placeholder="Search Tryout...."
-                            class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
-                    </div>
-                    <button class="bg-[#4A72D4] text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
-                        Cari
-                    </button>
-                </div>
-            </div>
-            <div class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0">
-                <div class="w-10 h-10 bg-gray-200 rounded-full border-2 border-white">
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
-                </div>
-                <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-            </div>
-        </header>
-=======
                 <div class="flex items-center w-full gap-4">
                     <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
                         <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,7 +375,6 @@ laporan</span>
                     </div>
                 </div>
             </header>
->>>>>>> 9f1523811615d39451a11b03a3226e96edf86548
 
             <div class="px-6 lg:px-14 py-2 shrink-0 overflow-x-auto no-scrollbar">
                 <div class="flex items-center justify-between lg:justify-end gap-3 min-w-max pr-4">
