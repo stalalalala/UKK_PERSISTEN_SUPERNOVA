@@ -172,12 +172,12 @@ Route::middleware(['auth'])->group(function () {
 
         
         //slime
-        Route::get('/streak', [AdminStreakController::class,'index'])->name('streak.index');
-        Route::get('/streak/create', [AdminStreakController::class,'create'])->name('streak.create');
-        Route::post('/streak/store', [AdminStreakController::class,'store'])->name('streak.store');
-        Route::get('/streak/edit/{id}', [AdminStreakController::class,'edit'])->name('streak.edit');
-        Route::put('/streak/update/{id}', [AdminStreakController::class,'update'])->name('streak.update');
-        Route::delete('/streak/delete/{id}', [AdminStreakController::class,'destroy'])->name('streak.delete');
+       Route::get('/streak', [AdminStreakController::class,'index'])->name('streak.index');
+    Route::get('/streak/create', [AdminStreakController::class,'create'])->name('streak.create');
+    Route::post('/streak/store', [AdminStreakController::class,'store'])->name('streak.store');
+    Route::get('/streak/edit/{id}', [AdminStreakController::class,'edit'])->name('streak.edit');
+    Route::put('/streak/update/{id}', [AdminStreakController::class,'update'])->name('streak.update');
+    Route::delete('/streak/delete/{id}', [AdminStreakController::class,'destroy'])->name('streak.delete');
     });
 
 

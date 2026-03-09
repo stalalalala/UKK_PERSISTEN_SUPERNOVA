@@ -10,6 +10,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -244,124 +245,248 @@
 
 
         <!-- CONTENT -->
-        <main class="flex-1 main-content p-10">
-
+        <main class="flex-1 main-content p-6 lg:p-10 bg-[#F8FAFC]">
             <div class="w-full mx-auto">
 
-                <div class="mb-10">
-                    <h1 class="text-3xl font-bold text-[#2D3B61]">Tambah Karakter Streak</h1>
-                    <p class="text-gray-500 mt-1">Buat karakter evolusi baru untuk sistem streak siswa</p>
-                </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+                    <div>
+                        {{-- <nav
+                            class="flex items-center gap-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                            <a href="#" class="hover:text-[#4A72D4] transition-colors">Admin</a>
+                            <span>/</span>
+                            <a href="#" class="hover:text-[#4A72D4] transition-colors">Streak System</a>
+                            <span>/</span>
+                            <span class="text-gray-600">Tambah Karakter</span>
+                        </nav> --}}
+                        <h1 class="text-2xl font-extrabold text-[#4A72D4] tracking-tight">
+                            Tambah Karakter Streak
+                        </h1>
+                        @if ($errors->any())
+                            <div class="mb-5 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-xl">
+                                <p class="font-bold">Terjadi Kesalahan:</p>
+                                <ul class="list-disc list-inside">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        <p class="text-gray-400 text-sm mt-1 shadow-sm-none">Tentukan parameter visual dan ambang batas
+                            level
+                            untuk karakter baru.</p>
+                    </div>
 
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('admin.streak.index') }}"
+                            class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 bg-white font-bold text-sm hover:bg-gray-50 transition-all">
+                            Batal
+                        </a>
+                    </div>
+                </div>
 
                 <form action="{{ route('admin.streak.store') }}" method="POST" enctype="multipart/form-data"
                     x-data="streakForm()">
-
                     @csrf
 
-                    <div class="grid grid-cols-2 gap-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-                        <!-- FORM -->
-                        <div class="bg-white p-8 rounded-3xl shadow-sm border">
+                        <div class="lg:col-span-7 space-y-6">
 
-                            <h2 class="font-bold text-lg mb-6">Informasi Karakter</h2>
+                            <div
+                                class="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 p-8 overflow-hidden relative">
 
-                            <div class="space-y-6">
-
-                                <!-- NAMA -->
-                                <div>
-                                    <label class="font-semibold text-sm">Nama Karakter</label>
-                                    <input type="text" name="nama" required
-                                        class="mt-2 w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none"
-                                        placeholder="Contoh: Baby Slime">
+                                <div class="flex items-center gap-4 mb-8">
+                                    <div
+                                        class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-[#4A72D4]">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-lg font-bold text-gray-800">Identitas Karakter</h2>
+                                        <p class="text-xs text-gray-400">Nama dan batasan akses level pengguna.</p>
+                                    </div>
                                 </div>
 
-                                <!-- LEVEL -->
-                                <div>
-                                    <label class="font-semibold text-sm">Level Muncul</label>
-                                    <input type="number" name="min_level" required min="1"
-                                        class="mt-2 w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-400 outline-none">
+                                <div class="space-y-5">
+                                    <div class="group">
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-[#4A72D4] transition-colors">Nama
+                                            Karakter</label>
+                                        <input type="text" name="nama" required
+                                            class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-5 py-4 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-[#4A72D4] transition-all outline-none text-gray-700 font-medium"
+                                            placeholder="John Doe">
+                                    </div>
+
+                                    <div class="group">
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-[#4A72D4] transition-colors">Minimum
+                                            Level</label>
+                                        <div class="relative">
+                                            <input type="number" name="min_level" required min="1"
+                                                class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-5 pr-14 py-4 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-[#4A72D4] transition-all outline-none text-gray-700 font-medium"
+                                                placeholder="1">
+                                            <div
+                                                class="absolute right-4 top-1/2 -translate-y-1/2 px-3 py-1 bg-white border border-gray-100 rounded-lg text-[10px] font-black text-gray-400 shadow-sm">
+                                                LVL</div>
+                                        </div>
+                                    </div>
                                 </div>
-
-                                <!-- SVG -->
-                                <div>
-                                    <label class="font-semibold text-sm">Upload SVG</label>
-
-                                    <input type="file" name="svg" accept=".svg" @change="previewSvg($event)"
-                                        class="mt-2 w-full border rounded-xl px-4 py-3 bg-gray-50">
-
-                                    <p class="text-xs text-gray-400 mt-1">
-                                        Format: SVG saja
-                                    </p>
-
-                                </div>
-
-                                <!-- ANIMATION -->
-                                <div>
-
-                                    <label class="font-semibold text-sm">Animasi Karakter</label>
-
-                                    <select name="animation" x-model="animation"
-                                        class="mt-2 w-full border rounded-xl px-4 py-3">
-
-                                        <option value="">Pilih Animasi</option>
-                                        <option value="bounce">Bounce</option>
-                                        <option value="float">Float</option>
-                                        <option value="wiggle">Wiggle</option>
-                                        <option value="spin">Spin</option>
-                                        <option value="pulse">Pulse</option>
-
-                                    </select>
-
-                                </div>
-
                             </div>
 
-                            <div class="mt-8 flex gap-4">
+                            <div
+                                class="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 p-8">
+                                <div class="flex items-center gap-4 mb-8">
+                                    <div
+                                        class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-500">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-lg font-bold text-gray-800">Visual & Motion</h2>
+                                        <p class="text-xs text-gray-400">Upload asset vektor dan tentukan perilaku
+                                            animasi.</p>
+                                    </div>
+                                </div>
 
-                                <a href="{{ route('admin.streak.index') }}"
-                                    class="px-6 py-3 bg-gray-200 rounded-xl font-semibold">
-                                    Batal
-                                </a>
+                                <div class="space-y-6">
+                                    <div
+                                        class="relative group border-2 border-dashed border-gray-200 hover:border-[#4A72D4] hover:bg-blue-50/30 rounded-[1.5rem] p-8 transition-all text-center">
+                                        <input type="file" name="svg" accept=".svg"
+                                            @change="previewSvg($event)"
+                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                        <div class="space-y-3">
+                                            <div
+                                                class="w-14 h-14 bg-white shadow-sm border border-gray-100 rounded-2xl flex items-center justify-center mx-auto transition-transform group-hover:scale-110">
+                                                <svg class="w-6 h-6 text-[#4A72D4]" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M12 4v16m8-8H4" stroke-width="2"
+                                                        stroke-linecap="round" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-bold text-gray-700">Tarik atau Klik untuk Upload
+                                                </p>
+                                                <p class="text-[11px] text-gray-400 mt-1 uppercase tracking-tighter">
+                                                    Vector SVG saja (Maks. 2MB)</p>
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                    <div class="group">
+                                        <label
+                                            class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Behavior
+                                            Animasi</label>
+                                        <div class="relative">
+                                            <select name="animation" x-model="animation"
+                                                class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-5 py-4 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-[#4A72D4] transition-all outline-none appearance-none text-gray-700 font-medium">
+                                                <option value="">Static (Tanpa Animasi)</option>
+                                                <option value="bounce">Bounce - Ceria</option>
+                                                <option value="float">Float - Melayang Halus</option>
+                                                <option value="wiggle">Wiggle - Enerjik</option>
+                                                <option value="spin">Spin - Berputar</option>
+                                                <option value="pulse">Pulse - Berdenyut</option>
+                                            </select>
+                                            <div
+                                                class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4">
                                 <button type="submit"
-                                    class="px-6 py-3 bg-[#4A72D4] text-white rounded-xl font-semibold shadow">
+                                    class="w-full bg-[#4A72D4] hover:bg-[#3b5eb8] text-white rounded-2xl py-4 font-black text-lg shadow-xl">
                                     Simpan Karakter
                                 </button>
-
                             </div>
-
                         </div>
 
+                        <div class="lg:col-span-5 sticky top-10">
+                            <div class="bg-gray-900 rounded-xl p-3 shadow-2xl">
+                                <div
+                                    class="bg-[#1A1C1E] rounded-[2rem] p-8 flex flex-col items-center relative overflow-hidden">
 
-                        <!-- PREVIEW -->
-                        <div
-                            class="bg-white p-8 rounded-3xl shadow-sm border flex flex-col items-center justify-center">
+                                    <div
+                                        class="absolute top-[-10%] right-[-10%] w-40 h-40 bg-[#4A72D4] opacity-20 blur-[80px]">
+                                    </div>
 
-                            <h2 class="font-bold text-lg mb-6">Preview Karakter</h2>
+                                    <div class="w-full flex justify-between items-center mb-10 relative z-10">
+                                        <h3 class="text-white font-bold text-sm tracking-widest uppercase">Live Render
+                                        </h3>
+                                        <div class="flex gap-1.5">
+                                            <div class="w-2.5 h-2.5 rounded-full bg-[#FF5F57]"></div>
+                                            <div class="w-2.5 h-2.5 rounded-full bg-[#FEBC2E]"></div>
+                                            <div class="w-2.5 h-2.5 rounded-full bg-[#28C840]"></div>
+                                        </div>
+                                    </div>
 
-                            <div class="w-56 h-56 flex items-center justify-center bg-blue-50 rounded-3xl">
+                                    <div
+                                        class="w-full aspect-square bg-[#0D0F10] rounded-[2rem] border border-white/5 flex items-center justify-center relative overflow-hidden shadow-inner group">
 
-                                <img x-show="svgPreview" :src="svgPreview" :class="'w-40 h-40 ' + animationClass">
+                                        <div class="absolute inset-0 opacity-[0.03]"
+                                            style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;">
+                                        </div>
 
-                                <span x-show="!svgPreview" class="text-gray-400 text-sm">
-                                    Upload SVG untuk preview
-                                </span>
+                                        <template x-if="svgPreview">
+                                            <img :src="svgPreview"
+                                                :class="'relative w-48 h-48 object-contain transition-all duration-500 ' +
+                                                animationClass">
+                                        </template>
 
+                                        <div x-show="!svgPreview" class="text-center space-y-4 relative z-10 px-10">
+                                            <div
+                                                class="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto border border-white/10 group-hover:border-white/20 transition-all">
+                                                <svg class="w-10 h-10 text-gray-600" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="1"
+                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                    </path>
+                                                </svg>
+                                            </div>
+                                            <p class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">
+                                                Awaiting Asset</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="w-full mt-8 grid grid-cols-2 gap-4">
+                                        <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+                                            <p class="text-[10px] font-black text-gray-500 uppercase mb-1">Animation
+                                            </p>
+                                            <p class="text-sm font-bold text-white truncate"
+                                                x-text="animation ? animation : 'Static'"></p>
+                                        </div>
+                                        <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+                                            <p class="text-[10px] font-black text-gray-500 uppercase mb-1">Status</p>
+                                            <div class="flex items-center gap-2">
+                                                <div
+                                                    class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]">
+                                                </div>
+                                                <p class="text-sm font-bold text-white uppercase tracking-tighter">
+                                                    Ready</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-
-                            <p class="text-sm text-gray-500 mt-4">
-                                Preview animasi akan muncul saat dipilih
-                            </p>
-
                         </div>
-
                     </div>
-
                 </form>
-
             </div>
-
         </main>
     </div>
 
@@ -380,7 +505,13 @@
                     const file = event.target.files[0]
 
                     if (file) {
+
+                        if (this.svgPreview) {
+                            URL.revokeObjectURL(this.svgPreview)
+                        }
+
                         this.svgPreview = URL.createObjectURL(file)
+
                     }
 
                 },

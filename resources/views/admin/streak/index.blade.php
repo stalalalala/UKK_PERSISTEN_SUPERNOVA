@@ -279,52 +279,49 @@
                             </thead>
 
                             <tbody class="divide-y divide-gray-100">
-
                                 @foreach ($streaks as $streak)
-                                    <tr class="hover:bg-blue-50/20">
-
+                                    <tr class="hover:bg-blue-50/20 transition-all">
                                         <td class="px-10 py-8 text-center">
-                                            <div class="w-20 h-20 bg-white rounded-3xl p-3 mx-auto border">
-                                                <img src="{{ asset('storage/' . $streak->svg) }}"
-                                                    class="w-full h-full object-contain">
+                                            <div
+                                                class="w-20 h-20 bg-white rounded-3xl p-3 mx-auto border border-gray-100 shadow-sm flex items-center justify-center overflow-hidden">
+                                                <img src="{{ asset('storage/' . $streak->svg_path) }}"
+                                                    class="w-full h-full object-contain animate-{{ $streak->animation }}">
                                             </div>
+                                            <p
+                                                class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">
+                                                {{ $streak->nama }}</p>
                                         </td>
 
                                         <td class="px-10 py-8 text-center">
                                             <span
-                                                class="bg-indigo-50 text-[#4A72D4] px-6 py-3 rounded-2xl font-black text-lg">
-                                                {{ $streak->level }}
+                                                class="inline-flex items-center gap-2 bg-indigo-50 text-[#4A72D4] px-6 py-3 rounded-2xl font-black text-lg">
+                                                <span class="text-[10px] opacity-50 font-bold">LV.</span>
+                                                {{ $streak->min_level }}
                                             </span>
                                         </td>
 
                                         <td class="px-10 py-8 text-center">
-
                                             <div class="flex justify-center gap-2">
-
                                                 <a href="{{ route('admin.streak.edit', $streak->id) }}"
-                                                    class="h-11 px-5 bg-blue-50 text-[#4A72D4] rounded-xl font-black text-[10px] uppercase">
+                                                    class="h-11 px-5 flex items-center bg-blue-50 text-[#4A72D4] rounded-xl font-black text-[10px] uppercase hover:bg-[#4A72D4] hover:text-white transition-all">
                                                     Edit
                                                 </a>
 
                                                 <button @click="confirmSoftDelete({{ $streak->id }})"
-                                                    class="h-11 px-5 bg-red-50 text-red-500 rounded-xl font-black text-[10px] uppercase">
+                                                    class="h-11 px-5 bg-red-50 text-red-500 rounded-xl font-black text-[10px] uppercase hover:bg-red-500 hover:text-white transition-all">
                                                     Hapus
                                                 </button>
 
                                                 <form id="delete-{{ $streak->id }}"
-                                                    action="{{ route('admin.streak.destroy', $streak->id) }}"
+                                                    action="{{ route('admin.streak.delete', $streak->id) }}"
                                                     method="POST" class="hidden">
                                                     @csrf
                                                     @method('DELETE')
                                                 </form>
-
                                             </div>
-
                                         </td>
-
                                     </tr>
                                 @endforeach
-
                             </tbody>
 
                         </table>
@@ -354,25 +351,31 @@
                     <table class="w-full text-left">
 
                         <tbody class="divide-y divide-gray-100">
-
                             @foreach ($trash as $streak)
-                                <tr>
-
+                                <tr class="hover:bg-gray-50/50 transition-all">
                                     <td class="px-10 py-6 text-center">
-                                        <img src="{{ asset('storage/' . $streak->svg) }}"
-                                            class="w-12 h-12 grayscale opacity-50 mx-auto">
+                                        <img src="{{ asset('storage/' . $streak->svg_path) }}"
+                                            class="w-12 h-12 grayscale opacity-50 mx-auto object-contain">
+                                        <p class="text-[9px] font-bold text-gray-300 mt-1 uppercase">
+                                            {{ $streak->nama }}</p>
                                     </td>
 
-                                    <td class="px-10 py-6 font-black text-slate-400">
-                                        Level {{ $streak->level }}
+                                    <td class="px-10 py-6">
+                                        <div class="flex flex-col">
+                                            <span class="font-black text-slate-400">Level
+                                                {{ $streak->min_level }}</span>
+                                            <span class="text-[10px] text-gray-400 uppercase tracking-tighter">Animasi:
+                                                {{ $streak->animation }}</span>
+                                        </div>
                                     </td>
 
                                     <td class="px-10 py-6 text-right">
-
-                                        <button @click="confirmPermanentDelete({{ $streak->id }})"
-                                            class="bg-red-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase">
-                                            Hapus Permanen
-                                        </button>
+                                        <div class="flex justify-end gap-2">
+                                            <button @click="confirmPermanentDelete({{ $streak->id }})"
+                                                class="bg-red-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase shadow-lg shadow-red-200 hover:bg-red-600 transition-all">
+                                                Hapus Permanen
+                                            </button>
+                                        </div>
 
                                         <form id="force-{{ $streak->id }}"
                                             action="{{ route('admin.streak.forceDelete', $streak->id) }}"
@@ -380,12 +383,9 @@
                                             @csrf
                                             @method('DELETE')
                                         </form>
-
                                     </td>
-
                                 </tr>
                             @endforeach
-
                         </tbody>
 
                     </table>

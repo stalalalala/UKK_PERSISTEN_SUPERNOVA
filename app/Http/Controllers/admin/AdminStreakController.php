@@ -14,8 +14,8 @@ class AdminStreakController extends Controller
      */
     public function index()
     {
-        $streaks = StreakCharacter::orderBy('min_level', 'asc')->get();
-    $trash = StreakCharacter::onlyTrashed()->orderBy('min_level')->get();
+        $streaks = StreakCharacter::orderBy('min_level')->get();
+$trash = StreakCharacter::onlyTrashed()->orderBy('min_level')->get();
 
     return view('admin.streak.index', compact('streaks','trash'));
     }
@@ -39,32 +39,31 @@ class AdminStreakController extends Controller
     /**
      * SIMPAN KARAKTER BARU
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required|string|max:100',
-            'svg' => 'required|mimes:svg|max:2048',
-            'min_level' => 'required|integer|min:1',
-            'animation' => 'required|in:bounce,float,wiggle,spin,pulse'
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'nama' => 'required|string|max:100',
+        'min_level' => 'required|integer|min:1',
+        'svg' => 'nullable|file|mimes:svg,xml|max:2048',
+        'animation' => 'nullable|in:bounce,float,wiggle,spin,pulse'
+    ]);
 
-        $svgPath = null;
-
-        if ($request->hasFile('svg')) {
-            $svgPath = $request->file('svg')->store('streak', 'public');
-        }
-
-        StreakCharacter::create([
-            'nama' => $request->nama,
-            'svg_path' => $svgPath,
-            'min_level' => $request->min_level,
-            'animation' => $request->animation
-        ]);
-
-        return redirect()
-            ->route('admin.streak.index')
-            ->with('success', 'Karakter streak berhasil ditambahkan');
+    $svgPath = null;
+    if ($request->hasFile('svg')) {
+        $svgPath = $request->file('svg')->store('streak', 'public');
     }
+
+ 
+
+    StreakCharacter::create([
+        'nama' => $request->nama,
+        'svg_path' => $svgPath,
+        'min_level' => $request->min_level,
+        'animation' => $request->animation
+    ]);
+
+    return redirect()->route('admin.streak.index')->with('success', 'Berhasil disimpan!');
+}
 
     /**
      * FORM EDIT KARAKTER
@@ -92,11 +91,11 @@ class AdminStreakController extends Controller
         $character = StreakCharacter::findOrFail($id);
 
         $request->validate([
-            'nama' => 'required|string|max:100',
-            'svg' => 'nullable|mimes:svg|max:2048',
-            'min_level' => 'required|integer|min:1',
-            'animation' => 'required|in:bounce,float,wiggle,spin,pulse'
-        ]);
+    'nama' => 'required|string|max:100',
+    'min_level' => 'required|integer|min:1',
+    'svg' => 'nullable|file|mimes:svg,xml|max:2048',
+    'animation' => 'nullable|in:bounce,float,wiggle,spin,pulse'
+]);
 
         $svgPath = $character->svg_path;
 
@@ -125,17 +124,13 @@ class AdminStreakController extends Controller
      * HAPUS KARAKTER
      */
     public function destroy($id)
-    {
-        $character = StreakCharacter::findOrFail($id);
+{
+    $character = StreakCharacter::findOrFail($id);
 
-        if ($character->svg_path && Storage::disk('public')->exists($character->svg_path)) {
-            Storage::disk('public')->delete($character->svg_path);
-        }
+    $character->delete();
 
-        $character->delete();
-
-        return redirect()
-            ->route('admin.streak.index')
-            ->with('success', 'Karakter streak berhasil dihapus');
-    }
+    return redirect()
+        ->route('admin.streak.index')
+        ->with('success', 'Karakter streak berhasil dipindahkan ke history');
+}
 }
