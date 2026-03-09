@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Universitas;
 use App\Models\Prodi;
 use Illuminate\Http\Request;
+use App\Models\SystemLog;
+use Illuminate\Support\Facades\Auth;
 
 class HalamanPeluangPtnController extends Controller
 {
@@ -31,6 +33,19 @@ class HalamanPeluangPtnController extends Controller
             ->get();
         
         return view('admin/peluangPtn.index', compact('univs', 'historyUniv', 'historyProdi'));
+    }
+
+    private function logAktivitas($aksi, $judul, $deskripsi, $status = 'active')
+    {
+        $fixJudul = $judul ?? 'Aktivitas Peluang PTN';
+
+        SystemLog::create([
+            'id_pengguna' => Auth::id(),
+            'category'    => $aksi,
+            'title'       => $fixJudul, 
+            'description' => $deskripsi,
+            'status'      => $status,
+        ]);
     }
 
     public function store(Request $request)
@@ -61,6 +76,10 @@ class HalamanPeluangPtnController extends Controller
             ]);
         }
 
+        $isNew = !$request->id;
+    $logAction = $isNew ? 'TAMBAH PTN' : 'UPDATE PTN';
+    $logDesc = $isNew ? "Admin menambah PTN baru: $cleanUnivName" : "Admin memperbarui data PTN: $cleanUnivName";
+
         if ($request->has('prodis')) {
             foreach ($request->prodis as $p) {
                 if (empty($p['nama'])) continue;
@@ -78,9 +97,12 @@ class HalamanPeluangPtnController extends Controller
                         'deleted_by_univ' => false
                     ]
                 );
+
+                $this->logAktivitas('TAMBAH PRODI PTN', $cleanProdiName, "Menambahkan prodi ke $cleanUnivName");
             }
+        }else {
+                $this->logAktivitas($logAction, $cleanUnivName, $logDesc);
         }
-        
         return response()->json(['message' => 'Data berhasil disimpan']);
     }
 
@@ -116,6 +138,9 @@ class HalamanPeluangPtnController extends Controller
                 ]);
             }
         }
+
+        $this->logAktivitas('IMPORT EXCEL PTN', 'Peluang PTN', "Admin melakukan import data PTN");
+
         return response()->json(['message' => 'Import Berhasil']);
     }
 
@@ -123,14 +148,20 @@ class HalamanPeluangPtnController extends Controller
     {
         $univ = Universitas::find($id);
         if ($univ) {
+            $name = $univ->nama_univ;
             $univ->update(['is_deleted' => true]);
             $univ->prodis()->where('is_deleted', false)->update(['is_deleted' => true, 'deleted_by_univ' => true]);
+
+            $this->logAktivitas('HAPUS PTN', $name, "Memindahkan PTN dan seluruh prodinya ke riwayat", 'deleted');
             return response()->json(['status' => 'success']);
         }
 
         $prodi = Prodi::find($id);
         if ($prodi) {
+            $name = $prodi->nama_prodi;
             $prodi->update(['is_deleted' => true, 'deleted_by_univ' => false]);
+
+            $this->logAktivitas('HAPUS PRODI PTN', $name, "Memindahkan program studi ke riwayat", 'deleted');
             return response()->json(['status' => 'success']);
         }
         return response()->json(['status' => 'error'], 404);
@@ -142,12 +173,16 @@ class HalamanPeluangPtnController extends Controller
         if ($univ) {
             $univ->update(['is_deleted' => false]);
             $univ->prodis()->where('deleted_by_univ', true)->update(['is_deleted' => false, 'deleted_by_univ' => false]);
+
+            $this->logAktivitas('RESTORE PTN', $univ->nama_univ, "Memulihkan data PTN dari riwayat");
             return response()->json(['status' => 'success']);
         }
 
         $prodi = Prodi::find($id);
         if ($prodi) {
             $prodi->update(['is_deleted' => false, 'deleted_by_univ' => false]);
+
+            $this->logAktivitas('RESTORE PTN', $univ->nama_univ, "Memulihkan data PTN dari riwayat");
             return response()->json(['status' => 'success']);
         }
         return response()->json(['status' => 'error'], 404);
@@ -157,8 +192,11 @@ class HalamanPeluangPtnController extends Controller
     {
         $univ = Universitas::find($id);
         if ($univ) {
+            $name = $univ->nama_univ;
             $univ->prodis()->delete();
             $univ->delete();
+
+            $this->logAktivitas('HAPUS PERMANEN PTN', $name, "Admin menghapus permanen data PTN dari database", 'deleted');
             return response()->json(['status' => 'success']);
         }
 

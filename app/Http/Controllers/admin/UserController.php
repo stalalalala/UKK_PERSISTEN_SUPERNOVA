@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use App\Models\SystemLog;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -21,6 +23,19 @@ class UserController extends Controller
             'admins'   => User::where('role', 'admin')->get(),
             'pesertas' => User::where('role', 'peserta')->get(),
             'history'  => User::onlyTrashed()->get()
+        ]);
+    }
+
+    private function logAktivitas($aksi, $judul, $deskripsi, $status = 'active')
+    {
+        $fixJudul = $judul ?? 'Aktivitas User';
+
+        SystemLog::create([
+            'id_pengguna' => Auth::id(),
+            'category'    => $aksi,
+            'title'       => $fixJudul, 
+            'description' => $deskripsi,
+            'status'      => $status,
         ]);
     }
 
@@ -45,7 +60,7 @@ class UserController extends Controller
             $photoPath = $request->file('photo')->store('admin_photos', 'public');
         }
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -53,6 +68,8 @@ class UserController extends Controller
             'no_hp' => $request->no_hp,
             'photo' => $photoPath
         ]);
+
+        $this->logAktivitas('TAMBAH ADMIN', $user->name, "Admin baru berhasil didaftarkan ke sistem");
 
         return back()->with('success', 'Admin berhasil ditambahkan');
     } catch (\Exception $e) {
@@ -104,6 +121,7 @@ class UserController extends Controller
 
         $user->save();
 
+        $this->logAktivitas('UPDATE ADMIN', $user->name, "Melakukan pembaruan data profil admin");
         return back()->with('success', 'Admin berhasil diupdate');
     }
 
@@ -114,7 +132,12 @@ class UserController extends Controller
     */
     public function destroy(User $user)
     {
+        $nama = $user->name;
+        $role = strtoupper($user->role);
         $user->delete();
+
+        
+        $this->logAktivitas("HAPUS $role", $nama, "User dipindahkan ke riwayat/history", 'deleted');
 
         return back()->with('success', 'User dipindahkan ke history');
     }
@@ -129,6 +152,8 @@ class UserController extends Controller
         $user = User::onlyTrashed()->findOrFail($id);
         $user->restore();
 
+        $this->logAktivitas('RESTORE USER', $user->name, "Memulihkan user " . strtoupper($user->role) . " dari history");
+
         return back()->with('success', 'User berhasil dipulihkan');
     }
 
@@ -140,6 +165,7 @@ class UserController extends Controller
     public function forceDelete($id)
     {
         $user = User::onlyTrashed()->findOrFail($id);
+        $nama = $user->name;
 
         // Hapus foto jika ada
         if ($user->photo && Storage::disk('public')->exists($user->photo)) {
@@ -147,6 +173,8 @@ class UserController extends Controller
         }
 
         $user->forceDelete();
+
+        $this->logAktivitas('HAPUS PERMANEN', $nama, "Menghapus data user secara permanen dari database", 'deleted');
 
         return back()->with('success', 'User dihapus permanen');
     }

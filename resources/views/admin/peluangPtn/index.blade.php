@@ -14,15 +14,22 @@
     <style>
         body { font-family: 'Poppins', sans-serif; letter-spacing: -0.01em; }
         [x-cloak] { display: none !important; }
-        .prodi-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
-        .prodi-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Scrollbar untuk daftar prodi */
+        .prodi-scroll-container::-webkit-scrollbar { width: 5px; height: 5px; }
+        .prodi-scroll-container::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        
         .admin-layout { display: flex; height: 100vh; overflow: hidden; width: 100%; }
-        .aside { width: 280px; flex-shrink: 0; }
+        .main-content-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .main-content-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-[#1E293B]" 
       x-data="{ 
         currentPage: 'peluang_ptn', 
+        mobileMenuOpen: false,
         historyTab: 'univ', 
         expandedUniv: null, 
         showModalUniv: false, 
@@ -156,7 +163,7 @@
                 [&::-webkit-scrollbar-thumb]:bg-white/20 
                 [&::-webkit-scrollbar-thumb]:rounded-full">
         
-        <a href="{{ route('admin.dashboard.index') }}"
+        <a href="{{ route('admin.dashboard.index') }}" 
             class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
@@ -182,7 +189,7 @@
         </a>
 
          <a href="{{ route('admin.tryout.index') }}" 
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left ">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
             </svg>
@@ -259,61 +266,92 @@ laporan</span>
 </aside>
 
         <main class="flex-1 flex flex-col h-screen overflow-hidden">
-            <header class="flex items-center justify-between px-14 py-6 shrink-0">
-                <div class="relative w-1/3"><input type="text" placeholder="Search...." class="w-full bg-white border-none rounded-full py-3 pl-12 shadow-sm text-sm"></div>
-                <button class="bg-[#4A72D4] text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
+            <header class="flex flex-col md:flex-row items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0">
+            <div class="flex items-center w-full gap-4">
+                <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="relative w-full group flex items-center gap-2">
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                        </div>
+                        <input type="text" placeholder="Search Tryout...."
+                            class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
+                    </div>
+                    <button class="bg-[#4A72D4] text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                         Cari
                     </button>
-                <div class="flex items-center gap-3">
-                    <button @click="currentPage = (currentPage === 'peluang_ptn' ? 'history' : 'peluang_ptn')" class="bg-white border text-[#4A72D4] px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm">
-                        <span x-text="currentPage === 'peluang_ptn' ? 'History' : 'Kembali'"></span>
-                    </button>
-                    <button x-show="currentPage === 'peluang_ptn'" @click="showImportModal = true" class="bg-emerald-500 text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest shadow-lg">Import Excel</button>
-                    <button x-show="currentPage === 'peluang_ptn'" @click="openAddUniv()" class="bg-[#4A72D4] text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest shadow-lg">Tambah PTN</button>
                 </div>
-                <div class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0">
+            </div>
+            <div class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0">
                 <div class="w-10 h-10 bg-gray-200 rounded-full border-2 border-white">
                     <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
                 </div>
                 <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
                 <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
             </div>
-            </header>
+        </header>
 
-            <div x-show="currentPage === 'peluang_ptn'" class="flex-1 overflow-y-auto p-10 pb-20">
+            <div class="px-6 lg:px-14 py-2 shrink-0 overflow-x-auto no-scrollbar">
+                <div class="flex items-center justify-between lg:justify-end gap-3 min-w-max pr-4">
+                    <button @click="currentPage = (currentPage === 'peluang_ptn' ? 'history' : 'peluang_ptn')" class="bg-white border text-[#4A72D4] px-5 py-2.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-sm whitespace-nowrap">
+                        <span x-text="currentPage === 'peluang_ptn' ? 'Riwayat / History' : 'Kembali ke Daftar'"></span>
+                    </button>
+                    <div x-show="currentPage === 'peluang_ptn'" class="flex gap-2">
+                        <button @click="showImportModal = true" class="bg-emerald-500 text-white px-5 py-2.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-lg whitespace-nowrap">Import Excel</button>
+                        <button @click="openAddUniv()" class="bg-[#4A72D4] text-white px-5 py-2.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-lg whitespace-nowrap">Tambah PTN Baru</button>
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="currentPage === 'peluang_ptn'" class="flex-1 overflow-y-auto main-content-scroll p-4 lg:p-10 pb-20">
                 <div class="max-w-6xl mx-auto space-y-4">
                     <template x-for="univ in univList" :key="univ.id">
-                        <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
-                            <div @click="expandedUniv = (expandedUniv === univ.id ? null : univ.id)" class="p-8 flex items-center justify-between cursor-pointer hover:bg-gray-50/50 transition-all">
-                                <div class="flex items-center gap-6">
-                                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-[#4A72D4]">
-                                        <svg :class="expandedUniv === univ.id ? 'rotate-180' : ''" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        <div class="bg-white rounded-[1.5rem] lg:rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                            <div @click="expandedUniv = (expandedUniv === univ.id ? null : univ.id)" class="p-4 lg:p-8 flex items-center justify-between cursor-pointer hover:bg-gray-50/50 transition-all shrink-0">
+                                <div class="flex items-center gap-3 lg:gap-6">
+                                    <div class="w-10 h-10 lg:w-14 lg:h-14 bg-blue-50 rounded-xl lg:rounded-2xl flex items-center justify-center text-[#4A72D4]">
+                                        <svg :class="expandedUniv === univ.id ? 'rotate-180' : ''" class="w-5 h-5 lg:w-6 lg:h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
                                     </div>
-                                    <div><h3 class="font-black text-gray-800 text-base uppercase" x-text="univ.name"></h3><p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1" x-text="univ.location"></p></div>
+                                    <div>
+                                        <h3 class="font-black text-gray-800 text-xs lg:text-base uppercase" x-text="univ.name"></h3>
+                                        <p class="text-[8px] lg:text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5 lg:mt-1" x-text="univ.location"></p>
+                                    </div>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button @click.stop="openEditUniv(univ)" class="p-3 text-gray-300 hover:text-blue-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
-                                    <button @click.stop="triggerDelete('univ', univ)" class="p-3 text-red-300 hover:text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
-                                    <button @click.stop="openAddProdi(univ)" class="p-3 bg-[#4A72D4] text-white rounded-2xl shadow-md"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M12 4.5v15m7.5-7.5h-15" /></svg></button>
+                                <div class="flex gap-1 lg:gap-2">
+                                    <button @click.stop="openEditUniv(univ)" class="p-2 lg:p-3 text-gray-300 hover:text-blue-500"><svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
+                                    <button @click.stop="triggerDelete('univ', univ)" class="p-2 lg:p-3 text-red-300 hover:text-red-500"><svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                                    <button @click.stop="openAddProdi(univ)" class="p-2 lg:p-3 bg-[#4A72D4] text-white rounded-xl lg:rounded-2xl shadow-md"><svg class="w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M12 4.5v15m7.5-7.5h-15" /></svg></button>
                                 </div>
                             </div>
+                            
                             <div x-show="expandedUniv === univ.id" x-collapse class="border-t bg-gray-50/30">
-                                <div class="overflow-x-auto prodi-scroll">
-                                    <table class="w-full text-left">
-                                        <thead class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                            <tr><th class="px-10 py-4">Nama Prodi</th><th class="px-10 py-4 text-center">Kuota</th><th class="px-10 py-4 text-center">Peminat</th><th class="px-10 py-4 text-center">Aksi</th></tr>
-                                        </thead>
-                                        <tbody class="divide-y bg-white">
-                                            <template x-for="prodi in univ.prodis">
-                                                <tr class="hover:bg-blue-50/40 transition-all">
-                                                    <td class="px-10 py-5 font-bold text-xs text-gray-700 uppercase" x-text="prodi.nama"></td>
-                                                    <td class="px-10 py-5 text-center font-black text-xs text-blue-600" x-text="prodi.kuota"></td>
-                                                    <td class="px-10 py-5 text-center font-black text-xs text-indigo-500" x-text="prodi.peminat"></td>
-                                                    <td class="px-10 py-5 text-center"><button @click="triggerDelete('prodi', prodi)" class="text-[10px] font-black text-red-400 uppercase">Hapus</button></td>
+                                <div class="max-h-[300px] overflow-y-auto prodi-scroll-container">
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full min-w-[500px] text-left">
+                                            <thead class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest sticky top-0 z-10">
+                                                <tr>
+                                                    <th class="px-6 lg:px-10 py-4">Nama Prodi</th>
+                                                    <th class="px-6 lg:px-10 py-4 text-center">Kuota</th>
+                                                    <th class="px-6 lg:px-10 py-4 text-center">Peminat</th>
+                                                    <th class="px-6 lg:px-10 py-4 text-center">Aksi</th>
                                                 </tr>
-                                            </template>
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody class="divide-y bg-white">
+                                                <template x-for="prodi in univ.prodis">
+                                                    <tr class="hover:bg-blue-50/40 transition-all">
+                                                        <td class="px-6 lg:px-10 py-5 font-bold text-[10px] lg:text-xs text-gray-700 uppercase whitespace-nowrap" x-text="prodi.nama"></td>
+                                                        <td class="px-6 lg:px-10 py-5 text-center font-black text-[10px] lg:text-xs text-blue-600 whitespace-nowrap" x-text="prodi.kuota"></td>
+                                                        <td class="px-6 lg:px-10 py-5 text-center font-black text-[10px] lg:text-xs text-indigo-500 whitespace-nowrap" x-text="prodi.peminat"></td>
+                                                        <td class="px-6 lg:px-10 py-5 text-center">
+                                                            <button @click="triggerDelete('prodi', prodi)" class="text-[10px] font-black text-red-400 uppercase">Hapus</button>
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -321,36 +359,42 @@ laporan</span>
                 </div>
             </div>
 
-            <div x-show="currentPage === 'history'" x-cloak class="flex-1 overflow-y-auto p-10 pb-20">
-                <div class="max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-sm border overflow-hidden">
+            <div x-show="currentPage === 'history'" x-cloak class="flex-1 overflow-y-auto p-4 lg:p-10 pb-20">
+                <div class="max-w-4xl mx-auto bg-white rounded-[1.5rem] lg:rounded-[2.5rem] shadow-sm border overflow-hidden">
                     <div class="flex border-b bg-gray-50/50">
-                        <button @click="historyTab = 'univ'" :class="historyTab === 'univ' ? 'bg-white border-b-2 border-[#4A72D4] text-[#4A72D4]' : 'text-gray-400'" class="flex-1 py-6 font-black uppercase text-xs">Riwayat Univ</button>
-                        <button @click="historyTab = 'prodi'" :class="historyTab === 'prodi' ? 'bg-white border-b-2 border-[#4A72D4] text-[#4A72D4]' : 'text-gray-400'" class="flex-1 py-6 font-black uppercase text-xs">Riwayat Prodi</button>
+                        <button @click="historyTab = 'univ'" :class="historyTab === 'univ' ? 'bg-white border-b-2 border-[#4A72D4] text-[#4A72D4]' : 'text-gray-400'" class="flex-1 py-4 lg:py-6 font-black uppercase text-[10px] lg:text-xs">Riwayat Univ</button>
+                        <button @click="historyTab = 'prodi'" :class="historyTab === 'prodi' ? 'bg-white border-b-2 border-[#4A72D4] text-[#4A72D4]' : 'text-gray-400'" class="flex-1 py-4 lg:py-6 font-black uppercase text-[10px] lg:text-xs">Riwayat Prodi</button>
                     </div>
                     <div x-show="historyTab === 'univ'" class="divide-y">
                         <template x-for="log in historyUnivList" :key="log.id">
-                            <div class="p-8 flex items-center justify-between hover:bg-gray-50/50 transition-all">
-                                <div class="flex items-center gap-4">
-                                    <div class="bg-amber-100 text-amber-600 w-12 h-12 rounded-xl flex items-center justify-center font-black text-xs">U</div>
-                                    <div><p class="font-bold text-sm uppercase text-gray-700" x-text="log.name"></p><p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1" x-text="'Dihapus: ' + log.time"></p></div>
+                            <div class="p-4 lg:p-8 flex items-center justify-between hover:bg-gray-50/50 transition-all gap-4">
+                                <div class="flex items-center gap-3 lg:gap-4">
+                                    <div class="bg-amber-100 text-amber-600 w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center font-black text-xs">U</div>
+                                    <div>
+                                        <p class="font-bold text-xs lg:text-sm uppercase text-gray-700" x-text="log.name"></p>
+                                        <p class="text-[8px] lg:text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1" x-text="'Dihapus: ' + log.time"></p>
+                                    </div>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button @click="restoreData(log.id)" class="bg-emerald-50 text-emerald-600 px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest">Pulihkan</button>
-                                    <button @click="permanentDelete(log.id)" class="bg-red-50 text-red-500 px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest">Hapus</button>
+                                <div class="flex gap-1 lg:gap-2">
+                                    <button @click="restoreData(log.id)" class="bg-emerald-50 text-emerald-600 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Pulihkan</button>
+                                    <button @click="permanentDelete(log.id)" class="bg-red-50 text-red-500 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Hapus</button>
                                 </div>
                             </div>
                         </template>
                     </div>
                     <div x-show="historyTab === 'prodi'" class="divide-y">
                         <template x-for="log in historyProdiList" :key="log.id">
-                            <div class="p-8 flex items-center justify-between hover:bg-gray-50/50 transition-all">
-                                <div class="flex items-center gap-4">
-                                    <div class="bg-indigo-100 text-indigo-600 w-12 h-12 rounded-xl flex items-center justify-center font-black text-xs">P</div>
-                                    <div><p class="font-bold text-sm uppercase text-gray-700" x-text="log.name"></p><p class="text-[10px] text-[#4A72D4] font-black uppercase tracking-widest" x-text="log.univ_name"></p></div>
+                            <div class="p-4 lg:p-8 flex items-center justify-between hover:bg-gray-50/50 transition-all gap-4">
+                                <div class="flex items-center gap-3 lg:gap-4">
+                                    <div class="bg-indigo-100 text-indigo-600 w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center font-black text-xs">P</div>
+                                    <div>
+                                        <p class="font-bold text-xs lg:text-sm uppercase text-gray-700" x-text="log.name"></p>
+                                        <p class="text-[8px] lg:text-[10px] text-[#4A72D4] font-black uppercase tracking-widest" x-text="log.univ_name"></p>
+                                    </div>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button @click="restoreData(log.id)" class="bg-emerald-50 text-emerald-600 px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest">Pulihkan</button>
-                                    <button @click="permanentDelete(log.id)" class="bg-red-50 text-red-500 px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest">Hapus</button>
+                                <div class="flex gap-1 lg:gap-2">
+                                    <button @click="restoreData(log.id)" class="bg-emerald-50 text-emerald-600 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Pulihkan</button>
+                                    <button @click="permanentDelete(log.id)" class="bg-red-50 text-red-500 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Hapus</button>
                                 </div>
                             </div>
                         </template>
@@ -361,7 +405,7 @@ laporan</span>
     </div>
 
     <div x-show="showImportModal" x-transition x-cloak class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl">
+        <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">
             <div class="bg-emerald-500 p-6 text-white text-center"><h4 class="text-lg font-black italic uppercase">Import PTN & Prodi</h4></div>
             <div class="p-8 space-y-4">
                 <button @click="unduhTemplate('utama')" class="w-full bg-gray-50 border-2 border-dashed border-gray-200 p-4 rounded-xl flex flex-col items-center gap-2">
@@ -377,7 +421,7 @@ laporan</span>
     </div>
 
     <div x-show="showModalProdi" x-transition x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl">
+        <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">
             <div class="bg-[#4A72D4] p-6 text-white text-center">
                 <h4 class="text-lg font-black italic uppercase">Tambah Prodi</h4>
                 <p class="text-[9px] opacity-70 font-bold uppercase tracking-widest mt-1" x-text="selectedUnivName"></p>
@@ -408,7 +452,7 @@ laporan</span>
     </div>
 
     <div x-show="showModalUniv" x-transition x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] w-full max-w-sm overflow-hidden shadow-2xl">
+        <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">
             <div class="bg-[#4A72D4] p-6 text-white text-center"><h4 class="text-lg font-black italic uppercase" x-text="isEditModeUniv ? 'Edit PTN' : 'Tambah PTN'"></h4></div>
             <div class="p-6 space-y-3">
                 <input x-model="newUnivName" type="text" placeholder="Nama Universitas" class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-bold text-sm">

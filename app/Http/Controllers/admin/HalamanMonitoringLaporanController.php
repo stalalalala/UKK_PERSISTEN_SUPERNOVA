@@ -2,65 +2,78 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Models\admin\halaman_monitoring_laporan;
+use App\Models\SystemLog;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // Tambahkan ini agar tidak merah
 
 class HalamanMonitoringLaporanController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan halaman monitoring dengan data log terbaru.
      */
     public function index()
     {
-        return view('admin/monitoring_laporan.index');
+        $logs = SystemLog::orderBy('created_at', 'desc')->get();
+        return view('admin.Monitoring_laporan.index', compact('logs'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Fungsi untuk mencatat log otomatis.
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required',
+            'category' => 'required',
+            'description' => 'required',
+        ]);
+
+        // Menggunakan Auth::id() lebih stabil di banyak versi editor
+        SystemLog::create([
+            'id_pengguna' => Auth::id(), 
+            'title' => $request->title,
+            'category' => $request->category,
+            'description' => $request->description,
+            'status' => 'active'
+        ]);
+
+        return redirect()->back();
+    }
+
+    public function show(SystemLog $systemLog)
+    {
+    }
+
+    public function edit(SystemLog $systemLog)
+    {
+    }
+
+    public function update(Request $request, SystemLog $systemLog)
+    {
     }
 
     /**
-     * Display the specified resource.
+     * Menghapus riwayat log jika diperlukan.
      */
-    public function show(halaman_monitoring_laporan $halaman_monitoring_laporan)
+    public function destroy($id)
     {
-        //
+        $log = SystemLog::findOrFail($id);
+        $log->delete();
+        return redirect()->back();
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(halaman_monitoring_laporan $halaman_monitoring_laporan)
-    {
-        //
+    public function updateStatusMultiple(Request $request) {
+        SystemLog::whereIn('id', $request->ids)->update(['status' => $request->status]);
+        return response()->json(['status' => 'success']);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, halaman_monitoring_laporan $halaman_monitoring_laporan)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(halaman_monitoring_laporan $halaman_monitoring_laporan)
-    {
-        //
+    public function destroyMultiple(Request $request) {
+        SystemLog::whereIn('id', $request->ids)->delete();
+        return response()->json(['status' => 'success']);
     }
 }

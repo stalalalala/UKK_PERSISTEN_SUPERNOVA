@@ -5,6 +5,8 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Kuis;
 use Illuminate\Http\Request;
+use App\Models\SystemLog;
+use Illuminate\Support\Facades\Auth;
 
 class AdminKuisController extends Controller
 {
@@ -28,6 +30,20 @@ $historyData = Kuis::onlyTrashed()->withCount('questions')->latest()->get();
 
 return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData'));
 
+    }
+
+    private function logAktivitas($aksi, $judul, $deskripsi, $status = 'active')
+    {
+        // Jika karena suatu alasan judul null, berikan nilai fallback agar database tidak error
+        $fixJudul = $judul ?? 'Aktivitas Kuis';
+
+        SystemLog::create([
+            'id_pengguna' => Auth::id(),
+            'category'    => $aksi,
+            'title'       => $fixJudul, 
+            'description' => $deskripsi,
+            'status'      => $status,
+        ]);
     }
 
     // ============================
@@ -79,6 +95,7 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
             'video_url' => $request->video_url,
             'is_active' => true,
         ]);
+        $this->logAktivitas('TAMBAH KUIS', $kuis->judul, "Admin menambahkan kuis baru pada kategori");
 
         // ============================
         // SAVE QUESTIONS
@@ -153,7 +170,7 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
     'materi' => $request->materi ?? $kuis->materi,
     'video_url' => $request->video_url ?? $kuis->video_url,
 ]);
-
+    $this->logAktivitas('UPDATE KUIS', $kuis->judul, "Admin memperbarui data kuis");
 
     if ($request->questions_json) {
 
@@ -197,6 +214,7 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
 {
     $kuis = Kuis::findOrFail($id);
     $deletedSetNumber = $kuis->set_ke;
+    $judulKuis = $kuis->judul;
 
     // 1. Hapus kuis (Soft Delete)
     $kuis->delete();
@@ -205,6 +223,8 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
     // Semua kuis yang set_ke-nya di atas nomor yang dihapus akan dikurangi 1
     Kuis::where('set_ke', '>', $deletedSetNumber)
         ->decrement('set_ke');
+    
+    SystemLog::where('title', $judulKuis)->update(['status' => 'deleted']);
     
     // 3. Update Judul agar sesuai dengan nomor set yang baru
     // Karena judulmu mengandung kata "Set X", maka judulnya perlu di-refresh
@@ -228,6 +248,8 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
     // Cari angka set tertinggi saat ini di tabel aktif
     $lastSet = Kuis::max('set_ke');
     $newSet = $lastSet ? $lastSet + 1 : 1;
+
+    SystemLog::where('title', $kuis->judul)->update(['status' => 'active']);
 
     // Pulihkan dengan nomor set baru di urutan paling akhir
     $kuis->restore();
@@ -269,6 +291,9 @@ public function show($id)
 public function forceDelete($id)
 {
     $kuis = Kuis::onlyTrashed()->findOrFail($id);
+    $judulKuis = $kuis->judul;
+
+    SystemLog::where('title', $judulKuis)->delete();
 
     $kuis->forceDelete();
 

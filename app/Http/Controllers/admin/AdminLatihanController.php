@@ -7,6 +7,8 @@ use App\Models\Latihan;
 use App\Models\LatihanQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\SystemLog;
+use Illuminate\Support\Facades\Auth;
 
 class AdminLatihanController extends Controller
 {
@@ -44,6 +46,20 @@ $subtesMap = [
 ];
 
         return view('admin.latihan.index', compact('latihans', 'trash', 'allLatihan', 'subtesMap', 'historyData'));
+    }
+
+    private function logAktivitas($aksi, $judul, $deskripsi, $status = 'active')
+    {
+        // Jika karena suatu alasan judul null, berikan nilai fallback agar database tidak error
+        $fixJudul = $judul ?? 'Aktivitas Latihan';
+
+        SystemLog::create([
+            'id_pengguna' => Auth::id(),
+            'category'    => $aksi,
+            'title'       => $fixJudul, 
+            'description' => $deskripsi,
+            'status'      => $status,
+        ]);
     }
 
     // edit
@@ -118,6 +134,8 @@ public function update(Request $request, $id)
         }
     }
 
+    $this->logAktivitas('UPDATE LATIHAN', $latihans->judul, "Admin memperbarui data latihan");
+
     return redirect()
         ->route('admin.latihan.index')
         ->with('success', 'Kuis berhasil diperbarui!');
@@ -181,8 +199,9 @@ $setKe = $lastSet ? $lastSet + 1 : 1;
                 'jawaban_benar' => $q['jawaban_benar'],
                 'pembahasan'    => $q['pembahasan'] ?? null,
             ]);
-        }
+            }
 
+        $this->logAktivitas('TAMBAH LATIHAN', $latihan->judul, "Admin menambahkan set latihan baru");
         return redirect()
             ->route('admin.latihan.index')
             ->with('success', 'Set Latihan berhasil dipublish!');
@@ -195,8 +214,11 @@ $setKe = $lastSet ? $lastSet + 1 : 1;
     {
         $latihan = Latihan::findOrFail($id);
         $deletedSetNumber = $latihan->set_ke;
+        $judulLatihan = $latihan->judul;
 
         $latihan->delete();
+
+        SystemLog::where('title', $judulLatihan)->update(['status' => 'deleted']);
 
         // Opsional: Geser nomor set (ikut sistem kuis)
         Latihan::where('set_ke', '>', $deletedSetNumber)->decrement('set_ke');
@@ -213,6 +235,8 @@ $setKe = $lastSet ? $lastSet + 1 : 1;
     {
         $latihan = Latihan::onlyTrashed()->findOrFail($id);
         
+        SystemLog::where('title', $latihan->judul)->update(['status' => 'active']);
+
         $lastSet = Latihan::max('set_ke');
         $newSet = $lastSet ? $lastSet + 1 : 1;
 
@@ -240,6 +264,8 @@ $setKe = $lastSet ? $lastSet + 1 : 1;
             }
         }
 
+        SystemLog::where('title', $latihan->judul)->delete();
+
         $latihan->forceDelete();
 
         return redirect()
@@ -253,9 +279,13 @@ $setKe = $lastSet ? $lastSet + 1 : 1;
     public function toggle($id)
     {
         $latihan = Latihan::findOrFail($id);
+
         $latihan->update([
             'is_active' => !$latihan->is_active
         ]);
+
+        $status = $latihan->is_active ? 'Mengaktifkan' : 'Menyembunyikan';
+        $this->logAktivitas('TOGGLE LATIHAN', $latihan->judul, "Admin $status akses latihan");
 
         return back()->with('success', 'Status latihan berhasil diubah!');
     }

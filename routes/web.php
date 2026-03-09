@@ -93,6 +93,10 @@ Route::middleware(['auth'])->group(function () {
             Route::resource('user', UserController::class);
 
         Route::resource('streak', HalamanStreakController::class);
+
+        // Monitoring Laporan
+        Route::post('/monitoringLaporan/destroy-multiple', [HalamanMonitoringLaporanController::class, 'destroyMultiple'])->name('laporan.destroy-multiple');
+        Route::post('/monitoringLaporan/update-status-multiple', [HalamanMonitoringLaporanController::class, 'updateStatusMultiple'])->name('laporan.update-status-multiple');
         Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
 
         Route::get('videoPembelajaran/history', [AdminVideoController::class, 'history'])->name('videoPembelajaran.history');

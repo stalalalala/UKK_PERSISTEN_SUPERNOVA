@@ -11,6 +11,8 @@ use App\Http\Controllers\Controller;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Models\SystemLog;
+use Illuminate\Support\Facades\Auth;
 
 class AdminMinatBakatController extends Controller
 {
@@ -29,6 +31,20 @@ class AdminMinatBakatController extends Controller
 
     return view('admin.minatBakat.index', compact('categories', 'participants'));
 }
+
+    private function logAktivitas($aksi, $judul, $deskripsi, $status = 'active')
+    {
+        // Jika karena suatu alasan judul null, berikan nilai fallback agar database tidak error
+        $fixJudul = $judul ?? 'Aktivitas Minat Bakat';
+
+        SystemLog::create([
+            'id_pengguna' => Auth::id(),
+            'category'    => $aksi,
+            'title'       => $fixJudul, 
+            'description' => $deskripsi,
+            'status'      => $status,
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -49,6 +65,7 @@ class AdminMinatBakatController extends Controller
             'soal' => 0
         ]);
 
+        $this->logAktivitas('TAMBAH MINAT BAKAT', $category->name, "Admin menambah kategori minat bakat baru");
         return response()->json($category);
     }
 
@@ -86,6 +103,8 @@ class AdminMinatBakatController extends Controller
             'color' => $request->color
         ]);
 
+        $this->logAktivitas('UPDATE MINAT BAKAT', $kategori->name, "Admin memperbarui deskripsi/warna kategori");
+
         return response()->json($kategori);
     }
 
@@ -102,6 +121,12 @@ class AdminMinatBakatController extends Controller
         return response()->json(['success' => true]);
     }
 
+    if ($category) {
+        $namaKategori = $category->name;
+        $category->delete();
+    }
+
+    $this->logAktivitas('HAPUS MINAT BAKAT', $namaKategori, "Admin menghapus kategori minat bakat", 'deleted');
     return response()->json(['message' => 'Data tidak ditemukan'], 404);
 }
 
@@ -183,6 +208,7 @@ public function resetPartisipan()
     // 2. Menghapus juga data dari tabel hasil (Gunakan DB karena mungkin tidak ada modelnya)
     DB::table('hasil_minat_bakats')->truncate();
 
+    $this->logAktivitas('RESET DATA MINAT BAKAT', 'Database Partisipan', 'Admin membersihkan seluruh data hasil tes minat bakat peserta', 'deleted');
     return back()->with('success', 'Semua data peserta dan hasil berhasil direset!');
 }
 
