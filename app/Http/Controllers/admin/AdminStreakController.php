@@ -14,8 +14,11 @@ class AdminStreakController extends Controller
      */
     public function index()
     {
-        $streaks = StreakCharacter::orderBy('min_level')->get();
-$trash = StreakCharacter::onlyTrashed()->orderBy('min_level')->get();
+        // Mengambil data dari yang terbaru ke terlama
+$streaks = StreakCharacter::orderBy('created_at', 'desc')->get();
+
+// Mengambil data trash dari yang dihapus paling terakhir
+$trash = StreakCharacter::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
 
     return view('admin.streak.index', compact('streaks','trash'));
     }
@@ -25,15 +28,16 @@ $trash = StreakCharacter::onlyTrashed()->orderBy('min_level')->get();
      */
     public function create()
     {
-        $animations = [
-            'bounce',
-            'float',
-            'wiggle',
-            'spin',
-            'pulse'
-        ];
+        // $animations = [
+        //     'bounce',
+        //     'float',
+        //     'wiggle',
+        //     'spin',
+        //     'pulse'
+        // ];
 
-        return view('admin.streak.create', compact('animations'));
+        // return view('admin.streak.create', compact('animations'));
+        return view('admin.streak.create');
     }
 
     /**
@@ -45,7 +49,7 @@ public function store(Request $request)
         'nama' => 'required|string|max:100',
         'min_level' => 'required|integer|min:1',
         'svg' => 'nullable|file|mimes:svg,xml|max:2048',
-        'animation' => 'nullable|in:bounce,float,wiggle,spin,pulse'
+        // 'animation' => 'nullable|in:bounce,float,wiggle,spin,pulse'
     ]);
 
     $svgPath = null;
@@ -59,7 +63,7 @@ public function store(Request $request)
         'nama' => $request->nama,
         'svg_path' => $svgPath,
         'min_level' => $request->min_level,
-        'animation' => $request->animation
+        // 'animation' => $request->animation
     ]);
 
     return redirect()->route('admin.streak.index')->with('success', 'Berhasil disimpan!');
@@ -69,68 +73,85 @@ public function store(Request $request)
      * FORM EDIT KARAKTER
      */
     public function edit($id)
-    {
-        $character = StreakCharacter::findOrFail($id);
+{
+    $character = StreakCharacter::findOrFail($id);
 
-        $animations = [
-            'bounce',
-            'float',
-            'wiggle',
-            'spin',
-            'pulse'
-        ];
-
-        return view('admin.streak.edit', compact('character', 'animations'));
+    if ($character->is_default) {
+        return redirect()->route('admin.streak.index')
+            ->with('error', 'Karakter default tidak bisa diedit.');
     }
 
-    /**
-     * UPDATE KARAKTER
-     */
-    public function update(Request $request, $id)
-    {
-        $character = StreakCharacter::findOrFail($id);
+    return view('admin.streak.edit', compact('character'));
+}
 
-        $request->validate([
-    'nama' => 'required|string|max:100',
-    'min_level' => 'required|integer|min:1',
-    'svg' => 'nullable|file|mimes:svg,xml|max:2048',
-    'animation' => 'nullable|in:bounce,float,wiggle,spin,pulse'
-]);
+public function update(Request $request, $id)
+{
+    $character = StreakCharacter::findOrFail($id);
 
-        $svgPath = $character->svg_path;
+    if ($character->is_default) {
+        return redirect()->route('admin.streak.index')
+            ->with('error', 'Karakter default tidak bisa diedit.');
+    }
 
-        if ($request->hasFile('svg')) {
+    $request->validate([
+        'nama' => 'required|string|max:100',
+        'min_level' => 'required|integer|min:1',
+        'svg' => 'nullable|file|mimes:svg,xml|max:2048',
+    ]);
 
-            if ($character->svg_path && Storage::disk('public')->exists($character->svg_path)) {
-                Storage::disk('public')->delete($character->svg_path);
-            }
+    $svgPath = $character->svg_path;
 
-            $svgPath = $request->file('svg')->store('streak', 'public');
+    if ($request->hasFile('svg')) {
+        if ($character->svg_path && Storage::disk('public')->exists($character->svg_path)) {
+            Storage::disk('public')->delete($character->svg_path);
         }
-
-        $character->update([
-            'nama' => $request->nama,
-            'svg_path' => $svgPath,
-            'min_level' => $request->min_level,
-            'animation' => $request->animation
-        ]);
-
-        return redirect()
-            ->route('admin.streak.index')
-            ->with('success', 'Karakter streak berhasil diperbarui');
+        $svgPath = $request->file('svg')->store('streak', 'public');
     }
+
+    $character->update([
+        'nama' => $request->nama,
+        'svg_path' => $svgPath,
+        'min_level' => $request->min_level,
+    ]);
+
+    return redirect()->route('admin.streak.index')
+        ->with('success', 'Karakter streak berhasil diperbarui');
+}
 
     /**
      * HAPUS KARAKTER
      */
-    public function destroy($id)
+   public function destroy($id)
 {
     $character = StreakCharacter::findOrFail($id);
 
+    if ($character->is_default) {
+        return redirect()->route('admin.streak.index')
+            ->with('error', 'Karakter default tidak bisa dihapus.');
+    }
+
     $character->delete();
 
-    return redirect()
-        ->route('admin.streak.index')
+    return redirect()->route('admin.streak.index')
         ->with('success', 'Karakter streak berhasil dipindahkan ke history');
 }
+
+public function restore($id)
+{
+    $streak = StreakCharacter::onlyTrashed()->findOrFail($id);
+    $streak->restore();
+
+    return redirect()->route('admin.streak.index')->with('success', 'Pet berhasil dipulihkan!');
+}
+
+public function forceDelete($id)
+    {
+        // Ambil data yang sudah di soft delete
+        $streak = StreakCharacter::onlyTrashed()->findOrFail($id);
+
+        // Hapus permanen
+        $streak->forceDelete();
+
+        return redirect()->back()->with('success', 'Pet berhasil dihapus permanen!');
+    }
 }

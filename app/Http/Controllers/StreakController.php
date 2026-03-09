@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Streak;
+use App\Models\StreakCharacter;
 use App\Models\UserXpLog;
 use App\Services\XpService;
 use Illuminate\Http\Request;
@@ -57,6 +58,13 @@ class StreakController extends Controller
         ->whereDate('xp_date', today())
         ->exists();
 
+        $userLevel = $user->level;
+
+// Ambil karakter streak sesuai level
+$currentStreak = StreakCharacter::where('min_level', '<=', $userLevel)
+    ->orderByDesc('min_level') // ambil yang tertinggi <= level user
+    ->first();
+
     return view('streak.index', compact(
         'user',
         'todayXp',
@@ -64,7 +72,9 @@ class StreakController extends Controller
         'loginDone',
         'kuisDone',
         'latihanDone',
-        'tryoutDone'
+        'tryoutDone',
+        'userLevel',
+        'currentStreak'
     ));
 }
 

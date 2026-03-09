@@ -93,7 +93,6 @@ Route::middleware(['auth'])->group(function () {
 
             Route::resource('user', UserController::class);
 
-        Route::resource('streak', HalamanStreakController::class);
         Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
 
         Route::get('videoPembelajaran/history', [AdminVideoController::class, 'history'])->name('videoPembelajaran.history');
@@ -171,13 +170,15 @@ Route::middleware(['auth'])->group(function () {
          Route::delete('/latihan/force-delete/{id}', [AdminLatihanController::class, 'forceDelete'])->name('latihan.forceDelete');
 
         
-        //slime
+        //strik
        Route::get('/streak', [AdminStreakController::class,'index'])->name('streak.index');
     Route::get('/streak/create', [AdminStreakController::class,'create'])->name('streak.create');
     Route::post('/streak/store', [AdminStreakController::class,'store'])->name('streak.store');
     Route::get('/streak/edit/{id}', [AdminStreakController::class,'edit'])->name('streak.edit');
     Route::put('/streak/update/{id}', [AdminStreakController::class,'update'])->name('streak.update');
     Route::delete('/streak/delete/{id}', [AdminStreakController::class,'destroy'])->name('streak.delete');
+    Route::delete('/streak/{id}/force-delete', [AdminStreakController::class, 'forceDelete'])->name('streak.forceDelete');
+    Route::post('/streak/{id}/restore', [AdminStreakController::class, 'restore'])->name('streak.restore');
     });
 
 

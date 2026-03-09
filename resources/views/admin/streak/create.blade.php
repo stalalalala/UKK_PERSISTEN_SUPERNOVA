@@ -380,7 +380,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="group">
+                                    {{-- <div class="group">
                                         <label
                                             class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Behavior
                                             Animasi</label>
@@ -403,7 +403,7 @@
                                                 </svg>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
 
@@ -425,7 +425,7 @@
                                     </div>
 
                                     <div class="w-full flex justify-between items-center mb-10 relative z-10">
-                                        <h3 class="text-white font-bold text-sm tracking-widest uppercase">Live Render
+                                        <h3 class="text-white font-bold text-sm tracking-widest uppercase">Preview
                                         </h3>
                                         <div class="flex gap-1.5">
                                             <div class="w-2.5 h-2.5 rounded-full bg-[#FF5F57]"></div>
@@ -463,7 +463,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="w-full mt-8 grid grid-cols-2 gap-4">
+                                    {{-- <div class="w-full mt-8 grid grid-cols-2 gap-4">
                                         <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
                                             <p class="text-[10px] font-black text-gray-500 uppercase mb-1">Animation
                                             </p>
@@ -480,7 +480,7 @@
                                                     Ready</p>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                         </div>

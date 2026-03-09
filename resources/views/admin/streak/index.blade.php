@@ -245,24 +245,48 @@
 
             <div class="p-4 lg:px-8 " x-show="currentView==='main'">
 
-                <div
-                    class="bg-white p-4 lg:px-8  rounded-[35px] shadow-sm border border-blue-100 overflow-hidden mb-10">
+                <div class="bg-white p-4  rounded-xl shadow-sm border border-blue-100 overflow-hidden mb-10">
 
-                    <div class="p-8 border-b flex justify-between items-center">
+                    <div
+                        class="p-6 md:p-8 border-b border-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
 
-                        <div class="flex items-center gap-4">
-                            <h3 class="font-black text-lg">Pet Aktif</h3>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800"
+                                x-text="currentView === 'main' ? 'Pet Streak' : 'History Pet'">
+                            </h3>
 
-                            <button @click="currentView='history'"
-                                class="text-[10px] font-black uppercase text-[#4A72D4] bg-blue-50 px-4 py-2 rounded-full">
-                                <i class="fa-solid fa-trash-can mr-1"></i> Lihat History
-                            </button>
+                            <p class="text-sm text-gray-400"
+                                x-text="currentView === 'main' 
+            ? 'Kelola visual pet berdasarkan level streak pengguna'
+            : 'Pet yang dihapus sementara dapat dipulihkan di sini'">
+                            </p>
                         </div>
 
-                        <a href="{{ route('admin.streak.create') }}"
-                            class="bg-[#4A72D4] text-white px-6 py-3 rounded-2xl font-black text-xs uppercase shadow-lg">
-                            Tambah Pet
-                        </a>
+                        <div class="flex flex-wrap items-center gap-3">
+
+                            <!-- Toggle History -->
+                            <button @click="currentView = currentView === 'main' ? 'history' : 'main'"
+                                class="flex-1 md:flex-none bg-orange-500 hover:bg-orange-600 text-white px-5 py-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-100 active:scale-95">
+
+                                <i
+                                    :class="currentView === 'main'
+                                        ?
+                                        'fa-solid fa-clock-rotate-left' :
+                                        'fa-solid fa-list'"></i>
+
+                                <span x-text="currentView === 'main' ? 'History' : 'Daftar'"></span>
+
+                            </button>
+
+                            <!-- Tambah Pet -->
+                            <a href="{{ route('admin.streak.create') }}"
+                                class="flex-1 md:flex-none bg-[#4A72D4] hover:bg-blue-600 text-white px-5 py-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-100 active:scale-95">
+
+                                <i class="fa-solid fa-plus"></i> Tambah Pet
+
+                            </a>
+
+                        </div>
 
                     </div>
 
@@ -270,10 +294,11 @@
 
                         <table class="w-full text-left">
 
-                            <thead class="bg-blue-50/30 text-[#4A72D4] text-[10px] uppercase font-black">
+                            <thead class="bg-blue-50/30 text-[#4A72D4] text-[11px] font-bold text-gray-400 uppercase">
                                 <tr>
                                     <th class="px-10 py-6 text-center">Visual Pet</th>
                                     <th class="px-10 py-6 text-center">Level Perubahan</th>
+                                    <th class="px-10 py-6 text-center">Animasi</th>
                                     <th class="px-10 py-6 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -283,7 +308,7 @@
                                     <tr class="hover:bg-blue-50/20 transition-all">
                                         <td class="px-10 py-8 text-center">
                                             <div
-                                                class="w-20 h-20 bg-white rounded-3xl p-3 mx-auto border border-gray-100 shadow-sm flex items-center justify-center overflow-hidden">
+                                                class="w-60 h-60 bg-white rounded-3xl p-3 mx-auto flex items-center justify-center overflow-hidden">
                                                 <img src="{{ asset('storage/' . $streak->svg_path) }}"
                                                     class="w-full h-full object-contain animate-{{ $streak->animation }}">
                                             </div>
@@ -295,29 +320,54 @@
                                         <td class="px-10 py-8 text-center">
                                             <span
                                                 class="inline-flex items-center gap-2 bg-indigo-50 text-[#4A72D4] px-6 py-3 rounded-2xl font-black text-lg">
-                                                <span class="text-[10px] opacity-50 font-bold">LV.</span>
+                                                <span class="text-sm opacity-50 font-bold">LV.</span>
                                                 {{ $streak->min_level }}
                                             </span>
                                         </td>
 
                                         <td class="px-10 py-8 text-center">
+                                            <span class="inline-flex items-center gap-2 px-6 py-3font-bold text-lg">
+                                                {{ $streak->animation }}
+                                            </span>
+                                        </td>
+
+                                        <td class="px-10 py-8 text-center">
                                             <div class="flex justify-center gap-2">
-                                                <a href="{{ route('admin.streak.edit', $streak->id) }}"
-                                                    class="h-11 px-5 flex items-center bg-blue-50 text-[#4A72D4] rounded-xl font-black text-[10px] uppercase hover:bg-[#4A72D4] hover:text-white transition-all">
-                                                    Edit
-                                                </a>
+                                                @if (!$streak->is_default)
+                                                    <!-- Tombol Edit -->
+                                                    <a href="{{ route('admin.streak.edit', $streak->id) }}"
+                                                        class="h-11 px-4 py-2 flex items-center bg-blue-50 text-[#4A72D4] rounded-xl font-black text-[10px] uppercase hover:bg-blue-100 transition-all">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="2"
+                                                            stroke="currentColor" class="size-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                                        </svg>
+                                                    </a>
 
-                                                <button @click="confirmSoftDelete({{ $streak->id }})"
-                                                    class="h-11 px-5 bg-red-50 text-red-500 rounded-xl font-black text-[10px] uppercase hover:bg-red-500 hover:text-white transition-all">
-                                                    Hapus
-                                                </button>
+                                                    <!-- Tombol Delete -->
+                                                    <button @click="confirmSoftDelete({{ $streak->id }})"
+                                                        class="h-11 px-4 py-2 bg-red-50 text-red-500 rounded-xl font-black text-[10px] uppercase hover:bg-red-100 transition-all">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="2"
+                                                            stroke="currentColor" class="size-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                        </svg>
+                                                    </button>
 
-                                                <form id="delete-{{ $streak->id }}"
-                                                    action="{{ route('admin.streak.delete', $streak->id) }}"
-                                                    method="POST" class="hidden">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                </form>
+                                                    <!-- Form Delete -->
+                                                    <form id="delete-{{ $streak->id }}"
+                                                        action="{{ route('admin.streak.delete', $streak->id) }}"
+                                                        method="POST" class="hidden">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                    </form>
+                                                @else
+                                                    <!-- Default Label -->
+                                                    <span
+                                                        class="text-gray-400 font-black text-[10px] uppercase">Default</span>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -333,62 +383,118 @@
             </div>
 
 
-            <div x-show="currentView==='history'">
+            <div class="p-4 lg:px-8" x-show="currentView==='history'">
 
-                <button @click="currentView='main'"
-                    class="mb-6 flex items-center gap-2 text-[#4A72D4] font-bold text-sm">
-                    <i class="fa-solid fa-arrow-left"></i> Kembali
-                </button>
+                <div class="bg-white rounded-xl shadow-sm border border-red-50 overflow-hidden">
 
-                <div class="bg-white rounded-[35px] shadow-sm border border-red-50 overflow-hidden">
-
-                    <div class="p-8 bg-red-50/20 border-b border-red-100">
-                        <h3 class="font-black text-lg text-red-500 uppercase">
-                            History Sampah
-                        </h3>
+                    <div class="p-6 bg-red-50/40 border-b border-red-100 flex items-center justify-between">
+                        <div>
+                            <h3 class="font-bold text-red-500 text-lg">
+                                History Pet
+                            </h3>
+                            <p class="text-xs text-gray-400">
+                                Pet yang dipindahkan ke history dapat dihapus permanen atau dipulihkan
+                            </p>
+                        </div>
+                        <button @click="currentView='main'"
+                            class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-3 rounded-xl text-xs font-bold transition-all">
+                            <i class="fa-solid fa-list mr-1"></i> Daftar
+                        </button>
                     </div>
 
-                    <table class="w-full text-left">
+                    <div class="overflow-x-auto">
 
-                        <tbody class="divide-y divide-gray-100">
-                            @foreach ($trash as $streak)
-                                <tr class="hover:bg-gray-50/50 transition-all">
-                                    <td class="px-10 py-6 text-center">
-                                        <img src="{{ asset('storage/' . $streak->svg_path) }}"
-                                            class="w-12 h-12 grayscale opacity-50 mx-auto object-contain">
-                                        <p class="text-[9px] font-bold text-gray-300 mt-1 uppercase">
-                                            {{ $streak->nama }}</p>
-                                    </td>
-
-                                    <td class="px-10 py-6">
-                                        <div class="flex flex-col">
-                                            <span class="font-black text-slate-400">Level
-                                                {{ $streak->min_level }}</span>
-                                            <span class="text-[10px] text-gray-400 uppercase tracking-tighter">Animasi:
-                                                {{ $streak->animation }}</span>
-                                        </div>
-                                    </td>
-
-                                    <td class="px-10 py-6 text-right">
-                                        <div class="flex justify-end gap-2">
-                                            <button @click="confirmPermanentDelete({{ $streak->id }})"
-                                                class="bg-red-500 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase shadow-lg shadow-red-200 hover:bg-red-600 transition-all">
-                                                Hapus Permanen
-                                            </button>
-                                        </div>
-
-                                        <form id="force-{{ $streak->id }}"
-                                            action="{{ route('admin.streak.forceDelete', $streak->id) }}"
-                                            method="POST" class="hidden">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
-                                    </td>
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 text-[11px] font-bold uppercase text-gray-400">
+                                <tr>
+                                    <th class="px-8 py-4 text-center">Pet</th>
+                                    <th class="px-8 py-4 text-center">Level</th>
+                                    {{-- <th class="px-8 py-4 text-center">Animasi</th> --}}
+                                    <th class="px-8 py-4 text-center">Aksi</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
+                            </thead>
 
-                    </table>
+                            <tbody class="divide-y divide-gray-100">
+
+                                @foreach ($trash as $streak)
+                                    <tr class="hover:bg-gray-50 transition-all">
+
+                                        <!-- PET -->
+                                        <td class="px-8 py-6 text-center">
+                                            <div class="flex flex-col items-center gap-2">
+                                                <div
+                                                    class="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center">
+                                                    <img src="{{ asset('storage/' . $streak->svg_path) }}"
+                                                        class="w-60 h-60 grayscale opacity-60 object-contain">
+                                                </div>
+                                                <span class="text-xs font-semibold text-gray-400 uppercase">
+                                                    {{ $streak->nama }}
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <!-- LEVEL -->
+                                        <td class="px-8 py-6 text-center">
+                                            <span
+                                                class="bg-gray-100 text-gray-500 px-4 py-2 rounded-xl font-bold text-sm">
+                                                LV {{ $streak->min_level }}
+                                            </span>
+                                        </td>
+
+                                        {{-- <!-- ANIMATION -->
+                                        <td class="px-8 py-6 text-center">
+                                            <span class="text-xs font-semibold text-gray-400 uppercase">
+                                                {{ $streak->animation ?? 'static' }}
+                                            </span>
+                                        </td> --}}
+
+                                        <!-- ACTION -->
+                                        <td
+                                            class="px-8 py-6 text-center flex flex-row gap-2 items-center justify-center">
+
+                                            <!-- Restore -->
+                                            <form action="{{ route('admin.streak.restore', $streak->id) }}"
+                                                method="POST">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-[11px] uppercase shadow-lg shadow-green-200 transition-all">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                        class="size-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+
+                                            <!-- Permanent Delete -->
+                                            <button @click="confirmPermanentDelete({{ $streak->id }})"
+                                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-[11px] uppercase shadow-lg shadow-red-200 transition-all">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                    class="size-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
+
+                                            <form id="force-{{ $streak->id }}"
+                                                action="{{ route('admin.streak.forceDelete', $streak->id) }}"
+                                                method="POST" class="hidden">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+
+                                        </td>
+
+                                    </tr>
+                                @endforeach
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
 
                 </div>
 

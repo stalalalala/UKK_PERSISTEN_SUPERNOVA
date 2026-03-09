@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\UserXpLog;
 use App\Models\Character;
+use App\Models\StreakCharacter;
 use App\Models\StreakRestore;
 use Carbon\Carbon;
 
@@ -111,24 +112,16 @@ class XpService
     }
 
     public function getCurrentCharacter($user)
-    {
-        // return Character::where('min_level', '<=', $user->level)
-        //     ->orderByDesc('min_level')
-        //     ->first();
-
-        return null;
-    }
+{
+    // Ambil karakter streak sesuai level user
+    return StreakCharacter::where('min_level', '<=', $user->level)
+        ->orderByDesc('min_level') // yang tertinggi <= level user
+        ->first();
+}
 
     private function calculateLevel($xp)
 {
-    $level = 1;
-
-    while ($xp >= ($level * 200)) {
-        $xp -= ($level * 200);
-        $level++;
-    }
-
-    return $level;
+    return floor($xp / 200) + 1;
 }
 
 public function getXpForNextLevel($user)
@@ -142,5 +135,11 @@ public function getXpProgress($user)
         'xp' => $user->total_xp,
         'maxXp' => $user->level * 200
     ];
+}
+
+public function recalcLevel($user)
+{
+    $user->level = $this->calculateLevel($user->total_xp);
+    $user->save();
 }
 }

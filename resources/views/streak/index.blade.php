@@ -147,8 +147,14 @@
 
             <div class="slime relative z-10 w-full max-w-[320px] md:max-w-[500px] lg:max-w-[600px]"
                 :class="{ 'animate-bounce-slime': isClicked }" @click="trigger">
-                <object data="{{ asset('img/pet(tanpa_animasi).svg') }}" type="image/svg+xml"
-                    class="pointer-events-none select-none w-full h-auto"></object>
+
+                @if ($currentStreak)
+                    <object data="{{ asset('storage/' . $currentStreak->svg_path) }}" type="image/svg+xml"
+                        class="pointer-events-none select-none w-full h-auto"></object>
+                @else
+                    <object data="{{ asset('img/pet(tanpa_animasi).svg') }}" type="image/svg+xml"
+                        class="pointer-events-none select-none w-full h-auto"></object>
+                @endif
             </div>
 
 
