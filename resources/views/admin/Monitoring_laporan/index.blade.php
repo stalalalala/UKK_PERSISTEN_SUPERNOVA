@@ -169,8 +169,6 @@
                         </svg>
                     </button>
 
-                    <div class="relative w-full group flex items-center gap-2">
-
                   <div 
                     x-data="{
                         keyword: '',
@@ -206,7 +204,6 @@
                             
                             <!-- ICON -->
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-
                                 <svg xmlns="http://www.w3.org/2000/svg" 
                                     class="w-5 h-5 text-gray-500" 
                                     fill="none"
@@ -235,11 +232,6 @@
 
                     </div>
                 </div>
-
-                <div
-                    class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 self-end md:self-auto">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
 
                 @php
                 use Illuminate\Support\Facades\Auth;
