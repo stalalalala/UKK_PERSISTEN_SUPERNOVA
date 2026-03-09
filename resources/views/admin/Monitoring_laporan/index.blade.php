@@ -167,9 +167,7 @@
                         </svg>
                     </button>
 
-<<<<<<< HEAD
                     <div class="relative w-full group flex items-center gap-2">
-=======
                   <div 
                     x-data="{
                         keyword: '',
@@ -201,16 +199,11 @@
                     class="relative w-full group flex items-center gap-2"
                     >
 
->>>>>>> 9f1523811615d39451a11b03a3226e96edf86548
                         <div class="relative w-full">
                             
                             <!-- ICON -->
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-<<<<<<< HEAD
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-=======
+
                                 <svg xmlns="http://www.w3.org/2000/svg" 
                                     class="w-5 h-5 text-gray-500" 
                                     fill="none"
@@ -219,7 +212,6 @@
                                     stroke-width="2">
                                     <path stroke-linecap="round" 
                                         stroke-linejoin="round"
->>>>>>> 9f1523811615d39451a11b03a3226e96edf86548
                                         d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                                 </svg>
                             </div>
@@ -231,13 +223,9 @@
                                 @keydown.enter="goToPage()"
                                 class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
                         </div>
-<<<<<<< HEAD
-                        <button
-=======
 
                         <button 
                             @click="goToPage()"
->>>>>>> 9f1523811615d39451a11b03a3226e96edf86548
                             class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                             Cari
                         </button>
@@ -245,12 +233,11 @@
                     </div>
                 </div>
 
-<<<<<<< HEAD
                 <div
                     class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 self-end md:self-auto">
                     <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
                         <img src="https://ui-avatars.com/api/?name=Admin&background=random" alt="Admin">
-=======
+
                 @php
                 use Illuminate\Support\Facades\Auth;
                 $user = Auth::user();
@@ -283,7 +270,6 @@
                             <p class="text-sm text-gray-500">{{ $user->email }}</p>
                             <p class="text-sm text-gray-500">{{ $user->no_hp ?? '-' }}</p>
                         </div>
->>>>>>> 9f1523811615d39451a11b03a3226e96edf86548
                     </div>
                 </div>
             </header>
