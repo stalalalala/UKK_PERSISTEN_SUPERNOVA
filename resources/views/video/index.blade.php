@@ -40,14 +40,17 @@
                                 d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                         </svg>
                     </a>
-                    <button
-                        class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
-                        </svg>
-                    </button>
+                    <form action="{{ route('logout') }}" method="POST" class="inline" id="logout-form">
+                        @csrf
+                        <button type="submit" 
+                                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+                            </svg>
+                        </button>
+                    </form>
                 </div>
 
                 <button @click="open = true"
@@ -102,18 +105,49 @@
         </div>
     </div>
 
-    <main class="max-w-[1440px] mx-auto py-10" x-data="{
+   <main class="max-w-[1440px] mx-auto py-10" x-data="{
         selectedSub: 'Penalaran Umum',
-        currentPage: 1
+        currentPage: 1,
+        perPage: 4, // Lo bisa atur mau berapa video per halaman di sini
+        
+        // Fungsi untuk ngitung total halaman berdasarkan subtes yang dipilih
+        getTotalPages() {
+            let count = 0;
+            @foreach($videos as $video)
+                if('{{ $video->subtes }}' === this.selectedSub) count++;
+            @endforeach
+            return Math.ceil(count / this.perPage) || 1;
+        },
+
+        // Fungsi untuk nentuin video mana yang muncul (Logic Pagination)
+        shouldShow(subtes, index) {
+            if (this.selectedSub !== subtes) return false;
+            
+            // Itung index relatif video di dalam subtes yang sama
+            let relativeIndex = 0;
+            let found = false;
+            @foreach($videos as $i => $v)
+                if('{{ $v->subtes }}' === this.selectedSub) {
+                    if({{ $i }} === index) {
+                        found = true;
+                    } else if (!found) {
+                        relativeIndex++;
+                    }
+                }
+            @endforeach
+            
+            let start = (this.currentPage - 1) * this.perPage;
+            let end = start + this.perPage;
+            return relativeIndex >= start && relativeIndex < end;
+        }
     }">
 
-        <section class="px-4 md:px-10 mb-10">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-[#2E3B66]">Subtes Video Pembelajaran</h1>
-            <p class="text-gray-500 mt-2">Tentukan materi yang ingin kamu pelajari dan mulai tonton videonya sekarang!
-            </p>
-        </section>
+    <section class="px-4 md:px-10 mb-10">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-[#2E3B66]">Subtes Video Pembelajaran</h1>
+        <p class="text-gray-500 mt-2">Tentukan materi yang ingin kamu pelajari dan mulai tonton videonya sekarang!</p>
+    </section>
 
-        <section class="px-4 md:px-10 mb-12">
+   <section class="px-4 md:px-10 mb-12">
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-5">
 
                 <div @click="selectedSub = 'Penalaran Umum'; currentPage = 1"
@@ -196,84 +230,62 @@
             </div>
         </section>
 
-        <div class="px-4 md:px-10">
-            <hr class="mb-12 border-gray-300">
-        </div>
+    <div class="px-4 md:px-10"><hr class="mb-12 border-gray-300"></div>
 
-        <section class="px-4 md:px-10">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-                @foreach($videos as $video)
-        <div 
-            x-show="selectedSub === '{{ $video->subtes }}'"
-            x-transition
-            class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
-
-            <div class="flex-1 flex flex-col justify-between">
-                <div>
-                    <h3 class="text-blue-600 font-bold text-xl mb-3">
-                        {{ $video->subtes }}
-                    </h3>
-
-                    <div class="space-y-3">
-                        <div class="flex items-center gap-3 text-blue-500 font-semibold">
-                            <i class="fa-solid fa-book-open"></i>
-                            <span>{{ $video->judul_video }}</span>
+    <section class="px-4 md:px-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            @foreach($videos as $index => $video)
+                <div 
+                    x-show="shouldShow('{{ $video->subtes }}', {{ $index }})"
+                    x-transition
+                    class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group">
+                    
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-blue-600 font-bold text-xl mb-3">{{ $video->subtes }}</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 text-blue-500 font-semibold">
+                                    <i class="fa-solid fa-book-open"></i>
+                                    <span>{{ $video->judul_video }}</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-blue-500 font-semibold">
+                                    <span>Video Pembelajaran</span>
+                                </div>
+                            </div>
                         </div>
+                        <div class="mt-6">
+                            <span class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">Belum Ditonton</span>
+                        </div>
+                    </div>
 
-                        <div class="flex items-center gap-3 text-blue-500 font-semibold">
-                            
-                            <span>Video Pembelajaran</span>
+                    <div class="w-full sm:w-56 h-36 rounded-3xl overflow-hidden bg-gray-100 relative">
+                        <div class="absolute inset-0">
+                            {!! preg_replace( ['/width=".*?"/', '/height=".*?"/'], ['width="100%"', 'height="100%"'], $video->iframe ) !!}
                         </div>
                     </div>
                 </div>
-
-                <div class="mt-6">
-                    <span class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
-                        Belum Ditonton
-                    </span>
-                </div>
-            </div>
-
-            <div class="w-full sm:w-56 h-36 rounded-3xl overflow-hidden bg-gray-100 relative">
-        <div class="absolute inset-0">
-            {!! preg_replace(
-                ['/width=".*?"/', '/height=".*?"/'],
-                ['width="100%"', 'height="100%"'],
-                $video->iframe
-            ) !!}
+            @endforeach
         </div>
-    </div>
 
+        <div class="flex justify-center items-center gap-3 mt-16" x-show="getTotalPages() > 1">
+            <button @click="if(currentPage > 1) currentPage--"
+                class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
 
+            <template x-for="p in getTotalPages()" :key="p">
+                <button @click="currentPage = p"
+                    :class="currentPage === p ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
+                    class="w-10 h-10 rounded-full font-bold" x-text="p"></button>
+            </template>
+
+            <button @click="if(currentPage < getTotalPages()) currentPage++"
+                class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
         </div>
-    @endforeach
-
-                </div>
-
-            </div>
-
-            <div class="flex justify-center items-center gap-3 mt-16">
-                <button @click="if(currentPage > 1) currentPage--"
-                    class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
-                </button>
-
-                <button @click="currentPage = 1"
-                    :class="currentPage === 1 ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
-                    class="w-10 h-10 rounded-full font-bold">1</button>
-
-                <button @click="currentPage = 2"
-                    :class="currentPage === 2 ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
-                    class="w-10 h-10 rounded-full font-bold">2</button>
-
-                <button @click="if(currentPage < 2) currentPage++"
-                    class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
-            </div>
-        </section>
-    </main>
+    </section>
+</main>
     @include('layouts.footer')
 
 

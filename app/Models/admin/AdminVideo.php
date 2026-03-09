@@ -25,4 +25,15 @@ class AdminVideo extends Model
         return $this->id . '-VID';
     }
 
+        public function usersWhoWatched()
+    {
+        return $this->belongsToMany(User::class, 'video_user');
+    }
+
+
+    public function isWatchedBy($userId)
+    {
+        return $this->usersWhoWatched()->where('user_id', $userId)->exists();
+    }
+
 }

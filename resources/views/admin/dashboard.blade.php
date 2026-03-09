@@ -11,8 +11,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-
     @vite('resources/css/app.css')
 </head>
 
@@ -184,8 +182,37 @@
                         </svg>
                     </button>
 
-                   <div class="relative w-full group flex items-center gap-2">
-    
+                  <div 
+                    x-data="{
+                        keyword: '',
+                        routes: {
+                            'dashboard': '{{ route('admin.dashboard.index') }}',
+                            'user': '{{ route('admin.user.index') }}',
+                            'streak': '{{ route('admin.streak.index') }}',
+                            'monitoring': '{{ route('admin.laporan.index') }}',
+                            'video': '{{ route('admin.videoPembelajaran.index') }}',
+                            'peluang': '{{ route('admin.peluang.index') }}',
+                            'tryout': '{{ route('admin.tryout.index') }}',
+                            'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                            'kuis': '{{ route('admin.kuis.index') }}',
+                            'latihan': '{{ route('admin.latihan.index') }}'
+                        },
+                        goToPage(){
+                            let search = this.keyword.toLowerCase()
+
+                            for (let key in this.routes) {
+                                if (key.includes(search)) {
+                                    window.location.href = this.routes[key]
+                                    return
+                                }
+                            }
+
+                            alert('Halaman tidak ditemukan')
+                        }
+                    }"
+                    class="relative w-full group flex items-center gap-2"
+                    >
+
                         <div class="relative w-full">
                             
                             <!-- ICON -->
@@ -203,14 +230,15 @@
                             </div>
 
                             <input 
-                                type="text" 
-                                id="pageSearch"
+                                type="text"
+                                x-model="keyword"
                                 placeholder="Cari halaman..."
+                                @keydown.enter="goToPage()"
                                 class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
                         </div>
 
                         <button 
-                            onclick="goToPage()" 
+                            @click="goToPage()"
                             class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                             Cari
                         </button>
@@ -442,33 +470,6 @@
             border-radius: 10px;
         }
     </style>
-    <script>
-function goToPage() {
-    let keyword = document.getElementById('pageSearch').value.toLowerCase();
-
-    let routes = {
-        "dashboard": "{{ route('admin.dashboard.index') }}",
-        "user": "{{ route('admin.user.index') }}",
-        "streak": "{{ route('admin.streak.index') }}",
-        "monitoring": "{{ route('admin.laporan.index') }}",
-        "video": "{{ route('admin.videoPembelajaran.index') }}",
-        "peluang": "{{ route('admin.peluang.index') }}",
-        "tryout": "{{ route('admin.tryout.index') }}",
-        "minat bakat": "{{ route('admin.minatBakat.index') }}",
-        "kuis": "{{ route('admin.kuis.index') }}",
-        "latihan": "{{ route('admin.latihan.index') }}"
-    };
-
-    for (let key in routes) {
-        if (key.includes(keyword)) {
-            window.location.href = routes[key];
-            return;
-        }
-    }
-
-    alert("Halaman tidak ditemukan");
-}
-</script>
 </body>
 
 
