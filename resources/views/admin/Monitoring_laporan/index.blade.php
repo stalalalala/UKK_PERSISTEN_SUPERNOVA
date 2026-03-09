@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Rinci - Persisten</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         * { font-family: 'Poppins', sans-serif !important; }
@@ -136,7 +138,7 @@
         </a>
 
         <a href="{{ route('admin.laporan.index') }}" x-init="if(currentPage === 'laporan') { $el.scrollIntoView({ block: 'center' }) }"
-            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left hover:bg-white/10 bg-[#D4DEF7] text-[#2E3B66]">
+            class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left bg-[#D4DEF7] text-[#2E3B66]">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
             </svg>
@@ -168,6 +170,7 @@
                     </button>
 
                     <div class="relative w-full group flex items-center gap-2">
+
                   <div 
                     x-data="{
                         keyword: '',
@@ -254,7 +257,9 @@
                         
                         <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
                         
-                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 text-gray-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        </svg>
                     </div>
 
                     <div x-show="open" @click.away="open = false"
@@ -442,6 +447,7 @@
                 selectedDraftTitle: '',
                 selectedCriteria: { year: null, month: null, week: null },
                 mobileMenuOpen: false,
+                adminDropdownOpen: false,
                 searchQuery: '',
                 logs: @json($logs),
 
