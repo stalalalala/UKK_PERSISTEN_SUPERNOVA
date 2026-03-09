@@ -9,14 +9,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        /* Memastikan font Poppins terpakai */
-        body { font-family: 'Poppins', sans-serif; }
-        [x-cloak] { display: none !important; }
-    </style>
+     <style>
+    [x-cloak] { display: none !important; }
+  </style>
+    @vite('resources/css/app.css')
 </head>
 
-<body class="bg-slate-100 overflow-x-hidden">
+<body class="bg-slate-100 font-po overflow-x-hidden">
 
 <div x-data="userApp()" class="flex h-screen overflow-hidden">
 
@@ -144,7 +143,7 @@
 </aside>
 
     <main class="flex-1 p-4 md:p-8 overflow-y-auto h-screen">
-   <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+    <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
                 <div class="flex items-center w-full gap-4">
                     <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
                         <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,8 +152,37 @@
                         </svg>
                     </button>
 
-                   <div class="relative w-full group flex items-center gap-2">
-    
+                  <div 
+                    x-data="{
+                        keyword: '',
+                        routes: {
+                            'dashboard': '{{ route('admin.dashboard.index') }}',
+                            'user': '{{ route('admin.user.index') }}',
+                            'streak': '{{ route('admin.streak.index') }}',
+                            'monitoring': '{{ route('admin.laporan.index') }}',
+                            'video': '{{ route('admin.videoPembelajaran.index') }}',
+                            'peluang': '{{ route('admin.peluang.index') }}',
+                            'tryout': '{{ route('admin.tryout.index') }}',
+                            'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                            'kuis': '{{ route('admin.kuis.index') }}',
+                            'latihan': '{{ route('admin.latihan.index') }}'
+                        },
+                        goToPage(){
+                            let search = this.keyword.toLowerCase()
+
+                            for (let key in this.routes) {
+                                if (key.includes(search)) {
+                                    window.location.href = this.routes[key]
+                                    return
+                                }
+                            }
+
+                            alert('Halaman tidak ditemukan')
+                        }
+                    }"
+                    class="relative w-full group flex items-center gap-2"
+                    >
+
                         <div class="relative w-full">
                             
                             <!-- ICON -->
@@ -172,14 +200,15 @@
                             </div>
 
                             <input 
-                                type="text" 
-                                id="pageSearch"
+                                type="text"
+                                x-model="keyword"
                                 placeholder="Cari halaman..."
+                                @keydown.enter="goToPage()"
                                 class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
                         </div>
 
                         <button 
-                            onclick="goToPage()" 
+                            @click="goToPage()"
                             class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                             Cari
                         </button>
@@ -206,8 +235,8 @@
                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                     </div>
 
-                    <div x-show="open" @click.away="open = false"
-                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                    <div x-show="open" @click.away="open = false" :class="{ 'block': open }"
+                        class="absolute hidden right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
                         x-transition:enter="transition ease-out duration-200"
                         x-transition:enter-start="opacity-0 transform scale-95"
                         x-transition:enter-end="opacity-100 transform scale-100"
@@ -640,7 +669,39 @@
     </div>
 </main>
 </div>
+@if(session('success'))
+<div 
+    x-data
+    x-init="
+        Swal.fire({
+            icon: 'success',
+            title: '{{ session('success') }}',
 
+            width: '340px',
+            padding: '1.8rem',
+
+            background: '#ffffff',
+            color: '#334155',
+
+            confirmButtonText: 'Oke',
+            confirmButtonColor: '#4A72D4',
+
+            customClass: {
+                popup: 'rounded-3xl shadow-xl',
+                title: 'text-lg font-bold',
+                confirmButton: 'rounded-xl px-6 py-2'
+            },
+
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        })
+    "
+></div>
+@endif
 <script>
 function userApp() {
     return {
@@ -716,63 +777,7 @@ function userApp() {
         }
     }
 }
-
-function goToPage() {
-    let keyword = document.getElementById('pageSearch').value.toLowerCase();
-
-    let routes = {
-        "dashboard": "{{ route('admin.dashboard.index') }}",
-        "user": "{{ route('admin.user.index') }}",
-        "streak": "{{ route('admin.streak.index') }}",
-        "monitoring": "{{ route('admin.laporan.index') }}",
-        "video": "{{ route('admin.videoPembelajaran.index') }}",
-        "peluang": "{{ route('admin.peluang.index') }}",
-        "tryout": "{{ route('admin.tryout.index') }}",
-        "minat bakat": "{{ route('admin.minatBakat.index') }}",
-        "kuis": "{{ route('admin.kuis.index') }}",
-        "latihan": "{{ route('admin.latihan.index') }}"
-    };
-
-    for (let key in routes) {
-        if (key.includes(keyword)) {
-            window.location.href = routes[key];
-            return;
-        }
-    }
-
-    alert("Halaman tidak ditemukan");
-}
 </script>
 
-@if(session('success'))
-<script>
-Swal.fire({
-    icon: 'success',
-    title: '{{ session('success') }}',
-
-    width: '340px',
-    padding: '1.8rem',
-
-    background: '#ffffff',
-    color: '#334155',
-
-    confirmButtonText: 'Oke',
-    confirmButtonColor: '#4A72D4',
-
-    customClass: {
-        popup: 'rounded-3xl shadow-xl',
-        title: 'text-lg font-bold',
-        confirmButton: 'rounded-xl px-6 py-2'
-    },
-
-    showClass: {
-        popup: 'animate__animated animate__fadeInDown'
-    },
-    hideClass: {
-        popup: 'animate__animated animate__fadeOutUp'
-    }
-});
-</script>
-@endif
 </body>
 </html>

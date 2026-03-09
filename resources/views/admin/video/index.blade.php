@@ -20,9 +20,12 @@
 
 <div x-data="videoApp()" class="flex h-screen overflow-hidden">
 
-    <!-- ================= SIDEBAR ================= -->
-   <aside x-data="{ currentPage: 'video' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-    class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
+    <aside 
+x-data="{ currentPage: 'video' }"
+:class="mobileMenuOpen 
+    ? 'translate-x-0 pointer-events-auto' 
+    : '-translate-x-full pointer-events-none lg:translate-x-0 lg:pointer-events-auto'"
+class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
     <div class="flex items-center justify-between mb-10 px-2">
         <div class="flex items-center gap-3">
@@ -143,9 +146,8 @@
     </form>
 </aside>
 
-    <!-- ================= MAIN ================= -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
-         <header class="flex flex-col md:flex-row items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0">
+          <header class="flex flex-col md:flex-row items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0">
                 <div class="flex items-center w-full gap-4">
                     <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
                         <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,8 +156,37 @@
                         </svg>
                     </button>
 
-                   <div class="relative w-full group flex items-center gap-2">
-    
+                  <div 
+                    x-data="{
+                        keyword: '',
+                        routes: {
+                            'dashboard': '{{ route('admin.dashboard.index') }}',
+                            'user': '{{ route('admin.user.index') }}',
+                            'streak': '{{ route('admin.streak.index') }}',
+                            'monitoring': '{{ route('admin.laporan.index') }}',
+                            'video': '{{ route('admin.videoPembelajaran.index') }}',
+                            'peluang': '{{ route('admin.peluang.index') }}',
+                            'tryout': '{{ route('admin.tryout.index') }}',
+                            'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                            'kuis': '{{ route('admin.kuis.index') }}',
+                            'latihan': '{{ route('admin.latihan.index') }}'
+                        },
+                        goToPage(){
+                            let search = this.keyword.toLowerCase()
+
+                            for (let key in this.routes) {
+                                if (key.includes(search)) {
+                                    window.location.href = this.routes[key]
+                                    return
+                                }
+                            }
+
+                            alert('Halaman tidak ditemukan')
+                        }
+                    }"
+                    class="relative w-full group flex items-center gap-2"
+                    >
+
                         <div class="relative w-full">
                             
                             <!-- ICON -->
@@ -173,14 +204,15 @@
                             </div>
 
                             <input 
-                                type="text" 
-                                id="pageSearch"
+                                type="text"
+                                x-model="keyword"
                                 placeholder="Cari halaman..."
+                                @keydown.enter="goToPage()"
                                 class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
                         </div>
 
                         <button 
-                            onclick="goToPage()" 
+                            @click="goToPage()"
                             class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                             Cari
                         </button>
@@ -207,8 +239,8 @@
                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                     </div>
 
-                    <div x-show="open" @click.away="open = false"
-                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                    <div x-show="open" @click.away="open = false" :class="{ 'block': open }"
+                        class="absolute hidden right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
                         x-transition:enter="transition ease-out duration-200"
                         x-transition:enter-start="opacity-0 transform scale-95"
                         x-transition:enter-end="opacity-100 transform scale-100"
@@ -223,6 +255,8 @@
                     </div>
                 </div>
             </header>
+
+
  <section class="flex-1 p-4 lg:p-6 xl:p-8 overflow-y-auto">
         <h2 class="text-2xl font-semibold text-slate-700 mb-6">Manajemen Video Pembelajaran</h2>
 
@@ -230,7 +264,6 @@
 
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden">
 
-            <!-- ================= TAB ================= -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div class="flex bg-gray-100 p-1 rounded-2xl w-full md:w-auto">
                     <button @click="activeTab = 'active'"
@@ -261,7 +294,6 @@
                 </div>
             </div>
 
-            <!-- ================= TABLE ACTIVE ================= -->
             <div x-show="activeTab === 'active'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2">
                 <div class="overflow-x-auto rounded-2xl border border-gray-50">
                     <table class="w-full text-sm min-w-[800px]">
@@ -302,7 +334,7 @@
                                     class=" text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                     </svg></button>
-                                <form id="form-delete-{{ $video->id }}" action="{{ route('admin.videoPembelajaran.destroy', $video->id) }}" method="POST" class="hidden">
+                                <form x-ref="formDelete{{ $video->id }}" action="{{ route('admin.videoPembelajaran.destroy', $video->id) }}" method="POST" class="hidden">
                                     @csrf @method('DELETE')
                                 </form>
                             </td>
@@ -313,7 +345,6 @@
                 </div>
             </div>
 
-            <!-- ================= TABLE HISTORY ================= -->
             <div x-show="activeTab === 'history'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-2" style="display: none;">
                 <div class="overflow-x-auto rounded-2xl border border-red-50">
                     <table class="w-full text-sm min-w-[800px]">
@@ -347,14 +378,14 @@
                             <td class="p-4 text-center space-x-2">
                                 <button @click="handleRestore('{{ $item->id }}')"
                                     class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
-                                    </svg></button>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+    </svg></button>
                                 <button @click="handleForceDelete('{{ $item->id }}')"
                                     class=" text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                     </svg></button>
-                                <form id="form-restore-{{ $item->id }}" action="{{ route('admin.videoPembelajaran.restore', $item->id) }}" method="POST" class="hidden">@csrf</form>
-                                <form id="form-force-delete-{{ $item->id }}" action="{{ route('admin.videoPembelajaran.force-delete', $item->id) }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
+                                <form x-ref="formRestore{{ $item->id }}" action="{{ route('admin.videoPembelajaran.restore', $item->id) }}" method="POST" class="hidden">@csrf</form>
+                                <form x-ref="formForceDelete{{ $item->id }}" action="{{ route('admin.videoPembelajaran.force-delete', $item->id) }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
                             </td>
                         </tr>
                         @endforeach
@@ -366,7 +397,6 @@
  </section>
     </main>
 
-    <!-- ================= MODAL TAMBAH/UBAH ================= -->
     <div x-show="openModalVideo" x-cloak style="display: none;" class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" x-transition>
         <div @click.away="closeModal()" class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl">
             <div class="flex justify-between items-center mb-6">
@@ -418,13 +448,10 @@
         </div>
     </div>
 
-    <!-- ================= MODAL IMPORT ================= -->
-
-<div x-show="openImportModalVideo" x-cloak class="fixed inset-0 z-[100] overflow-y-auto">
+    <div x-show="openImportModalVideo" x-cloak class="fixed inset-0 z-[100] overflow-y-auto">
    
     <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="closeImportModal()"></div>
 
-    <!-- Modal Content -->
     <div class="relative min-h-screen flex items-center justify-center p-4">
         <div class="relative bg-white w-full max-w-lg rounded-[35px] shadow-2xl p-8 transform transition-all"
              x-show="openImportModalVideo"
@@ -432,7 +459,6 @@
              x-transition:enter-start="opacity-0 scale-95 translate-y-8"
              x-transition:enter-end="opacity-100 scale-100 translate-y-0">
 
-            <!-- Header -->
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
                     <i class="fa-solid fa-video text-emerald-500"></i> Import Video dari Excel
@@ -442,7 +468,6 @@
                 </button>
             </div>
 
-            <!-- Upload Area -->
             <div class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-300 transition-all bg-gray-50/50">
                 <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
@@ -450,15 +475,13 @@
                 <p class="text-sm font-bold text-gray-600">Klik di sini</p>
                 <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 100MB (.xlsx, .xls)</p>
                 
-                <!-- Input File -->
-                <input type="file" class="hidden" id="video_excel_upload" @change="handleFileUpload($event)" accept=".xlsx,.xls">
-                <button onclick="document.getElementById('video_excel_upload').click()"
+                <input type="file" class="hidden" x-ref="videoExcelInput" @change="handleFileUpload($event)" accept=".xlsx,.xls">
+                <button @click="$refs.videoExcelInput.click()"
                         class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">
                     Pilih File
                 </button>
             </div>
 
-            <!-- Template Info -->
             <div class="mt-8 p-4 bg-emerald-50 rounded-2xl flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <i class="fa-solid fa-circle-info text-emerald-500"></i>
@@ -471,7 +494,6 @@
                 </a>
             </div>
 
-            <!-- Footer Buttons -->
             <div class="grid grid-cols-2 gap-4 mt-8">
                 <button @click="closeImportModal()"
                         class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">
@@ -487,6 +509,39 @@
 
 
 </div>
+@if(session('success'))
+<div 
+    x-data
+    x-init="
+        Swal.fire({
+            icon: 'success',
+            title: '{{ session('success') }}',
+
+            width: '340px',
+            padding: '1.8rem',
+
+            background: '#ffffff',
+            color: '#334155',
+
+            confirmButtonText: 'Oke',
+            confirmButtonColor: '#4A72D4',
+
+            customClass: {
+                popup: 'rounded-3xl shadow-xl',
+                title: 'text-lg font-bold',
+                confirmButton: 'rounded-xl px-6 py-2'
+            },
+
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        })
+    "
+></div>
+@endif
 
 <script>
 function videoApp() {
@@ -515,148 +570,128 @@ function videoApp() {
         },
 
         openImportModal() {
-    this.openImportModalVideo = true;
-},
-closeImportModal() {
-    this.openImportModalVideo = false;
-},
+            this.openImportModalVideo = true;
+        },
+        closeImportModal() {
+            this.openImportModalVideo = false;
+        },
 
-handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
 
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
 
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-        console.log(jsonData);
+                // Kirim ke backend Laravel menggunakan pola Alpine terintegrasi
+                this.sendImportData(jsonData);
+            };
 
-        fetch("{{ route('admin.videoPembelajaran.import') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({ data: jsonData })
-        })
-        .then(res => res.json())
-        .then(response => {
-            Swal.fire('Berhasil!', 'Data berhasil diimport', 'success')
-                .then(() => location.reload());
-        });
-    };
+            reader.readAsArrayBuffer(file);
+        },
 
-    reader.readAsArrayBuffer(file);
-},
+        async sendImportData(jsonData) {
+            try {
+                const response = await fetch("{{ route('admin.videoPembelajaran.import') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({ data: jsonData })
+                });
 
-
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Data berhasil diimport',
+                        icon: 'success',
+                        customClass: { popup: 'rounded-3xl' }
+                    }).then(() => location.reload());
+                }
+            } catch (error) {
+                console.error("Import error:", error);
+                Swal.fire('Gagal!', 'Terjadi kesalahan saat import data', 'error');
+            }
+        },
 
         // ================= CRUD =================
         handleDelete(id) {
-    Swal.fire({
-        title: 'Hapus Video?',
-        text: "Data akan dipindahkan ke tab history.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Ya, Hapus!',
-        cancelButtonText: 'Batal',
-        customClass: {
-            popup: 'rounded-3xl',
-            confirmButton: 'rounded-xl px-4 py-2',
-            cancelButton: 'rounded-xl px-4 py-2'
-        }
-    }).then((result) => {
-        if(result.isConfirmed) {
-            document.getElementById(`form-delete-${id}`).submit();
-        }
-    });
-},
+            Swal.fire({
+                title: 'Hapus Video?',
+                text: "Data akan dipindahkan ke tab history.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl px-4 py-2',
+                    cancelButton: 'rounded-xl px-4 py-2'
+                }
+            }).then((result) => {
+                if(result.isConfirmed) {
+                   
+                    this.$refs['formDelete' + id].submit();
+                }
+            });
+        },
 
-handleRestore(id) {
-    Swal.fire({
-        title: 'Pulihkan Video?',
-        text: "Data akan dikembalikan ke daftar video.",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#22c55e',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Ya, Pulihkan!',
-        cancelButtonText: 'Batal',
-        customClass: {
-            popup: 'rounded-3xl',
-            confirmButton: 'rounded-xl px-4 py-2',
-            cancelButton: 'rounded-xl px-4 py-2'
-        }
-    }).then((result) => {
-        if(result.isConfirmed) {
-            document.getElementById(`form-restore-${id}`).submit();
-        }
-    });
-},
+        handleRestore(id) {
+            Swal.fire({
+                title: 'Pulihkan Video?',
+                text: "Data akan dikembalikan ke daftar video.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#22c55e',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Pulihkan!',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl px-4 py-2',
+                    cancelButton: 'rounded-xl px-4 py-2'
+                }
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    this.$refs['formRestore' + id].submit();
+                }
+            });
+        },
 
-handleForceDelete(id) {
-    Swal.fire({
-        title: 'Hapus Permanen?',
-        text: "Data akan dihapus permanen dan tidak bisa dikembalikan!",
-        icon: 'error',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Ya, Hapus Permanen!',
-        cancelButtonText: 'Batal',
-        customClass: {
-            popup: 'rounded-3xl',
-            confirmButton: 'rounded-xl px-4 py-2',
-            cancelButton: 'rounded-xl px-4 py-2'
+        handleForceDelete(id) {
+            Swal.fire({
+                title: 'Hapus Permanen?',
+                text: "Data akan dihapus permanen dan tidak bisa dikembalikan!",
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Hapus Permanen!',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl px-4 py-2',
+                    cancelButton: 'rounded-xl px-4 py-2'
+                }
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    this.$refs['formForceDelete' + id].submit();
+                }
+            });
         }
-    }).then((result) => {
-        if(result.isConfirmed) {
-            document.getElementById(`form-force-delete-${id}`).submit();
-        }
-    });
-}
     }
 }
 </script>
-
-@if(session('success'))
-<script>
-Swal.fire({
-    icon: 'success',
-    title: '{{ session('success') }}',
-
-    width: '340px',
-    padding: '1.8rem',
-
-    background: '#ffffff',
-    color: '#334155',
-
-    confirmButtonText: 'Oke',
-    confirmButtonColor: '#4A72D4',
-
-    customClass: {
-        popup: 'rounded-3xl shadow-xl',
-        title: 'text-lg font-bold',
-        confirmButton: 'rounded-xl px-6 py-2'
-    },
-
-    showClass: {
-        popup: 'animate__animated animate__fadeInDown'
-    },
-    hideClass: {
-        popup: 'animate__animated animate__fadeOutUp'
-    }
-});
-</script>
-@endif
 
 </body>
 </html>
