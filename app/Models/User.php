@@ -38,5 +38,15 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     return $this->hasOne(Streak::class);
 }
+
+public function xpLogs()
+{
+    return $this->hasMany(UserXpLog::class);
+}
+
+public function restores()
+{
+    return $this->hasMany(StreakRestore::class);
+}
 }
 

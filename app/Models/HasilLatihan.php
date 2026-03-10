@@ -13,5 +13,6 @@ class HasilLatihan extends Model
         'benar',
         'salah',
         'kosong',
+        'list_jawaban',
     ];
 }

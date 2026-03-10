@@ -1,0 +1,157 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\StreakCharacter;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+class AdminStreakController extends Controller
+{
+    /**
+     * LIST SEMUA KARAKTER
+     */
+    public function index()
+    {
+        // Mengambil data dari yang terbaru ke terlama
+$streaks = StreakCharacter::orderBy('created_at', 'desc')->get();
+
+// Mengambil data trash dari yang dihapus paling terakhir
+$trash = StreakCharacter::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
+
+    return view('admin.streak.index', compact('streaks','trash'));
+    }
+
+    /**
+     * FORM TAMBAH KARAKTER
+     */
+    public function create()
+    {
+        // $animations = [
+        //     'bounce',
+        //     'float',
+        //     'wiggle',
+        //     'spin',
+        //     'pulse'
+        // ];
+
+        // return view('admin.streak.create', compact('animations'));
+        return view('admin.streak.create');
+    }
+
+    /**
+     * SIMPAN KARAKTER BARU
+     */
+public function store(Request $request)
+{
+    $request->validate([
+        'nama' => 'required|string|max:100',
+        'min_level' => 'required|integer|min:1',
+        'svg' => 'nullable|file|mimes:svg,xml|max:2048',
+        // 'animation' => 'nullable|in:bounce,float,wiggle,spin,pulse'
+    ]);
+
+    $svgPath = null;
+    if ($request->hasFile('svg')) {
+        $svgPath = $request->file('svg')->store('streak', 'public');
+    }
+
+ 
+
+    StreakCharacter::create([
+        'nama' => $request->nama,
+        'svg_path' => $svgPath,
+        'min_level' => $request->min_level,
+        // 'animation' => $request->animation
+    ]);
+
+    return redirect()->route('admin.streak.index')->with('success', 'Berhasil disimpan!');
+}
+
+    /**
+     * FORM EDIT KARAKTER
+     */
+    public function edit($id)
+{
+    $character = StreakCharacter::findOrFail($id);
+
+    if ($character->is_default) {
+        return redirect()->route('admin.streak.index')
+            ->with('error', 'Karakter default tidak bisa diedit.');
+    }
+
+    return view('admin.streak.edit', compact('character'));
+}
+
+public function update(Request $request, $id)
+{
+    $character = StreakCharacter::findOrFail($id);
+
+    if ($character->is_default) {
+        return redirect()->route('admin.streak.index')
+            ->with('error', 'Karakter default tidak bisa diedit.');
+    }
+
+    $request->validate([
+        'nama' => 'required|string|max:100',
+        'min_level' => 'required|integer|min:1',
+        'svg' => 'nullable|file|mimes:svg,xml|max:2048',
+    ]);
+
+    $svgPath = $character->svg_path;
+
+    if ($request->hasFile('svg')) {
+        if ($character->svg_path && Storage::disk('public')->exists($character->svg_path)) {
+            Storage::disk('public')->delete($character->svg_path);
+        }
+        $svgPath = $request->file('svg')->store('streak', 'public');
+    }
+
+    $character->update([
+        'nama' => $request->nama,
+        'svg_path' => $svgPath,
+        'min_level' => $request->min_level,
+    ]);
+
+    return redirect()->route('admin.streak.index')
+        ->with('success', 'Karakter streak berhasil diperbarui');
+}
+
+    /**
+     * HAPUS KARAKTER
+     */
+   public function destroy($id)
+{
+    $character = StreakCharacter::findOrFail($id);
+
+    if ($character->is_default) {
+        return redirect()->route('admin.streak.index')
+            ->with('error', 'Karakter default tidak bisa dihapus.');
+    }
+
+    $character->delete();
+
+    return redirect()->route('admin.streak.index')
+        ->with('success', 'Karakter streak berhasil dipindahkan ke history');
+}
+
+public function restore($id)
+{
+    $streak = StreakCharacter::onlyTrashed()->findOrFail($id);
+    $streak->restore();
+
+    return redirect()->route('admin.streak.index')->with('success', 'Pet berhasil dipulihkan!');
+}
+
+public function forceDelete($id)
+    {
+        // Ambil data yang sudah di soft delete
+        $streak = StreakCharacter::onlyTrashed()->findOrFail($id);
+
+        // Hapus permanen
+        $streak->forceDelete();
+
+        return redirect()->back()->with('success', 'Pet berhasil dihapus permanen!');
+    }
+}

@@ -19,11 +19,12 @@ use App\Http\Controllers\admin\AdminLatihanController;
 use App\Http\Controllers\admin\AdminTryoutController;
 use App\Http\Controllers\admin\AdminVideoController;
 use App\Http\Controllers\admin\AdminMinatBakatController;
+use App\Http\Controllers\admin\AdminStreakController;
 
 use App\Http\Controllers\admin\HalamanStreakController;
 use App\Http\Controllers\admin\HalamanPeluangPtnController;
 use App\Http\Controllers\admin\HalamanMonitoringLaporanController;
-
+use App\Http\Controllers\Admin\SlimeController;
 /* ===============================
    PESERTA CONTROLLERS
 ================================ */
@@ -97,6 +98,7 @@ Route::middleware(['auth'])->group(function () {
         // Monitoring Laporan
         Route::post('/monitoringLaporan/destroy-multiple', [HalamanMonitoringLaporanController::class, 'destroyMultiple'])->name('laporan.destroy-multiple');
         Route::post('/monitoringLaporan/update-status-multiple', [HalamanMonitoringLaporanController::class, 'updateStatusMultiple'])->name('laporan.update-status-multiple');
+
         Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
 
         Route::get('videoPembelajaran/history', [AdminVideoController::class, 'history'])->name('videoPembelajaran.history');
@@ -162,7 +164,6 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/kuis/force-delete/{id}', [AdminKuisController::class, 'forceDelete'])->name('kuis.forceDelete'); 
          
 
-        // Latihan
         // Latihan Soal
          Route::get('/latihan', [AdminLatihanController::class, 'index'])->name('latihan.index');
          Route::get('/latihan/create', [AdminLatihanController::class, 'create'])->name('latihan.create');
@@ -174,6 +175,16 @@ Route::middleware(['auth'])->group(function () {
          Route::post('/latihan/{id}/restore', [AdminLatihanController::class, 'restore'])->name('latihan.restore'); 
          Route::delete('/latihan/force-delete/{id}', [AdminLatihanController::class, 'forceDelete'])->name('latihan.forceDelete');
 
+        
+        //strik
+       Route::get('/streak', [AdminStreakController::class,'index'])->name('streak.index');
+    Route::get('/streak/create', [AdminStreakController::class,'create'])->name('streak.create');
+    Route::post('/streak/store', [AdminStreakController::class,'store'])->name('streak.store');
+    Route::get('/streak/edit/{id}', [AdminStreakController::class,'edit'])->name('streak.edit');
+    Route::put('/streak/update/{id}', [AdminStreakController::class,'update'])->name('streak.update');
+    Route::delete('/streak/delete/{id}', [AdminStreakController::class,'destroy'])->name('streak.delete');
+    Route::delete('/streak/{id}/force-delete', [AdminStreakController::class, 'forceDelete'])->name('streak.forceDelete');
+    Route::post('/streak/{id}/restore', [AdminStreakController::class, 'restore'])->name('streak.restore');
     });
 
 
@@ -181,7 +192,7 @@ Route::middleware(['auth'])->group(function () {
 ///////////////////////////////////
     // PESERTA
 //////////////////////////////////
-    Route::middleware(['role:peserta','verified','dailyxp'])->group(function () {
+    Route::middleware(['role:peserta','verified'])->group(function () {
 
         Route::get('/', [BerandaController::class, 'index'])->name('beranda');
         Route::get('/profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile.index');
@@ -194,6 +205,7 @@ Route::middleware(['auth'])->group(function () {
            Streak & Video
         ======================= */
         Route::get('/streak', [StreakController::class, 'index'])->name('streak.index');
+        Route::post('/streak/restore', [StreakController::class,'restore'])->name('streak.restore');
         Route::get('/video', [VideoController::class, 'index'])->name('video.index');
         Route::post('/video/ditonton/{id}', [VideoController::class, 'tonton']);
 

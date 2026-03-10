@@ -6,19 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hasil - Latihan Soal {{ $latihan->subtes }} - Set {{ $latihan->set_ke }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        /* Menghapus scroll di desktop, mengizinkan di mobile jika sangat kecil */
-        @media (min-width: 1024px) {
-            body {
-                overflow: hidden;
-            }
-        }
-
         .glass-effect {
             background: rgba(255, 255, 255, 0.96);
         }
@@ -44,25 +34,20 @@
             }
         }
     </style>
+    @vite('resources/css/app.css')
 </head>
 
-<body class="bg-slate-50 min-h-screen flex items-center justify-center relative overflow-x-hidden">
+<body class="min-h-screen font-po relative overflow-x-hidden">
 
-    <div class="blob top-0 left-0"></div>
-    <div class="blob bottom-0 right-0"
-        style="background: linear-gradient(180deg, rgba(255, 200, 0, 0.1) 0%, rgba(255, 200, 0, 0) 100%);"></div>
 
-    <div
-        class="bg-[#DAEDFE] w-full min-h-screen lg:h-screen flex flex-col items-center justify-center p-4 md:p-6 relative shadow-inner overflow-y-auto lg:overflow-hidden">
 
-        <div class="relative w-full max-w-4xl flex flex-col items-center">
+    <div class="w-full min-h-screen flex flex-col p-4 md:p-6 relative shadow-inner">
 
-            <div
-                class="hidden sm:block absolute bottom-[-10px] w-[80%] h-12 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 rounded-full shadow-lg z-0">
-            </div>
+        <div class="relative w-full max-w-[1440px] mx-auto flex flex-col items-center">
 
-            <div
-                class="relative z-10 bg-white glass-effect w-full rounded-3xl shadow-sm border border-white overflow-hidden">
+
+
+            <div class="relative z-10 bg-white glass-effect w-full rounded-3xl border border-white overflow-hidden">
                 <div class="p-5 md:p-8 flex flex-col">
 
                     <div class="flex flex-col items-center justify-center gap-2 mb-4 text-[#2d4a85]">
@@ -73,10 +58,10 @@
                                     d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
                         </div>
-                        <h2 class="text-xl md:text-2xl font-extrabold tracking-tight text-center">
-                            Hasil {{ $latihan->category->name ?? 'Kuis' }}
-                            <span class="block text-blue-500 text-base md:text-lg font-bold">Kuis Fundamental - Set
-                                {{ $latihan->set_ke }}</span>
+                        <h2 class="text-xl md:text-2xl font-extrabold tracking-tight text-center ">
+                            HASIL LATIHAN SOAL
+                            <span class="block text-blue-500 text-base md:text-lg font-bold">
+                                {{ $latihan->subtes }} - Set {{ $latihan->set_ke }}</span>
                         </h2>
                     </div>
 
@@ -84,15 +69,15 @@
                         class="mb-6 text-center bg-slate-50/50 rounded-2xl py-6 border-2 border-dashed border-blue-100">
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Skor Kamu
                         </p>
-                        <div class="text-6xl md:text-7xl font-black text-blue-500 tracking-tighter">
+                        <div class="text-6xl md:text-7xl font-black text-blue-500 ">
                             <span id="counter-score">0</span>
                         </div>
                         <p class="text-[10px] font-bold text-blue-400 mt-1">* 1 Soal = 5 Poin</p>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                    <div class="grid grid-cols-3 gap-4 sm:gap-6">
                         <div
-                            class="bg-[#66cc66] rounded-2xl p-6 min-h-[150px] sm:min-h-[150px] md:min-h-[220px] flex flex-col items-center justify-between shadow-lg transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-2xl active:scale-95">
+                            class="bg-emerald-500 rounded-2xl p-6 min-h-[150px] sm:min-h-[150px] md:min-h-[220px] flex flex-col items-center justify-between shadow-lg transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-2xl active:scale-95">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 sm:h-10 sm:w-10 text-white/90"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -100,9 +85,9 @@
                             </svg>
                             <div class="text-center">
                                 <span
-                                    class="text-4xl sm:text-3xl font-black text-white block leading-none">{{ $hasil['benar'] }}</span>
+                                    class="text-4xl sm:text-3xl font-bold text-white block leading-none">{{ $hasil['benar'] }}</span>
                                 <span
-                                    class="text-[12px] sm:text-[10px] font-bold text-white uppercase tracking-widest mt-1 block">Benar</span>
+                                    class="text-[12px] sm:text-[10px] font-semibold text-white uppercase tracking-widest mt-1 block">Benar</span>
                             </div>
                         </div>
 
@@ -115,14 +100,14 @@
                             </svg>
                             <div class="text-center">
                                 <span
-                                    class="text-4xl sm:text-3xl font-black text-white block leading-none">{{ $hasil['kosong'] }}</span>
+                                    class="text-4xl sm:text-3xl font-bold text-white block leading-none">{{ $hasil['kosong'] }}</span>
                                 <span
-                                    class="text-[12px] sm:text-[10px] font-bold text-white uppercase tracking-widest mt-1 block">Kosong</span>
+                                    class="text-[12px] sm:text-[10px] font-semibold text-white uppercase tracking-widest mt-1 block">Kosong</span>
                             </div>
                         </div>
 
                         <div
-                            class="bg-[#e65c5c] rounded-2xl p-6 min-h-[150px] sm:min-h-[150px] md:min-h-[220px] flex flex-col items-center justify-between shadow-lg  transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-2xl active:scale-95">
+                            class="bg-rose-400 rounded-2xl p-6 min-h-[150px] sm:min-h-[150px] md:min-h-[220px] flex flex-col items-center justify-between shadow-lg  transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 hover:shadow-2xl active:scale-95">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 sm:h-10 sm:w-10 text-white/90"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -130,15 +115,117 @@
                             </svg>
                             <div class="text-center">
                                 <span
-                                    class="text-4xl sm:text-3xl font-black text-white block leading-none">{{ $hasil['salah'] }}</span>
+                                    class="text-4xl sm:text-3xl font-bold text-white block leading-none">{{ $hasil['salah'] }}</span>
                                 <span
-                                    class="text-[12px] sm:text-[10px] font-bold text-white uppercase tracking-widest mt-1 block">Salah</span>
+                                    class="text-[12px] sm:text-[10px] font-semibold text-white uppercase tracking-widest mt-1 block">Salah</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex justify-center">
-                        <a href="{{ route('kuis.index') }}"
+                    <div class="mt-10 space-y-6 w-full mx-auto">
+
+                        @foreach ($latihan->questions as $index => $soal)
+                            @php
+                                // Ambil jawaban user dari array berdasarkan ID soal
+                                $userJawaban = $jawabanUser[$soal->id] ?? null;
+
+                                // Logika pengecekan yang akurat (case-insensitive & trim spasi)
+                                $isCorrect =
+                                    strtolower(trim($userJawaban ?? '')) ===
+                                    strtolower(trim($soal->jawaban_benar ?? ''));
+                            @endphp
+
+                            <div
+                                class="group bg-white rounded-[2rem] p-1 border border-pink-100 shadow-sm hover:shadow-md transition-all duration-300">
+                                <div
+                                    class="bg-white rounded-[1.8rem] p-6 border border-transparent group-hover:border-pink-50">
+
+                                    <div class="flex items-start justify-between cursor-pointer gap-4"
+                                        onclick="togglePembahasan({{ $index }})">
+
+                                        <div class="flex items-start gap-4 text-left">
+                                            <div class="flex-shrink-0 z-10">
+                                                <div
+                                                    class="w-12 h-12 flex items-center justify-center rounded-full border-4 border-white shadow-md transition-all duration-300 group-hover:scale-110 {{ $isCorrect ? 'bg-emerald-500' : 'bg-rose-400' }}">
+                                                    <span class="text-white font-black text-lg">
+                                                        {{ $index + 1 }}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="space-y-2">
+                                                <span
+                                                    class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500">
+                                                    Pertanyaan
+                                                </span>
+                                                <h3 class="text-lg font-medium text-slate-800 leading-relaxed">
+                                                    "{{ $soal->pertanyaan }}"
+                                                </h3>
+
+                                                <div class="flex flex-wrap gap-2 mt-4">
+                                                    @if ($isCorrect)
+                                                        <div
+                                                            class="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full border border-emerald-100 animate-pulse">
+                                                            <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                                            <span class="text-xs font-bold">
+                                                                Yeay! Kamu benar: {{ strtoupper($userJawaban) }} ✨
+                                                            </span>
+                                                        </div>
+                                                    @else
+                                                        <div
+                                                            class="flex items-center gap-2 bg-rose-50 text-rose-700 px-4 py-2 rounded-full border border-rose-100">
+                                                            <div class="w-2 h-2 rounded-full bg-rose-500"></div>
+                                                            <span class="text-xs font-bold">
+                                                                Ups! Jawabanmu: {{ strtoupper($userJawaban ?? '-') }}
+                                                            </span>
+                                                        </div>
+                                                        <div
+                                                            class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full border border-indigo-100">
+                                                            <span class="text-xs font-bold">
+                                                                Kunci: {{ strtoupper($soal->jawaban_benar) }}
+                                                            </span>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="bg-slate-50 p-2 rounded-xl text-slate-400 group-hover:text-pink-400 transition-colors shrink-0">
+                                            <svg id="chevron-{{ $index }}"
+                                                class="w-5 h-5 transition-transform duration-500" fill="none"
+                                                stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <div id="pembahasan-{{ $index }}"
+                                        class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out opacity-0">
+                                        <div class="mt-6 pt-6 text-left">
+                                            <div class="flex items-center gap-2 mb-3">
+                                                <span class="text-lg">💡</span>
+                                                <span class="font-bold text-slate-700 ">Yuk
+                                                    Simak Pembahasannya:</span>
+                                            </div>
+                                            <div
+                                                class="bg-gradient-to-r from-pink-50 to-transparent p-5 rounded-xl shadow-inner">
+                                                <p class="text-slate-600 leading-loose">
+                                                    {{ $soal->pembahasan }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        @endforeach
+
+                    </div>
+
+                    <div class="flex justify-center mt-6">
+                        <a href="{{ route('latihan.index') }}"
                             class="w-full py-4 bg-blue-500 text-white rounded-xl font-black text-xs hover:bg-blue-600 active:translate-y-1 transition-all text-center uppercase tracking-widest shadow-md">
                             Selesai & Keluar
                         </a>
@@ -219,6 +306,23 @@
                 }());
             }, 500);
         };
+
+        function togglePembahasan(index) {
+            const content = document.getElementById(`pembahasan-${index}`);
+            const chevron = document.getElementById(`chevron-${index}`);
+
+            if (content.style.maxHeight && content.style.maxHeight !== "0px") {
+                // Tutup
+                content.style.maxHeight = "0px";
+                content.style.opacity = "0";
+                chevron.style.transform = "rotate(0deg)";
+            } else {
+                // Buka
+                content.style.maxHeight = content.scrollHeight + "px";
+                content.style.opacity = "1";
+                chevron.style.transform = "rotate(180deg)";
+            }
+        }
     </script>
 </body>
 

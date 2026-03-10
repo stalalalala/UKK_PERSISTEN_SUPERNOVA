@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kuis;
-use App\Models\HasilKuis; 
+use App\Models\HasilKuis;
+use App\Services\XpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,23 +29,12 @@ class KuisController extends Controller
     /**
      * Halaman instruksi sebelum mulai kuis
      */
-    public function intruksi($id) {
-        $kuis = Kuis::findOrFail($id);
+    public function intruksi($id)
+{
+    $kuis = Kuis::withCount('questions')->findOrFail($id);
 
-        // BAGIAN PROTEKSI DIHAPUS/DIKOMENTARI 
-        // Agar user bisa masuk ke sini saat klik tombol "Ulang"
-        /*
-        $sudahDikerjakan = HasilKuis::where('user_id', Auth::id())
-                                    ->where('kuis_id', $id)
-                                    ->exists();
-
-        if ($sudahDikerjakan) {
-            return redirect()->route('kuis.index')->with('info', 'Kamu sudah mengerjakan kuis ini!');
-        }
-        */
-
-        return view('kuis.intruksi', compact('kuis'));
-    }
+    return view('kuis.intruksi', compact('kuis'));
+}
 
     /**
      * Halaman pengerjaan soal
@@ -116,7 +106,11 @@ class KuisController extends Controller
             'skor'    => round($skor)
         ]]);
 
-        return redirect()->route('kuis.hasil', $id);
+        $xpService = new XpService();
+        $xpService->addXp(Auth::user(), 'kuis', 20);
+
+    return redirect()->route('kuis.hasil', $id)->with('success', 'Kuis selesai +20 XP');
+
     }
 
     /**

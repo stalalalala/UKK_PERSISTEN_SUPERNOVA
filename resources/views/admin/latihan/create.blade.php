@@ -462,7 +462,7 @@
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
                 <div>
                     <h2 class="text-2xl font-extrabold text-[#4A72D4]">
-                        Kuis Fundamental - Set <span x-text="currentSet">1</span>
+                        Latihan Soal
                     </h2>
                     <p class="text-gray-400 text-sm">Persisten Admin Panel / Kuis</p>
                 </div>

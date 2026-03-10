@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AdminTryout;
 use App\Models\SoalTryout;
+use App\Services\XpService;
 use App\Models\Universitas;
 use App\Models\Prodi;
 use Illuminate\Http\Request;
@@ -132,7 +133,23 @@ class TryoutController extends Controller
                             ->orderBy('id', 'asc')
                             ->first();
 
-        return view('tryout.intruksi', compact('tryout', 'firstCategory'));
+         // 🔹 HITUNG TOTAL SOAL
+    $totalSoal = DB::table('soal_tryouts')
+        ->join('tryout_categories', 'soal_tryouts.category_id', '=', 'tryout_categories.id')
+        ->where('tryout_categories.admin_tryout_id', $id)
+        ->count();
+
+    // 🔹 HITUNG TOTAL DURASI
+    $totalDurasi = DB::table('tryout_categories')
+        ->where('admin_tryout_id', $id)
+        ->sum('durasi');
+
+    return view('tryout.intruksi', compact(
+        'tryout',
+        'firstCategory',
+        'totalSoal',
+        'totalDurasi'
+    ));
     }
 
     // --- Fungsi lainnya (soal, jeda, hasil, ranking, simpanJawaban, generateSertifikat) 
@@ -191,6 +208,10 @@ class TryoutController extends Controller
         $userRankIndex = $rankingsFull->search(fn($r) => $r->user_id == $userId);
         $userRankNumber = ($userRankIndex !== false) ? $userRankIndex + 1 : 1;
         $rankings = $rankingsFull; 
+
+        $xpService = new XpService();
+$xpService->addXp(Auth::user(), 'tryout', 50);
+
         return view('tryout.hasil', compact('tryout', 'categories', 'userAnswers', 'benar', 'salah', 'kosong', 'akurasi', 'skorTotal', 'rankings', 'userRankNumber'));
     }
 

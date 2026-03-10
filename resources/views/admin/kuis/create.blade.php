@@ -243,7 +243,6 @@
                 if (this.questions[index]) {
                     let q = this.questions[index];
 
-                    // ✅ Set dropdown ikut soal
                     this.selectedSubtes = q.subtes;
                     this.selectedWaktu = q.waktu;
 
@@ -254,6 +253,16 @@
                         opsi: [q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e],
                         benar: ['a', 'b', 'c', 'd', 'e'].indexOf(q.jawaban_benar),
                         bobot: q.bobot,
+                    };
+                } else {
+                    // ✅ RESET kalau belum ada soal
+                    this.currentQuestion = {
+                        materi: '',
+                        gambar: null,
+                        pertanyaan: '',
+                        opsi: ['', '', '', '', ''],
+                        benar: null,
+                        bobot: 1,
                     };
                 }
             },
@@ -422,14 +431,17 @@
             </nav>
 
             <form action="{{ route('logout') }}" method="POST" class="w-full inline">
-    @csrf
-    <button type="submit" class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5 md:size-6 text-white">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-        </svg>
-        <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
-    </button>
-    </form>
+                @csrf
+                <button type="submit"
+                    class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-5 md:size-6 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                    </svg>
+                    <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
+                </button>
+            </form>
         </aside>
 
         <div x-show="mobileMenuOpen" x-transition:enter="transition opacity-ease-out duration-300"
