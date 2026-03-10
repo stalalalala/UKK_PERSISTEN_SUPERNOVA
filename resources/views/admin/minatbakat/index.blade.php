@@ -178,8 +178,8 @@
 }">
 
     <div class="flex h-full w-full">
-        <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-            class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-screen overflow-y-auto">
+        <aside
+            class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
             <div class="flex items-center justify-between mb-10 px-2">
                 <div class="flex items-center gap-3">
@@ -199,22 +199,7 @@
                 </button>
             </div>
 
-            <nav
-                class="flex-1 space-y-1 overflow-y-auto pr-2 
-                [&::-webkit-scrollbar]:w-1 
-                [&::-webkit-scrollbar-track]:bg-transparent 
-                [&::-webkit-scrollbar-thumb]:bg-white/20 
-                [&::-webkit-scrollbar-thumb]:rounded-full">
-
-
-                <a href="#"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                    <div
-                        class="w-5 h-5 border-2 border-white/50 rounded group-hover:border-white transition-colors shrink-0">
-                    </div>
-                    <span class="text-md font-regular">Dashboard</span>
-                </a>
-
+            <nav class="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
                 <a href="{{ route('admin.dashboard.index') }}"
                     class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -258,7 +243,7 @@
                 </a>
 
                 <a href="{{ route('admin.kuis.index') }}"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl  transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -268,7 +253,7 @@
                 </a>
 
                 <a href="{{ route('admin.latihan.index') }}"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3  rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-7">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -277,15 +262,6 @@
                     <span class="text-md font-regular">Manajemen latihan soal</span>
                 </a>
 
-                <a href="{{ route('admin.minatBakat.index') }}" x-init="if (currentPage === 'minat_bakat') { $el.scrollIntoView({ block: 'center' }) }"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                        stroke="currentColor" class="size-7">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
-                    </svg>
-                    <span class="text-md font-regular">Manajemen minat bakat</span>
-                </a>
                 <a href="{{ route('admin.videoPembelajaran.index') }}"
                     class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -296,8 +272,9 @@
                     <span class="text-md font-regular">Manajemen video pembelajaran</span>
                 </a>
 
-                <a href="{{ route('admin.minatBakat.index') }}" x-init="if (currentPage === 'minatbakat') { $el.scrollIntoView({ block: 'center' }) }"
-                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-[#D4DEF7]  text-[#2E3B66] transition-all duration-200 group text-left">
+                <a href="{{ route('admin.minatBakat.index') }}"
+                    class="w-full flex items-center gap-4 px-4 py-3 bg-[#D4DEF7]  text-[#2E3B66] rounded-2xl transition-all duration-200 group text-left"
+                    x-init="if (currentPage === 'minat_bakat') { $el.scrollIntoView({ block: 'center' }) }">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-7">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -327,19 +304,13 @@
                     </svg>
                     <span class="text-md font-regular">Monitoring dan laporan</span>
                 </a>
+            </nav>
 
-                <form action="{{ route('logout') }}" method="POST" class="w-full inline">
-                    @csrf
-                    <button type="submit"
-                        class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="size-5 md:size-6 text-white">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-                        </svg>
-                        <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
-                    </button>
-                </form>
+            <button
+                class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
+                <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
+            </button>
         </aside>
 
         <main class="flex-1 flex flex-col min-w-0 bg-[#F8FAFF] overflow-hidden p-4 lg:p-8">
@@ -400,50 +371,44 @@
                             class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                             Cari
                         </button>
-
-                        <div class="relative w-full">
-                            <i
-                                class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" placeholder="Cari data..."
-                                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
-                        </div>
                     </div>
+                </div>
 
-                    @php
-                        use Illuminate\Support\Facades\Auth;
-                        $user = Auth::user();
-                    @endphp
-                    <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
+                @php
+                    use Illuminate\Support\Facades\Auth;
+                    $user = Auth::user();
+                @endphp
+                <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
 
-                        <div @click="open = !open"
-                            class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
+                    <div @click="open = !open"
+                        class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
                                 ml-auto md:ml-0 cursor-pointer">
 
-                            <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                                <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
-                                    alt="Admin">
-                            </div>
-
-                            <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-
-                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                        <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
+                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
+                                alt="Admin">
                         </div>
 
-                        <div x-show="open" @click.away="open = false"
-                            class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
-                            x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100"
-                            x-transition:leave="transition ease-in duration-150"
-                            x-transition:leave-start="opacity-100 transform scale-100"
-                            x-transition:leave-end="opacity-0 transform scale-95">
-                            <div class="p-4">
-                                <p class="font-semibold text-gray-700">{{ $user->name }}</p>
-                                <p class="text-sm text-gray-500">{{ $user->email }}</p>
-                                <p class="text-sm text-gray-500">{{ $user->no_hp ?? '-' }}</p>
-                            </div>
+                        <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
+
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                    </div>
+
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 transform scale-100"
+                        x-transition:leave-end="opacity-0 transform scale-95">
+                        <div class="p-4">
+                            <p class="font-semibold text-gray-700">{{ $user->name }}</p>
+                            <p class="text-sm text-gray-500">{{ $user->email }}</p>
+                            <p class="text-sm text-gray-500">{{ $user->no_hp ?? '-' }}</p>
                         </div>
                     </div>
+                </div>
             </header>
 
             <div class="flex-1 pb-8 overflow-y-auto custom-scrollbar">
