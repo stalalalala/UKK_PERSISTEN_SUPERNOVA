@@ -93,7 +93,6 @@ Route::middleware(['auth'])->group(function () {
 
             Route::resource('user', UserController::class);
 
-        Route::resource('streak', HalamanStreakController::class);
 
         // Monitoring Laporan
         Route::post('/monitoringLaporan/destroy-multiple', [HalamanMonitoringLaporanController::class, 'destroyMultiple'])->name('laporan.destroy-multiple');

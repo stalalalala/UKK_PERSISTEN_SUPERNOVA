@@ -71,45 +71,77 @@
     </style>
 </head>
 
-<body class="bg-[#F4F7FF] text-[#2D3B61] overflow-hidden" x-data="{
-    mobileMenuOpen: false,
-    currentView: 'main',
+<script>
+    function streakPageGuard() {
 
-    confirmSoftDelete(id) {
-        Swal.fire({
-            title: 'Pindahkan ke History?',
-            text: 'Pet akan dinonaktifkan sementara.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#4A72D4',
-            confirmButtonText: 'PINDAHKAN'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('delete-' + id).submit()
-            }
-        })
-    },
+        return {
 
-    confirmPermanentDelete(id) {
-        Swal.fire({
-            title: 'Hapus Permanen?',
-            text: 'Data visual pet akan hilang selamanya.',
-            icon: 'error',
-            showCancelButton: true,
-            confirmButtonColor: '#EF4444',
-            confirmButtonText: 'HAPUS SELAMANYA'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('force-' + id).submit()
+            allowLeave: false,
+
+            init() {
+
+                // trap tombol back browser
+                history.pushState(null, null, location.href)
+
+                window.addEventListener('popstate', () => {
+
+                    if (!this.allowLeave) {
+
+                        this.confirmLeave()
+
+                        history.pushState(null, null, location.href)
+
+                    }
+
+                })
+
+                // refresh / close tab
+                window.addEventListener('beforeunload', (e) => {
+
+                    if (!this.allowLeave) {
+                        e.preventDefault()
+                        e.returnValue = ''
+                    }
+
+                })
+
+            },
+
+            confirmLeave() {
+
+                Swal.fire({
+                    title: "Kembali ke halaman daftar?",
+                    text: "Perubahan data akan hilang",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#4A72D4",
+                    cancelButtonColor: "#9CA3AF",
+                    confirmButtonText: "Ya, kembali",
+                    cancelButtonText: "Tetap di sini"
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        this.allowLeave = true
+                        window.location.href = "{{ route('admin.streak.index') }}"
+
+                    }
+
+                })
+
             }
-        })
+
+        }
+
     }
-}">
+</script>
+
+<body class="bg-[#F4F7FF] text-[#2D3B61] overflow-hidden" x-data="{ ...streakPageGuard(), activeMenu: 'Manajemen Streak', mobileMenuOpen: false }" x-init="init()">
 
     <div class="flex h-screen w-full relative">
 
         <!-- SIDEBAR (TETAP SAMA) -->
-        <aside x-data="{ currentPage: 'kuis' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+        <aside x-data="{ currentPage: 'streak' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
             class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
             <div class="flex items-center justify-between mb-10 px-2">
@@ -151,8 +183,8 @@
                     <span class="text-md font-regular">Manajemen user</span>
                 </a>
 
-                <a href="{{ route('admin.streak.index') }}"
-                    class="w-full flex items-center gap-4 px-4 bg-[#D4DEF7]  text-[#2E3B66] py-3 rounded-2xl transition-all duration-200 group text-left">
+                <a href="{{ route('admin.streak.index') }}" x-init="if (currentPage === 'streak') { $el.scrollIntoView({ block: 'center' }) }"
+                    class="w-full flex items-center gap-4 px-4 py-3 bg-[#D4DEF7]  text-[#2E3B66] rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -173,7 +205,7 @@
                     <span class="text-md font-regular">Manajemen tryout</span>
                 </a>
 
-                <a href="{{ route('admin.kuis.index') }}" x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }"
+                <a href="{{ route('admin.kuis.index') }}"
                     class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl  transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-6">
@@ -184,7 +216,7 @@
                 </a>
 
                 <a href="{{ route('admin.latihan.index') }}"
-                    class="w-full flex items-center gap-4 px-4 py-3  rounded-2xl transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-7">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -236,16 +268,128 @@
                 </a>
             </nav>
 
-            <button
-                class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
-                <i class="fa-solid fa-right-from-bracket text-lg"></i>
-                <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
-            </button>
+            <form action="{{ route('logout') }}" method="POST" class="w-full inline">
+                @csrf
+                <button type="submit"
+                    class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-5 md:size-6 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                    </svg>
+                    <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
+                </button>
+            </form>
         </aside>
+
+        <div x-show="mobileMenuOpen" x-transition:enter="transition opacity-ease-out duration-300"
+            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+            x-transition:leave="transition opacity-ease-in duration-300" x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0" @click="mobileMenuOpen = false"
+            class="fixed inset-0 bg-black/50 z-40 lg:hidden">
+        </div>
 
 
         <!-- CONTENT -->
         <main class="flex-1 main-content p-6 lg:p-10 bg-[#F8FAFC]">
+            <header class="flex flex-col md:flex-row items-center justify-between pb-4 gap-4 flex-shrink-0">
+                <div class="flex items-center w-full gap-4">
+                    <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
+                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+
+                    <div x-data="{
+                        keyword: '',
+                        routes: {
+                            'dashboard': '{{ route('admin.dashboard.index') }}',
+                            'user': '{{ route('admin.user.index') }}',
+                            'streak': '{{ route('admin.streak.index') }}',
+                            'monitoring': '{{ route('admin.laporan.index') }}',
+                            'video': '{{ route('admin.videoPembelajaran.index') }}',
+                            'peluang': '{{ route('admin.peluang.index') }}',
+                            'tryout': '{{ route('admin.tryout.index') }}',
+                            'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                            'kuis': '{{ route('admin.kuis.index') }}',
+                            'latihan': '{{ route('admin.latihan.index') }}'
+                        },
+                        goToPage() {
+                            let search = this.keyword.toLowerCase()
+                    
+                            for (let key in this.routes) {
+                                if (key.includes(search)) {
+                                    window.location.href = this.routes[key]
+                                    return
+                                }
+                            }
+                    
+                            alert('Halaman tidak ditemukan')
+                        }
+                    }" class="relative w-full group flex items-center gap-2">
+
+                        <div class="relative w-full">
+
+                            <!-- ICON -->
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                </svg>
+                            </div>
+
+                            <input type="text" x-model="keyword" placeholder="Cari halaman..."
+                                @keydown.enter="goToPage()"
+                                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
+                        </div>
+
+                        <button @click="goToPage()"
+                            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
+                            Cari
+                        </button>
+
+                    </div>
+                </div>
+
+                @php
+                    use Illuminate\Support\Facades\Auth;
+                    $user = Auth::user();
+                @endphp
+                <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
+
+                    <div @click="open = !open"
+                        class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
+                                ml-auto md:ml-0 cursor-pointer">
+
+                        <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
+                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
+                                alt="Admin">
+                        </div>
+
+                        <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
+
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                    </div>
+
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 transform scale-100"
+                        x-transition:leave-end="opacity-0 transform scale-95">
+                        <div class="p-4">
+                            <p class="font-semibold text-gray-700">{{ $user->name }}</p>
+                            <p class="text-sm text-gray-500">{{ $user->email }}</p>
+                            <p class="text-sm text-gray-500">{{ $user->no_hp ?? '-' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
             <div class="w-full mx-auto">
 
                 <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
@@ -277,15 +421,15 @@
                     </div>
 
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('admin.streak.index') }}"
+                        <a href="{{ route('admin.streak.index') }}" @click.prevent="confirmLeave()"
                             class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 bg-white font-bold text-sm hover:bg-gray-50 transition-all">
                             Batal
                         </a>
                     </div>
                 </div>
 
-                <form action="{{ route('admin.streak.update', $character->id) }}" method="POST"
-                    enctype="multipart/form-data" x-data="streakForm()">
+                <form action="{{ route('admin.streak.update', $character->id) }}" @submit="allowLeave = true"
+                    method="POST" enctype="multipart/form-data" x-data="streakForm()">
                     @csrf
                     @method('PUT')
 
