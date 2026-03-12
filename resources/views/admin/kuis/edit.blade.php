@@ -524,7 +524,31 @@
                                     </div>
                             </div>
 
-                            <div class="space-y-6" x-data="{ imageUrl: null }">
+                            <div class="space-y-6" x-data="{
+                                imageUrl: null,
+                            
+                                init() {
+                                    this.updatePreview()
+                                },
+                            
+                                updatePreview() {
+                            
+                                    if (currentQuestion && currentQuestion.gambar) {
+                            
+                                        if (currentQuestion.gambar.startsWith('data:image')) {
+                                            this.imageUrl = currentQuestion.gambar
+                                        } else {
+                                            this.imageUrl = '/storage/' + currentQuestion.gambar
+                                        }
+                            
+                                    } else {
+                            
+                                        this.imageUrl = null
+                            
+                                    }
+                            
+                                }
+                            }" x-effect="updatePreview()">
 
                                 <div class="space-y-2">
                                     <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi
@@ -567,7 +591,20 @@
 
                                                     <input type="file" class="hidden" accept="image/*"
                                                         @change="const file = $event.target.files[0];
-                    if (file) { imageUrl = URL.createObjectURL(file) }">
+
+if(file){
+
+    const reader = new FileReader();
+
+    reader.onload = (e)=>{
+
+        currentQuestion.gambar = e.target.result;
+        imageUrl = e.target.result;
+
+    }
+
+    reader.readAsDataURL(file);
+}">
                                                 </label>
                                             </div>
                                         </div>
@@ -577,16 +614,20 @@
 
                                     <template x-if="imageUrl">
                                         <div class="relative mt-3 inline-block">
+
                                             <img :src="imageUrl"
                                                 class="max-h-48 rounded-2xl border-2 border-white shadow-sm ring-1 ring-gray-100">
-                                            <button @click="imageUrl = null"
-                                                class="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:scale-110 transition-all shadow-md">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
+
+                                            <button
+                                                @click="
+imageUrl=null;
+currentQuestion.gambar=null;
+markChanged();
+"
+                                                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full px-2 py-0.5 text-xs shadow hover:bg-red-600">
+                                                ✕
                                             </button>
+
                                         </div>
                                     </template>
                                 </div>

@@ -57,6 +57,35 @@
                 bobot: 1,
             },
 
+            uploadGambar(e) {
+
+                const file = e.target.files[0];
+
+                if (!file) return;
+
+                if (file.size > 1024 * 1024) {
+                    alert("Ukuran gambar maksimal 1MB");
+                    e.target.value = "";
+                    return;
+                }
+
+                const allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
+                if (!allowed.includes(file.type)) {
+                    alert("Format gambar harus PNG, JPG, atau WEBP");
+                    e.target.value = "";
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = (event) => {
+                    this.currentQuestion.gambar = event.target.result;
+                }
+
+                reader.readAsDataURL(file);
+            },
+
             importExcel(event) {
                 const file = event.target.files[0];
                 if (!file) return;
@@ -92,12 +121,12 @@
                     // =========================================
                     this.questions = jsonData.slice(0, 20).map((row) => ({
 
-                        // ❌ Jangan lagi ambil dari row
                         subtes: globalSubtes,
                         waktu: globalWaktu,
 
                         materi: row["Materi"] || "",
                         pertanyaan: row["Pertanyaan"] || "",
+                        gambar: null,
 
                         opsi_a: row["Opsi A"] || "",
                         opsi_b: row["Opsi B"] || "",
@@ -137,6 +166,7 @@
                         "Waktu",
                         "Materi",
                         "Pertanyaan",
+                        "URL Gambar",
                         "Opsi A",
                         "Opsi B",
                         "Opsi C",
@@ -151,6 +181,7 @@
                         20,
                         "Teks bacaan atau materi soal",
                         "Apa ibukota Indonesia?",
+                        "Gambar",
                         "Jakarta",
                         "Bandung",
                         "Surabaya",
@@ -191,6 +222,8 @@
                     return;
                 }
 
+
+
                 // ==========================
                 // SIMPAN BERDASARKAN NOMOR
                 // ==========================
@@ -200,7 +233,7 @@
                     subtes: this.selectedSubtes,
 
                     materi: this.currentQuestion.materi,
-                    gambar: this.currentQuestion.gambar,
+                    gambar: null,
 
                     pertanyaan: this.currentQuestion.pertanyaan,
 
@@ -239,7 +272,15 @@
 
 
             loadQuestion() {
+
                 let index = this.activeQuestion - 1;
+
+                // reset preview gambar
+                document.querySelectorAll('[x-data*="imageUrl"]').forEach(el => {
+                    if (el.__x) {
+                        el.__x.$data.imageUrl = null;
+                    }
+                });
 
                 if (this.questions[index]) {
                     let q = this.questions[index];
@@ -255,8 +296,9 @@
                         benar: ['a', 'b', 'c', 'd', 'e'].indexOf(q.jawaban_benar),
                         bobot: q.bobot,
                     };
+
                 } else {
-                    // ✅ RESET kalau belum ada soal
+
                     this.currentQuestion = {
                         materi: '',
                         gambar: null,
@@ -265,7 +307,9 @@
                         benar: null,
                         bobot: 1,
                     };
+
                 }
+
             },
 
 
@@ -274,7 +318,7 @@
 
                 let totalTerisi = this.questions.filter(q => q).length;
 
-                if (totalTerisi < 2) {
+                if (totalTerisi < 20) {
                     alert("Wajib isi 20 soal sebelum publish!");
                     return;
                 }
@@ -330,7 +374,7 @@
 
                 Swal.fire({
                     title: "Kembali ke halaman daftar?",
-                    text: "Karakter streak yang sedang dibuat akan hilang.",
+                    text: "Data kuis yang belum dipublikasikan akan hilang.",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: "#4A72D4",
@@ -785,23 +829,23 @@
                                                             class="text-[10px] font-bold text-blue-600 uppercase">Tambah
                                                             Foto</span>
                                                         <input type="file" class="hidden" accept="image/*"
-                                                            @change="
-                                                            const file = $event.target.files[0];
-                                                            if(file){
-                                                                currentQuestion.gambar = file.name;
-                                                                imageUrl = URL.createObjectURL(file);
-                                                            }
-                                                        ">
+                                                            @change="uploadGambar($event)">
 
                                                     </label>
                                                 </div>
                                             </div>
 
-                                            <template x-if="imageUrl">
+                                            @if (session('error'))
+                                                <div class="bg-red-500 text-white p-3 rounded mb-3">
+                                                    {{ session('error') }}
+                                                </div>
+                                            @endif
+
+                                            <template x-if="currentQuestion.gambar">
                                                 <div class="relative mt-3 inline-block">
-                                                    <img :src="imageUrl"
+                                                    <img :src="currentQuestion.gambar"
                                                         class="max-h-48 rounded-2xl border-2 border-white shadow-sm ring-1 ring-gray-100">
-                                                    <button @click="imageUrl = null"
+                                                    <button @click="currentQuestion.gambar = null"
                                                         class="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:scale-110 transition-all shadow-md">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3"
                                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">

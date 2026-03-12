@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -33,7 +34,7 @@
 
 
 <script>
-    function editKuisData() {
+    function editLatihanData() {
         return {
             mobileMenuOpen: false,
             showImportModal: false,
@@ -58,15 +59,81 @@
             }
         }
     }
+
+    function PageGuard() {
+
+        return {
+
+            allowLeave: false,
+
+            init() {
+
+                history.pushState({
+                    page: 1
+                }, "", location.href);
+                history.pushState({
+                    page: 2
+                }, "", location.href);
+
+                window.addEventListener("popstate", () => {
+
+                    if (!this.allowLeave) {
+                        this.confirmLeave();
+                        history.pushState({
+                            page: 2
+                        }, "", location.href);
+                    }
+
+                });
+
+                window.addEventListener("beforeunload", (e) => {
+
+                    if (!this.allowLeave) {
+                        e.preventDefault();
+                        e.returnValue = "";
+                    }
+
+                });
+
+            },
+
+            confirmLeave() {
+
+                Swal.fire({
+                    title: "Kembali ke halaman daftar?",
+                    text: "Perubahan latihan yang belum disimpan akan hilang.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#4A72D4",
+                    cancelButtonColor: "#9CA3AF",
+                    confirmButtonText: "Ya, kembali",
+                    cancelButtonText: "Tetap di sini",
+                    scrollbarPadding: false
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        this.allowLeave = true;
+                        window.location.href = "{{ route('admin.kuis.index') }}";
+
+                    }
+
+                });
+
+            }
+
+        }
+
+    }
 </script>
 
 
 
 
 
-<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="editKuisData()">
+<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="{ ...PageGuard(), ...editLatihanData() }" x-init="init()">
 
-    <div class="flex h-full w-full">
+    <div class="flex h-screen w-full relative">
         <aside x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
             class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
@@ -232,8 +299,7 @@
                         </svg>
                     </button>
 
-                  <div 
-                    x-data="{
+                    <div x-data="{
                         keyword: '',
                         routes: {
                             'dashboard': '{{ route('admin.dashboard.index') }}',
@@ -247,48 +313,37 @@
                             'kuis': '{{ route('admin.kuis.index') }}',
                             'latihan': '{{ route('admin.latihan.index') }}'
                         },
-                        goToPage(){
+                        goToPage() {
                             let search = this.keyword.toLowerCase()
-
+                    
                             for (let key in this.routes) {
                                 if (key.includes(search)) {
                                     window.location.href = this.routes[key]
                                     return
                                 }
                             }
-
+                    
                             alert('Halaman tidak ditemukan')
                         }
-                    }"
-                    class="relative w-full group flex items-center gap-2"
-                    >
+                    }" class="relative w-full group flex items-center gap-2">
 
                         <div class="relative w-full">
-                            
+
                             <!-- ICON -->
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" 
-                                    class="w-5 h-5 text-gray-500" 
-                                    fill="none"
-                                    viewBox="0 0 24 24" 
-                                    stroke="currentColor" 
-                                    stroke-width="2">
-                                    <path stroke-linecap="round" 
-                                        stroke-linejoin="round"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                                 </svg>
                             </div>
 
-                            <input 
-                                type="text"
-                                x-model="keyword"
-                                placeholder="Cari halaman..."
+                            <input type="text" x-model="keyword" placeholder="Cari halaman..."
                                 @keydown.enter="goToPage()"
                                 class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
                         </div>
 
-                        <button 
-                            @click="goToPage()"
+                        <button @click="goToPage()"
                             class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                             Cari
                         </button>
@@ -297,21 +352,22 @@
                 </div>
 
                 @php
-                use Illuminate\Support\Facades\Auth;
-                $user = Auth::user();
-            @endphp
-                    <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
-    
-                    <div @click="open = !open" 
+                    use Illuminate\Support\Facades\Auth;
+                    $user = Auth::user();
+                @endphp
+                <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
+
+                    <div @click="open = !open"
                         class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
                                 ml-auto md:ml-0 cursor-pointer">
-                        
+
                         <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" alt="Admin">
+                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
+                                alt="Admin">
                         </div>
-                        
+
                         <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-                        
+
                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                     </div>
 
@@ -342,9 +398,9 @@
 
                 <div class="flex flex-wrap gap-3 w-full lg:w-auto">
 
-                    <a href="{{ route('kuis.index') }}"
+                    <a href="{{ route('latihan.index') }}" @click.prevent="confirmLeave()"
                         class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-white hover:bg-white-600 text-emerald-600 px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95">
-                        Kembali ke kuis
+                        Kembali ke Daftar
                     </a>
 
 
