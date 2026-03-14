@@ -54,13 +54,42 @@
                 pertanyaan: '',
                 opsi: ['', '', '', '', ''],
                 benar: null,
-                bobot: 1,
+            },
+
+            autoSaveSoal() {
+
+                let index = this.activeQuestion - 1;
+
+                // jangan simpan kalau kosong
+                if (this.currentQuestion.pertanyaan.trim() === '') return;
+
+                this.questions[index] = {
+
+                    subtes: this.selectedSubtes,
+                    waktu: this.selectedWaktu,
+
+                    materi: this.currentQuestion.materi,
+                    gambar: this.currentQuestion.gambar,
+
+                    pertanyaan: this.currentQuestion.pertanyaan,
+
+                    opsi_a: this.currentQuestion.opsi[0],
+                    opsi_b: this.currentQuestion.opsi[1],
+                    opsi_c: this.currentQuestion.opsi[2],
+                    opsi_d: this.currentQuestion.opsi[3],
+                    opsi_e: this.currentQuestion.opsi[4],
+
+                    jawaban_benar: this.currentQuestion.benar !== null ? ['a', 'b', 'c', 'd', 'e'][this
+                        .currentQuestion.benar
+                    ] : null,
+
+                };
+
             },
 
             uploadGambar(e) {
 
                 const file = e.target.files[0];
-
                 if (!file) return;
 
                 if (file.size > 1024 * 1024) {
@@ -72,7 +101,7 @@
                 const allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
 
                 if (!allowed.includes(file.type)) {
-                    alert("Format gambar harus PNG, JPG, atau WEBP");
+                    alert("Format gambar harus PNG/JPG/WEBP");
                     e.target.value = "";
                     return;
                 }
@@ -80,8 +109,12 @@
                 const reader = new FileReader();
 
                 reader.onload = (event) => {
+
                     this.currentQuestion.gambar = event.target.result;
-                }
+
+                    console.log("BASE64 OK:", this.currentQuestion.gambar.substring(0, 50));
+
+                };
 
                 reader.readAsDataURL(file);
             },
@@ -119,27 +152,28 @@
                     // =========================================
                     // ✅ 2. Mapping soal TANPA ambil subtes per baris
                     // =========================================
+                    // Di dalam fungsi importExcel(event)
                     this.questions = jsonData.slice(0, 20).map((row) => ({
-
                         subtes: globalSubtes,
                         waktu: globalWaktu,
-
-                        materi: row["Materi"] || "",
+                        materi: row["Materi"] || "", // Pastikan kolom di Excel namanya tepat "Materi"
                         pertanyaan: row["Pertanyaan"] || "",
-                        gambar: null,
+                        gambar: (() => {
+                            let url = (row["URL Gambar"] || "").trim();
 
+                            if (url === "") return null;
+
+                            if (!url.startsWith("http")) return null;
+
+                            return url;
+                        })(),
                         opsi_a: row["Opsi A"] || "",
                         opsi_b: row["Opsi B"] || "",
                         opsi_c: row["Opsi C"] || "",
                         opsi_d: row["Opsi D"] || "",
                         opsi_e: row["Opsi E"] || "",
-
-                        jawaban_benar: (row["Jawaban Benar"] || "")
-                            .toString()
-                            .trim()
-                            .toLowerCase(),
-
-                        bobot: row["Bobot"] || 1,
+                        // Samakan format jawaban_benar dengan loadQuestion
+                        jawaban_benar: (row["Jawaban Benar"] || "").toString().trim().toLowerCase(),
                     }));
 
                     // =========================================
@@ -173,7 +207,6 @@
                         "Opsi D",
                         "Opsi E",
                         "Jawaban Benar",
-                        "Bobot"
                     ],
 
                     [
@@ -181,7 +214,7 @@
                         20,
                         "Teks bacaan atau materi soal",
                         "Apa ibukota Indonesia?",
-                        "Gambar",
+                        "https://i.imgur.com/contoh.jpg",
                         "Jakarta",
                         "Bandung",
                         "Surabaya",
@@ -203,6 +236,8 @@
 
 
             simpanSoal() {
+
+                this.autoSaveSoal();
 
                 // ==========================
                 // VALIDASI
@@ -231,9 +266,10 @@
 
                 this.questions[index] = {
                     subtes: this.selectedSubtes,
+                    waktu: this.selectedWaktu,
 
                     materi: this.currentQuestion.materi,
-                    gambar: null,
+                    gambar: this.currentQuestion.gambar,
 
                     pertanyaan: this.currentQuestion.pertanyaan,
 
@@ -244,7 +280,6 @@
                     opsi_e: this.currentQuestion.opsi[4],
 
                     jawaban_benar: ['a', 'b', 'c', 'd', 'e'][this.currentQuestion.benar],
-                    bobot: this.currentQuestion.bobot,
                 };
 
 
@@ -275,12 +310,7 @@
 
                 let index = this.activeQuestion - 1;
 
-                // reset preview gambar
-                document.querySelectorAll('[x-data*="imageUrl"]').forEach(el => {
-                    if (el.__x) {
-                        el.__x.$data.imageUrl = null;
-                    }
-                });
+
 
                 if (this.questions[index]) {
                     let q = this.questions[index];
@@ -294,7 +324,6 @@
                         pertanyaan: q.pertanyaan,
                         opsi: [q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e],
                         benar: ['a', 'b', 'c', 'd', 'e'].indexOf(q.jawaban_benar),
-                        bobot: q.bobot,
                     };
 
                 } else {
@@ -305,7 +334,6 @@
                         pertanyaan: '',
                         opsi: ['', '', '', '', ''],
                         benar: null,
-                        bobot: 1,
                     };
 
                 }
@@ -323,11 +351,12 @@
                     return;
                 }
 
-                // Masukkan JSON ke hidden input
+                console.log("DATA SOAL FULL:", this.questions);
+                console.log("GAMBAR SOAL 1:", this.questions[0].gambar);
+
                 document.getElementById("questions_json").value =
                     JSON.stringify(this.questions);
 
-                // Submit form
                 document.getElementById("kuisForm").submit();
             }
         }
@@ -793,7 +822,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="space-y-6" x-data="{ imageUrl: null }">
+                                    <div class="space-y-6">
 
                                         <div class="space-y-2">
                                             <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi
@@ -828,9 +857,9 @@
                                                         <span
                                                             class="text-[10px] font-bold text-blue-600 uppercase">Tambah
                                                             Foto</span>
-                                                        <input type="file" class="hidden" accept="image/*"
+                                                        <input type="file" x-ref="imageInput" class="hidden"
+                                                            accept="image/png,image/jpeg,image/jpg,image/webp"
                                                             @change="uploadGambar($event)">
-
                                                     </label>
                                                 </div>
                                             </div>
@@ -841,9 +870,9 @@
                                                 </div>
                                             @endif
 
-                                            <template x-if="currentQuestion.gambar">
+                                            <template x-if="currentQuestion.gambar !== null">
                                                 <div class="relative mt-3 inline-block">
-                                                    <img :src="currentQuestion.gambar"
+                                                    <img :src="currentQuestion.gambar" referrerpolicy="no-referrer"
                                                         class="max-h-48 rounded-2xl border-2 border-white shadow-sm ring-1 ring-gray-100">
                                                     <button @click="currentQuestion.gambar = null"
                                                         class="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:scale-110 transition-all shadow-md">
@@ -918,8 +947,7 @@
                                                         gambar: null,
                                                         pertanyaan: '',
                                                         opsi: ['', '', '', '', ''],
-                                                        benar: null,
-                                                        bobot: 1
+                                                        benar: null
                                                     }"
                                                 class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-red-400">
                                                 Reset
@@ -944,7 +972,12 @@
 
                                 <div class="grid grid-cols-5 gap-3">
                                     <template x-for="n in 20">
-                                        <button @click="activeQuestion = n; loadQuestion()"
+                                        <button
+                                            @click="
+autoSaveSoal();
+activeQuestion = n;
+loadQuestion();
+window.scrollTo({top:0,behavior:'smooth'})"
                                             :class="{
                                                 'bg-blue-500 text-white': activeQuestion === n,
                                                 'bg-emerald-500 text-white': questions[n - 1]?.pertanyaan,
@@ -969,7 +1002,7 @@
                                 </div>
 
                                 <button type="button" @click="submitFinal()"
-                                    :disabled="questions.filter(q => q).length < 2"
+                                    :disabled="questions.filter(q => q?.pertanyaan).length < 20"
                                     class="w-full mt-6 bg-emerald-500 text-white py-3 rounded-xl font-bold disabled:opacity-40 disabled:cursor-not-allowed">
                                     Publikasikan Kuis
                                 </button>

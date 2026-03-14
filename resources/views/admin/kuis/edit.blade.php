@@ -45,10 +45,16 @@
             selectedWaktu: @json($kuis->durasi),
 
             activeQuestion: @json($questions->first()['id'] ?? null),
-            questions: @json($questions),
+            questions: @json($questions).map(q => ({
+                ...q
+            })), // deep copy tiap soal
 
             get currentQuestion() {
                 return this.questions.find(q => q.id === this.activeQuestion);
+            },
+            set currentQuestion(val) {
+                const index = this.questions.findIndex(q => q.id === this.activeQuestion);
+                if (index !== -1) this.questions[index] = val;
             },
 
             markChanged() {
@@ -94,6 +100,24 @@
 
                 });
 
+            },
+
+            uploadGambar(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    // Validasi ukuran (opsional tapi disarankan)
+                    if (file.size > 2 * 1024 * 1024) { // 2MB
+                        alert('File terlalu besar, maksimal 2MB');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        // Ini akan menimpa URL lama (Imgur) dengan string Base64 baru
+                        this.currentQuestion.gambar = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
             },
 
             confirmLeave() {
@@ -425,8 +449,8 @@
                                         <div class="p-3 bg-blue-50 rounded-2xl text-[#4A72D4]">
                                             <i class="fa-solid fa-pen-nib text-xl"></i>
                                         </div>
-                                        <h3 class="text-xl font-bold text-gray-800">Ubah Soal Nomor <span
-                                                x-text="questions.findIndex(q => q.id === activeQuestion) + 1"></span>
+                                        <h3 class="text-xl font-bold text-gray-800">
+                                            Ubah Soal Nomor <span x-text="activeQuestionIndex + 1"></span>
                                         </h3>
                                     </div>
                                 </div>
@@ -526,29 +550,21 @@
 
                             <div class="space-y-6" x-data="{
                                 imageUrl: null,
-                            
-                                init() {
-                                    this.updatePreview()
-                                },
-                            
+                                init() { this.updatePreview(); },
                                 updatePreview() {
-                            
-                                    if (currentQuestion && currentQuestion.gambar) {
-                            
-                                        if (currentQuestion.gambar.startsWith('data:image')) {
-                                            this.imageUrl = currentQuestion.gambar
-                                        } else {
-                                            this.imageUrl = '/storage/' + currentQuestion.gambar
-                                        }
-                            
-                                    } else {
-                            
-                                        this.imageUrl = null
-                            
+                                    if (!this.currentQuestion || !this.currentQuestion.gambar) {
+                                        this.imageUrl = null;
+                                        return;
                                     }
-                            
+                                    let img = this.currentQuestion.gambar;
+                                    if (img.startsWith('data:image') || img.startsWith('http')) {
+                                        this.imageUrl = img;
+                                    } else {
+                                        this.imageUrl = '/storage/' + img;
+                                    }
                                 }
-                            }" x-effect="updatePreview()">
+                            }" x-effect="updatePreview()"
+                                x-watch:activeQuestion="updatePreview()">
 
                                 <div class="space-y-2">
                                     <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi
@@ -589,22 +605,20 @@
                                                         Ubah Foto
                                                     </span>
 
-                                                    <input type="file" class="hidden" accept="image/*"
-                                                        @change="const file = $event.target.files[0];
-
-if(file){
-
-    const reader = new FileReader();
-
-    reader.onload = (e)=>{
-
-        currentQuestion.gambar = e.target.result;
-        imageUrl = e.target.result;
-
-    }
-
-    reader.readAsDataURL(file);
-}">
+                                                    <input type="file" class="hidden" x-ref="imageInput"
+                                                        accept="image/png,image/jpeg,image/jpg,image/webp"
+                                                        @change="
+        const file = $event.target.files[0];
+        if(!file) return;
+        if(file.size > 2*1024*1024){ alert('Ukuran gambar maksimal 2MB'); return; }
+        const reader = new FileReader();
+        reader.onload = (e)=>{
+            currentQuestion.gambar = e.target.result;
+            imageUrl = e.target.result; // hanya soal aktif
+            markChanged();
+        }
+        reader.readAsDataURL(file);
+">
                                                 </label>
                                             </div>
                                         </div>
@@ -612,22 +626,20 @@ if(file){
                                     </div>
 
 
-                                    <template x-if="imageUrl">
+                                    <template x-if="currentQuestion.gambar">
                                         <div class="relative mt-3 inline-block">
-
-                                            <img :src="imageUrl"
+                                            <img :src="imageUrl" referrerpolicy="no-referrer"
                                                 class="max-h-48 rounded-2xl border-2 border-white shadow-sm ring-1 ring-gray-100">
 
                                             <button
                                                 @click="
-imageUrl=null;
-currentQuestion.gambar=null;
-markChanged();
+    currentQuestion.gambar = null;
+    imageUrl = null;
+    markChanged();
 "
-                                                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full px-2 py-0.5 text-xs shadow hover:bg-red-600">
-                                                ✕
+                                                class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-all">
+                                                <i class="fa-solid fa-xmark text-[10px]"></i>
                                             </button>
-
                                         </div>
                                     </template>
                                 </div>
@@ -732,7 +744,7 @@ markChanged();
 
                             <div class="grid grid-cols-5 gap-3">
                                 <template x-for="q in questions" :key="q.id">
-                                    <button @click="activeQuestion = q.id"
+                                    <button @click="activeQuestion = q.id; updateStatuses()"
                                         :class="{
                                             // Warna Biru jika Aktif
                                             'bg-[#4A72D4] text-white shadow-lg shadow-blue-200 ring-2 ring-offset-2 ring-blue-400': activeQuestion ===
