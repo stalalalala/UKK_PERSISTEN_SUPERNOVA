@@ -34,9 +34,18 @@ class ProfileController extends Controller
 
     $request->validate([
         'name'     => 'required|string|max:255',
-        'no_hp'    => 'nullable|string|max:20',
+        'no_hp'    => 'required|numeric|digits_between:11,100', 
         'photo'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        'password' => 'nullable|min:6|confirmed',
+        'password' => [
+            'nullable',
+            'min:6', 
+            'confirmed',
+            'regex:/[0-9]/',      
+            'regex:/[@$!%*#?&]/', 
+        ],
+    ], [
+        'password.regex' => 'Password baru harus mengandung minimal satu angka dan satu simbol.',
+        'no_hp.digits_between' => 'Nomor HP minimal harus 11 karakter.',
     ]);
 
     $user->name = $request->name;
@@ -47,11 +56,9 @@ class ProfileController extends Controller
     }
 
     if ($request->hasFile('photo')) {
-
         if ($user->photo && file_exists(public_path('storage/'.$user->photo))) {
             unlink(public_path('storage/'.$user->photo));
         }
-
         $path = $request->file('photo')->store('profile', 'public');
         $user->photo = $path;
     }
@@ -60,5 +67,4 @@ class ProfileController extends Controller
 
     return back()->with('success', 'Profil berhasil diperbarui');
 }
-
 }

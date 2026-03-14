@@ -256,14 +256,15 @@ Route::middleware(['auth'])->group(function () {
 // ==============================
 // EMAIL VERIFICATION
 // ==============================
-Route::middleware('auth')->group(function () {
+// 1. PINDAHKAN VERIFY KE LUAR (Agar bisa diklik di HP tanpa login)
+Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
 
+// 2. SISANYA TETAP DI DALAM AUTH (Karena butuh login untuk akses halaman/tombolnya)
+Route::middleware('auth')->group(function () {
     Route::get('/email/verify', [EmailVerificationController::class, 'notice'])
         ->name('verification.notice');
-
-    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
 
     Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
         ->middleware('throttle:6,1')

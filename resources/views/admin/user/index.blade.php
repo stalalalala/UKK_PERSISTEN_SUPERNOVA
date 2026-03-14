@@ -217,26 +217,28 @@
                 </div>
 
                 @php
-                use Illuminate\Support\Facades\Auth;
-                $user = Auth::user();
-            @endphp
-                    <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
-    
+                    use Illuminate\Support\Facades\Auth;
+                    $user = Auth::user();
+                    $firstName = explode(' ', trim($user->name))[0];
+                @endphp
+
+                <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
+
                     <div @click="open = !open" 
                         class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
                                 ml-auto md:ml-0 cursor-pointer">
                         
                         <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" alt="Admin">
+                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=random' }}" alt="User Photo">
                         </div>
                         
-                        <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
+                        <span class="font-bold text-sm hidden sm:block text-gray-700">{{ $firstName }}</span>
                         
                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                     </div>
 
-                    <div x-show="open" @click.away="open = false" :class="{ 'block': open }"
-                        class="absolute hidden right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
                         x-transition:enter="transition ease-out duration-200"
                         x-transition:enter-start="opacity-0 transform scale-95"
                         x-transition:enter-end="opacity-100 transform scale-100"
@@ -254,7 +256,7 @@
 
     <h2 class="text-2xl font-semibold text-slate-700 mb-6">Manajemen User</h2>
 
-    <div x-data="userTableApp()" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden">
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden">
         
         <div class="flex gap-6 mb-6 border-b border-gray-100">
             <button @click="tab='admin'" :class="tab==='admin' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-400 hover:text-gray-600'" class="pb-3 text-sm font-bold transition-all">Admin</button>
@@ -264,7 +266,9 @@
 
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <div class="relative w-full md:w-80">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <div class="absolute left-4 inset-y-0 flex items-center">
+                    <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
+                </div>
                 <input type="text"
                 x-model="search"
                 :placeholder="tab === 'admin' ? 'Search Admin....' : (tab === 'peserta' ? 'Search Peserta....' : 'Search History....')"
@@ -282,10 +286,10 @@
                     <tr>
                         <th class="p-4 text-left font-bold">ID</th>
                         <th class="p-4 text-left font-bold">Nama</th>
-                        <th class="p-4 text-left font-bold" x-text="tab === 'history' ? 'Status Hapus' : 'Status'">Status</th>
+                        <th class="p-4 text-left font-bold">Email</th>
                         <th class="p-4 text-left font-bold" x-text="tab === 'history' ? 'Modul' : 'No HP'">No HP</th>
                         <th class="p-4 text-left font-bold" x-text="tab === 'history' ? 'Waktu Hapus' : 'Bergabung'">Bergabung</th>
-                        <th class="p-4 text-left font-bold">Aksi</th>
+                        <th class="p-4 text-left font-bold" x-show="tab !== 'peserta'">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -312,11 +316,7 @@
                 </div>
             </td>
 
-            <td class="p-4">
-                <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-[11px] font-bold">
-                    Aktif
-                </span>
-            </td>
+            <td class="p-4 font-semibold text-slate-700" x-text="user.email"></td>
 
             <td class="p-4 text-gray-500" x-text="user.no_hp"></td>
 
@@ -331,7 +331,7 @@
                         @click="editData({
                             id: user.id,
                             nama: user.name,
-                            wa: user.no_hp,
+                            no_hp: user.no_hp,
                             email: user.email
                         })"
                         class="px-3 py-1 bg-yellow-400 text-white rounded-lg text-xs font-semibold hover:bg-yellow-500">
@@ -369,11 +369,7 @@
 
             <td class="p-4 font-semibold text-slate-700" x-text="user.name"></td>
 
-            <td class="p-4">
-                <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-[11px] font-bold">
-                    Aktif
-                </span>
-            </td>
+            <td class="p-4 font-semibold text-slate-700" x-text="user.email"></td>
 
             <td class="p-4 text-gray-500" x-text="user.no_hp"></td>
 
@@ -381,22 +377,6 @@
                 x-text="new Date(user.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })">
             </td>
 
-            <td class="p-4">
-                <div class="flex gap-2">
-
-                    <button 
-                        @click="
-                            selectedId = user.id;
-                            selectedName = user.name;
-                            isTrashed = user.deleted_at ? true : false;
-                            showDeleteConfirm = true;
-                        "
-                        class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
-                        Hapus
-                    </button>
-
-                </div>
-            </td>
 
         </tr>
     </template>
@@ -415,11 +395,7 @@
 
             <td class="p-4 font-semibold text-slate-700" x-text="user.name"></td>
 
-            <td class="p-4">
-                <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[11px] font-bold">
-                    Terhapus
-                </span>
-            </td>
+             <td class="p-4 font-semibold text-slate-700" x-text="user.email"></td>
 
             <td class="p-4 text-gray-500 font-medium"
                 x-text="user.role.toUpperCase()">
@@ -436,7 +412,7 @@
                     <form :action="`/admin/user/${user.id}/restore`" method="POST">
                         @csrf
                         <button type="submit"
-                            class="px-3 py-1 bg-green-500 text-white rounded-lg text-xs font-semibold hover:bg-green-600">
+                            class="px-3 py-2 bg-green-500 text-white rounded-lg text-xs font-semibold hover:bg-green-600">
                             Pulihkan
                         </button>
                     </form>
@@ -483,6 +459,7 @@
             <form class="space-y-4 pr-1"
                   method="POST"
                   enctype="multipart/form-data"
+                  autocomplete="off"
                   :action="isEdit 
                     ? '/admin/user/' + form.id 
                     : '{{ route('admin.user.store') }}'">
@@ -515,13 +492,24 @@
                                class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
                     </div>
 
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">
-                            No HP
-                        </label>
-                        <input type="text" name="no_hp"
-                               x-model="form.wa"
-                               class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                    <div x-data="{ hpError: '' }" class="space-y-1">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">
+                                No HP
+                                </label>
+
+                                <input type="text"
+                                name="no_hp"
+                                x-model="form.no_hp"
+
+                                @input="
+                                form.no_hp = form.no_hp.replace(/[^0-9]/g,'');
+                                hpError = (form.no_hp.length > 0 && form.no_hp.length < 11) 
+                                    ? 'Minimal 11 digit' 
+                                    : '';
+                                "
+                            class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+
+                        <p x-text="hpError" class="text-red-500 text-[11px]"></p>
                     </div>
                 </div>
 
@@ -532,67 +520,65 @@
                     </label>
                     <input type="email" name="email"
                            x-model="form.email"
+                           autocomplete="off"
                            class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
                 </div>
 
                 {{-- PASSWORD --}}
-               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <!-- Password -->
-                <div x-data="{ password: '', passwordError: '', show: false }" class="space-y-1 relative">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Kata Sandi</label>
-                    <input :type="show ? 'text' : 'password'" name="password" x-model="password"
-                        @input="passwordError = password.length >= 6 || password.length === 0 ? '' : 'Minimal 6 karakter'"
-                        class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none pr-10">
-                    <button type="button" @click="show = !show"
-                        class="absolute right-3 top-[32px] text-gray-400">
-                        <template x-if="!show">
-                            <!-- Icon mata tertutup -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-9 0-1.135.204-2.22.575-3.225M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </template>
-                        <template x-if="show">
-                            <!-- Icon mata terbuka -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                        </template>
-                    </button>
-                    <p x-text="passwordError" class="text-red-600 text-[11px] mt-1"></p>
-                </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div x-data="{ password: '', passwordError: '', show: false }" class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Kata Sandi</label>
 
-            <!-- Konfirmasi Password -->
-                    <div x-data="{ showConfirm: false }" class="space-y-1 relative">
+                        <div class="relative">
+                            <input 
+                                :type="show ? 'text' : 'password'"
+                                name="password"
+                                autocomplete="new-password"
+                                x-model="password"
+                                @input="
+                                    const hasNumber = /[0-9]/.test(password);
+                                    const hasSymbol = /[^A-Za-z0-9]/.test(password);
+
+                                    if(password.length === 0){
+                                        passwordError = '';
+                                    } 
+                                    else if(password.length < 6){
+                                        passwordError = 'Minimal 6 karakter';
+                                    }
+                                    else if(!hasNumber){
+                                        passwordError = 'Harus mengandung angka';
+                                    }
+                                    else if(!hasSymbol){
+                                        passwordError = 'Wajib ada simbol(@$!%*#?&)';
+                                    }
+                                    else{
+                                        passwordError = '';
+                                    }
+                                "
+                                class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none pr-10"
+                            >
+
+                            <button type="button" @click="show = !show"
+                                class="absolute right-3 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition-colors">
+                                <i class="fa-solid" :class="show ? 'fa-eye' : 'fa-eye-slash'"></i>
+                            </button>
+                        </div>
+
+                        <p x-text="passwordError" class="text-red-600 text-[11px] mt-1 ml-1"></p>
+                    </div>
+
+                    <div x-data="{ showConfirm: false }" class="space-y-1">
                         <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Konfirmasi Sandi</label>
-                        <input :type="showConfirm ? 'text' : 'password'" name="password_confirmation"
-                            class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none pr-10">
-                        <button type="button" @click="showConfirm = !showConfirm"
-                            class="absolute right-3 top-[32px] text-gray-400">
-                            <template x-if="!showConfirm">
-                                <!-- Icon mata tertutup -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-9 0-1.135.204-2.22.575-3.225M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </template>
-                            <template x-if="showConfirm">
-                                <!-- Icon mata terbuka -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </template>
-                        </button>
+                        
+                        <div class="relative">
+                            <input :type="showConfirm ? 'text' : 'password'" name="password_confirmation"
+                                class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none pr-10">
+                            
+                            <button type="button" @click="showConfirm = !showConfirm"
+                                class="absolute right-3 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition-colors">
+                                <i class="fa-solid" :class="showConfirm ? 'fa-eye' : 'fa-eye-slash'"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -702,9 +688,44 @@
     "
 ></div>
 @endif
+
+@if(session('error'))
+<div 
+    x-data
+    x-init="
+        Swal.fire({
+            icon: 'error',
+            title: '{{ session('error') }}',
+
+            width: '340px',
+            padding: '1.8rem',
+
+            background: '#ffffff',
+            color: '#334155',
+
+            confirmButtonText: 'Coba Lagi',
+            confirmButtonColor: '#ef4444',
+
+            customClass: {
+                popup: 'rounded-3xl shadow-xl',
+                title: 'text-lg font-bold',
+                confirmButton: 'rounded-xl px-6 py-2'
+            },
+
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        })
+    "
+></div>
+@endif
 <script>
 function userApp() {
     return {
+    mobileMenuOpen: false,
         tab: 'admin',
         search: '', 
         admins: @json($admins),
@@ -756,7 +777,7 @@ function userApp() {
             this.isEdit = true;
             this.form.id = data.id;
             this.form.nama = data.nama;
-            this.form.wa = data.wa;
+            this.form.no_hp = data.no_hp;
             this.form.email = data.email;
             this.openModal = true;
         },

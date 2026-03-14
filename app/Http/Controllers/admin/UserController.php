@@ -19,10 +19,10 @@ class UserController extends Controller
     */
     public function index()
     {
-        return view('admin.user.index', [
-            'admins'   => User::where('role', 'admin')->get(),
-            'pesertas' => User::where('role', 'peserta')->get(),
-            'history'  => User::onlyTrashed()->get()
+       return view('admin.user.index', [
+            'admins'   => User::where('role', 'admin')->latest()->get(),
+            'pesertas' => User::where('role', 'peserta')->latest()->get(),
+            'history'  => User::onlyTrashed()->latest()->get()
         ]);
     }
 
@@ -49,9 +49,14 @@ class UserController extends Controller
     try {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
-            'no_hp' => 'nullable|string|max:20',
+            'email' => 'required|email',
+            'password' => [
+                'required',
+                'min:6',
+                'regex:/^(?=.*[0-9])(?=.*[\W]).+$/',
+                'confirmed'
+            ],
+            'no_hp' => 'nullable|digits_between:11,100',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
@@ -83,9 +88,10 @@ class UserController extends Controller
     | UPDATE (Edit Admin)
     |--------------------------------------------------------------------------
     */
-    public function update(Request $request, User $user)
-    {
-       
+   public function update(Request $request, User $user)
+{
+    try {
+
         if ($user->role !== 'admin') {
             abort(403);
         }
@@ -93,15 +99,19 @@ class UserController extends Controller
         $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email,' . $user->id,
-            'password'  => 'nullable|min:6|confirmed',
-            'no_hp'     => 'nullable|string|max:20',
-            'photo'     => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'password'  => [
+                'nullable', 
+                'min:6',
+                'regex:/^(?=.*[0-9])(?=.*[\W]).+$/',
+                'confirmed'
+            ],
+            'no_hp' => 'nullable|digits_between:11,100',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
         // Upload foto baru
         if ($request->hasFile('photo')) {
 
-            // Hapus foto lama kalau ada
             if ($user->photo && Storage::disk('public')->exists($user->photo)) {
                 Storage::disk('public')->delete($user->photo);
             }
@@ -122,8 +132,14 @@ class UserController extends Controller
         $user->save();
 
         $this->logAktivitas('UPDATE ADMIN', $user->name, "Melakukan pembaruan data profil admin");
+
         return back()->with('success', 'Admin berhasil diupdate');
+
+    } catch (\Exception $e) {
+
+        return back()->with('error', 'Gagal memperbarui data admin');
     }
+}
 
     /*
     |--------------------------------------------------------------------------

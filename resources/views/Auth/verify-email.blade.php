@@ -4,9 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verifikasi Email</title>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+     @vite('resources/css/app.css')
 </head>
-<body class="bg-blue-50 font-poppins min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+<body class="font-po bg-blue-50 font-poppins min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
 
     <div class="bg-white 
                 rounded-3xl shadow-xl 
@@ -58,38 +63,73 @@
         @endif
 
         <!-- Tombol kirim ulang -->
-        <form method="POST" action="{{ route('verification.send') }}">
-            @csrf
-            <button type="submit"
-                class="w-full 
-                       bg-blue-400 hover:bg-blue-500 
-                       text-white font-semibold 
-                       py-2 sm:py-3 
-                       text-sm sm:text-base
-                       rounded-2xl shadow-md 
-                       transition-colors">
-                Kirim Ulang Link Verifikasi
-            </button>
-        </form>
+        <div x-data="{ 
+    canResend: true, 
+    timer: 0,
+    storageKey: 'verification_expiry',
 
-        <!-- Tombol logout -->
-        <form method="POST" action="{{ route('logout') }}" class="mt-3 sm:mt-4">
-            @csrf
-            <button type="submit"
-                class="w-full 
-                       bg-gray-400 hover:bg-gray-500 
-                       text-white font-semibold 
-                       py-2 sm:py-3 
-                       text-sm sm:text-base
-                       rounded-2xl shadow-md 
-                       transition-colors">
-                Kembali ke Halaman Masuk
-            </button>
-        </form>
+    init() {
+        // Cek apakah ada waktu kedaluwarsa yang tersimpan saat halaman dimuat
+        const expiry = localStorage.getItem(this.storageKey);
+        if (expiry) {
+            const remaining = Math.floor((parseInt(expiry) - Date.now()) / 1000);
+            if (remaining > 0) {
+                this.startCountdown(remaining);
+            } else {
+                localStorage.removeItem(this.storageKey);
+            }
+        }
+    },
 
-        <p class="text-blue-300 text-xs sm:text-sm mt-5 sm:mt-6">
-            Terima kasih telah mendaftar! 😊
-        </p>
+    startTimer() {
+        // Set waktu kedaluwarsa 60 detik dari sekarang
+        const expiryTime = Date.now() + (60 * 1000);
+        localStorage.setItem(this.storageKey, expiryTime);
+        this.startCountdown(60);
+    },
+
+    startCountdown(seconds) {
+        this.canResend = false;
+        this.timer = seconds;
+        
+        let interval = setInterval(() => {
+            this.timer--;
+            if (this.timer <= 0) {
+                this.canResend = true;
+                clearInterval(interval);
+                localStorage.removeItem(this.storageKey);
+            }
+        }, 1000);
+    }
+}">
+    <form method="POST" action="{{ route('verification.send') }}" @submit="startTimer()">
+        @csrf
+        <button type="submit"
+            :disabled="!canResend"
+            :class="!canResend ? 'bg-gray-300 cursor-not-allowed text-gray-500' : 'bg-blue-400 hover:bg-blue-500 text-white'"
+            class="w-full font-semibold py-2 sm:py-3 text-sm sm:text-base rounded-2xl shadow-md transition-colors">
+            
+            <span x-show="canResend">Kirim Ulang Link Verifikasi</span>
+            
+            <span x-show="!canResend" x-cloak>Tunggu <span x-text="timer"></span> detik</span>
+        </button>
+    </form>
+</div>
+
+       
+        <form method="POST" action="{{ route('logout') }}" class="mt-4">
+    @csrf
+    <button type="submit"
+        class="w-full flex items-center justify-center gap-2
+               bg-gray-100 hover:bg-gray-200 
+               text-gray-600 font-semibold 
+               py-2 sm:py-3 
+               text-sm sm:text-base
+               rounded-xl transition-all duration-300">
+        <i class="fa-solid fa-arrow-left"></i>
+        Kembali ke Halaman Masuk
+    </button>
+</form>
 
     </div>
 

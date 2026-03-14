@@ -358,7 +358,7 @@
 <div class="grid grid-cols-12 gap-6">
     <div class="col-span-12 lg:col-span-7 space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white rounded-[20px] p-6 shadow-sm flex items-center gap-6 border border-blue-50">
+            <div class="bg-white rounded-[20px] p-6 lg:p-2 shadow-sm flex items-center gap-6 border border-blue-50">
                 <div class="w-14 h-14 bg-[#A6C1FF] rounded-full shrink-0 flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#4A72D4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9.003 9.003 0 0112 15c2.21 0 4.21.896 5.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -370,7 +370,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-[20px] p-6 shadow-sm border border-blue-50">
+            <div class="bg-white rounded-[20px] p-6 lg:p-2 shadow-sm border border-blue-50">
                 <div class="flex items-center gap-6">
                     <div class="w-14 h-14 bg-[#5BB58D] rounded-full shrink-0 flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
