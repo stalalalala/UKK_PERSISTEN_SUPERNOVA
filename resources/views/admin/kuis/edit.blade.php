@@ -36,27 +36,21 @@
 <script>
     function editKuisData() {
         return {
-            mobileMenuOpen: false,
-            showImportModal: false,
-            currentPage: 'kuis',
-            activeMenu: "Manajemen Kuis",
-            currentSet: @json($kuis->set_ke),
+            // ... state menu lainnya
+            questions: @json($questions), // Pastikan ini array soal yang lengkap
+            activeQuestionId: @json($questions->first()->id ?? null),
 
-            selectedWaktu: @json($kuis->durasi),
-
-            activeQuestion: @json($questions->first()['id'] ?? null),
-            questions: @json($questions).map(q => ({
-                ...q
-            })), // deep copy tiap soal
-
+            // Getter untuk mengambil referensi soal yang sedang aktif
             get currentQuestion() {
-                return this.questions.find(q => q.id === this.activeQuestion);
-            },
-            set currentQuestion(val) {
-                const index = this.questions.findIndex(q => q.id === this.activeQuestion);
-                if (index !== -1) this.questions[index] = val;
+                return this.questions.find(q => q.id === this.activeQuestionId) || {};
             },
 
+            // Fungsi untuk navigasi
+            selectQuestion(id) {
+                this.activeQuestionId = id;
+            },
+
+            // Panggil fungsi ini di setiap input @input="markChanged()"
             markChanged() {
                 if (this.currentQuestion) {
                     this.currentQuestion.status = "changed";

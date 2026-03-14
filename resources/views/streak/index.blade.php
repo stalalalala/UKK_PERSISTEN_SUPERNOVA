@@ -43,8 +43,8 @@
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="inline" id="logout-form">
                         @csrf
-                        <button type="submit" 
-                                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
+                        <button type="submit"
+                            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -244,9 +244,19 @@
                 <div
                     class="bg-white/20 backdrop-blur-sm rounded-[2.5rem] p-6 md:p-8 border-2 border-blue-200 shadow-inner h-full flex flex-col overflow-hidden">
 
+
                     <div
                         class="absolute -right-8 top-0 md:right-4 md:top-4 opacity-30 md:opacity-80 pointer-events-none">
-                        <img src="{{ asset('img/slime-tp.png') }}" class="w-32 md:w-64 h-auto object-contain">
+                        @if ($currentStreak)
+                            {{-- Tampilkan karakter saat ini --}}
+                            <img src="{{ asset('storage/' . $nextEvolution->svg_path) }}"
+                                class="w-32 md:w-64 h-auto object-contain">
+                        @elseif($nextEvolution)
+                            {{-- Jika belum punya, tampilkan siluet karakter berikutnya --}}
+                            <img src="{{ asset('storage/' . $currentStreak->svg_path) }}"
+                                class="w-32 md:w-64 h-auto object-contain"
+                                style="filter: grayscale(100%) brightness(0%); opacity: 0.5;">
+                        @endif
                     </div>
 
                     <div class="mb-4 relative z-10">
@@ -345,26 +355,36 @@
 
                 </div>
             </div>
+        </div>
 
+
+
+        @if ($nextEvolution)
             <div
-                class="mt-10 glass-card rounded-[2rem] p-4 md:p-6 border-2 border-white/40 flex flex-col md:flex-row items-center justify-between group hover:border-blue-300 transition-all shadow-lg relative overflow-hidden">
+                class="mt-10 glass-card rounded-[2rem] p-4 md:p-6 border-2 border-white/40 flex flex-col md:flex-row items-center justify-between group transition-all shadow-lg relative overflow-hidden">
                 <div class="flex items-center gap-5 relative z-10 w-full md:w-auto">
-                    <div class="bg-blue-100 p-3 md:p-4 rounded-2xl"><i
-                            class="fa-solid fa-lock text-blue-400 text-xl md:text-2xl"></i></div>
+                    <div class="bg-blue-100 p-3 md:p-4 rounded-2xl">
+                        <i class="fa-solid fa-lock text-blue-400 text-xl md:text-2xl"></i>
+                    </div>
                     <div>
-                        <h3 class="text-[#2E3B66] font-black text-base md:text-lg leading-none">Evolusi Berikutnya
-                            <span class="text-xs font-bold text-gray-500 ml-2">(Lv 5)</span>
+                        <h3 class="text-[#2E3B66] font-black text-base md:text-lg leading-none">
+                            Evolusi Berikutnya
+                            <span class="text-xs font-bold text-gray-500 ml-2">(Lv
+                                {{ $nextEvolution->min_level }})</span>
                         </h3>
-                        <p class="text-blue-800/60 text-xs md:text-sm font-semibold mt-1">Capai <span
-                                class="text-blue-600 font-black">Level 5</span> untuk membuka bentuk baru!</p>
+                        <p class="text-blue-800/60 text-xs md:text-sm font-semibold mt-1">
+                            Capai <span class="text-blue-600 font-black">Level {{ $nextEvolution->min_level }}</span>
+                            untuk membuka bentuk baru!
+                        </p>
                     </div>
                 </div>
-                <div
-                    class="absolute right-[-10px] md:right-[15%] pointer-events-none transition-all duration-700 group-hover:scale-110 opacity-20 md:opacity-100">
-                    <img src="{{ asset('img/slime-tp2.png') }}"
-                        class="w-32 md:w-64 lg:w-80 h-auto object-contain grayscale group-hover:grayscale-0">
+
+                <div class="absolute right-[-10px] md:right-[5%] pointer-events-none opacity-40">
+                    <img src="{{ asset('storage/' . $nextEvolution->svg_path) }}"
+                        class="w-32 md:w-48 h-auto object-contain" style="filter: brightness(0%) contrast(100%);">
                 </div>
             </div>
+        @endif
     </main>
 
     @include('layouts.footer')
