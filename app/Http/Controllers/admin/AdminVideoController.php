@@ -12,9 +12,8 @@ class AdminVideoController extends Controller
 {
     public function index()
     {
-        $videos  = AdminVideo::all();              // Video aktif
-        $history = AdminVideo::onlyTrashed()->get(); // Video dihapus sementara
-
+       $videos  = AdminVideo::latest()->get();              
+       $history = AdminVideo::onlyTrashed()->latest('deleted_at')->get(); 
         return view('admin.video.index', compact('videos', 'history'));
     }
 
@@ -35,13 +34,14 @@ class AdminVideoController extends Controller
      * Simpan video baru.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'subtes'      => 'required',
-            'judul_video' => 'required',
-            'iframe'      => 'required', 
-        ]);
+{
+    $request->validate([
+        'subtes'      => 'required',
+        'judul_video' => 'required',
+        'iframe'      => 'required', 
+    ]);
 
+    try {
         $video = AdminVideo::create([
             'subtes'      => $request->subtes,
             'judul_video' => $request->judul_video,
@@ -50,7 +50,10 @@ class AdminVideoController extends Controller
 
         $this->logAktivitas('TAMBAH VIDEO', $video->judul_video, "Menambahkan video pembelajaran baru pada subtes {$video->subtes}");
         return redirect()->back()->with('success', 'Video berhasil ditambahkan!');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Gagal menyimpan data video!');
     }
+}
 
     public function import(Request $request)
 {
@@ -82,21 +85,24 @@ class AdminVideoController extends Controller
      * Update video.
      */
     public function update(Request $request, $id)
-    {
-        $video = AdminVideo::findOrFail($id);
+{
+    $video = AdminVideo::findOrFail($id);
 
-        $request->validate([
-            'subtes'      => 'required',
-            'judul_video' => 'required',
-            'iframe'      => 'required', 
-        ]);
+    $request->validate([
+        'subtes'      => 'required',
+        'judul_video' => 'required',
+        'iframe'      => 'required', 
+    ]);
 
+    try {
         $video->update($request->only(['subtes', 'judul_video', 'iframe'])); 
 
         $this->logAktivitas('UPDATE VIDEO', $video->judul_video, "Memperbarui detail informasi video pembelajaran");
-
         return redirect()->back()->with('success', 'Video berhasil diperbarui!');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Gagal memperbarui data video!');
     }
+}
 
     /**
      * Hapus sementara (soft delete).

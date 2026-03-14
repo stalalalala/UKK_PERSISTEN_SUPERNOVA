@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar - Web UTBK</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     @vite('resources/css/app.css')
 </head>
@@ -48,21 +49,41 @@
                     <div class="space-y-2">
                         <label class="block text-gray-500 font-bold ml-1">Nama pengguna</label>
                         <input type="text" name="name" value="{{ old('name') }}"
-                            placeholder="contoh" 
+                            placeholder="contoh"
+                            autocomplete="off" 
                             class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white">
                         @error('name')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
+                   
                     {{-- No HP --}}
-                    <div class="space-y-2">
+                    <div class="space-y-2" x-data="{ hp: '{{ old('no_hp') }}', hpError: '' }">
                         <label class="block text-gray-500 font-bold ml-1">No telepon</label>
-                        <input type="text" name="no_hp" value="{{ old('no_hp') }}"
+                        
+                        <input type="text" 
+                            name="no_hp" 
                             placeholder="081234567890" 
-                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white">
+                            x-model="hp"
+                          
+                            @input="
+                                hp = hp.replace(/[^0-9]/g, ''); 
+                                if (hp.length > 0 && hp.length < 11) {
+                                    hpError = 'Nomor HP minimal 11 digit (Baru: ' + hp.length + ')';
+                                } else {
+                                    hpError = '';
+                                }
+                            "
+                            class="w-full px-6 py-4 rounded-2xl border-2 transition-all bg-white focus:outline-none focus:ring-4 focus:ring-blue-100"
+                            :class="hpError ? 'border-red-500' : 'border-[#4A9FFF]'">
+
+                        
+                        <p x-show="hpError" x-text="hpError" class="text-red-500 text-xs mt-1 ml-2 font-semibold italic"></p>
+                        
+                        
                         @error('no_hp')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-xs mt-1 ml-2 font-semibold italic">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
@@ -73,7 +94,8 @@
                     <div class="space-y-2">
                         <label class="block text-gray-500 font-bold ml-1">Email</label>
                         <input type="email" name="email" value="{{ old('email') }}"
-                            placeholder="contoh@gmail.com" 
+                            placeholder="contoh@gmail.com"
+                            autocomplete="off" 
                             class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white">
                         @error('email')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -81,66 +103,47 @@
                     </div>
 
                    
-                     <div x-data="{ showPassword: false, showConfirm: false }" class="space-y-6">
-                    <!-- Buat Sandi -->
-                    <div class="space-y-2 relative">
+                    <div x-data="{ showPassword: false, showConfirm: false }" class="space-y-6">
+                    <div x-data="{ password: '', passwordError: '' }" class="space-y-2">
                         <label class="block text-gray-500 font-bold ml-1">Buat sandi</label>
-                        <input :type="showPassword ? 'text' : 'password'" name="password"
-                            placeholder="xxxxxxxx"
-                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white tracking-widest pr-12">
-                        <button type="button" @click="showPassword = !showPassword"
-                            class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                            <template x-if="!showPassword">
-                                <!-- Icon mata tertutup -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-9 0-1.135.204-2.22.575-3.225M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </template>
-                            <template x-if="showPassword">
-                                <!-- Icon mata terbuka -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </template>
-                        </button>
-                        @error('password')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        
+                        <div class="relative">
+                            <input :type="showPassword ? 'text' : 'password'" 
+                                name="password"
+                                placeholder="xxxxxxxx"
+                                autocomplete="new-password"
+                                x-model="password"
+                                @input="
+                                    passwordError = (password.length < 6) ? 'Minimal 6 karakter' : 
+                                                    (!/[0-9]/.test(password)) ? 'Wajib ada angka' : 
+                                                    (!/[^A-Za-z0-9]/.test(password)) ? 'Wajib ada simbol(@$!%*#?&)' : '';
+                                "
+                                class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white pr-12">
+                            
+                            {{-- Tombol Mata Font Awesome --}}
+                            <button type="button" @click="showPassword = !showPassword"
+                                    class="absolute right-4 top-0 h-full flex items-center text-gray-400 focus:outline-none hover:text-[#4A9FFF] transition-colors">
+                                <i class="fa-solid text-lg" :class="showPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
+                            </button>
+                        </div>
+                        <p x-show="passwordError" x-text="passwordError" class="text-red-500 text-xs mt-1 font-semibold italic ml-2"></p>
                     </div>
 
-                    <!-- Konfirmasi Sandi -->
-                    <div class="space-y-2 relative">
+                    <div class="space-y-2">
                         <label class="block text-gray-500 font-bold ml-1">Konfirmasi sandi</label>
-                        <input :type="showConfirm ? 'text' : 'password'" name="password_confirmation"
-                            placeholder="xxxxxxxx"
-                            class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white tracking-widest pr-12">
-                        <button type="button" @click="showConfirm = !showConfirm"
-                            class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                            <template x-if="!showConfirm">
-                                <!-- Icon mata tertutup -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-9 0-1.135.204-2.22.575-3.225M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                            </template>
-                            <template x-if="showConfirm">
-                                <!-- Icon mata terbuka -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </template>
-                        </button>
+                        
+                        <div class="relative">
+                            <input :type="showConfirm ? 'text' : 'password'" 
+                                name="password_confirmation"
+                                placeholder="xxxxxxxx"
+                                class="w-full px-6 py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white tracking-widest pr-12">
+                            
+                            {{-- Tombol Mata Font Awesome --}}
+                            <button type="button" @click="showConfirm = !showConfirm"
+                                    class="absolute right-4 top-0 h-full flex items-center text-gray-400 focus:outline-none hover:text-[#4A9FFF] transition-colors">
+                                <i class="fa-solid text-lg" :class="showConfirm ? 'fa-eye' : 'fa-eye-slash'"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 

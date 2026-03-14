@@ -13,16 +13,23 @@ class PasswordForgotController extends Controller
         return view('auth.lupa-password');
     }
 
-    public function sendLink(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email'
-        ]);
+   public function sendLink(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email'
+    ], [
+        'email.required' => 'Email wajib diisi.',
+        'email.email' => 'Format email tidak valid.'
+    ]);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+    $status = Password::sendResetLink(
+        $request->only('email')
+    );
 
-        return back()->with('status', __($status));
+    if ($status === Password::RESET_LINK_SENT) {
+        return back()->with('status', 'Link reset password sudah dikirim ke email Anda!');
     }
+
+    return back()->withErrors(['email' => 'Alamat email tidak terdaftar di sistem kami.']);
+}
 }

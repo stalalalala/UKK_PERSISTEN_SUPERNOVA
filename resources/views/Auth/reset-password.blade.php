@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+     @vite('resources/css/app.css')
 </head>
-<body class="bg-blue-50 flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
+<body class="font-po bg-blue-50 flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
 
 <div class="bg-white 
             w-full 
@@ -21,131 +25,64 @@
         Reset Password
     </h2>
 
-    <form method="POST" action="{{ route('password.update') }}">
-        @csrf
 
-        <input type="hidden" name="token" value="{{ $token }}">
+<form method="POST" action="{{ route('password.update') }}">
+    @csrf
+    <input type="hidden" name="token" value="{{ $token }}">
 
-        <input type="email" name="email" required placeholder="Email"
-            class="w-full px-4 py-2 sm:py-3 border rounded-xl mb-4 text-sm sm:text-base">
+    <input type="email" name="email" required placeholder="Email"
+        class="w-full px-4 py-2 sm:py-3 border-2 border-blue-400 rounded-xl mb-4 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-100">
 
-        <div x-data="{ showPassword: false, showConfirm: false }" class="space-y-4">
+    <div x-data="{ password: '', passwordError: '', showPassword: false, showConfirm: false }" class="space-y-4">
 
-            <!-- PASSWORD BARU -->
+        {{-- Input Password Baru --}}
+        <div class="space-y-1">
             <div class="relative">
                 <input
                     :type="showPassword ? 'text' : 'password'"
                     name="password"
+                    x-model="password"
+                    @input="
+                        passwordError = (password.length < 6) ? 'Minimal 6 karakter' : 
+                                        (!/[0-9]/.test(password)) ? 'Wajib ada angka' : 
+                                        (!/[^A-Za-z0-9]/.test(password)) ? 'Wajib ada simbol(@$!%*#?&)' : '';
+                    "
                     required
                     placeholder="Password Baru"
-                    class="w-full px-4 py-2 sm:py-3 border rounded-xl pr-12 
-                           text-sm sm:text-base
-                           focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+                    class="w-full px-4 py-2 sm:py-3 border-2 rounded-xl pr-12 text-sm sm:text-base focus:outline-none transition-all"
+                    :class="passwordError ? 'border-red-500' : 'border-blue-400 focus:ring-2 focus:ring-blue-100'">
 
-                <button type="button"
-                    @click="showPassword = !showPassword"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 
-                           text-gray-400 hover:text-blue-500 transition">
-
-                    <svg x-show="!showPassword"
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5 sm:h-6 sm:w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5
-                            c4.477 0 8.268 2.943 9.542 7
-                            -1.274 4.057-5.065 7-9.542 7
-                            -4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-
-                    <svg x-show="showPassword"
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5 sm:h-6 sm:w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13.875 18.825A10.05 10.05 0 0112 19
-                            c-4.477 0-8.268-2.943-9.542-7
-                            a9.956 9.956 0 012.043-3.368
-                            m3.1-2.42A9.953 9.953 0 0112 5
-                            c4.477 0 8.268 2.943 9.542 7
-                            a9.965 9.965 0 01-4.132 5.411
-                            M15 12a3 3 0 00-3-3
-                            m0 0a3 3 0 00-3 3
-                            m3-3l6 6" />
-                    </svg>
+                <button type="button" @click="showPassword = !showPassword"
+                    class="absolute right-4 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition">
+                    <i class="fa-solid" :class="showPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
                 </button>
             </div>
+            <p x-show="passwordError" x-text="passwordError" class="text-red-500 text-[10px] md:text-xs font-semibold italic ml-2"></p>
+        </div>
 
-            <!-- KONFIRMASI PASSWORD -->
-            <div class="relative">
-                <input
-                    :type="showConfirm ? 'text' : 'password'"
-                    name="password_confirmation"
-                    required
-                    placeholder="Konfirmasi Password"
-                    class="w-full px-4 py-2 sm:py-3 border rounded-xl pr-12 
-                           text-sm sm:text-base
-                           focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
+        {{-- Konfirmasi Password --}}
+        <div class="relative">
+            <input
+                :type="showConfirm ? 'text' : 'password'"
+                name="password_confirmation"
+                required
+                placeholder="Konfirmasi Password"
+                class="w-full px-4 py-2 sm:py-3 border-2 border-blue-400 rounded-xl pr-12 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-100 transition">
 
-                <button type="button"
-                    @click="showConfirm = !showConfirm"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 
-                           text-gray-400 hover:text-blue-500 transition">
-
-                    <svg x-show="!showConfirm"
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5 sm:h-6 sm:w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M2.458 12C3.732 7.943 7.523 5 12 5
-                            c4.477 0 8.268 2.943 9.542 7
-                            -1.274 4.057-5.065 7-9.542 7
-                            -4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-
-                    <svg x-show="showConfirm"
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5 sm:h-6 sm:w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13.875 18.825A10.05 10.05 0 0112 19
-                            c-4.477 0-8.268-2.943-9.542-7
-                            a9.956 9.956 0 012.043-3.368
-                            m3.1-2.42A9.953 9.953 0 0112 5
-                            c4.477 0 8.268 2.943 9.542 7
-                            a9.965 9.965 0 01-4.132 5.411
-                            M15 12a3 3 0 00-3-3
-                            m0 0a3 3 0 00-3 3
-                            m3-3l6 6" />
-                    </svg>
-                </button>
-            </div>
-
+            <button type="button" @click="showConfirm = !showConfirm"
+                class="absolute right-4 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition">
+                <i class="fa-solid" :class="showConfirm ? 'fa-eye' : 'fa-eye-slash'"></i>
+            </button>
         </div>
 
         <div class="pt-4">
             <button type="submit"
-                class="w-full bg-blue-500 text-white 
-                       py-2 sm:py-3 
-                       text-sm sm:text-base
-                       rounded-xl hover:bg-blue-600 transition">
+                class="w-full bg-blue-500 text-white py-2 sm:py-3 text-sm sm:text-base rounded-xl hover:bg-blue-600 transition font-bold shadow-lg shadow-blue-100">
                 Reset Password
             </button>
         </div>
-
-    </form>
+    </div>
+</form>
 </div>
 
 </body>

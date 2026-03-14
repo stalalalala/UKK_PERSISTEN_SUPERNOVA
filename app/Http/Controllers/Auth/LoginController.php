@@ -21,29 +21,41 @@ class LoginController extends Controller
     }
 
     public function register(Request $request)
-    {
-        $request->validate([
-            'name'     => 'required|string|max:255',
-            'no_hp'    => 'required|string|max:20',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
-        ]);
+{
 
-        $user = User::create([
+    $request->validate([
+        'name'     => 'required|string|max:255',
+        'no_hp' => 'required|numeric|digits_between:11,100',
+        'email'    => 'required|email|unique:users,email',
+        'password' => [
+            'required',
+            'min:6', 
+            'confirmed',
+            'regex:/[0-9]/',      
+            'regex:/[@$!%*#?&]/', 
+        ],
+    ], [
+        'password.regex' => 'Password harus mengandung minimal satu angka dan satu simbol.',
+        'no_hp.min' => 'Nomor HP minimal harus 11 karakter.',
+    ]);
+
+    $user = User::create([
         'name' => $request->name,
         'no_hp' => $request->no_hp,
         'email' => $request->email,
         'password' => Hash::make($request->password),
         'role' => 'peserta',
-]);
+    ]);
 
-$user->sendEmailVerificationNotification();
+    Auth::login($user); 
 
-return redirect()->route('verification.notice')
-    ->with('success', 'Silakan verifikasi email terlebih dahulu.');
-    }
+    // Kirim Email
+    $user->sendEmailVerificationNotification();
 
-    // ==============================
+    return redirect()->route('verification.notice'); 
+}
+
+      // ==============================
     // LOGIN MANUAL
     // ==============================
     public function showLoginForm()

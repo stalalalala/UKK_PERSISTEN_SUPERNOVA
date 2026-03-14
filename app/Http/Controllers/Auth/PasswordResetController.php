@@ -21,8 +21,16 @@ class PasswordResetController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|confirmed|min:6',
-        ]);
+            'password' => [
+            'required',
+            'min:6', 
+            'confirmed',
+            'regex:/[0-9]/',      
+            'regex:/[@$!%*#?&]/', 
+        ],
+    ], [
+        'password.regex' => 'Password baru harus mengandung minimal satu angka dan satu simbol.',
+    ]);
 
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),

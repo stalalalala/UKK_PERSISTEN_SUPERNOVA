@@ -220,7 +220,7 @@ class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-
                     </div>
                 </div>
 
-                @php
+                 @php
                 use Illuminate\Support\Facades\Auth;
                 $user = Auth::user();
             @endphp
@@ -239,8 +239,8 @@ class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-
                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                     </div>
 
-                    <div x-show="open" @click.away="open = false" :class="{ 'block': open }"
-                        class="absolute hidden right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
                         x-transition:enter="transition ease-out duration-200"
                         x-transition:enter-start="opacity-0 transform scale-95"
                         x-transition:enter-end="opacity-100 transform scale-100"
@@ -378,8 +378,8 @@ class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-
                             <td class="p-4 text-center space-x-2">
                                 <button @click="handleRestore('{{ $item->id }}')"
                                     class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
-    </svg></button>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                </svg></button>
                                 <button @click="handleForceDelete('{{ $item->id }}')"
                                     class=" text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -407,44 +407,48 @@ class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-
             </div>
 
             <form :action="isEditVideo ? `/admin/videoPembelajaran/${videoData.id}` : '{{ route('admin.videoPembelajaran.store') }}'" method="POST">
-                @csrf
-                <template x-if="isEditVideo">
-                    <input type="hidden" name="_method" value="PUT">
-                </template>
+    @csrf
+    <template x-if="isEditVideo">
+        <input type="hidden" name="_method" value="PUT">
+    </template>
 
-                <div class="space-y-1 mb-3">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Kategori Subtes</label>
-                    <select name="subtes" x-model="videoData.subtes" class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none appearance-none">
-                        <option value="">Pilih Subtes</option>
-                        <option>Penalaran Umum</option>
-                        <option>Pengetahuan dan Pemahaman Umum</option>
-                        <option>Pemahaman Bacaan dan Menulis</option>
-                        <option>Pengetahuan Kuantitatif</option>
-                        <option>Penalaran Matematika</option>
-                        <option>Literasi dalam Bahasa Indonesia</option>
-                        <option>Literasi dalam Bahasa Inggris</option>
-                    </select>
-                </div>
+    <div class="space-y-1 mb-3">
+        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Kategori Subtes</label>
+        <select name="subtes" x-model="videoData.subtes" 
+            class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none appearance-none"
+            required> <option value="">Pilih Subtes</option>
+            <option>Penalaran Umum</option>
+            <option>Pengetahuan dan Pemahaman Umum</option>
+            <option>Pemahaman Bacaan dan Menulis</option>
+            <option>Pengetahuan Kuantitatif</option>
+            <option>Penalaran Matematika</option>
+            <option>Literasi dalam Bahasa Indonesia</option>
+            <option>Literasi dalam Bahasa Inggris</option>
+        </select>
+    </div>
 
-                <div class="space-y-1 mb-3">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Judul Video</label>
-                    <input type="text" name="judul_video" x-model="videoData.judul_video" class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" placeholder="Masukkan judul video..." required>
-                </div>
+    <div class="space-y-1 mb-3">
+        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Judul Video</label>
+        <input type="text" name="judul_video" x-model="videoData.judul_video" 
+            class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" 
+            placeholder="Masukkan judul video..." 
+            required> </div>
 
-                <div class="space-y-1 mb-6">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Iframe Video</label>
-                    <textarea name="iframe" x-model="videoData.iframe" 
-                        class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" 
-                        placeholder='<iframe width="560" height="315" src="https://www.youtube.com/embed/..." frameborder="0" allowfullscreen></iframe>'
-                        rows="4"
-                        required></textarea>
-                </div>
+    <div class="space-y-1 mb-6">
+        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Iframe Video</label>
+        <textarea name="iframe" x-model="videoData.iframe" 
+            class="w-full bg-[#F3F6FF] border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none" 
+            placeholder='<iframe ...></iframe>'
+            rows="4"
+            required
+            oninput="validateIframe(this)"></textarea> <p class="text-[10px] text-red-500 mt-1 hidden" id="iframe-error">Input harus berupa tag &lt;iframe&gt; yang valid.</p>
+    </div>
 
-                <div class="flex gap-3">
-                    <button type="button" @click="closeModal()" class="flex-1 bg-slate-50 text-slate-400 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition-all">Batal</button>
-                    <button type="submit" class="flex-1 bg-[#4A72D4] text-white font-bold py-3.5 rounded-2xl hover:bg-blue-600 shadow-lg shadow-blue-100 transition-all active:scale-95">Simpan</button>
-                </div>
-            </form>
+    <div class="flex gap-3">
+        <button type="button" @click="closeModal()" class="flex-1 bg-slate-50 text-slate-400 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition-all">Batal</button>
+        <button type="submit" class="flex-1 bg-[#4A72D4] text-white font-bold py-3.5 rounded-2xl hover:bg-blue-600 shadow-lg shadow-blue-100 transition-all active:scale-95">Simpan</button>
+    </div>
+</form>
         </div>
     </div>
 
@@ -483,16 +487,15 @@ class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-
             </div>
 
             <div class="mt-8 p-4 bg-emerald-50 rounded-2xl flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-circle-info text-emerald-500"></i>
-                    <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-tight">Belum punya formatnya?</span>
-                </div>
-                <a href="https://docs.google.com/spreadsheets/d/1fETPSBkIrL-oo-xsghGYZiJh665qYPuaQP2a1pizft4/copy"
-                   target="_blank"
-                   class="text-[11px] font-black text-emerald-600 hover:underline">
-                    DOWNLOAD TEMPLATE
-                </a>
-            </div>
+    <div class="flex items-center gap-3">
+        <i class="fa-solid fa-circle-info text-emerald-500"></i>
+        <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-tight">Belum punya formatnya?</span>
+    </div>
+    <button @click="unduhTemplate()" 
+        class="text-[11px] font-black text-emerald-600 hover:underline cursor-pointer uppercase">
+        Unduh Template Excel
+    </button>
+</div>
 
             <div class="grid grid-cols-2 gap-4 mt-8">
                 <button @click="closeImportModal()"
@@ -543,6 +546,40 @@ class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-
 ></div>
 @endif
 
+@if(session('error'))
+<div 
+    x-data
+    x-init="
+        Swal.fire({
+            icon: 'error',
+            title: '{{ session('error') }}',
+
+            width: '340px',
+            padding: '1.8rem',
+
+            background: '#ffffff',
+            color: '#334155',
+
+            confirmButtonText: 'Coba Lagi',
+            confirmButtonColor: '#ef4444',
+
+            customClass: {
+                popup: 'rounded-3xl shadow-xl',
+                title: 'text-lg font-bold',
+                confirmButton: 'rounded-xl px-6 py-2'
+            },
+
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        })
+    "
+></div>
+@endif
+
 <script>
 function videoApp() {
     return {
@@ -568,7 +605,6 @@ function videoApp() {
         closeModal() {
             this.openModalVideo = false;
         },
-
         openImportModal() {
             this.openImportModalVideo = true;
         },
@@ -576,24 +612,48 @@ function videoApp() {
             this.openImportModalVideo = false;
         },
 
+        // ================= EXCEL LOGIC =================
+        unduhTemplate() {
+            const wb = XLSX.utils.book_new();
+
+            // 1. Sheet Utama
+            const header = [['subtes', 'judul_video', 'iframe']];
+            const dummyData = [['Penalaran Umum', 'Contoh Judul Video', '<iframe src="..."></iframe>']];
+            const ws = XLSX.utils.aoa_to_sheet([...header, ...dummyData]);
+
+            // 2. Sheet Dropdown Referensi
+            const daftarSubtes = [
+                ['Penalaran Umum'], ['Pengetahuan dan Pemahaman Umum'], ['Pemahaman Bacaan dan Menulis'],
+                ['Pengetahuan Kuantitatif'], ['Penalaran Matematika'], ['Literasi dalam Bahasa Indonesia'],
+                ['Literasi dalam Bahasa Inggris']
+            ];
+            const wsLookup = XLSX.utils.aoa_to_sheet(daftarSubtes);
+            XLSX.utils.book_append_sheet(wb, ws, "Template Video");
+            XLSX.utils.book_append_sheet(wb, wsLookup, "Daftar_Subtes");
+
+            // 3. Tambahkan Dropdown pada Kolom A
+            if (!ws['!dataValidation']) ws['!dataValidation'] = [];
+            ws['!dataValidation'].push({
+                sqref: 'A2:A100',
+                type: 'list',
+                formula1: 'Daftar_Subtes!$A$1:$A$7'
+            });
+
+            ws['!cols'] = [{ wch: 30 }, { wch: 35 }, { wch: 70 }];
+            XLSX.writeFile(wb, 'Template_Video_Pembelajaran.xlsx');
+        },
+
         handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = (e) => {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
-
-                const sheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-                // Kirim ke backend Laravel menggunakan pola Alpine terintegrasi
                 this.sendImportData(jsonData);
             };
-
             reader.readAsArrayBuffer(file);
         },
 
@@ -610,85 +670,64 @@ function videoApp() {
 
                 if (response.ok) {
                     Swal.fire({
-                        title: 'Berhasil!',
-                        text: 'Data berhasil diimport',
                         icon: 'success',
-                        customClass: { popup: 'rounded-3xl' }
+                        title: 'Data berhasil diimport',
+                        width: '340px',
+                        padding: '1.8rem',
+                        confirmButtonColor: '#4A72D4',
+                        customClass: {
+                            popup: 'rounded-3xl shadow-xl',
+                            title: 'text-lg font-bold',
+                            confirmButton: 'rounded-xl px-6 py-2'
+                        }
                     }).then(() => location.reload());
-                }
+                } else { throw new Error(); }
             } catch (error) {
-                console.error("Import error:", error);
-                Swal.fire('Gagal!', 'Terjadi kesalahan saat import data', 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Data Gagal Tersimpan!',
+                    width: '340px',
+                    confirmButtonColor: '#ef4444',
+                    customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold' }
+                });
             }
         },
 
-        // ================= CRUD =================
+        // ================= CRUD (UKURAN 340px) =================
         handleDelete(id) {
             Swal.fire({
                 title: 'Hapus Video?',
-                text: "Data akan dipindahkan ke tab history.",
+                width: '340px',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Hapus!',
-                cancelButtonText: 'Batal',
-                customClass: {
-                    popup: 'rounded-3xl',
-                    confirmButton: 'rounded-xl px-4 py-2',
-                    cancelButton: 'rounded-xl px-4 py-2'
-                }
-            }).then((result) => {
-                if(result.isConfirmed) {
-                   
-                    this.$refs['formDelete' + id].submit();
-                }
-            });
+                confirmButtonText: 'Hapus',
+                customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold' }
+            }).then((result) => { if(result.isConfirmed) this.$refs['formDelete' + id].submit(); });
         },
 
         handleRestore(id) {
             Swal.fire({
-                title: 'Pulihkan Video?',
-                text: "Data akan dikembalikan ke daftar video.",
+                title: 'Pulihkan?',
+                width: '340px',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#22c55e',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Pulihkan!',
-                cancelButtonText: 'Batal',
-                customClass: {
-                    popup: 'rounded-3xl',
-                    confirmButton: 'rounded-xl px-4 py-2',
-                    cancelButton: 'rounded-xl px-4 py-2'
-                }
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    this.$refs['formRestore' + id].submit();
-                }
-            });
-        },
-
-        handleForceDelete(id) {
-            Swal.fire({
-                title: 'Hapus Permanen?',
-                text: "Data akan dihapus permanen dan tidak bisa dikembalikan!",
-                icon: 'error',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Hapus Permanen!',
-                cancelButtonText: 'Batal',
-                customClass: {
-                    popup: 'rounded-3xl',
-                    confirmButton: 'rounded-xl px-4 py-2',
-                    cancelButton: 'rounded-xl px-4 py-2'
-                }
-            }).then((result) => {
-                if(result.isConfirmed) {
-                    this.$refs['formForceDelete' + id].submit();
-                }
-            });
+                customClass: { popup: 'rounded-3xl shadow-xl' }
+            }).then((result) => { if(result.isConfirmed) this.$refs['formRestore' + id].submit(); });
         }
+    }
+}
+
+function validateIframe(el) {
+    const errorMsg = document.getElementById('iframe-error');
+    const iframePattern = /<iframe.*?>.*?<\/iframe>/i;
+    if (el.value && !iframePattern.test(el.value)) {
+        el.setCustomValidity("Wajib tag <iframe>");
+        errorMsg.classList.remove('hidden');
+    } else {
+        el.setCustomValidity(""); 
+        errorMsg.classList.add('hidden');
     }
 }
 </script>
