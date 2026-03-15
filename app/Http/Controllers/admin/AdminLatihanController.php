@@ -82,7 +82,7 @@ $subtesMap = [
         'opsi_e' => $q->opsi_e,
 
         'jawaban_benar' => $q->jawaban_benar,
-        'pembahasan' => $q->pembahasan,
+        'pembahasan' => $q->pembahasan ?? null,
 
         'status' => 'original'
     ];
@@ -106,7 +106,7 @@ public function update(Request $request, $id)
 ]);
 
 
-    if ($request->questions_json) {
+    if ($request->filled('questions_json')) {
 
         $questions = json_decode($request->questions_json, true);
 
@@ -115,8 +115,11 @@ public function update(Request $request, $id)
             $question = $latihans->questions()->where('id', $q['id'])->first();
 
             if ($question) {
-                $gambarPath = $question->gambar;
+                $gambarPath = $question->gambar; // default gambar lama
 
+// =========================
+// BASE64 IMAGE
+// =========================
 if (!empty($q['gambar']) && str_starts_with($q['gambar'], 'data:image')) {
 
     if (preg_match('/^data:image\/(\w+);base64,/', $q['gambar'], $type)) {
@@ -140,6 +143,10 @@ if (!empty($q['gambar']) && str_starts_with($q['gambar'], 'data:image')) {
     }
 
 }
+
+// =========================
+// URL IMAGE
+// =========================
 elseif (!empty($q['gambar']) && filter_var($q['gambar'], FILTER_VALIDATE_URL)) {
 
     $gambarPath = $q['gambar'];
@@ -171,7 +178,7 @@ elseif (!empty($q['gambar']) && filter_var($q['gambar'], FILTER_VALIDATE_URL)) {
 
     return redirect()
         ->route('admin.latihan.index')
-        ->with('success', 'Kuis berhasil diperbarui!');
+        ->with('success', 'Latihan berhasil diperbarui!');
 }
 
     // ============================
@@ -192,10 +199,12 @@ elseif (!empty($q['gambar']) && filter_var($q['gambar'], FILTER_VALIDATE_URL)) {
     public function store(Request $request)
     {
         $request->validate([
-            'subtes' => 'required',
-            'durasi' => 'required|integer',
-            'questions_json' => 'required'
-        ]);
+    'subtes' => 'required',
+    'durasi' => 'required|integer',
+    'materi' => 'nullable',
+    'video_url' => 'nullable',
+    'questions_json' => 'required'
+]);
 
         $questions = json_decode($request->questions_json, true);
 
@@ -210,14 +219,16 @@ $lastSet = Latihan::where('subtes', $request->subtes)
 $setKe = $lastSet ? $lastSet + 1 : 1;
 
         // Simpan Header Latihan
-        $latihan = Latihan::create([
-            'judul'        => "Latihan " . $request->subtes . " Set $setKe",
-            'subtes'       => $request->subtes,
-            'set_ke'       => $setKe,
-            'durasi'       => $request->durasi,
-            'is_active'    => true,
-            'is_published' => true,
-        ]);
+       $latihan = Latihan::create([
+    'judul'        => "Latihan " . $request->subtes . " Set $setKe",
+    'subtes'       => $request->subtes,
+    'set_ke'       => $setKe,
+    'durasi'       => $request->durasi,
+    'materi'       => $request->materi,
+    'video_url'    => $request->video_url,
+    'is_active'    => true,
+    'is_published' => true,
+]);
 
         // Simpan Butir Soal
         foreach ($questions as $q) {

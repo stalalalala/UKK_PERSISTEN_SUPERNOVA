@@ -49,10 +49,24 @@
 
             currentQuestion: {
                 materi: '',
+                gambar: '',
                 pertanyaan: '',
                 opsi: ['', '', '', '', ''],
                 benar: null,
                 pembahasan: ''
+            },
+
+            previewImage(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    this.currentQuestion.gambar = e.target.result;
+                };
+
+                reader.readAsDataURL(file);
             },
 
             // Pastikan format import sesuai dengan kolom di Controller
@@ -79,24 +93,58 @@
                     this.selectedWaktu = jsonData[0]["Waktu"] || 20;
 
                     this.questions = jsonData.slice(0, 20).map((row) => ({
+
                         materi: row["Materi"] || "",
+
+                        gambar: row["Gambar"] || row["Image"] || row["URL Gambar"] || "",
+
                         pertanyaan: row["Pertanyaan"] || "",
+
                         opsi_a: row["Opsi A"] || "",
                         opsi_b: row["Opsi B"] || "",
                         opsi_c: row["Opsi C"] || "",
                         opsi_d: row["Opsi D"] || "",
                         opsi_e: row["Opsi E"] || "",
-                        jawaban_benar: (row["Jawaban Benar"] || "").toString().trim().toLowerCase(),
+
+                        jawaban_benar: (row["Jawaban Benar"] || "")
+                            .toString()
+                            .trim()
+                            .toLowerCase(),
+
                         pembahasan: row["Pembahasan"] || ""
+
                     }));
 
                     this.soalTersimpan = this.questions.length;
                     this.activeQuestion = 1;
                     this.loadQuestion();
+                    this.currentQuestion.gambar = this.questions[0]?.gambar || '';
                     this.showImportModal = false;
                     alert("Berhasil import " + this.soalTersimpan + " soal!");
                 };
                 reader.readAsArrayBuffer(file);
+            },
+
+            saveCurrentDraft() {
+
+                let index = this.activeQuestion - 1;
+
+                // simpan tanpa validasi
+                this.questions[index] = {
+                    materi: this.currentQuestion.materi,
+                    gambar: this.currentQuestion.gambar,
+                    pertanyaan: this.currentQuestion.pertanyaan,
+                    opsi_a: this.currentQuestion.opsi[0],
+                    opsi_b: this.currentQuestion.opsi[1],
+                    opsi_c: this.currentQuestion.opsi[2],
+                    opsi_d: this.currentQuestion.opsi[3],
+                    opsi_e: this.currentQuestion.opsi[4],
+                    jawaban_benar: this.currentQuestion.benar !== null ? ['a', 'b', 'c', 'd', 'e'][this
+                        .currentQuestion.benar
+                    ] : null,
+                    pembahasan: this.currentQuestion.pembahasan
+                };
+
             },
 
             simpanSoal() {
@@ -118,6 +166,7 @@
                 // Bungkus data agar sesuai dengan struktur database LatihanQuestion
                 this.questions[index] = {
                     materi: this.currentQuestion.materi,
+                    gambar: this.currentQuestion.gambar,
                     pertanyaan: this.currentQuestion.pertanyaan,
                     opsi_a: this.currentQuestion.opsi[0],
                     opsi_b: this.currentQuestion.opsi[1],
@@ -131,6 +180,7 @@
                 this.soalTersimpan = this.questions.filter(q => q).length;
 
                 if (this.activeQuestion < 20) {
+                    this.saveCurrentDraft();
                     this.activeQuestion++;
                     this.loadQuestion();
                     alert("Soal ke-" + (this.activeQuestion - 1) + " tersimpan sementara.");
@@ -150,6 +200,7 @@
                     let q = this.questions[index];
                     this.currentQuestion = {
                         materi: q.materi,
+                        gambar: q.gambar || '',
                         pertanyaan: q.pertanyaan,
                         opsi: [q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e],
                         benar: ['a', 'b', 'c', 'd', 'e'].indexOf(q.jawaban_benar),
@@ -159,6 +210,7 @@
                     // Reset form untuk soal baru
                     this.currentQuestion = {
                         materi: '',
+                        gambar: '',
                         pertanyaan: '',
                         opsi: ['', '', '', '', ''],
                         benar: null,
@@ -661,6 +713,7 @@
                                                 <div class="absolute right-4 bottom-4">
                                                     <label
                                                         class="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-100 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all">
+
                                                         <svg xmlns="http://www.w3.org/2000/svg"
                                                             class="h-4 w-4 text-blue-500" fill="none"
                                                             viewBox="0 0 24 24" stroke="currentColor">
@@ -668,27 +721,30 @@
                                                                 stroke-width="2"
                                                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                         </svg>
-                                                        <span
-                                                            class="text-[10px] font-bold text-blue-600 uppercase">Tambah
-                                                            Foto</span>
-                                                        <input type="file" class="hidden" accept="image/*"
-                                                            @change="
-                                                            const file = $event.target.files[0];
-                                                            if(file){
-                                                                currentQuestion.gambar = file.name;
-                                                                imageUrl = URL.createObjectURL(file);
-                                                            }
-                                                        ">
+
+                                                        <span class="text-[10px] font-bold text-blue-600 uppercase">
+                                                            Tambah Foto
+                                                        </span>
+
+                                                        <input type="file" accept="image/*"
+                                                            @change="previewImage($event)" class="hidden">
 
                                                     </label>
+
                                                 </div>
                                             </div>
 
-                                            <template x-if="imageUrl">
-                                                <div class="relative mt-3 inline-block">
-                                                    <img :src="imageUrl"
-                                                        class="max-h-48 rounded-2xl border-2 border-white shadow-sm ring-1 ring-gray-100">
-                                                    <button @click="imageUrl = null"
+                                            <template x-if="currentQuestion.gambar">
+                                                <div x-show="currentQuestion.gambar"
+                                                    class="relative mt-3 inline-block">
+                                                    <img :src="currentQuestion.gambar.startsWith('http') ?
+                                                        currentQuestion.gambar :
+                                                        (currentQuestion.gambar.startsWith('data:image') ?
+                                                            currentQuestion.gambar :
+                                                            '/storage/' + currentQuestion.gambar)"
+                                                        referrerpolicy="no-referrer" crossorigin="anonymous"
+                                                        class="max-h-48 rounded-lg border">
+                                                    <button @click="currentQuestion.gambar=''"
                                                         class="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:scale-110 transition-all shadow-md">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3"
                                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -778,7 +834,7 @@
                                             <button type="button"
                                                 @click="currentQuestion = {
                                                         materi: '',
-                                                        gambar: null,
+                                                       gambar: '',
                                                         pertanyaan: '',
                                                         opsi: ['', '', '', '', ''],
                                                         benar: null,
@@ -807,7 +863,7 @@
 
                                 <div class="grid grid-cols-5 gap-3">
                                     <template x-for="n in 20">
-                                        <button @click="activeQuestion = n; loadQuestion()"
+                                        <button @click="saveCurrentDraft(); activeQuestion = n; loadQuestion()"
                                             :class="{
                                                 'bg-blue-500 text-white': activeQuestion === n,
                                                 'bg-emerald-500 text-white': questions[n - 1]?.pertanyaan,

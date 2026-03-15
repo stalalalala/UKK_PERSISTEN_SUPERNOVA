@@ -45,11 +45,31 @@
             selectedSubtes: @json($latihans->subtes),
             selectedWaktu: @json($latihans->durasi),
 
-            activeQuestion: @json($questions->first()['id'] ?? null),
-            questions: @json($questions),
+            activeQuestionIndex: 0,
+            questions: JSON.parse(JSON.stringify(@json($questions))),
 
             get currentQuestion() {
-                return this.questions.find(q => q.id === this.activeQuestion);
+                return this.questions[this.activeQuestionIndex] || {};
+            },
+
+            set currentQuestion(val) {
+                this.questions[this.activeQuestionIndex] = val;
+            },
+
+            previewImage(event) {
+
+                const file = event.target.files[0];
+
+                if (!file) return;
+
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    this.currentQuestion.gambar = e.target.result;
+                };
+
+                reader.readAsDataURL(file);
+
             },
 
             markChanged() {
@@ -114,7 +134,7 @@
                     if (result.isConfirmed) {
 
                         this.allowLeave = true;
-                        window.location.href = "{{ route('admin.kuis.index') }}";
+                        window.location.href = "{{ route('admin.latihan.index') }}";
 
                     }
 
@@ -424,7 +444,7 @@
                                             <i class="fa-solid fa-pen-nib text-xl"></i>
                                         </div>
                                         <h3 class="text-xl font-bold text-gray-800">Ubah Soal Nomor <span
-                                                x-text="questions.findIndex(q => q.id === activeQuestion) + 1"></span>
+                                                x-text="activeQuestionIndex + 1"></span>
                                         </h3>
                                     </div>
                                 </div>
@@ -515,7 +535,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="space-y-6" x-data="{ imageUrl: null }">
+                                    <div class="space-y-6" x-data="{ imageUrl: null }"
+                                        :key="'question-' + activeQuestionIndex">
 
                                         <div class="space-y-2">
                                             <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi
@@ -524,14 +545,14 @@
                                             <div x-show="currentQuestion" x-cloak>
 
                                                 <div class="relative group">
-                                                    <textarea x-model="currentQuestion.materi" name="materi" x-data="{
+                                                    <textarea x-model="currentQuestion.materi" @resize-textarea.window="resize()" name="materi" x-data="{
                                                         resize() {
                                                             $el.style.height = 'auto';
                                                             $el.style.height =
                                                                 ($el.scrollHeight < 140 ? 140 : $el.scrollHeight) + 'px';
                                                         }
-                                                    }" x-init="resize()"
-                                                        x-effect="resize()" @input="resize(); markChanged()"
+                                                    }"
+                                                        x-init="resize()" x-effect="resize()" @input="resize(); markChanged()"
                                                         class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm
            focus:bg-white focus:ring-2 focus:ring-blue-100
            outline-none shadow-inner transition-all
@@ -558,8 +579,7 @@
                                                             </span>
 
                                                             <input type="file" class="hidden" accept="image/*"
-                                                                @change="const file = $event.target.files[0];
-                    if (file) { imageUrl = URL.createObjectURL(file) }">
+                                                                @change="previewImage($event)">
                                                         </label>
                                                     </div>
                                                 </div>
@@ -567,11 +587,15 @@
                                             </div>
 
 
-                                            <template x-if="imageUrl">
+                                            <template x-if="currentQuestion && currentQuestion.gambar">
                                                 <div class="relative mt-3 inline-block">
-                                                    <img :src="imageUrl"
-                                                        class="max-h-48 rounded-2xl border-2 border-white shadow-sm ring-1 ring-gray-100">
-                                                    <button @click="imageUrl = null"
+                                                    <img :src="currentQuestion.gambar.startsWith('http') ?
+                                                        currentQuestion.gambar :
+                                                        (currentQuestion.gambar.startsWith('data:image') ?
+                                                            currentQuestion.gambar :
+                                                            '/storage/' + currentQuestion.gambar)"
+                                                        class="max-h-48 rounded-lg border">
+                                                    <button @click="currentQuestion.gambar = null; markChanged()"
                                                         class="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:scale-110 transition-all shadow-md">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3"
                                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -588,14 +612,14 @@
                                                 Pertanyaan
                                             </label>
 
-                                            <textarea required x-model="currentQuestion.pertanyaan" x-data="{
+                                            <textarea required x-model="currentQuestion.pertanyaan" @resize-textarea.window="resize()" x-data="{
                                                 resize() {
                                                     $el.style.height = 'auto';
                                                     $el.style.height =
                                                         ($el.scrollHeight < 140 ? 140 : $el.scrollHeight) + 'px';
                                                 }
-                                            }" x-init="resize()"
-                                                x-effect="resize()" @input="resize(); markChanged()"
+                                            }"
+                                                x-init="resize()" x-effect="resize()" @input="resize(); markChanged()"
                                                 class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm 
                focus:bg-white focus:ring-2 focus:ring-blue-100 
                outline-none shadow-inner transition-all 
@@ -622,14 +646,14 @@
                                                     </span>
 
                                                     <!-- Textarea Jawaban Auto Resize -->
-                                                    <textarea x-model="currentQuestion['opsi_' + opt.toLowerCase()]" name="opsi[]" x-data="{
-                                                        resize() {
-                                                            $el.style.height = 'auto';
-                                                            $el.style.height =
-                                                                ($el.scrollHeight < 60 ? 60 : $el.scrollHeight) + 'px';
-                                                        }
-                                                    }"
-                                                        x-init="resize()" x-effect="resize()" @input="resize(); markChanged()"
+                                                    <textarea x-model="currentQuestion['opsi_' + opt.toLowerCase()]" @resize-textarea.window="resize()" name="opsi[]"
+                                                        x-data="{
+                                                            resize() {
+                                                                $el.style.height = 'auto';
+                                                                $el.style.height =
+                                                                    ($el.scrollHeight < 60 ? 60 : $el.scrollHeight) + 'px';
+                                                            }
+                                                        }" x-init="resize()" x-effect="resize()" @input="resize(); markChanged()"
                                                         class="flex-1 bg-white/40 rounded-xl px-4 py-3
                        border-none outline-none text-sm font-medium
                        resize-none overflow-hidden leading-relaxed
@@ -656,14 +680,14 @@
                                                 Pembahasan
                                             </label>
 
-                                            <textarea x-model="currentQuestion.pembahasan" x-data="{
+                                            <textarea x-model="currentQuestion.pembahasan" @resize-textarea.window="resize()" x-data="{
                                                 resize() {
                                                     $el.style.height = 'auto';
                                                     $el.style.height =
                                                         ($el.scrollHeight < 140 ? 140 : $el.scrollHeight) + 'px';
                                                 }
-                                            }" x-init="resize()" x-effect="resize()"
-                                                @input="resize(); markChanged()"
+                                            }"
+                                                x-init="resize()" x-effect="resize()" @input="resize(); markChanged()"
                                                 class="w-full bg-yellow-50 border-none rounded-[25px] p-6 text-sm
                focus:bg-white focus:ring-2 focus:ring-yellow-200
                outline-none shadow-inner transition-all
@@ -706,27 +730,33 @@
                                     Navigasi Soal</h4>
 
                                 <div class="grid grid-cols-5 gap-3">
-                                    <template x-for="q in questions" :key="q.id">
-                                        <button @click="activeQuestion = q.id"
+                                    <template x-for="(q,index) in questions" :key="q.id">
+                                        <button
+                                            @click="
+activeQuestionIndex = index;
+$nextTick(() => {
+    $dispatch('resize-textarea')
+});
+"
                                             :class="{
                                                 // Warna Biru jika Aktif
-                                                'bg-[#4A72D4] text-white shadow-lg shadow-blue-200 ring-2 ring-offset-2 ring-blue-400': activeQuestion ===
-                                                    q.id,
+                                                'bg-[#4A72D4] text-white shadow-lg shadow-blue-200 ring-2 ring-offset-2 ring-blue-400': activeQuestionIndex ===
+                                                    index,
                                             
                                                 // Warna Hijau jika Original (Belum diubah)
                                                 'bg-emerald-500 text-white border-emerald-500': q
-                                                    .status === 'original' && activeQuestion !== q.id,
+                                                    .status === 'original' && activeQuestionIndex !== index,
                                             
                                                 // Warna Orange jika Ada Perubahan
                                                 'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-100': q
-                                                    .status === 'changed' && activeQuestion !== q.id,
+                                                    .status === 'changed' && activeQuestionIndex !== index,
                                             
                                                 // Warna Abu jika Kosong (jika ada soal baru)
                                                 'bg-gray-50 text-gray-400 border-gray-100': q.status === 'empty' &&
-                                                    activeQuestion !== q.id
+                                                    activeQuestionIndex !== index
                                             }"
                                             class="aspect-square rounded-xl border-2 flex items-center justify-center font-bold text-xs transition-all hover:scale-110 relative">
-                                            <span x-text="questions.indexOf(q)+1"></span>
+                                            <span x-text="index + 1"></span>
 
 
                                             <template x-if="q.status === 'changed'">
