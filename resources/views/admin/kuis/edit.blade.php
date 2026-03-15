@@ -36,24 +36,49 @@
 <script>
     function editKuisData() {
         return {
-            // ... state menu lainnya
-            questions: @json($questions), // Pastikan ini array soal yang lengkap
-            activeQuestionId: @json($questions->first()->id ?? null),
+            mobileMenuOpen: false,
+            showImportModal: false,
+            activeMenu: "Manajemen Kuis",
+            currentSet: @json($kuis->set_ke),
 
-            // Getter untuk mengambil referensi soal yang sedang aktif
-            get currentQuestion() {
-                return this.questions.find(q => q.id === this.activeQuestionId) || {};
+            // 🔥 INI YANG PENTING
+            selectedSubtes: @json($kuis->subtes),
+            selectedWaktu: @json($kuis->durasi),
+
+            activeQuestionIndex: 0,
+
+            questions: @json($questions).map(q => ({
+                ...q
+            })),
+
+            currentQuestion: null,
+
+            changeQuestion(i) {
+                this.activeQuestionIndex = i
+                this.currentQuestion = this.questions[i]
             },
 
-            // Fungsi untuk navigasi
-            selectQuestion(id) {
-                this.activeQuestionId = id;
+            init() {
+                this.questions = this.questions.map(q => ({
+                    ...q,
+                    status: q.status ?? "original"
+                }))
+
+                this.currentQuestion = this.questions[0]
             },
 
-            // Panggil fungsi ini di setiap input @input="markChanged()"
+            // get activeQuestionIndex() {
+            //     return this.questions.findIndex(q => Number(q.id) === Number(this.activeQuestion));
+            // },
+
             markChanged() {
                 if (this.currentQuestion) {
                     this.currentQuestion.status = "changed";
+
+                    // paksa Alpine update array
+                    this.questions[this.activeQuestionIndex] = {
+                        ...this.currentQuestion
+                    };
                 }
             }
         }
@@ -96,29 +121,11 @@
 
             },
 
-            uploadGambar(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    // Validasi ukuran (opsional tapi disarankan)
-                    if (file.size > 2 * 1024 * 1024) { // 2MB
-                        alert('File terlalu besar, maksimal 2MB');
-                        return;
-                    }
-
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        // Ini akan menimpa URL lama (Imgur) dengan string Base64 baru
-                        this.currentQuestion.gambar = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            },
-
             confirmLeave() {
 
                 Swal.fire({
                     title: "Kembali ke halaman daftar?",
-                    text: "Perubahan kuis yang belum disimpan akan hilang.",
+                    text: "Perubahan latihan yang belum disimpan akan hilang.",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: "#4A72D4",
@@ -542,29 +549,13 @@
                                     </div>
                             </div>
 
-                            <div class="space-y-6" x-data="{
-                                imageUrl: null,
-                                init() { this.updatePreview(); },
-                                updatePreview() {
-                                    if (!this.currentQuestion || !this.currentQuestion.gambar) {
-                                        this.imageUrl = null;
-                                        return;
-                                    }
-                                    let img = this.currentQuestion.gambar;
-                                    if (img.startsWith('data:image') || img.startsWith('http')) {
-                                        this.imageUrl = img;
-                                    } else {
-                                        this.imageUrl = '/storage/' + img;
-                                    }
-                                }
-                            }" x-effect="updatePreview()"
-                                x-watch:activeQuestion="updatePreview()">
+                            <div class="space-y-6">
 
                                 <div class="space-y-2">
                                     <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi
                                         atau Teks (Opsional)</label>
 
-                                    <div x-show="currentQuestion" x-cloak>
+                                    <div x-show="currentQuestion" x-cloak :key="activeQuestionIndex">
 
                                         <div class="relative group">
                                             <textarea x-model="currentQuestion.materi" name="materi" x-data="{
@@ -607,10 +598,9 @@
         if(file.size > 2*1024*1024){ alert('Ukuran gambar maksimal 2MB'); return; }
         const reader = new FileReader();
         reader.onload = (e)=>{
-            currentQuestion.gambar = e.target.result;
-            imageUrl = e.target.result; // hanya soal aktif
-            markChanged();
-        }
+    $data.currentQuestion.gambar = e.target.result;
+    markChanged();
+}
         reader.readAsDataURL(file);
 ">
                                                 </label>
@@ -620,16 +610,22 @@
                                     </div>
 
 
-                                    <template x-if="currentQuestion.gambar">
+                                    <template x-if="currentQuestion && currentQuestion.gambar"
+                                        :key="currentQuestion.gambar">
                                         <div class="relative mt-3 inline-block">
-                                            <img :src="imageUrl" referrerpolicy="no-referrer"
+                                            <img :src="currentQuestion.gambar.startsWith('data:image') ?
+                                                currentQuestion.gambar :
+                                                currentQuestion.gambar.startsWith('http') ?
+                                                currentQuestion.gambar :
+                                                '/storage/' + currentQuestion.gambar"
+                                                referrerpolicy="no-referrer"
                                                 class="max-h-48 rounded-2xl border-2 border-white shadow-sm ring-1 ring-gray-100">
 
                                             <button
                                                 @click="
-    currentQuestion.gambar = null;
-    imageUrl = null;
-    markChanged();
+currentQuestion.gambar = null;
+$refs.imageInput.value = '';
+markChanged();
 "
                                                 class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition-all">
                                                 <i class="fa-solid fa-xmark text-[10px]"></i>
@@ -737,27 +733,27 @@
                                 Navigasi Soal</h4>
 
                             <div class="grid grid-cols-5 gap-3">
-                                <template x-for="q in questions" :key="q.id">
-                                    <button @click="activeQuestion = q.id; updateStatuses()"
+                                <template x-for="(q,i) in questions" :key="q.id">
+                                    <button @click="changeQuestion(i)"
                                         :class="{
                                             // Warna Biru jika Aktif
-                                            'bg-[#4A72D4] text-white shadow-lg shadow-blue-200 ring-2 ring-offset-2 ring-blue-400': activeQuestion ===
-                                                q.id,
+                                            'bg-[#4A72D4] text-white shadow-lg shadow-blue-200 ring-2 ring-offset-2 ring-blue-400': activeQuestionIndex ===
+                                                i,
                                         
                                             // Warna Hijau jika Original (Belum diubah)
                                             'bg-emerald-500 text-white border-emerald-500': q
-                                                .status === 'original' && activeQuestion !== q.id,
+                                                .status === 'original' && activeQuestionIndex !== i,
                                         
                                             // Warna Orange jika Ada Perubahan
                                             'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-100': q
-                                                .status === 'changed' && activeQuestion !== q.id,
+                                                .status === 'changed',
                                         
                                             // Warna Abu jika Kosong (jika ada soal baru)
                                             'bg-gray-50 text-gray-400 border-gray-100': q.status === 'empty' &&
-                                                activeQuestion !== q.id
+                                                activeQuestionIndex !== i
                                         }"
                                         class="aspect-square rounded-xl border-2 flex items-center justify-center font-bold text-xs transition-all hover:scale-110 relative">
-                                        <span x-text="questions.indexOf(q)+1"></span>
+                                        <span x-text="i+1"></span>
 
 
                                         <template x-if="q.status === 'changed'">
@@ -795,8 +791,8 @@
                         </div>
                     </div>
                 </div>
-    </div>
-    </main>
+
+            </main>
     </div>
 
     <div x-show="showImportModal" class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>

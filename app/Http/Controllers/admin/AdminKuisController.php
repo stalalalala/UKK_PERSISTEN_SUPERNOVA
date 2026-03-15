@@ -147,6 +147,7 @@ class AdminKuisController extends Controller
         'materi' => $q->materi,
         'gambar' => $q->gambar,
         'subtes' => $q->subtes,
+        'waktu' => $q->waktu,
         'pertanyaan' => $q->pertanyaan,
         'opsi_a' => $q->opsi_a,
         'opsi_b' => $q->opsi_b,
