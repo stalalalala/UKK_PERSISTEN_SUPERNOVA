@@ -46,15 +46,26 @@
             selectedWaktu: @json($latihans->durasi),
 
             activeQuestionIndex: 0,
-            questions: JSON.parse(JSON.stringify(@json($questions))),
+            questions: @json($questions).map(q => ({
+                ...q
+            })),
 
-            get currentQuestion() {
-                return this.questions[this.activeQuestionIndex] || {};
+            currentQuestion: null,
+
+            changeQuestion(i) {
+                this.activeQuestionIndex = i
+                this.currentQuestion = this.questions[i]
             },
 
-            set currentQuestion(val) {
-                this.questions[this.activeQuestionIndex] = val;
+            init() {
+                this.questions = this.questions.map(q => ({
+                    ...q,
+                    status: q.status ?? "original"
+                }))
+
+                this.currentQuestion = this.questions[0]
             },
+
 
             previewImage(event) {
 
@@ -66,6 +77,7 @@
 
                 reader.onload = (e) => {
                     this.currentQuestion.gambar = e.target.result;
+                    this.markChanged();
                 };
 
                 reader.readAsDataURL(file);
@@ -75,6 +87,11 @@
             markChanged() {
                 if (this.currentQuestion) {
                     this.currentQuestion.status = "changed";
+
+                    // sync ke array
+                    this.questions[this.activeQuestionIndex] = {
+                        ...this.currentQuestion
+                    };
                 }
             }
         }
@@ -535,8 +552,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="space-y-6" x-data="{ imageUrl: null }"
-                                        :key="'question-' + activeQuestionIndex">
+                                    <div class="space-y-6" :key="activeQuestionIndex">
 
                                         <div class="space-y-2">
                                             <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi
@@ -733,25 +749,25 @@
                                     <template x-for="(q,index) in questions" :key="q.id">
                                         <button
                                             @click="
-activeQuestionIndex = index;
+changeQuestion(index);
 $nextTick(() => {
     $dispatch('resize-textarea')
 });
 "
                                             :class="{
-                                                // Warna Biru jika Aktif
-                                                'bg-[#4A72D4] text-white shadow-lg shadow-blue-200 ring-2 ring-offset-2 ring-blue-400': activeQuestionIndex ===
-                                                    index,
+                                                // 🔥 PRIORITAS 1: kalau berubah → ORANGE (walaupun aktif)
+                                                'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-100': q
+                                                    .status === 'changed',
                                             
-                                                // Warna Hijau jika Original (Belum diubah)
+                                                // 🔥 PRIORITAS 2: aktif tapi belum berubah → BIRU
+                                                'bg-[#4A72D4] text-white shadow-lg shadow-blue-200 ring-2 ring-offset-2 ring-blue-400': activeQuestionIndex ===
+                                                    index && q.status !== 'changed',
+                                            
+                                                // 🔥 ORIGINAL
                                                 'bg-emerald-500 text-white border-emerald-500': q
                                                     .status === 'original' && activeQuestionIndex !== index,
                                             
-                                                // Warna Orange jika Ada Perubahan
-                                                'bg-orange-500 text-white border-orange-500 shadow-md shadow-orange-100': q
-                                                    .status === 'changed' && activeQuestionIndex !== index,
-                                            
-                                                // Warna Abu jika Kosong (jika ada soal baru)
+                                                // 🔥 EMPTY
                                                 'bg-gray-50 text-gray-400 border-gray-100': q.status === 'empty' &&
                                                     activeQuestionIndex !== index
                                             }"
