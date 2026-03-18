@@ -17,7 +17,6 @@ class Kuis extends Model
         'set_ke',
         'durasi',
         'materi',
-        'video_url',
         'is_active',
         'is_published'
     ];

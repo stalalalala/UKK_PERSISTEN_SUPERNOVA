@@ -195,9 +195,11 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/', [BerandaController::class, 'index'])->name('beranda');
         Route::get('/profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile.index');
+        
 
        Route::get('/profile/edit', [ProfileController::class, 'edit'])->middleware('auth')->name('profile.edit');
        Route::post('/profile/update', [ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
+       Route::get('/log', [ProfileController::class, 'log'])->name('log.index');
 
 
         /* =======================

@@ -73,49 +73,71 @@ class XpService
     }
 
     public function checkStreakExpired($user)
-    {
-        if (!$user->last_xp_date) return;
+{
+    if (!$user->last_xp_date) return;
 
-        $days = Carbon::parse($user->last_xp_date)
-                ->diffInDays(now());
+    $days = Carbon::parse($user->last_xp_date)
+            ->diffInDays(now());
 
-        if ($days >= 5) {
-            $user->streak_days = 0;
-            $user->streak_active = false;
-            $user->save();
-        }
+    if ($days >= 1) {
+
+        // 🔥 RESET TOTAL
+        $user->streak_days = 1;
+        $user->streak_active = false;
+
+        // XP reset
+        $user->total_xp = 0;
+        $user->level = 1;
+
+        // 🔒 Lock karakter
+        $user->character_locked = true;
+
+        $user->save();
     }
+}
 
     public function restoreStreak($user)
-    {
-        if ($user->streak_active) return false;
+{
+    if ($user->streak_active) return false;
 
-        $month = now()->month;
+    $month = now()->month;
 
-        $used = StreakRestore::where('user_id', $user->id)
-            ->whereMonth('restore_date', $month)
-            ->exists();
+    $used = StreakRestore::where('user_id', $user->id)
+        ->whereMonth('restore_date', $month)
+        ->exists();
 
-        if ($used) return false;
+    if ($used) return false;
 
-        StreakRestore::create([
-            'user_id' => $user->id,
-            'restore_date' => now()
-        ]);
+    // Catat pemakaian
+    StreakRestore::create([
+        'user_id' => $user->id,
+        'restore_date' => now()
+    ]);
 
-        $user->streak_active = true;
-        $user->streak_days = 1;
-        $user->last_xp_date = now();
-        $user->save();
+    // 🔥 RESTORE
+    $user->streak_active = true;
+    $user->streak_days = 1;
+    $user->last_xp_date = now();
 
-        return true;
-    }
+    // 🔓 Unlock karakter
+    $user->character_locked = false;
+
+    // (Optional) kasih XP awal biar ga terlalu kejam
+    // $user->total_xp = 50;
+
+    $user->save();
+
+    return true;
+}
 
     public function getCurrentCharacter($user)
 {
-    // Ambil karakter streak sesuai level user
+    if ($user->character_locked) {
+        return null; // atau return karakter default "locked"
+    }
+
     return StreakCharacter::where('min_level', '<=', $user->level)
-        ->orderByDesc('min_level') // yang tertinggi <= level user
+        ->orderByDesc('min_level')
         ->first();
 }
 

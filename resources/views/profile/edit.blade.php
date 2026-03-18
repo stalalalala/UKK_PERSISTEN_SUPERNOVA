@@ -19,7 +19,7 @@
 <body class="bg-white font-po overflow-x-hidden">
 
     <div class="max-w-[1440px] mx-auto" x-data="{ open: false }">
-       <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4 relative z-10">
+        <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4 relative z-10">
             <div class="w-20 md:w-28 h-12 bg-blue-400 rounded-full flex-shrink-0"></div>
 
             <ul class="hidden lg:flex gap-12 text-gray-800 font-medium text-sm">
@@ -42,8 +42,8 @@
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="inline" id="logout-form">
                         @csrf
-                        <button type="submit" 
-                                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
+                        <button type="submit"
+                            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -105,130 +105,152 @@
         </div>
     </div>
 
-  <main class="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 p-8 md:p-10 mt-6 rounded-[35px] bg-[#E2EDFE] border-2 border-blue-400 mx-4 md:mx-10 mb-10 relative overflow-hidden">
+    <div class="max-w-[1440px] mx-auto flex justify-center px-4 md:px-10">
+        <main
+            class="w-full flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 p-4 md:p-6 mt-6 rounded-[35px] bg-[#E2EDFE] border-2 border-blue-400  relative overflow-hidden">
 
-    {{-- Bagian Foto --}}
-    <div class="flex flex-col items-center shrink-0">
-    <div class="w-44 h-44 md:w-52 md:h-52 rounded-full border-[10px] border-white shadow-sm overflow-hidden bg-white relative">
-        <img id="previewPhoto"  
-            @if($user->photo) 
-                src="{{ asset('storage/'.$user->photo) }}"  
+            {{-- Bagian Foto --}}
+            <div class="flex flex-col items-center shrink-0">
+                <div
+                    class="w-44 h-44 md:w-52 md:h-52 rounded-full border-[10px] border-white shadow-sm overflow-hidden bg-white relative">
+                    <img id="previewPhoto"
+                        @if ($user->photo) src="{{ asset('storage/' . $user->photo) }}"  
             @else  
-                src="https://via.placeholder.com/150?text=Belum+ada+foto"  
-            @endif  
-            alt="Profile" class="w-full h-full object-cover">
-    </div>
-
-    <h1 class="text-2xl font-bold text-[#3D4B7A] mt-8 md:mt-10 text-center">Edit Profil</h1>
-
-    <label for="photoInput"
-        class="mt-6 bg-[#6EB4FF] hover:bg-blue-500 text-white px-5 py-2.5 text-sm rounded-full font-medium flex items-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer">
-        <i class="fa-solid fa-camera"></i> Ubah Foto
-    </label>
-</div>
-
-{{-- Bagian Form --}}
-<div class="bg-white rounded-[20px] md:rounded-[35px] p-6 md:p-10 shadow-sm w-full border border-white">
-    @if(session('success'))
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-        {{ session('success') }}
-    </div>
-@endif
-
-@if(session('error'))
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-        {{ session('error') }}
-    </div>
-@endif
-    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-        @csrf
-
-        {{-- Input file HARUS di dalam form --}}
-        <input type="file" name="photo" id="photoInput" class="hidden">
-
-
-            {{-- Nama --}}
-            <div class="space-y-2">
-                <label class="block text-[#4A5578] font-semibold text-sm ml-1">Nama Pengguna</label>
-                <div class="flex items-center bg-white rounded-lg md:rounded-2xl border-2 border-[#6EB4FF] overflow-hidden">
-                    <div class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
-                        <i class="fa-solid fa-user text-lg"></i>
-                    </div>
-                    <input type="text" name="name" value="{{ $user->name }}" class="w-full px-2 md:px-4 py-1 md:py-3 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
+                src="https://via.placeholder.com/150?text=Belum+ada+foto" @endif
+                        alt="Profile" class="w-full h-full object-cover">
                 </div>
+
+                <h1 class="text-2xl font-bold text-[#3D4B7A] mt-8 md:mt-10 text-center">Edit Profil</h1>
+
+                <label for="photoInput"
+                    class="mt-6 bg-[#6EB4FF] hover:bg-blue-500 text-white px-5 py-2.5 text-sm rounded-full font-medium flex items-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer">
+                    <i class="fa-solid fa-camera"></i> Ubah Foto
+                </label>
             </div>
 
-            {{-- Email --}}
-            <div class="space-y-2">
-                <label class="block text-[#4A5578] font-semibold text-sm ml-1">Email</label>
-                <div class="flex items-center bg-white rounded-lg md:rounded-2xl border-2 border-[#6EB4FF] overflow-hidden">
-                    <div class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
-                        <i class="fa-solid fa-envelope text-lg"></i>
+            {{-- Bagian Form --}}
+            <div class="bg-white rounded-[20px] md:rounded-xl p-4 shadow-sm w-full border border-white">
+                @if (session('success'))
+                    <div
+                        class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-full relative mb-4">
+                        {{ session('success') }}
                     </div>
-                    <input type="email" value="{{ $user->email }}" readonly class="w-full px-2 md:px-4 py-1 md:py-3 outline-none text-gray-400 text-xs md:text-sm font-medium bg-gray-50">
-                </div>
-            </div>
+                @endif
 
-            {{-- Nomor Telepon --}}
-            <div class="space-y-2">
-                <label class="block text-[#4A5578] font-semibold text-sm ml-1">Nomor Telepon</label>
-                <div class="flex items-center bg-white rounded-lg md:rounded-2xl border-2 border-[#6EB4FF] overflow-hidden">
-                    <div class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
-                        <i class="fa-solid fa-phone text-lg"></i>
+                @if (session('error'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-full relative mb-4">
+                        {{ session('error') }}
                     </div>
-                    <input type="text" name="no_hp" value="{{ $user->no_hp }}" class="w-full px-2 md:px-4 py-1 md:py-3 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
-                </div>
-            </div>
+                @endif
+                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data"
+                    class="space-y-6">
+                    @csrf
 
-            {{-- Password --}}
-            <div class="space-y-2">
-                <label class="block text-[#4A5578] font-semibold text-sm ml-1">Kata Sandi</label>
-                <div class="grid grid-cols-2 md:grid-cols-2 gap-4">
-                    <div class="flex items-center bg-white rounded-lg md:rounded-2xl border-2 border-[#6EB4FF] overflow-hidden">
-                        <div class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
-                            <i class="fa-solid fa-lock text-lg"></i>
+                    {{-- Input file HARUS di dalam form --}}
+                    <input type="file" name="photo" id="photoInput" class="hidden">
+
+
+                    {{-- Nama --}}
+                    <div class="space-y-2">
+                        <label class="block text-[#4A5578] font-semibold text-sm ml-1">Nama Pengguna</label>
+                        <div
+                            class="flex items-center bg-white rounded-lg md:rounded-2xl border-2 border-[#6EB4FF] overflow-hidden">
+                            <div
+                                class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
+                                <i class="fa-solid fa-user text-lg"></i>
+                            </div>
+                            <input type="text" name="name" value="{{ $user->name }}"
+                                class="w-full px-2 md:px-4 py-1 md:py-3 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
                         </div>
-                        <input type="password" name="password" placeholder="kata sandi baru" class="w-full px-2 md:px-4 py-1 md:py-3 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-[#AAB4D1]">
                     </div>
-                    <div class="flex items-center bg-white rounded-lg md:rounded-2xl border-2 border-[#6EB4FF] overflow-hidden">
-                        <div class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
-                            <i class="fa-solid fa-lock text-lg"></i>
-                        </div>
-                        <input type="password" name="password_confirmation" placeholder="konfirmasi kata sandi baru" class="w-full px-2 md:px-4 py-1 md:py-3 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-[#AAB4D1]">
-                    </div>
-                </div>
-            </div>
 
-            {{-- Tombol --}}
-            <div class="flex justify-end items-center text-xs md:text-sm gap-4 pt-4">
-                <a href="{{ route('profile.index') }}">
-                    <button type="button" class="bg-white border-2 border-gray-200 text-gray-400 font-medium px-8 py-2.5 rounded-full hover:bg-gray-50 transition-all">
-                        Batal
-                    </button>
-                </a>
-                <button type="submit" class="bg-[#6EB4FF] hover:bg-blue-500 text-white px-8 py-3 rounded-full font-medium shadow-lg shadow-blue-200 transition-all active:scale-95">
-                    Simpan Perubahan
-                </button>
+                    {{-- Email --}}
+                    <div class="space-y-2">
+                        <label class="block text-[#4A5578] font-semibold text-sm ml-1">Email</label>
+                        <div
+                            class="flex items-center bg-white rounded-lg md:rounded-2xl border-2 border-[#6EB4FF] overflow-hidden">
+                            <div
+                                class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
+                                <i class="fa-solid fa-envelope text-lg"></i>
+                            </div>
+                            <input type="email" value="{{ $user->email }}" readonly
+                                class="w-full px-2 md:px-4 py-1 md:py-3 outline-none text-gray-400 text-xs md:text-sm font-medium bg-gray-50">
+                        </div>
+                    </div>
+
+                    {{-- Nomor Telepon --}}
+                    <div class="space-y-2">
+                        <label class="block text-[#4A5578] font-semibold text-sm ml-1">Nomor Telepon</label>
+                        <div
+                            class="flex items-center bg-white rounded-lg md:rounded-2xl border-2 border-[#6EB4FF] overflow-hidden">
+                            <div
+                                class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
+                                <i class="fa-solid fa-phone text-lg"></i>
+                            </div>
+                            <input type="text" name="no_hp" value="{{ $user->no_hp }}"
+                                class="w-full px-2 md:px-4 py-1 md:py-3 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
+                        </div>
+                    </div>
+
+                    {{-- Password --}}
+                    <div class="space-y-2">
+                        <label class="block text-[#4A5578] font-semibold text-sm ml-1">Kata Sandi</label>
+                        <div class="grid grid-cols-2 md:grid-cols-2 gap-4">
+                            <div
+                                class="flex items-center bg-white rounded-lg md:rounded-2xl border-2 border-[#6EB4FF] overflow-hidden">
+                                <div
+                                    class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
+                                    <i class="fa-solid fa-lock text-lg"></i>
+                                </div>
+                                <input type="password" name="password" placeholder="kata sandi baru"
+                                    class="w-full px-2 md:px-4 py-1 md:py-3 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-[#AAB4D1]">
+                            </div>
+                            <div
+                                class="flex items-center bg-white rounded-lg md:rounded-2xl border-2 border-[#6EB4FF] overflow-hidden">
+                                <div
+                                    class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
+                                    <i class="fa-solid fa-lock text-lg"></i>
+                                </div>
+                                <input type="password" name="password_confirmation"
+                                    placeholder="konfirmasi kata sandi baru"
+                                    class="w-full px-2 md:px-4 py-1 md:py-3 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-[#AAB4D1]">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Tombol --}}
+                    <div class="flex justify-end items-center text-xs md:text-sm gap-4 pt-4">
+                        <a href="{{ route('profile.index') }}">
+                            <button type="button"
+                                class="bg-white border-2 border-gray-200 text-gray-400 font-medium px-8 py-2.5 rounded-full hover:bg-gray-50 transition-all">
+                                Batal
+                            </button>
+                        </a>
+                        <button type="submit"
+                            class="bg-[#6EB4FF] hover:bg-blue-500 text-white px-8 py-3 rounded-full font-medium shadow-lg shadow-blue-200 transition-all active:scale-95">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </main>
     </div>
-</main>
 
     <script>
-    const photoInput = document.getElementById('photoInput');
-    const previewPhoto = document.getElementById('previewPhoto');
+        const photoInput = document.getElementById('photoInput');
+        const previewPhoto = document.getElementById('previewPhoto');
 
-    photoInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewPhoto.src = e.target.result;
+        photoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewPhoto.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
             }
-            reader.readAsDataURL(file);
-        }
-    });
-</script>
+        });
+    </script>
 
 </body>
 

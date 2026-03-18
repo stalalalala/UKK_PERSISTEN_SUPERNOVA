@@ -12,7 +12,6 @@ class KuisQuestion extends Model
         'kuis_id',
         'pertanyaan',
         'materi',
-        'subtes',
         'gambar',
         'kuis',
         'opsi_a',

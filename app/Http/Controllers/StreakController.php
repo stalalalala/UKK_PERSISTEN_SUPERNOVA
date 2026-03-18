@@ -70,6 +70,12 @@ $nextEvolution = StreakCharacter::where('min_level', '>', $userLevel)
     ->orderBy('min_level', 'ASC')
     ->first();
 
+    $userHasNextEvolution = false;
+
+if ($nextEvolution) {
+    $userHasNextEvolution = $userLevel >= $nextEvolution->min_level;
+}
+
     return view('streak.index', compact(
         'user',
         'todayXp',
@@ -80,7 +86,8 @@ $nextEvolution = StreakCharacter::where('min_level', '>', $userLevel)
         'tryoutDone',
         'userLevel',
         'currentStreak',
-        'nextEvolution'
+        'nextEvolution',
+        'userHasNextEvolution'
     ));
 }
 

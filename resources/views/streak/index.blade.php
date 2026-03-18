@@ -112,13 +112,9 @@
 
         $xp = $user->total_xp ?? 0;
         $jumlahHari = $user->streak_days ?? 0;
+        $isLocked = $user->character_locked ?? false; // 🔥
 
-        /*
-|-----------------------------------------
-| Hitung level dari total XP
-|-----------------------------------------
-*/
-
+        // Hitung level dari total XP
         $level = 1;
         $xpNeed = 200;
 
@@ -127,8 +123,14 @@
             $xpNeed += 200;
         }
 
-        $currentXpInLevel = $xp; // pakai total xp
+        $currentXpInLevel = $xp;
         $maxXp = $xpNeed;
+
+        // Ambil karakter saat ini
+        $currentStreak = $isLocked ? null : $currentStreak ?? null;
+
+        // Cek next evolution
+        $userHasNextEvolution = $nextEvolution && !$isLocked;
     @endphp
 
     <main class="max-w-[1300px] mx-auto mt-10 px-4 md:px-6 pb-20" x-data="{
@@ -148,41 +150,52 @@
                 • Level {{ $level }} •
             </div>
 
-            <div class="slime relative z-10 w-full max-w-[320px] md:max-w-[500px] lg:max-w-[600px]"
-                :class="{ 'animate-bounce-slime': isClicked }" @click="trigger">
+            <div class="slime relative z-10 w-full max-w-[320px] md:max-w-[500px] lg:max-w-[600px] cursor-pointer"
+                :class="{ 'animate-bounce-slime': isClicked, 'filter blur-sm opacity-50': {{ $isLocked ? 'true' : 'false' }} }"
+                @click="trigger">
 
-                @if ($currentStreak)
-                    <object data="{{ asset('storage/' . $currentStreak->svg_path) }}" type="image/svg+xml"
-                        class="pointer-events-none select-none w-full h-auto"></object>
-                @else
-                    <object data="{{ asset('img/pet(tanpa_animasi).svg') }}" type="image/svg+xml"
-                        class="pointer-events-none select-none w-full h-auto"></object>
+                <!-- ICON LOCK DI TENGAH -->
+                @if ($isLocked)
+                    <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                        <i class="fa-solid fa-lock text-white text-4xl md:text-6xl drop-shadow-lg"></i>
+                    </div>
                 @endif
+
+                <!-- SVG -->
+                <object
+                    data="{{ $isLocked ? asset('img/pet(tanpa_animasi).svg') : asset('storage/' . $currentStreak->svg_path) }}"
+                    type="image/svg+xml" class="pointer-events-none select-none w-full h-auto"></object>
             </div>
 
 
 
-            <div class="w-full max-w-md relative z-20">
-                <div
-                    class="bg-blue-400/30 rounded-full h-8 md:h-9 p-1 border-2 border-blue-400/50 shadow-inner relative overflow-hidden">
-                    <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full transition-all duration-700"
-                        :style="`width: ${(xp/maxXp)*100}%`">
-                    </div>
+            <div class="mt-10 w-full max-w-md mx-auto relative z-20">
+
+                @if ($isLocked)
+                    <!-- Tombol Pulihkan -->
+                    <button
+                        class="w-full bg-yellow-400 text-blue-900 font-bold py-2.5 rounded-full shadow-md hover:bg-yellow-500 transition-all"
+                        @click="alert('Pulihkan karakter ini!');">
+                        Pulihkan Karakter
+                    </button>
+                @else
+                    <!-- Progress XP normal -->
                     <div
-                        class="absolute inset-0 flex items-center justify-center text-white font-black text-sm md:text-lg drop-shadow-md">
-                        <div class="flex items-center gap-1">
-                            <span x-text="xp"></span>
-                            <span>/</span>
-                            <span x-text="maxXp"></span>
-                            <span>XP</span>
+                        class="bg-blue-400/30 rounded-full h-8 md:h-9 p-1 border-2 border-blue-400/50 shadow-inner relative overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full transition-all duration-700"
+                            :style="`width: ${(xp/maxXp)*100}%`">
+                        </div>
+                        <div
+                            class="absolute inset-0 flex items-center justify-center text-white font-black text-sm md:text-lg drop-shadow-md">
+                            <div class="flex items-center gap-1">
+                                <span x-text="xp"></span>
+                                <span>/</span>
+                                <span x-text="maxXp"></span>
+                                <span>XP</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-
-                {{-- <div class="mt-4 flex justify-center">
-                    <img :src="`/images/pets/${pet}.png`" alt="Pet" class="w-16 h-16">
-                </div> --}}
+                @endif
             </div>
         </div>
 
@@ -194,18 +207,122 @@
                     <div class="flex flex-col md:flex-row items-center md:items-start gap-5">
                         <div class="relative md:absolute md:-left-12 md:-top-20 drop-shadow-2xl w-48 md:w-80">
                             <img src="{{ asset('img/api.png') }}" class="w-full h-auto object-contain">
-                            <span
-                                class="absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-black text-4xl md:text-5xl italic tracking-tighter drop-shadow-md">X{{ $jumlahHari }}</span>
+                            {{-- <span
+                                class="absolute top-[60%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-black text-4xl md:text-5xl italic tracking-tighter drop-shadow-md">X{{ $jumlahHari }}</span> --}}
                         </div>
                         <div class="md:ml-48 text-center md:text-left">
                             <span
-                                class="inline-block bg-yellow-400 text-blue-900 text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-wider mb-2">Semangat
-                                Menyala</span>
-                            <h2 class="text-6xl md:text-7xl font-black text-[#2E3B66] leading-none">Hari</h2>
+                                class="inline-block bg-yellow-400 text-blue-900 text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-wider mb-2">Streak
+                                berjalan</span>
+                            <h2 class="text-6xl md:text-7xl font-black text-[#2E3B66] leading-none">
+                                {{ $jumlahHari }} Hari</h2>
                             <p class="text-blue-800/60 text-sm md:text-base font-bold mt-2">Konsisten belajar bikin
                                 peluang naik!</p>
                         </div>
                     </div>
+
+                    <div x-data="{ openInfo: false }" class="mt-8 flex items-center justify-center md:justify-start">
+
+                        {{-- BUTTON --}}
+                        <button @click="openInfo = true"
+                            class="group w-full inline-flex items-center gap-2 px-4 py-2 rounded-full
+               bg-gradient-to-r from-blue-500 to-blue-600
+               text-white text-xs md:text-sm font-bold
+               shadow-md hover:shadow-lg
+               hover:from-blue-600 hover:to-blue-700
+               transition-all duration-300">
+
+                            <span class="text-white/90 group-hover:scale-110 transition">
+                                ⓘ
+                            </span>
+
+                            <span>
+                                Informasi Streak
+                            </span>
+                        </button>
+
+                        {{-- POPUP --}}
+                        <div x-show="openInfo" x-transition
+                            class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+
+                            <div @click.away="openInfo = false"
+                                class="bg-white rounded-3xl p-6 max-w-2xl w-full shadow-2xl text-left border border-blue-100">
+
+                                {{-- HEADER --}}
+                                <h3 class="font-black text-lg text-[#2E3B66] mb-3 flex items-center gap-2">
+                                    <span class="text-blue-500">🔥</span>
+                                    Sistem Persisten Streak
+                                </h3>
+
+                                {{-- CONTENT --}}
+                                <div class="text-sm text-gray-600 space-y-4">
+
+                                    {{-- HOOK --}}
+                                    <p class="font-semibold text-[#2E3B66]">
+                                        Kunci naik level bukan belajar lama — tapi <span
+                                            class="text-blue-600 font-bold">konsisten setiap hari</span>.
+                                    </p>
+
+                                    {{-- PENJELASAN --}}
+                                    <p>
+                                        Sistem streak dirancang supaya kamu tetap belajar sedikit demi sedikit, tapi
+                                        terus maju.
+                                        Bahkan progress kecil setiap hari akan berdampak besar dalam jangka panjang.
+                                    </p>
+
+                                    {{-- CARA MAIN --}}
+                                    <div>
+                                        <p class="text-xs font-bold text-gray-500 uppercase mb-2">Cara menjaga streak
+                                        </p>
+                                        <ul class="space-y-2 text-xs">
+                                            <li>🔥 Lakukan minimal <b>1 aktivitas</b> setiap hari</li>
+                                            <li>🎯 Ambil XP dari: Login, Latihan, Kuis, atau Tryout</li>
+                                            <li>⚡ Maksimal <span class="text-blue-600 font-bold">140 XP / hari</span>
+                                            </li>
+                                            <li>⏱️ Setiap aktivitas hanya dihitung <b>1x per hari</b></li>
+                                        </ul>
+                                    </div>
+
+                                    {{-- KONSEKUENSI --}}
+                                    <div>
+                                        <p class="text-xs font-bold text-gray-500 uppercase mb-2">Perlu diperhatikan
+                                        </p>
+                                        <ul class="space-y-2 text-xs">
+                                            <li>⚠️ Tidak aktif <b>5 hari</b> → streak akan hangus</li>
+                                            <li>🔁 Bisa dipulihkan <b>1x per bulan</b></li>
+                                        </ul>
+                                    </div>
+
+                                    {{-- REWARD --}}
+                                    <div>
+                                        <p class="text-xs font-bold text-gray-500 uppercase mb-2">Reward progres kamu
+                                        </p>
+                                        <ul class="space-y-2 text-xs">
+                                            <li>🧬 Setiap <b>200 XP</b> → naik level</li>
+                                            <li>🚀 Level tinggi membuka <b>evolusi karakter baru</b></li>
+                                        </ul>
+                                    </div>
+
+                                    {{-- HIGHLIGHT MOTIVASI --}}
+                                    <div class="bg-blue-50 rounded-xl p-3 text-xs text-blue-800 font-semibold">
+                                        💡 10–15 menit belajar setiap hari lebih efektif daripada belajar lama tapi
+                                        jarang.
+                                        Jaga streak kamu — itu bukti konsistensi kamu.
+                                    </div>
+
+                                </div>
+
+                                {{-- BUTTON --}}
+                                <button @click="openInfo = false"
+                                    class="mt-5 w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-2.5 rounded-xl hover:from-blue-600 hover:to-blue-700 transition">
+                                    Mengerti
+                                </button>
+
+                            </div>
+                        </div>
+
+                    </div>
+
                     <div class="mt-8 bg-orange-100/60 rounded-[2rem] p-4 border-2 border-orange-200">
                         <div class="flex justify-between items-center text-center">
                             <div class="flex-1">
@@ -247,15 +364,21 @@
 
                     <div
                         class="absolute -right-8 top-0 md:right-4 md:top-4 opacity-30 md:opacity-80 pointer-events-none">
-                        @if ($currentStreak)
-                            {{-- Tampilkan karakter saat ini --}}
-                            <img src="{{ asset('storage/' . $nextEvolution->svg_path) }}"
-                                class="w-32 md:w-64 h-auto object-contain">
-                        @elseif($nextEvolution)
-                            {{-- Jika belum punya, tampilkan siluet karakter berikutnya --}}
+                        @if ($nextEvolution)
+                            @if ($userHasNextEvolution)
+                                {{-- Sudah punya next evolution → tampil normal --}}
+                                <img src="{{ asset('storage/' . $nextEvolution->svg_path) }}"
+                                    class="w-32 md:w-64 h-auto object-contain">
+                            @else
+                                {{-- Belum punya → tampil siluet next evolution --}}
+                                <img src="{{ asset('storage/' . $nextEvolution->svg_path) }}"
+                                    class="w-32 md:w-64 h-auto object-contain"
+                                    style="filter: grayscale(100%) brightness(0%); opacity: 0.5;">
+                            @endif
+                        @elseif ($currentStreak)
+                            {{-- Tidak ada next → fallback ke current --}}
                             <img src="{{ asset('storage/' . $currentStreak->svg_path) }}"
-                                class="w-32 md:w-64 h-auto object-contain"
-                                style="filter: grayscale(100%) brightness(0%); opacity: 0.5;">
+                                class="w-32 md:w-64 h-auto object-contain">
                         @endif
                     </div>
 
@@ -338,15 +461,22 @@
                         <div
                             class="flex justify-between text-[10px] font-black text-blue-600 mb-2 uppercase tracking-widest">
                             <span>Capai XP harian</span>
-                            <span class="bg-blue-600 text-white px-3 py-0.5 rounded-full">
+                            <span class="bg-blue-600 text-white px-3 rounded-full">
                                 {{ $todayXp }}/140
                             </span>
                         </div>
 
-                        <div class="bg-white/50 rounded-full h-4 p-1 border border-blue-200 overflow-hidden">
+                        <div class="bg-white/50 rounded-full h-4 border border-blue-200 overflow-hidden relative">
 
-                            <div class="bg-blue-600 h-full rounded-full shadow-sm transition-all duration-1000"
+                            <!-- PROGRESS -->
+                            <div class="h-full rounded-full shadow-sm transition-all duration-1000 ease-out
+               bg-gradient-to-r from-blue-400 to-blue-600 relative overflow-hidden"
                                 style="width: {{ $xpPercent }}%">
+
+                                <!-- EFEK LONGOR -->
+                                <div class="absolute inset-0 overflow-hidden">
+                                    <div class="h-full w-1/2 bg-white/30 blur-sm animate-shimmer"></div>
+                                </div>
                             </div>
 
                         </div>
