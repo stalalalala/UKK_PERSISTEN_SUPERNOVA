@@ -155,10 +155,9 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <template x-for="to in paginatedTryouts" :key="to.id">
-                    <a :href="to.is_open ? to.url_mengerjakan : (to.sudah_dikerjakan ? to.url_hasil : '#')" 
-                       @click="if(to.is_locked) alert('Silakan pilih Universitas & Jurusan terlebih dahulu!')">
-                        
-                        <div :class="to.is_open ? 'bg-blue-50 border-blue-100 hover:shadow-lg' : (to.sudah_dikerjakan ? 'bg-emerald-50 border-emerald-100 hover:shadow-lg' : 'bg-gray-100 opacity-60 border-gray-200 cursor-not-allowed grayscale')"
+                    <a :href="to.sudah_dikerjakan ? to.url_hasil : (to.is_open ? to.url_mengerjakan : '#')" 
+                        @click="if(!to.sudah_dikerjakan && to.is_locked) alert('Silakan pilih Universitas & Jurusan terlebih dahulu!')">
+                        <div :class="to.sudah_dikerjakan ? 'bg-emerald-50 border-emerald-100 hover:shadow-lg' : (to.is_open ? 'bg-blue-50 border-blue-100 hover:shadow-lg' : 'bg-gray-100 opacity-60 border-gray-200 cursor-not-allowed grayscale')"
                             class="rounded-[2rem] p-6 flex flex-col items-center relative transition-all group border h-full">
                             
                             <template x-if="to.is_locked">
@@ -185,7 +184,9 @@
                                 <template x-if="to.sudah_dikerjakan"><i class="fa-solid fa-circle-check text-[10px]"></i></template>
                                 <template x-if="!to.is_open && !to.sudah_dikerjakan"><i class="fa-solid fa-lock text-[10px]"></i></template>
 
-                                <span class="text-[11px] font-bold" x-text="to.is_open ? (to.tanggal + ' - ' + to.tanggal_akhir) : (to.sudah_dikerjakan ? 'Lihat Hasil' : (to.is_locked ? 'Pilih Jurusan' : 'Belum Tersedia'))"></span>
+                                <span class="text-[11px] font-bold" 
+                                    x-text="to.sudah_dikerjakan ? 'Lihat Hasil' : (to.is_open ? (to.tanggal + ' - ' + to.tanggal_akhir) : (to.is_locked ? 'Pilih Jurusan' : 'Tidak Tersedia'))">
+                                </span>
                             </div>
                         </div>
                     </a>

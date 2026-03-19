@@ -134,7 +134,7 @@
             <h2>{{ $hasil }}</h2>
         </div>
 
-        <div class="section-title">Detail 3 Potensi Teratas</div>
+        <div class="section-title">Detail Potensi Teratas</div>
 
         @if(count($top_categories) > 0)
     @foreach($top_categories as $cat)

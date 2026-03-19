@@ -13,6 +13,107 @@
     <style>
         [x-cloak] {
             display: none !important;
+    @vite('resources/css/app.css')
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100 font-po min-h-screen py-10 overflow-x-hidden px-6 md:px-10">
+
+    <div x-data="{ 
+        soalAktif: parseInt(localStorage.getItem('last_soal_{{ $tryout->id }}_{{ $currentCategory->id }}')) || 1, 
+        totalSoal: {{ $soals->count() }}, 
+        jawabanTerpilih: JSON.parse(localStorage.getItem('jawaban_to_{{ $tryout->id }}_{{ $currentCategory->id }}')) || {},
+        
+        // PERBAIKAN TIMER: Cek localStorage dulu, jika tidak ada baru pakai durasi asli
+        timeLeft: parseInt(localStorage.getItem('timer_{{ $tryout->id }}_{{ $currentCategory->id }}')) ?? {{ ($totalDurasi ?? 30) * 60 }}, 
+        
+        timerText: '',
+        showExitModal: false,
+        showConfirmNextModal: false, 
+        
+        adaSoalKosong() {
+            return Object.keys(this.jawabanTerpilih).length < this.totalSoal;
+        },
+
+        pindahHalaman() {
+            this.sendData().then(() => {
+                this.clearData();
+                @if($nextCategory)
+                    window.location.href = '{{ route('tryout.jeda', [$tryout->id, $nextCategory->id]) }}';
+                @else
+                    window.location.href = '{{ route('tryout.hasil', $tryout->id) }}';
+                @endif
+            }).catch(error => {
+                console.error('Gagal mengirim jawaban:', error);
+                window.location.reload(); 
+            });
+        },
+
+        sendData() {
+            return fetch('{{ route('tryout.simpan', $tryout->id) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ jawaban: this.jawabanTerpilih })
+            });
+        },
+
+        init() {
+            // Jika di localStorage nilainya null (pertama kali buka), set ke durasi asli
+            if (isNaN(this.timeLeft) || this.timeLeft === null) {
+                this.timeLeft = {{ ($totalDurasi ?? 30) * 60 }};
+            }
+
+            this.updateTimerText();
+            this.startTimer();
+            this.lockHistory();
+
+            this.$watch('jawabanTerpilih', (value) => {
+                localStorage.setItem('jawaban_to_{{ $tryout->id }}_{{ $currentCategory->id }}', JSON.stringify(value));
+            });
+
+            this.$watch('soalAktif', (value) => {
+                localStorage.setItem('last_soal_{{ $tryout->id }}_{{ $currentCategory->id }}', value);
+            });
+        },
+
+        lockHistory() {
+            history.pushState(null, null, window.location.href);
+            window.onpopstate = () => {
+                this.showExitModal = true;
+                history.pushState(null, null, window.location.href);
+            };
+        },
+
+        updateTimerText() {
+            let minutes = Math.floor(this.timeLeft / 60);
+            let seconds = this.timeLeft % 60;
+            this.timerText = `${minutes.toString().padStart(2, '0')}.${seconds.toString().padStart(2, '0')}`;
+        },
+
+        startTimer() {
+            let timer = setInterval(() => {
+                if (this.timeLeft > 0) {
+                    this.timeLeft--;
+                    this.updateTimerText();
+                    // SIMPAN SISA WAKTU KE STORAGE TIAP DETIK
+                    localStorage.setItem('timer_{{ $tryout->id }}_{{ $currentCategory->id }}', this.timeLeft);
+                } else {
+                    clearInterval(timer);
+                    this.pindahHalaman();
+                }
+            }, 1000);
+        },
+
+        clearData() {
+            localStorage.removeItem('jawaban_to_{{ $tryout->id }}_{{ $currentCategory->id }}');
+            localStorage.removeItem('last_soal_{{ $tryout->id }}_{{ $currentCategory->id }}');
+            localStorage.removeItem('timer_{{ $tryout->id }}_{{ $currentCategory->id }}');
         }
 
         body {
@@ -71,19 +172,31 @@
             </div>
         </div>
 
-        <div
-            class="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
+        <div class="bg-white rounded-[35px] shadow-sm overflow-hidden border border-gray-100 flex flex-col lg:flex-row">
+            <div class="flex-1 p-5 sm:p-10 md:p-14 lg:p-16 border-b lg:border-b-0 lg:border-r border-gray-100">
+                @foreach($soals as $index => $soal)
+                <div x-show="soalAktif === {{ $index + 1 }}" x-cloak>
+                    <p class="text-xs md:text-sm font-semibold text-[#2E3B66] mb-4">Subtes: {{ $currentCategory->nama_kategori }}</p>
 
-            <div class="flex-1 flex flex-col min-h-0 border-b lg:border-b-0 lg:border-r-2 border-gray-100 bg-white">
+                    @if($soal->materi_teks)
+                    <div class="mb-6 p-4 bg-slate-50 border-l-4 border-[#3B82F6] rounded-r-xl text-gray-700 text-sm md:text-base leading-relaxed italic">
+                        {!! $soal->materi_teks !!}
+                    </div>
+                    @endif
 
-                <div class="pt-4 px-4 md:px-7">
-                    <div class="flex justify-between items-center mb-4">
-                        <p class="text-sm font-bold text-blue-500 uppercase tracking-widest">
-                            {{ $currentCategory->nama_kategori }}</p>
-                        <p class="text-sm font-medium uppercase text-gray-400">Soal <span
-                                x-text="soalAktifIdx + 1"></span> dari
-                            <span x-text="questions.length"></span>
-                        </p>
+                    @if($soal->image_url)
+                    <div class="mb-8 flex justify-center">
+                        <div class="max-w-full overflow-hidden rounded-2xl border-2 border-gray-100 shadow-sm bg-white">
+                            <img src="{{ str_contains($soal->image_url, 'http') ? $soal->image_url : asset('storage/' . $soal->image_url) }}" 
+                                alt="Gambar Soal" 
+                                class="max-h-[300px] md:max-h-[450px] w-auto object-contain p-2"
+                                onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Gambar+Tidak+Ditemukan';">
+                        </div>
+                    </div>
+                    @endif
+
+                    <div class="mb-10 text-gray-800 text-base sm:text-lg md:text-xl font-medium leading-relaxed">
+                        {!! $soal->pertanyaan !!}
                     </div>
                     <div class="w-full h-2.5 bg-gray-100 rounded-full mb-6">
                         <div class="h-full bg-blue-400 rounded-full transition-all duration-500"
@@ -126,6 +239,11 @@
                             </template>
                         </div>
                     </div>
+        <div x-show="showExitModal" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-transition x-cloak>
+            <div class="fixed inset-0 bg-black/50" @click="showExitModal = false"></div>
+            <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-10 text-center shadow-2xl">
+                <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                    <i class="fa-solid fa-circle-exclamation"></i>
                 </div>
 
                 <div class="p-4 bg-white border-t border-gray-50 shrink-0">
@@ -189,10 +307,20 @@
             </div>
         </div>
 
-        {{-- <form id="formKuis" action="{{ route('kuis.submit', $kuis->id) }}" method="POST" class="hidden">
-            @csrf
-            <input type="hidden" name="jawaban" :value="JSON.stringify(jawabanTerpilih)">
-        </form> --}}
+        <div x-show="showConfirmNextModal" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-transition x-cloak>
+            <div class="fixed inset-0 bg-black/50" @click="showConfirmNextModal = false"></div>
+            <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-10 text-center shadow-2xl">
+                <div class="w-20 h-20 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h3 class="text-xl font-black text-[#2E3B66] mb-2">Soal Belum Lengkap</h3>
+                <p class="text-gray-500 text-sm mb-8">Masih ada soal yang belum dijawab. Yakin ingin melanjutkan ke subtes berikutnya?</p>
+                <div class="flex flex-col gap-3">
+                    <button @click="pindahHalaman()" class="w-full py-3 rounded-xl font-bold bg-[#3B82F6] text-white">Ya, Lanjutkan</button>
+                    <button @click="showConfirmNextModal = false" class="w-full py-3 rounded-xl font-bold bg-gray-100 text-gray-500">Batal, Cek Lagi</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>

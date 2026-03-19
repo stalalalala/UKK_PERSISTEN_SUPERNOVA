@@ -28,6 +28,13 @@
     imageUrl: null,
     showImageModal: false,
     showImportModal: false,
+    showConfirmBackModal: false,
+    isDirty: false,
+    showSuccessModal: false,
+    successMessage: '',
+    showErrorModal: false,
+    errorMessage: '',
+    showPublishModal: false,
     tempImageUrl: '',
     namaTryout: '',
     tglMulai: '',
@@ -43,24 +50,41 @@
     ],
 
     init() {
+        history.pushState(null, null, window.location.href);
+        window.onpopstate = () => {
+            if (this.isDirty) {
+                this.showConfirmBackModal = true;
+                history.pushState(null, null, window.location.href);
+            } else {
+                window.location.href = '/admin/tryout';
+            }
+        };
+
         const saved = localStorage.getItem('persisten_tryout_final');
         if (saved) {
             const data = JSON.parse(saved);
-            this.subtesList = data.subtesList || this.subtesList;
+            this.subtesList = data.subtesList || [];
             this.namaTryout = data.namaTryout || '';
             this.tglMulai = data.tglMulai || '';
             this.tglSelesai = data.tglSelesai || '';
+            this.isDirty = true; 
         }
+
+        this.$watch('subtesList', () => this.saveLocal());
+        this.$watch('namaTryout', () => this.saveLocal());
+        this.$watch('tglMulai', () => this.saveLocal());
+        this.$watch('tglSelesai', () => this.saveLocal());
     },
 
-    saveLocal() {
-        localStorage.setItem('persisten_tryout_final', JSON.stringify({
-            subtesList: this.subtesList, 
-            namaTryout: this.namaTryout, 
-            tglMulai: this.tglMulai, 
-            tglSelesai: this.tglSelesai
-        }));
-    },
+        saveLocal() {
+            this.isDirty = true;
+            localStorage.setItem('persisten_tryout_final', JSON.stringify({
+                subtesList: this.subtesList, 
+                namaTryout: this.namaTryout, 
+                tglMulai: this.tglMulai, 
+                tglSelesai: this.tglSelesai
+            }));
+        },
 
     get canPublish() {
         return this.namaTryout && this.tglMulai && this.tglSelesai && this.subtesList.every(s => s.completed);
@@ -75,7 +99,7 @@
             const ws = XLSX.utils.aoa_to_sheet([...header, dummyData]);
             XLSX.utils.book_append_sheet(wb, ws, sub.name.substring(0, 31));
         });
-        XLSX.writeFile(wb, 'Template_Soal_20.xlsx');
+        XLSX.writeFile(wb, 'Template_Soal_TRYOUT.xlsx');
     },
 
     importSheet(event) {
@@ -83,37 +107,51 @@
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            workbook.SheetNames.forEach(sheetName => {
-                const sIdx = this.subtesList.findIndex(s => s.name.toLowerCase() === sheetName.toLowerCase());
-                if (sIdx !== -1) {
-                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-                    if (jsonData.length > 0) {
-                        let current = this.subtesList[sIdx];
-                        jsonData.forEach((row, i) => {
-                            if(i < this.targetSoal) {
-                                current.questions[i] = {
-                                    pertanyaan: row['Pertanyaan'] || '',
-                                    opsi_a: row['Opsi A'] || '', opsi_b: row['Opsi B'] || '',
-                                    opsi_c: row['Opsi C'] || '', opsi_d: row['Opsi D'] || '',
-                                    opsi_e: row['Opsi E'] || '',
-                                    jawaban_benar: row['Jawaban Benar']?.toUpperCase() || '',
-                                    pembahasan: row['Pembahasan'] || '',
-                                    materi_teks: row['Materi Teks'] || '',
-                                    image_url: row['Link Gambar'] || null
-                                };
-                            }
-                        });
-                        current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
-                        current.completed = (current.soalTerisi >= this.targetSoal); 
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                let totalImported = 0;
+                let foundSheet = false;
+
+                workbook.SheetNames.forEach(sheetName => {
+                    const sIdx = this.subtesList.findIndex(s => s.name.toLowerCase() === sheetName.toLowerCase());
+                    if (sIdx !== -1) {
+                        foundSheet = true;
+                        const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+                        if (jsonData.length > 0) {
+                            let current = this.subtesList[sIdx];
+                            jsonData.forEach((row, i) => {
+                                if(i < this.targetSoal) {
+                                    current.questions[i] = {
+                                        pertanyaan: row['Pertanyaan'] || '',
+                                        opsi_a: row['Opsi A'] || '', opsi_b: row['Opsi B'] || '',
+                                        opsi_c: row['Opsi C'] || '', opsi_d: row['Opsi D'] || '',
+                                        opsi_e: row['Opsi E'] || '',
+                                        jawaban_benar: row['Jawaban Benar']?.toString().toUpperCase() || '',
+                                        pembahasan: row['Pembahasan'] || '',
+                                        materi_teks: row['Materi Teks'] || '',
+                                        image_url: row['Link Gambar'] || null
+                                    };
+                                }
+                            });
+                            current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
+                            current.completed = (current.soalTerisi >= this.targetSoal);
+                            totalImported += current.soalTerisi;
+                        }
                     }
-                }
-            });
-            this.saveLocal();
-            alert('Berhasil mengimpor data!');
-            this.showImportModal = false;
-            if (this.activeSubtesIndex !== null) this.loadQuestion();
+                });
+
+                if (!foundSheet) throw new Error('Nama sheet tidak sesuai subtes.');
+                
+                this.saveLocal();
+                this.successMessage = 'Berhasil mengimport ' + totalImported + ' soal.';
+                this.showSuccessModal = true;
+                this.showImportModal = false;
+                if (this.activeSubtesIndex !== null) this.loadQuestion();
+            } catch (error) {
+                this.errorMessage = error.message;
+                this.showErrorModal = true;
+            }
             event.target.value = '';
         };
         reader.readAsArrayBuffer(file);
@@ -214,13 +252,17 @@
     },
 
     publikasikan() {
-        if (!this.canPublish) {
-            alert('Lengkapi semua data dan subtes!'); return;
-        }
-        if(confirm('Publikasikan Tryout?')) {
-            localStorage.removeItem('persisten_tryout_final');
-            document.getElementById('formTryout').submit();
-        }
+    if (!this.canPublish) {
+        this.errorMessage = 'Lengkapi semua data dan subtes terlebih dahulu!';
+        this.showErrorModal = true;
+        return;
+    }
+    this.showPublishModal = true;
+    },
+
+    confirmPublikasikan() {
+        localStorage.removeItem('persisten_tryout_final');
+        document.getElementById('formTryout').submit();
     }
 }">
 
@@ -250,23 +292,60 @@
         </div>
     </div>
 
-    <div x-show="showImportModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" x-transition>
-        <div class="bg-white w-full max-w-md rounded-[30px] p-8 shadow-2xl" @click.away="showImportModal = false">
+    <div x-show="showImportModal" x-cloak class="fixed inset-0 z-[100] overflow-y-auto">
+   
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="showImportModal = false"></div>
+
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+        <div class="relative bg-white w-full max-w-lg rounded-[35px] shadow-2xl p-8 transform transition-all"
+             x-show="showImportModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0">
+
             <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold text-lg text-[#4A72D4]">Import Soal via Sheet</h3>
-                <button type="button" @click="showImportModal = false" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fa-solid fa-file-excel text-emerald-500"></i> Import Soal dari Excel
+                </h3>
+                <button @click="showImportModal = false" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <i class="fa-solid fa-circle-xmark text-2xl"></i>
+                </button>
             </div>
-            <div class="space-y-6 text-center">
-                <p class="text-xs text-gray-400 font-medium">Pastikan nama Sheet di Excel sesuai dengan nama Subtes.</p>
-                <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-emerald-100 rounded-[30px] bg-emerald-50/50 cursor-pointer hover:bg-emerald-50 transition-all">
-                    <i class="fa-solid fa-file-excel text-emerald-400 text-3xl mb-3"></i>
-                    <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Klik untuk pilih file Excel</p>
-                    <input type="file" class="hidden" accept=".xlsx, .xls" @change="importSheet">
-                </label>
-                <button type="button" @click="unduhTemplate()" class="text-[10px] font-bold text-[#4A72D4] uppercase hover:underline">Belum punya template? Unduh di sini</button>
+
+            <div class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-300 transition-all bg-gray-50/50">
+                <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
+                </div>
+                <p class="text-sm font-bold text-gray-600">Klik di sini</p>
+                <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 100MB (.xlsx, .xls)</p>
+                
+                <input type="file" class="hidden" x-ref="soalExcelInput" @change="importSheet($event)" accept=".xlsx,.xls">
+                <button @click="$refs.soalExcelInput.click()"
+                        class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">
+                    Pilih File
+                </button>
+            </div>
+
+            <div class="mt-8 p-4 bg-emerald-50 rounded-2xl flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-circle-info text-emerald-500"></i>
+                    <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-tight">Belum punya formatnya?</span>
+                </div>
+                <button @click="unduhTemplate()"
+                   class="text-[11px] font-black text-emerald-600 hover:underline">
+                    DOWNLOAD TEMPLATE
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-8">
+                <button @click="showImportModal = false"
+                        class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                    Batalkan
+                </button>
             </div>
         </div>
     </div>
+</div>
 
     <div class="flex h-full w-full">
         <aside x-data="{ currentPage: 'tryout' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
@@ -513,36 +592,34 @@ laporan</span>
                 <input type="hidden" name="payload_full_data" :value="JSON.stringify(subtesList)">
 
                 <div x-show="activeSubtesIndex === null" x-transition>
-                    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <button type="button" @click="backToDaftarTryout()" class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all"><i class="fa-solid fa-arrow-left"></i></button>
-                            <div>
-                                <h2 class="text-2xl font-extrabold text-[#4A72D4]">Panel Pembuatan Tryout</h2>
-                                <p class="text-gray-400 text-xs mt-1 italic font-bold tracking-wide">Lengkapi data subtes untuk mempublikasikan.</p>
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                            <button type="button" @click="unduhTemplate()" class="bg-emerald-500 text-white px-6 py-3 rounded-2xl font-bold text-xs shadow-lg flex items-center gap-2 hover:scale-105 transition-all">
-                                <i class="fa-solid fa-download"></i> UNDUH TEMPLATE
-                            </button>
-                            <button type="button" @click="showImportModal = true" class="bg-white border border-blue-100 text-[#4A72D4] px-6 py-3 rounded-2xl font-bold text-xs shadow-lg flex items-center gap-2 hover:scale-105 transition-all">
-                                <i class="fa-solid fa-file-import"></i> IMPORT VIA SHEET
-                            </button>
+                <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <button type="button" @click="isDirty ? showConfirmBackModal = true : window.location.href = '/admin/tryout'" class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all"><i class="fa-solid fa-arrow-left"></i></button>
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-[#4A72D4]">Panel Pembuatan Tryout</h2>
+                            <p class="text-gray-400 text-xs mt-1 italic font-bold tracking-wide">Lengkapi data subtes untuk mempublikasikan.</p>
                         </div>
                     </div>
+                    
+                    <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                        <button type="button" @click="showImportModal = true" class="w-full md:w-auto bg-white border border-blue-100 text-[#4A72D4] px-6 py-3 rounded-2xl font-bold text-xs shadow-lg flex items-center justify-center gap-2 hover:scale-105 transition-all">
+                            <i class="fa-solid fa-file-import"></i> IMPORT VIA SHEET
+                        </button>
+                    </div>
+                </div>
 
                     <div class="bg-white p-8 rounded-[35px] shadow-sm mb-8 border border-blue-50 grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="space-y-2">
                             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Nama Tryout *</label>
-                            <input type="text" x-model="namaTryout" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
+                            <input type="text" x-model="namaTryout" @input="saveLocal()" @input="isDirty = true" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Mulai *</label>
-                            <input type="date" x-model="tglMulai" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
+                            <input type="date" x-model="tglMulai" @input="saveLocal()" @input="isDirty = true" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Selesai *</label>
-                            <input type="date" x-model="tglSelesai" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
+                            <input type="date" x-model="tglSelesai" @input="saveLocal()" @input="isDirty = true" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
                         </div>
                     </div>
 
@@ -568,21 +645,49 @@ laporan</span>
                 </div>
 
                 <div x-show="activeSubtesIndex !== null" x-cloak x-transition>
-                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-                        <div class="flex items-center gap-4">
-                            <button type="button" @click="backToKategori()" class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all"><i class="fa-solid fa-arrow-left"></i></button>
-                            <h2 class="text-xl font-extrabold text-[#4A72D4]" x-text="subtesList[activeSubtesIndex]?.name"></h2>
-                        </div>
-                        <div class="flex gap-2">
-                            <button type="button" @click="showImportModal = true" class="bg-white border border-blue-100 text-[#4A72D4] px-5 py-3 rounded-2xl text-[10px] font-black uppercase shadow-sm hover:bg-blue-50">
-                                <i class="fa-solid fa-file-import mr-2"></i> Import
-                            </button>
-                            <div class="bg-white px-4 py-2 rounded-xl shadow-sm border flex items-center gap-3">
-                                <label class="text-[10px] font-bold text-gray-400 uppercase">Waktu (m)</label>
-                                <input type="number" x-model="subtesList[activeSubtesIndex].waktu" class="w-12 bg-gray-50 rounded-lg p-2 text-sm font-bold text-[#4A72D4] outline-none">
-                            </div>
-                        </div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                    <div class="flex items-center gap-4">
+                        <button type="button" @click="backToKategori()" class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <h2 class="text-xl font-extrabold text-[#4A72D4]" x-text="subtesList[activeSubtesIndex]?.name"></h2>
                     </div>
+
+                    <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                        
+                        <button type="button" @click="showImportModal = true" 
+                            class="w-full md:w-auto flex items-center justify-center bg-white border border-blue-100 text-[#4A72D4] px-5 py-3 rounded-2xl text-[10px] font-black uppercase shadow-sm hover:bg-blue-50">
+                            <i class="fa-solid fa-file-import mr-2"></i> Import
+                        </button>
+
+                        <div class="w-full md:w-48 flex flex-col gap-2" x-data="{ open: false }" @click.away="open = false">
+                            <div class="bg-white px-4 py-3 rounded-2xl shadow-sm border border-blue-50 flex items-center gap-2 relative h-full">
+                                <i class="fa-solid fa-stopwatch text-orange-400 text-sm"></i>
+                                
+                                <button type="button" @click="open = !open"
+                                    class="w-full flex items-center justify-between text-sm font-bold text-gray-700 focus:outline-none">
+                                    <span x-text="subtesList[activeSubtesIndex].waktu + ' Menit'"></span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"
+                                        :class="open ? 'rotate-180' : ''"></i>
+                                </button>
+
+                                <div x-show="open" 
+                                    x-transition 
+                                    class="absolute z-50 w-full mt-2 top-full left-0 bg-white border border-blue-50 shadow-xl rounded-2xl overflow-hidden py-2"
+                                    style="display: none;">
+                                    <template x-for="t in [20,25,30,35,40,45,50,55,60]">
+                                        <div @click="subtesList[activeSubtesIndex].waktu = t; open = false"
+                                            class="px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-[#4A72D4] cursor-pointer transition-colors font-medium"
+                                            x-text="t + ' Menit'">
+                                        </div>
+                                    </template>
+                                </div>
+                            
+                        </div>
+
+                    </div>
+                </div>
+            </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="lg:col-span-2 space-y-6">
@@ -645,8 +750,105 @@ laporan</span>
                         </div>
                     </div>
                 </div>
+                </div>
             </form>
         </main>
     </div>
+
+    {{-- MODAL KEMBALI --}}
+    <div x-show="showConfirmBackModal" x-cloak class="fixed inset-0 z-[150] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showConfirmBackModal = false"></div>
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[151] text-center shadow-2xl border border-blue-50">
+        <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Konfirmasi Keluar</h3>
+        <p class="text-gray-500 text-sm mb-8">Data belum disimpan. Jika keluar sekarang, data akan dihapus.</p>
+        <div class="flex gap-3">
+            <button type="button" @click="showConfirmBackModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200">Batal</button>
+            <button type="button" @click="isDirty = false; localStorage.removeItem('persisten_tryout_final'); window.location.href = '/admin/tryout'" 
+                    class="flex-1 py-3 rounded-xl font-bold bg-red-500 text-white shadow-lg shadow-red-200">Ya, Keluar</button>
+        </div>
+    </div>
+</div>
+
+{{-- MODAL BERHASIL IMPORT --}}
+<div x-show="showSuccessModal" x-cloak class="fixed inset-0 z-[160] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showSuccessModal = false"></div>
+    
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[161] text-center shadow-2xl border border-blue-50"
+         x-show="showSuccessModal"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100">
+        
+        <div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Import Berhasil</h3>
+        <p class="text-gray-500 text-sm mb-8" x-text="successMessage"></p>
+        
+        <button type="button" @click="showSuccessModal = false" 
+                class="w-full py-3 rounded-xl font-bold bg-[#4A72D4] text-white shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all text-center">
+            Tutup
+        </button>
+    </div>
+</div>
+
+{{-- MODAL GAGAL IMPORT --}}
+<div x-show="showErrorModal" x-cloak class="fixed inset-0 z-[170] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showErrorModal = false"></div>
+    
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[171] text-center shadow-2xl border border-blue-50"
+         x-show="showErrorModal"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100">
+        
+        <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-circle-xmark"></i>
+        </div>
+        
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Import Gagal</h3>
+        <p class="text-gray-500 text-sm mb-8" x-text="errorMessage"></p>
+        
+        <button type="button" @click="showErrorModal = false" 
+                class="w-full py-3 rounded-xl font-bold bg-gray-800 text-white shadow-lg hover:bg-black transition-all text-center">
+            Coba Lagi
+        </button>
+    </div>
+</div>
+
+{{-- MODAL KONFIRM PUBLIKASI --}}
+<div x-show="showPublishModal" x-cloak class="fixed inset-0 z-[180] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showPublishModal = false"></div>
+    
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[181] text-center shadow-2xl border border-blue-50"
+         x-show="showPublishModal"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100">
+        
+        <div class="w-20 h-20 bg-blue-100 text-[#4A72D4] rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Publikasikan Tryout?</h3>
+        <p class="text-gray-500 text-sm mb-8">Pastikan semua data sudah benar. Tryout yang dipublikasikan akan langsung dapat diakses.</p>
+        
+        <div class="flex gap-3">
+            <button type="button" @click="showPublishModal = false" 
+                    class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all">
+                Batal
+            </button>
+            <button type="button" @click="confirmPublikasikan()" 
+                    class="flex-1 py-3 rounded-xl font-bold bg-[#4A72D4] text-white shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all">
+                Ya, Terbitkan
+            </button>
+        </div>
+    </div>
+</div>
 </body>
+
 </html>

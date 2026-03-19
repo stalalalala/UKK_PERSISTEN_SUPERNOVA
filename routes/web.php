@@ -120,8 +120,11 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('peluangPtn', HalamanPeluangPtnController::class)->names('peluang');
 
         // TRYOUT
-        Route::resource('tryout', AdminTryoutController::class);
+        Route::post('tryout/{id}/restore', [AdminTryoutController::class, 'restore'])->name('tryout.restore');
+        Route::delete('tryout/{id}/force-delete', [AdminTryoutController::class, 'forceDelete'])->name('tryout.force-delete');
         Route::patch('tryout/{id}/toggle', [AdminTryoutController::class, 'toggleStatus'])->name('tryout.toggle');
+        Route::resource('tryout', AdminTryoutController::class);
+        
 
         // minat bakat
         Route::get('minat-bakat/manajemen', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'manajemenSoal'])
@@ -147,6 +150,12 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('minat-bakat/soal/import-bulk', [App\Http\Controllers\admin\AdminMinatBakatController::class, 'importSoalBulk'])
     ->name('minatBakat.soal.importBulk');
+
+    Route::post('minat-bakat/{id}/restore', [AdminMinatBakatController::class, 'restore'])
+            ->name('minatBakat.kategori.restore');
+
+        Route::delete('minat-bakat/{id}/force-delete', [AdminMinatBakatController::class, 'forceDelete'])
+            ->name('minatBakat.kategori.forceDelete');
 
         Route::resource('minatBakat', AdminMinatBakatController::class)->names([
             'index'   => 'minatBakat.index',
@@ -256,6 +265,7 @@ Route::middleware(['auth'])->group(function () {
       });
 
         // Minat Bakat
+        Route::get('/minat-bakat/download-pdf', [MinatBakatController::class, 'downloadPdf'])->name('minatbakat.download');
         Route::get('minatbakat/hasil', [MinatBakatController::class, 'hasil'])->name('minatbakat.hasil');
         Route::get('minatbakat/intruksi', [MinatBakatController::class, 'intruksi'])->name('minatbakat.intruksi');
 

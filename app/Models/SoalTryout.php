@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SoalTryout extends Model
 {
+    use SoftDeletes;
     protected $table = 'soal_tryouts';
 
     // WAJIB: Tambahkan semua kolom yang ada di form/excel kamu

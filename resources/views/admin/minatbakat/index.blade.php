@@ -48,6 +48,7 @@
     </style>
 </head>
 
+<<<<<<< HEAD
 <body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="{
     activeMenu: 'minat-bakat',
     currentPage: 'minat_bakat',
@@ -177,6 +178,9 @@
         window.location.href = `${baseUrl}?category=${encodeURIComponent(name)}`;
     }
 }">
+=======
+<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="minatBakatLogic()">
+>>>>>>> perubahan
 
     <div class="flex h-full w-full">
         <aside
@@ -452,16 +456,24 @@
                     </div>
                 </div>
 
-                <div class="mb-6 flex items-center justify-between">
+                <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h3 class="text-sm font-bold text-gray-800 uppercase tracking-widest">Kategori Minat Bakat</h3>
                         <p class="text-[10px] text-gray-400 font-medium mt-1">Kelola kategori dan deskripsi Minat bakat
                         </p>
                     </div>
-                    <button @click="openAddModal()"
-                        class="px-6 py-3 bg-[#4A72D4] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-blue-100 hover:scale-105 active:scale-95 transition-all">
-                        <i class="fa-solid fa-plus mr-2"></i> Tambah Kategori
-                    </button>
+                    
+                    <div class="flex items-center gap-3">
+                        <button @click="showHistoryModal = true" 
+                            class="flex-1 md:flex-none px-5 py-3 bg-white border border-gray-200 text-gray-500 rounded-xl text-[10px] font-bold uppercase hover:bg-gray-50 transition-all flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-clock-rotate-left mr-2 text-[#4A72D4]"></i> History
+                        </button>
+                        
+                        <button @click="openAddModal()"
+                            class="flex-1 md:flex-none px-6 py-3 bg-[#4A72D4] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-blue-100 hover:scale-105 active:scale-95 transition-all flex items-center justify-center">
+                            <i class="fa-solid fa-plus mr-2"></i> Tambah Kategori
+                        </button>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
@@ -482,8 +494,12 @@
                                     class="w-8 h-8 bg-white text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all shadow-md flex items-center justify-center">
                                     <i class="fa-solid fa-pen-to-square text-xs"></i>
                                 </button>
+<<<<<<< HEAD
                                 <button @click.stop="deleteCategory(cat.id)"
                                     class="w-8 h-8 bg-white text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-md flex items-center justify-center">
+=======
+                                <button @click.stop="prepareDelete(cat)" class="w-8 h-8 bg-white text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-md flex items-center justify-center">
+>>>>>>> perubahan
                                     <i class="fa-solid fa-trash text-xs"></i>
                                 </button>
                             </div>
@@ -708,7 +724,6 @@
         Swal.fire({
             icon: 'success',
             title: '{{ session('success') }}',
-
             width: '340px',
             padding: '1.8rem',
 
@@ -768,6 +783,342 @@
     "
 ></div>
 @endif
+
+    <script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('minatBakatLogic', () => ({
+            activeMenu: 'minat-bakat',
+            currentPage: 'minat_bakat',
+            searchQuery: '',
+            searchParticipants: '',
+            mobileMenuOpen: false,
+            showModal: false,
+            showAllParticipants: false,
+            showHistoryModal: false,
+            isEdit: false,
+            showRestoreModal: false,
+            showForceDeleteModal: false,
+            actionId: null,
+            actionName: '',
+            pagiCurrentPage: 1,
+            pagiItemsPerPage: 5,
+            showDeleteConfirmModal: false,
+
+            // Data Initialization
+            deletedSubtests: @json($trashedCategories ?? []),
+            categories: @json($categories),
+            participants: @json($participants),
+
+            formData: {
+                id: null,
+                name: '',
+                color: '#4A72D4',
+                description: ''
+            },
+
+            // Computed Properties
+            get totalSoalAktif() {
+                return this.categories.reduce((acc, cat) => acc + (parseInt(cat.soals_count) || 0), 0);
+            },
+
+            get filteredParticipants() {
+                return this.participants.filter(p => 
+                    p.name.toLowerCase().includes(this.searchParticipants.toLowerCase()) || 
+                    (p.hasil && p.hasil.toLowerCase().includes(this.searchParticipants.toLowerCase()))
+                );
+            },
+
+            get paginatedParticipants() {
+                let start = (this.pagiCurrentPage - 1) * this.pagiItemsPerPage;
+                return this.filteredParticipants.slice(start, start + this.pagiItemsPerPage);
+            },
+
+            get totalParticipantPages() {
+                return Math.ceil(this.filteredParticipants.length / this.pagiItemsPerPage) || 1;
+            },
+
+            // Actions
+            exportData() {
+                window.location.href = '{{ route('admin.minatBakat.export') }}';
+            },
+
+            async resetData() {
+                if(confirm('PERINGATAN: Pastikan Anda sudah membackup data! Hapus semua data peserta sekarang?')) {
+                    try {
+                        const response = await fetch('{{ route('admin.minatBakat.reset') }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            }
+                        });
+                        if(response.ok) {
+                            alert('Database berhasil dibersihkan');
+                            window.location.reload();
+                        }
+                    } catch (e) { alert('Gagal mereset data'); }
+                }
+            },
+
+            openAddModal() {
+                this.isEdit = false;
+                this.formData = { id: null, name: '', color: '#4A72D4', description: '' };
+                this.showModal = true;
+            },
+
+            openEditModal(cat) {
+                this.isEdit = true;
+                this.formData = { 
+                    id: cat.id, 
+                    name: cat.name, 
+                    color: cat.color, 
+                    description: cat.description || '' 
+                };
+                this.showModal = true;
+            },
+
+            async saveCategory() {
+                let url = this.isEdit 
+                    ? '{{ route("admin.minatBakat.kategori.update", ":id") }}'.replace(':id', this.formData.id)
+                    : '{{ route("admin.minatBakat.kategori.store") }}';
+                
+                let method = this.isEdit ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: this.formData.name,
+                        color: this.formData.color,
+                        description: this.formData.description
+                    })
+                });
+
+                if (response.ok) {
+                    const newCategory = await response.json();
+                    if (this.isEdit) {
+                        window.location.reload(); 
+                    } else {
+                        this.categories.unshift(newCategory); 
+                        this.showModal = false;
+                    }
+                }
+            },
+
+            async deleteCategory(id) {
+                if(confirm('Pindahkan kategori ini ke History?')) {
+                    let url = '{{ route('admin.minatBakat.kategori.destroy', ':id') }}'.replace(':id', id);
+                    const response = await fetch(url, {
+                        method: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+                    });
+                    if (response.ok) {
+                        const item = this.categories.find(c => c.id === id);
+                        this.deletedSubtests.push(item);
+                        this.categories = this.categories.filter(c => c.id !== id);
+                    }
+                }
+            },
+
+            prepareRestore(item) {
+                this.actionId = item.id;
+                this.actionName = item.name;
+                this.showRestoreModal = true;
+            },
+
+            prepareForceDelete(item) {
+                this.actionId = item.id;
+                this.actionName = item.name;
+                this.showForceDeleteModal = true;
+            },
+
+            async confirmRestore() {
+                let url = '{{ route('admin.minatBakat.kategori.restore', ':id') }}'.replace(':id', this.actionId);
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const item = this.deletedSubtests.find(c => c.id === this.actionId);
+                    this.categories.unshift(item);
+                    this.deletedSubtests = this.deletedSubtests.filter(c => c.id !== this.actionId);
+                    this.showRestoreModal = false;
+                }
+            },
+
+            // Fungsi untuk memicu modal konfirmasi pindah ke history
+            prepareDelete(item) {
+                this.actionId = item.id;
+                this.actionName = item.name;
+                this.showDeleteConfirmModal = true;
+            },
+
+            // Fungsi eksekusi setelah klik "Ya" di modal konfirmasi
+            async confirmDeleteToHistory() {
+                let url = '{{ route("admin.minatBakat.kategori.destroy", ":id") }}'.replace(':id', this.actionId);
+                
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: { 
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json' 
+                    }
+                });
+
+                if (response.ok) {
+                    const item = this.categories.find(c => c.id === this.actionId);
+                    this.deletedSubtests.push(item);
+                    this.categories = this.categories.filter(c => c.id !== this.actionId);
+                    this.showDeleteConfirmModal = false; // Tutup modal
+                }
+            },
+
+            async confirmPermanentDelete() {
+                let url = '{{ route('admin.minatBakat.kategori.forceDelete', ':id') }}'.replace(':id', this.actionId);
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+                });
+
+                if (response.ok) {
+                    this.deletedSubtests = this.deletedSubtests.filter(c => c.id !== this.actionId);
+                    this.showForceDeleteModal = false;
+                }
+            },
+
+            goToSoal(name) {
+                const baseUrl = '{{ route("admin.minatBakat.manajemen") }}';
+                window.location.href = `${baseUrl}?category=${encodeURIComponent(name)}`;
+            }
+        }));
+    });
+</script>
+
+{{-- HISTORY --}}
+<div x-show="showHistoryModal" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-6">
+    <div @click="showHistoryModal = false" 
+         x-transition:enter="ease-out duration-300" 
+         x-transition:enter-start="opacity-0" 
+         x-transition:leave="ease-in duration-200" 
+         class="absolute inset-0 bg-[#2D3B61]/60 backdrop-blur-md"></div>
+
+    <div class="bg-white rounded-[2.5rem] w-full max-w-2xl flex flex-col relative shadow-[0_20px_50px_rgba(0,0,0,0.2)] overflow-hidden max-h-[80vh]"
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95 translate-y-10">
+        
+        <div class="p-8 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-50 text-[#4A72D4] rounded-2xl flex items-center justify-center shadow-inner">
+                    <i class="fa-solid fa-box-archive text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-black text-[#2D3B61] uppercase tracking-tight">History</h2>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Kelola data terhapus</p>
+                </div>
+            </div>
+            <button @click="showHistoryModal = false" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-8 bg-[#F8FAFF] custom-scrollbar">
+            <div class="grid gap-4">
+                <template x-if="deletedSubtests.length === 0">
+                    <div class="text-center py-16 bg-white rounded-[2rem] border-2 border-dashed border-gray-100">
+                        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Tidak ada kategori terhapus</p>
+                    </div>
+                </template>
+
+                <template x-for="item in deletedSubtests" :key="item.id">
+                    <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center justify-between group hover:shadow-md transition-all duration-300">
+                        <div class="flex items-center gap-4 w-full sm:w-auto mb-4 sm:mb-0">
+                            <div class="w-2 h-10 rounded-full shrink-0" :style="`background-color: ${item.color}`"></div>
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-[#2D3B61] text-sm truncate" x-text="item.name"></h4>
+                                <p class="text-[10px] text-gray-400 font-medium line-clamp-1" x-text="item.description || 'Tanpa deskripsi'"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <button @click="prepareRestore(item)" 
+                                    class="flex-1 sm:flex-none px-5 py-2.5 bg-emerald-50 text-emerald-600 rounded-xl text-[10px] font-bold uppercase hover:bg-emerald-500 hover:text-white transition-all">
+                                <i class="fa-solid fa-rotate-left mr-1.5"></i> Pulihkan
+                            </button>
+                            <button @click="prepareForceDelete(item)" 
+                                    class="flex-1 sm:flex-none px-5 py-2.5 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold uppercase hover:bg-red-500 hover:text-white transition-all">
+                                <i class="fa-solid fa-trash-can mr-1.5"></i> Hapus
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{{-- MODAL PULIHKAN --}}
+<div x-show="showRestoreModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showRestoreModal = false" x-transition:opacity></div>
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" 
+         x-show="showRestoreModal" 
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-90">
+        <div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-inner">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Pulihkan Kategori?</h3>
+        <p class="text-gray-500 text-sm mb-8 italic">" <span class="font-bold" x-text="actionName"></span> "</p>
+        <div class="flex gap-3">
+            <button @click="showRestoreModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400 hover:bg-gray-200 transition-all">Batal</button>
+            <button @click="confirmRestore()" class="flex-1 py-3 rounded-xl font-bold bg-emerald-500 text-white shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all">Ya, Pulihkan</button>
+        </div>
+    </div>
+</div>
+
+{{-- MODAL HAPUS PERMANEN --}}
+<div x-show="showForceDeleteModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showForceDeleteModal = false" x-transition:opacity></div>
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" 
+         x-show="showForceDeleteModal" 
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-90">
+        <div class="w-20 h-20 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-inner">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Hapus Permanen?</h3>
+        <p class="text-gray-500 text-sm mb-8">Data <span class="text-rose-600 font-bold" x-text="actionName"></span> akan dihapus selamanya dari sistem.</p>
+        <div class="flex gap-3">
+            <button @click="showForceDeleteModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400 hover:bg-gray-200 transition-all">Batal</button>
+            <button @click="confirmPermanentDelete()" class="flex-1 py-3 rounded-xl font-bold bg-rose-600 text-white shadow-lg shadow-rose-100 hover:bg-rose-700 transition-all">Hapus!</button>
+        </div>
+    </div>
+</div>
+
+
+{{-- MODAL KONFIRMASI PINDAH KE HISTORY --}}
+<div x-show="showDeleteConfirmModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showDeleteConfirmModal = false"></div>
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" 
+         x-show="showDeleteConfirmModal" 
+         x-transition>
+        <div class="w-20 h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-box-archive"></i>
+        </div>
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2 uppercase tracking-tight">Hapus Kategori?</h3>
+        <p class="text-gray-500 text-xs mb-8">Kategori <span class="font-bold text-[#4A72D4]" x-text="actionName"></span> akan dipindahkan ke folder History.</p>
+        <div class="flex gap-3">
+            <button @click="showDeleteConfirmModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400 text-[10px] uppercase">Batal</button>
+            <button @click="confirmDeleteToHistory()" class="flex-1 py-3 rounded-xl font-bold bg-amber-500 text-white shadow-lg shadow-amber-100 text-[10px] uppercase">Ya, Arsipkan</button>
+        </div>
+    </div>
+</div>
+
 </body>
 
 </html>

@@ -20,10 +20,21 @@ class AdminTryoutController extends Controller
     public function index() 
     {
         $tryouts = AdminTryout::with(['categories'])
-            ->withCount(['categories', 'soals'])
-            ->get();
+        ->withCount(['categories', 'soals'])
+        ->latest()
+        ->get();
 
-        return view('admin.tryout.index', compact('tryouts'));
+        $trashed = AdminTryout::onlyTrashed()
+        ->withCount(['categories as categories_count' => function($query) {
+            $query->onlyTrashed();
+        }])
+        ->withCount(['soals as soals_count' => function($query) {
+            $query->onlyTrashed();
+        }])
+        ->latest()
+        ->get();
+
+        return view('admin.tryout.index', compact('tryouts', 'trashed'));
     }
 
     private function logAktivitas($aksi, $judul, $deskripsi, $status = 'active')
@@ -90,6 +101,7 @@ class AdminTryoutController extends Controller
                                 SoalTryout::create([
                                     'category_id'   => $category->id,
                                     'materi_teks'   => $s['materi_teks'] ?? '',
+                                    'image_url'     => $s['image_url'] ?? null,
                                     'pertanyaan'    => $s['pertanyaan'],
                                     'opsi_a'        => $s['opsi_a'],
                                     'opsi_b'        => $s['opsi_b'],
@@ -163,6 +175,7 @@ class AdminTryoutController extends Controller
                                 SoalTryout::create([
                                     'category_id'   => $category->id,
                                     'materi_teks'   => $s['materi_teks'] ?? '',
+                                    'image_url'     => $s['image_url'] ?? null,
                                     'pertanyaan'    => $s['pertanyaan'],
                                     'opsi_a'        => $s['opsi_a'],
                                     'opsi_b'        => $s['opsi_b'],
@@ -201,25 +214,87 @@ class AdminTryoutController extends Controller
             $adminTryout = AdminTryout::findOrFail($id);
             $nama_tryout = $adminTryout->nama_tryout;
 
+            // Soft Delete semua subtes terkait
             foreach ($adminTryout->categories as $category) {
-                SoalTryout::where('category_id', $category->id)->delete();
+                // Soft Delete semua soal di dalam subtes ini
+                $category->soals()->delete(); 
                 $category->delete();
             }
+            
             $adminTryout->delete();
 
-            // Log Aktivitas
             $this->logAktivitas(
                 'HAPUS TRYOUT', 
                 $nama_tryout, 
-                'Admin menghapus permanen seluruh data terkait paket tryout ini.',
+                'Admin memindahkan paket tryout ke history.',
                 'deleted'
             );
 
             DB::commit();
-            return redirect()->route('admin.tryout.index')->with('success', 'Data dihapus!');
+            return redirect()->route('admin.tryout.index')->with('success', 'Data dipindahkan ke history!');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal hapus: ' . $e->getMessage());
+        }
+    }
+
+    public function restore($id)
+    {
+        DB::beginTransaction();
+        try {
+            // 1. Ambil data tryout dari sampah dengan findOrFail
+            $tryout = AdminTryout::onlyTrashed()->findOrFail($id);
+            
+            // 2. Paksa hapus nilai deleted_at (Restore)
+            $tryout->restore();
+
+            // 3. Cari semua kategori/subtes yang terkait di sampah dan pulihkan
+            $categories = TryoutCategory::onlyTrashed()
+                ->where('admin_tryout_id', $id)
+                ->get();
+
+            foreach ($categories as $category) {
+                // Pulihkan soal-soal di dalam subtes ini
+                SoalTryout::onlyTrashed()
+                    ->where('category_id', $category->id)
+                    ->restore();
+                
+                // Pulihkan subtesnya
+                $category->restore();
+            }
+
+            DB::commit();
+
+            // Mengarahkan kembali ke index untuk merefresh data terbaru
+            return redirect()->route('admin.tryout.index')->with('success', 'Paket Tryout berhasil dipulihkan!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal memulihkan: ' . $e->getMessage());
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        DB::beginTransaction();
+        try {
+            // Hapus permanen dari database
+            $tryout = AdminTryout::onlyTrashed()->findOrFail($id);
+            
+            // Ambil kategori di sampah untuk menghapus soal permanen
+            $categories = TryoutCategory::onlyTrashed()->where('admin_tryout_id', $id)->get();
+            
+            foreach ($categories as $category) {
+                SoalTryout::onlyTrashed()->where('category_id', $category->id)->forceDelete();
+                $category->forceDelete();
+            }
+            
+            $tryout->forceDelete();
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Paket Tryout dihapus permanen!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal hapus permanen: ' . $e->getMessage());
         }
     }
 }

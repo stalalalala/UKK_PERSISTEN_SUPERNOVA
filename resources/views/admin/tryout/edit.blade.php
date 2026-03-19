@@ -49,7 +49,7 @@
     </div>
 
     <div class="flex h-full w-full">
-        <aside x-data="{ currentPage: 'tryout' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+        <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
     class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
     <div class="flex items-center justify-between mb-10 px-2">
@@ -297,7 +297,10 @@ laporan</span>
                 <div x-show="activeSubtesIndex === null" x-transition>
                     <div class="mb-8 flex items-center justify-between">
                         <div class="flex items-center gap-4">
-                            <a href="{{ route('admin.tryout.index') }}" class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all"><i class="fa-solid fa-arrow-left"></i></a>
+                            <button type="button" @click="showConfirmBackModal = true" 
+                                class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </button>
                             <div>
                                 <h2 class="text-2xl font-extrabold text-[#4A72D4]">Panel Edit Tryout</h2>
                                 <p class="text-gray-400 text-xs mt-1 italic font-bold tracking-wide">Perbarui data subtes dan simpan perubahan.</p>
@@ -308,15 +311,15 @@ laporan</span>
                     <div class="bg-white p-8 rounded-[35px] shadow-sm mb-8 border border-blue-50 grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="space-y-2">
                             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Nama Tryout *</label>
-                            <input type="text" x-model="namaTryout" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
+                            <input type="text" x-model="namaTryout" @input="isDirty = true" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Mulai *</label>
-                            <input type="date" x-model="tglMulai" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
+                            <input type="date" x-model="tglMulai" @input="isDirty = true" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Selesai *</label>
-                            <input type="date" x-model="tglSelesai" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
+                            <input type="date" x-model="tglSelesai" @input="isDirty = true" required class="w-full bg-gray-50 rounded-2xl py-4 px-6 text-sm outline-none">
                         </div>
                     </div>
 
@@ -337,21 +340,50 @@ laporan</span>
                     </div>
 
                     <div class="mt-12 p-8 bg-white rounded-[35px] border-2 border-dashed border-gray-200 flex flex-col items-center">
-                        <button type="submit" class="px-16 py-4 bg-[#4A72D4] text-white rounded-2xl font-bold shadow-xl transition-all hover:scale-105 active:scale-95">SIMPAN PERUBAHAN</button>
+                        <button type="button" @click="publikasikan()" 
+                            class="px-6 py-3 bg-[#4A72D4] text-white rounded-xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Simpan Perubahan</span>
+                        </button>
                     </div>
                 </div>
 
                 <div x-show="activeSubtesIndex !== null" x-cloak x-transition>
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center gap-4">
-                            <button type="button" @click="activeSubtesIndex = null" class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all"><i class="fa-solid fa-arrow-left"></i></button>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                        
+                        <div class="flex items-center gap-4 w-full md:w-auto">
+                            <button type="button" @click="activeSubtesIndex = null" class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </button>
                             <h2 class="text-xl font-extrabold text-[#4A72D4]" x-text="subtesList[activeSubtesIndex]?.name"></h2>
                         </div>
-                        <div class="bg-white px-4 py-2 rounded-xl shadow-sm border flex items-center gap-3">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase">Waktu (m)</label>
-                            <input type="number" x-model="subtesList[activeSubtesIndex].waktu" class="w-12 bg-gray-50 rounded-lg p-2 text-sm font-bold text-[#4A72D4] outline-none">
+
+                        <div class="w-full md:w-48 flex flex-col gap-2" x-data="{ open: false }" @click.away="open = false">
+                            <div class="bg-white px-4 py-3 rounded-2xl shadow-sm border border-blue-50 flex items-center gap-2 relative h-full">
+                                <i class="fa-solid fa-stopwatch text-orange-400 text-sm"></i>
+                                
+                                <button type="button" @click="open = !open"
+                                    class="w-full flex items-center justify-between text-sm font-bold text-gray-700 focus:outline-none">
+                                    <span x-text="subtesList[activeSubtesIndex].waktu + ' Menit'"></span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-gray-400 transition-transform duration-200"
+                                        :class="open ? 'rotate-180' : ''"></i>
+                                </button>
+
+                                <div x-show="open" 
+                                    x-transition 
+                                    class="absolute z-50 w-full mt-2 top-full left-0 bg-white border border-blue-50 shadow-xl rounded-2xl overflow-hidden py-2"
+                                    style="display: none;">
+                                    <template x-for="t in [20,25,30,35,40,45,50,55,60]">
+                                        <div @click="subtesList[activeSubtesIndex].waktu = t; open = false"
+                                            class="px-4 py-2 text-sm text-gray-600 hover:bg-blue-50 hover:text-[#4A72D4] cursor-pointer transition-colors font-medium"
+                                            x-text="t + ' Menit'">
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="lg:col-span-2 space-y-6">
@@ -360,9 +392,9 @@ laporan</span>
                                     <div class="space-y-2">
                                         <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Materi / Teks</label>
                                         <div class="relative">
-                                            <textarea id="materi_teks" class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm outline-none min-h-[120px] resize-none"></textarea>
+                                            <textarea id="materi_teks" @input="isDirty = true" class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm outline-none min-h-[120px] resize-none"></textarea>
                                             <div class="absolute right-4 bottom-4">
-                                                <button type="button" @click="showImageModal = true" class="flex items-center gap-2 bg-white/80 px-4 py-2 rounded-full shadow-sm border cursor-pointer hover:bg-blue-50 transition-all">
+                                                <button type="button" @click="showImageModal = true" @input="isDirty = true" class="flex items-center gap-2 bg-white/80 px-4 py-2 rounded-full shadow-sm border cursor-pointer hover:bg-blue-50 transition-all">
                                                     <i class="fa-solid fa-image text-blue-500"></i><span class="text-[10px] font-bold uppercase">Gambar</span>
                                                 </button>
                                             </div>
@@ -370,26 +402,26 @@ laporan</span>
                                         <template x-if="imageUrl">
                                             <div class="mt-2 relative inline-block group">
                                                 <img :src="imageUrl" class="max-h-32 rounded-xl border-2 border-white shadow-md">
-                                                <button type="button" @click="imageUrl = null" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"><i class="fa-solid fa-xmark"></i></button>
+                                                <button type="button" @click="imageUrl = null" @input="isDirty = true" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"><i class="fa-solid fa-xmark"></i></button>
                                             </div>
                                         </template>
                                     </div>
                                     <div class="space-y-2">
                                         <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Pertanyaan Nomor <span x-text="activeQuestion"></span> *</label>
-                                        <textarea id="pertanyaan_teks" class="w-full bg-gray-50 rounded-[25px] p-6 text-sm outline-none min-h-[100px] resize-none"></textarea>
+                                        <textarea id="pertanyaan_teks" @input="isDirty = true" class="w-full bg-gray-50 rounded-[25px] p-6 text-sm outline-none min-h-[100px] resize-none"></textarea>
                                     </div>
                                     <div class="grid grid-cols-1 gap-4">
                                         <template x-for="opt in ['A','B','C','D','E']">
                                             <div class="flex items-start gap-4 p-4 rounded-2xl border-2 bg-gray-50 transition-all">
                                                 <span class="w-10 h-10 shrink-0 flex items-center justify-center bg-white rounded-xl shadow-sm font-black text-[#4A72D4]" x-text="opt"></span>
-                                                <textarea :id="'opt_'+opt.toLowerCase()" placeholder="Isi opsi..." class="flex-1 bg-transparent border-none outline-none text-sm pt-2 h-10 resize-none"></textarea>
+                                                <textarea :id="'opt_'+opt.toLowerCase()" placeholder="Isi opsi..." @input="isDirty = true" class="flex-1 bg-transparent border-none outline-none text-sm pt-2 h-10 resize-none"></textarea>
                                                 <input type="radio" name="correct_option" :value="opt" class="mt-3 w-5 h-5 accent-emerald-500 cursor-pointer">
                                             </div>
                                         </template>
                                     </div>
                                     <div class="pt-6 border-t">
                                         <label class="text-[10px] font-bold text-orange-500 uppercase flex items-center gap-2 mb-2 ml-1"><i class="fa-solid fa-lightbulb"></i> Pembahasan *</label>
-                                        <textarea id="pembahasan_teks" class="w-full bg-orange-50/30 border-2 border-orange-100 rounded-[25px] p-6 text-sm outline-none min-h-[100px] resize-none"></textarea>
+                                        <textarea id="pembahasan_teks" @input="isDirty = true" class="w-full bg-orange-50/30 border-2 border-orange-100 rounded-[25px] p-6 text-sm outline-none min-h-[100px] resize-none"></textarea>
                                     </div>
                                 </div>
                                 <div class="flex items-center justify-between mt-10">
@@ -414,6 +446,7 @@ laporan</span>
                         </div>
                     </div>
                 </div>
+                </div>
             </form>
         </main>
     </div>
@@ -421,11 +454,15 @@ laporan</span>
     <script>
         function editTryoutForm() {
             return {
+                mobileMenuOpen: false,
                 activeSubtesIndex: null,
                 activeQuestion: 1,
                 imageUrl: null,
                 showImageModal: false,
                 tempImageUrl: '',
+                showPublishModal: false,
+                showConfirmBackModal: false,
+                isDirty: false,
                 namaTryout: {!! json_encode($tryout->nama_tryout) !!},
                 tglMulai: {!! json_encode($tryout->tanggal->format('Y-m-d')) !!},
                 tglSelesai: {!! json_encode($tryout->tanggal_akhir ? $tryout->tanggal_akhir->format('Y-m-d') : '') !!},
@@ -521,11 +558,130 @@ laporan</span>
                 },
 
                 submitForm() {
+                    this.isDirty = false;
+                    localStorage.removeItem('persisten_tryout_edit_backup');
                     document.getElementById('payload_full_data').value = JSON.stringify(this.subtesList);
                     document.getElementById('formTryout').submit();
+                },
+
+                saveToLocal() {
+                    const dataToSave = {
+                        subtesList: this.subtesList,
+                        namaTryout: this.namaTryout,
+                        tglMulai: this.tglMulai,
+                        tglSelesai: this.tglSelesai
+                    };
+                    localStorage.setItem('persisten_tryout_edit_backup', JSON.stringify(dataToSave));
+                },
+
+                publikasikan() {
+                    this.showPublishModal = true;
+                },
+
+                // Fungsi eksekusi final saat tombol "Ya, Terbitkan" diklik
+                confirmPublikasikan() {
+                    // 1. Matikan proteksi isDirty agar tidak dicegat browser/history
+                    this.isDirty = false;
+                    
+                    // 2. Hapus backup di LocalStorage karena data sudah akan disimpan permanen
+                    localStorage.removeItem('persisten_tryout_edit_backup');
+                    
+                    // 3. Masukkan data subtes ke input hidden
+                    document.getElementById('payload_full_data').value = JSON.stringify(this.subtesList);
+                    
+                    // 4. Submit form asli
+                    document.getElementById('formTryout').submit();
+                },
+
+                init() {
+                    // 1. Cek apakah ada data cadangan di LocalStorage
+                    const saved = localStorage.getItem('persisten_tryout_edit_backup');
+                    if (saved) {
+                        const data = JSON.parse(saved);
+                        // Gunakan data dari localstorage jika ada
+                        this.subtesList = data.subtesList;
+                        this.namaTryout = data.namaTryout;
+                        this.tglMulai = data.tglMulai;
+                        this.tglSelesai = data.tglSelesai;
+                        this.isDirty = true; 
+                    }
+
+                    // 2. Setup Watcher untuk simpan otomatis setiap ada perubahan
+                    this.$watch('subtesList', () => { this.isDirty = true; this.saveToLocal(); });
+                    this.$watch('namaTryout', () => { this.isDirty = true; this.saveToLocal(); });
+                    this.$watch('tglMulai', () => { this.isDirty = true; this.saveToLocal(); });
+                    this.$watch('tglSelesai', () => { this.isDirty = true; this.saveToLocal(); });
+
+                    // 3. Teknik History API (Tetap dipertahankan untuk tombol Back)
+                    history.pushState(null, null, window.location.href);
+                    window.onpopstate = () => {
+                        if (this.isDirty) {
+                            this.showConfirmBackModal = true;
+                            history.pushState(null, null, window.location.href);
+                        } else {
+                            window.location.href = '{{ route("admin.tryout.index") }}';
+                        }
+                    };
                 }
             }
         }
     </script>
+
+    {{-- MODAL KEMBALI --}}
+<div x-show="showConfirmBackModal" x-cloak class="fixed inset-0 z-[150] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showConfirmBackModal = false"></div>
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[151] text-center shadow-2xl border border-blue-50"
+         x-show="showConfirmBackModal"
+         x-transition>
+        <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Konfirmasi Keluar</h3>
+        <p class="text-gray-500 text-sm mb-8">Perubahan belum disimpan. Jika keluar sekarang, perubahan akan hilang.</p>
+        <div class="flex gap-3">
+            <button type="button" @click="showConfirmBackModal = false" 
+                class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200">Batal</button>
+            
+            <button type="button" 
+                @click="isDirty = false; localStorage.removeItem('persisten_tryout_edit_backup'); window.location.href = '{{ route('admin.tryout.index') }}'" 
+                class="flex-1 py-3 rounded-xl font-bold bg-red-500 text-white shadow-lg shadow-red-200">
+                Ya, Keluar
+            </button>
+        </div>
+    </div>
+</div>
+
+{{-- MODAL PUBLIKASI --}}
+<div x-show="showPublishModal" x-cloak class="fixed inset-0 z-[180] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showPublishModal = false"></div>
+    
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[181] text-center shadow-2xl border border-blue-50"
+         x-show="showPublishModal"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+        
+        <div class="w-20 h-20 bg-blue-100 text-[#4A72D4] rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Simpan Perubahan?</h3>
+        <p class="text-gray-500 text-sm mb-8">Data tryout akan diperbarui sesuai dengan perubahan terbaru yang dibuat.</p>
+        
+        <div class="flex gap-3">
+            <button type="button" @click="showPublishModal = false" 
+                    class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all">
+                Batal
+            </button>
+            <button type="button" @click="confirmPublikasikan()" 
+                    class="flex-1 py-3 rounded-xl font-bold bg-[#4A72D4] text-white shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all">
+                Ya, Simpan
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

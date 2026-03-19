@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TryoutCategory extends Model
 {
+    use SoftDeletes;
     protected $table = 'tryout_categories';
 
     // WAJIB: Tambahkan ini agar data bisa disimpan dari Controller

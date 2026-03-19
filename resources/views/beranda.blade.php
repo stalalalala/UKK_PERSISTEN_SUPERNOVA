@@ -325,11 +325,19 @@
                         Kuasai fundamental dulu sebelum masuk <br> latihan tingkat lanjut.
                         <br><span class="font-bold">Yuk latihan pemahaman dasarmu!</span>
                     </p>
-                    <a href="/kuis"> <button
-                            class="mt-7 bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-105">
-                            Mulai Kuis
-                            <span class="bg-white/30 w-8 h-8 flex items-center justify-center rounded-full">➜</span>
-                        </button></a>
+                    @php
+                        // Cek apakah user sudah pernah mengerjakan tes
+                        $hasilTes = \App\Models\HasilMinatBakat::where('user_id', Auth::id())->exists();
+                    @endphp
+
+                    <a href="{{ route('minatbakat.intruksi') }}">
+                        <button class="mt-7 bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-100">
+                            {{ $hasilTes ? 'Lihat Hasil Tes' : 'Mulai Tes' }}
+                            <span class="bg-white/30 w-8 h-8 flex items-center justify-center rounded-full text-white">
+                                ➜
+                            </span>
+                        </button>
+                    </a>
                 </div>
             </section>
 

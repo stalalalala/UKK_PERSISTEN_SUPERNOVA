@@ -11,6 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -44,13 +45,19 @@
     </style>
 </head>
 
-<body class="bg-[#E9EFFF] h-screen flex overflow-hidden text-[#2D3B61]" x-data="{
-    activeMenu: 'Manajemen Tryout',
-    mobileMenuOpen: false,
-    activeTab: 'list',
-    currentPage: 1,
-    itemsPerPage: 10,
-    allTryout: {{ $tryouts->map(function ($t) {
+<body class="bg-[#E9EFFF] h-screen flex overflow-hidden text-[#2D3B61]" 
+    x-data="{
+        activeMenu: 'Manajemen Tryout',
+        mobileMenuOpen: false,
+        activeTab: 'list',
+        currentPage: 1,
+        itemsPerPage: 5,
+        showRestoreModal: false,
+        showForceDeleteModal: false,
+        actionUrl: '',
+        actionName: '',
+        
+        allTryout: {{ $tryouts->map(function($t) {
             return [
                 'id' => $t->id,
                 'judul' => $t->nama_tryout,
@@ -59,51 +66,70 @@
                 'durasi' => $t->categories->sum('durasi'),
                 'is_active' => (bool) $t->is_active,
                 'tgl' => $t->tanggal->format('d M Y'),
-                'toggle_url' => route('admin.tryout.toggle', $t->id),
+                'toggle_url' => route('admin.tryout.toggle', $t->id)
             ];
         })->toJson() }},
-    historyTryout: [],
 
-    deleteToHistory(id) {
-        const index = this.allTryout.findIndex(item => item.id === id);
-        if (index !== -1) {
-            this.historyTryout.push(this.allTryout[index]);
-            this.allTryout.splice(index, 1);
+        historyTryout: {{ $trashed->map(function($t) {
+            return [
+                'id' => $t->id,
+                'judul' => $t->nama_tryout,
+                'subtes' => $t->categories_count,
+                'total_soal' => $t->soals_count,
+                'durasi' => $t->categories->sum('durasi'),
+                'is_active' => (bool) $t->is_active,
+                'tgl' => $t->deleted_at ? $t->deleted_at->format('d M Y') : '-'
+            ];
+        })->toJson() }},
+
+        deleteToHistory(id) {
+            const form = document.createElement('form');
+            form.action = '/admin/tryout/' + id;
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type='hidden' name='_token' value='{{ csrf_token() }}'>
+                <input type='hidden' name='_method' value='DELETE'>
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        },
+
+        confirmRestore() {
+            const form = document.createElement('form');
+            form.action = this.actionUrl;
+            form.method = 'POST';
+            form.innerHTML = `<input type='hidden' name='_token' value='{{ csrf_token() }}'>`;
+            document.body.appendChild(form);
+            form.submit();
+        },
+
+        confirmPermanentDelete() {
+            const form = document.createElement('form');
+            form.action = this.actionUrl;
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type='hidden' name='_token' value='{{ csrf_token() }}'>
+                <input type='hidden' name='_method' value='DELETE'>
+            `;
+            document.body.appendChild(form);
+            form.submit();
+        },
+
+        get totalPages() {
+            let data = this.activeTab === 'list' ? this.allTryout : this.historyTryout;
+            return Math.ceil(data.length / this.itemsPerPage) || 1;
+        },
+
+        get pagedTryout() {
+            let start = (this.currentPage - 1) * this.itemsPerPage;
+            return this.allTryout.slice(start, start + this.itemsPerPage);
+        },
+
+        get pagedHistory() {
+            let start = (this.currentPage - 1) * this.itemsPerPage;
+            return this.historyTryout.slice(start, start + this.itemsPerPage);
         }
-    },
-
-    restoreFromHistory(id) {
-        const index = this.historyTryout.findIndex(item => item.id === id);
-        if (index !== -1) {
-            this.allTryout.push(this.historyTryout[index]);
-            this.historyTryout.splice(index, 1);
-        }
-    },
-
-    permanentDelete(id) {
-        if (confirm('Apakah Anda yakin ingin menghapus permanen data ini dari database?')) {
-            const form = document.getElementById('delete-form-' + id);
-            if (form) form.submit();
-        }
-    },
-
-    get totalPages() {
-        let data = this.activeTab === 'list' ? this.allTryout : this.historyTryout;
-        return Math.ceil(data.length / this.itemsPerPage) || 1;
-    },
-
-    get pagedTryout() {
-        let start = (this.currentPage - 1) * this.itemsPerPage;
-        let end = start + this.itemsPerPage;
-        return this.allTryout.slice(start, end);
-    },
-
-    get pagedHistory() {
-        let start = (this.currentPage - 1) * this.itemsPerPage;
-        let end = start + this.itemsPerPage;
-        return this.historyTryout.slice(start, end);
-    }
-}">
+    }">
 
     <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
         class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-screen overflow-y-auto">
@@ -408,7 +434,7 @@
                             x-text="activeTab === 'list' ? 'Kelola subtes, soal, dan durasi tryout' : 'Data yang dihapus sementara dapat dipulihkan di sini'">
                         </p>
                     </div>
-                    <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex flex-row items-center gap-3">
                         <button @click="activeTab = activeTab === 'list' ? 'history' : 'list'; currentPage = 1"
                             class="flex-1 md:flex-none bg-orange-500 hover:bg-orange-600 text-white px-5 py-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-100 active:scale-95">
                             <i
@@ -447,60 +473,58 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
-                            <template x-for="(to, index) in pagedTryout" :key="to.id">
-                                <tr class="hover:bg-blue-50/30 transition-colors group">
-                                    <td class="px-8 py-5">
-                                        <div class="flex flex-col">
-                                            <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]"
-                                                x-text="to.judul"></span>
-                                            <span class="text-[10px] text-gray-400 font-medium uppercase"
-                                                x-text="'ID: #TO-' + to.id + ' • ' + to.tgl"></span>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5 text-center">
-                                        <span
-                                            class="bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-indigo-100"
-                                            x-text="to.subtes + ' Subtes'"></span>
-                                    </td>
-                                    <td class="px-8 py-5 text-center text-sm font-bold text-gray-600"
-                                        x-text="to.total_soal + ' Soal'"></td>
-                                    <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">
-                                        <div class="flex items-center justify-center gap-2">
-                                            <i class="fa-regular fa-clock text-gray-400"></i>
-                                            <span x-text="to.durasi + ' Menit'"></span>
-                                        </div>
-                                    </td>
-                                    <td class="px-8 py-5 text-center">
+
+                        <template x-for="(to, index) in pagedTryout" :key="to.id">
+                            <tr class="hover:bg-blue-50/30 transition-colors group">
+                                <td class="px-8 py-5">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]" x-text="to.judul"></span>
+                                        <span class="text-[10px] text-gray-400 font-medium uppercase" x-text="'ID: #TO-' + to.id + ' • ' + to.tgl"></span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5 text-center">
+                                    <span class="inline-block whitespace-nowrap bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-indigo-100" x-text="to.subtes + ' Subtes'"></span>
+                                </td>
+                                <td class="px-8 py-5 text-center text-sm font-bold text-gray-600" x-text="to.total_soal + ' Soal'"></td>
+                                <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <i class="fa-regular fa-clock text-gray-400"></i>
+                                        <span x-text="to.durasi + ' Menit'"></span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5 text-center">
+                                    <span :class="to.is_active ? 'bg-emerald-100 text-emerald-600 border-emerald-200' : 'bg-red-50 text-red-500 border-red-100'"
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase border">
+                                        <span x-text="to.is_active ? 'Aktif' : 'Nonaktif'"></span>
+                                    </span>
+                                </td>
+                                <td class="px-8 py-5 text-center">
+                                    <div class="flex items-center justify-center gap-2">
                                         <form :action="to.toggle_url" method="POST" class="inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit"
-                                                :class="to.is_active ? 'bg-emerald-100 text-emerald-600 border-emerald-200' :
-                                                    'bg-red-50 text-red-500 border-red-100'"
-                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase border transition-all hover:scale-105">
-                                                <i class="fa-solid"
-                                                    :class="to.is_active ? 'fa-eye' : 'fa-eye-slash'"></i>
-                                                <span x-text="to.is_active ? 'Aktif' : 'Nonaktif'"></span>
+                                            <button type="submit" 
+                                                :class="to.is_active ? 'text-emerald-500 hover:bg-emerald-50' : 'text-gray-400 hover:bg-gray-50'"
+                                                class="p-2 rounded-lg transition-all" 
+                                                :title="to.is_active ? 'Nonaktifkan' : 'Aktifkan'">
+                                                <i class="fa-solid" :class="to.is_active ? 'fa-eye' : 'fa-eye-slash'"></i>
                                             </button>
                                         </form>
-                                    </td>
-                                    <td class="px-8 py-5 text-center">
-                                        <div class="flex items-center justify-center gap-2">
-                                            <a :href="'/admin/tryout/' + to.id + '/edit'"
-                                                class="p-2 text-blue-400 hover:bg-blue-50 rounded-lg transition-all"
-                                                title="Edit">
-                                                <i class="fa-solid fa-pen-to-square"></i>
-                                            </a>
-                                            <button @click="deleteToHistory(to.id)"
-                                                class="p-2 text-rose-400 hover:bg-rose-50 rounded-lg transition-all"
-                                                title="Hapus">
-                                                <i class="fa-solid fa-trash-can"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
+
+                                        <a :href="'/admin/tryout/' + to.id + '/edit'"
+                                            class="p-2 text-blue-400 hover:bg-blue-50 rounded-lg transition-all" title="Edit">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                        <button type="button" 
+                                                @click="deleteToHistory(to.id)" 
+                                                class="cursor-pointer w-9 h-9 flex items-center justify-center rounded-xl text-rose-600 transition-all shadow-sm">
+                                            <i class="fa-solid fa-trash-can text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
                     </table>
 
                     <table x-show="activeTab === 'history'"
@@ -531,9 +555,8 @@
                                         </div>
                                     </td>
                                     <td class="px-8 py-5 text-center">
-                                        <span
-                                            class="bg-gray-50 text-gray-600 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-gray-100"
-                                            x-text="hist.subtes + ' Subtes'"></span>
+                                        <span class="inline-block whitespace-nowrap bg-gray-50 text-gray-600 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-gray-100" x-text="hist.subtes + ' Subtes'"></span>
+
                                     </td>
                                     <td class="px-8 py-5 text-center">
                                         <span
@@ -542,12 +565,12 @@
                                     </td>
                                     <td class="px-8 py-5 text-center">
                                         <div class="flex items-center justify-center gap-3">
-                                            <button @click="restoreFromHistory(hist.id)"
-                                                class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95">
+                                            <button @click="showRestoreModal = true; actionUrl = '/admin/tryout/' + hist.id + '/restore'; actionName = hist.judul"
+                                                class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-md">
                                                 <i class="fa-solid fa-rotate-left"></i> Pulihkan
                                             </button>
-                                            <button @click="permanentDelete(hist.id)"
-                                                class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all shadow-md active:scale-95">
+                                            <button @click="showForceDeleteModal = true; actionUrl = '/admin/tryout/' + hist.id + '/force-delete'; actionName = hist.judul"
+                                                class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all shadow-md">
                                                 <i class="fa-solid fa-circle-xmark"></i> Hapus Permanen
                                             </button>
                                             <form :id="'delete-form-' + hist.id" :action="'/admin/tryout/' + hist.id"
@@ -599,6 +622,7 @@
             </div>
         </div>
     </main>
+
     @if(session('success'))
 <div 
     x-data
@@ -665,6 +689,53 @@
         })
     "
 ></div>
+
+{{-- MODAL PULIHKAN DAN HAPUS PERMANEN --}}
+<div x-show="showRestoreModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showRestoreModal = false"></div>
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" x-show="showRestoreModal" x-transition>
+        <div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Pulihkan Tryout?</h3>
+        <p class="text-gray-500 text-sm mb-8" x-text="actionName"></p>
+        <div class="flex gap-3">
+            <button @click="showRestoreModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400">Batal</button>
+            <button @click="confirmRestore()" class="flex-1 py-3 rounded-xl font-bold bg-emerald-500 text-white">Ya, Pulihkan</button>
+        </div>
+    </div>
+</div>
+
+<div x-show="showForceDeleteModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showForceDeleteModal = false"></div>
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" x-show="showForceDeleteModal" x-transition>
+        <div class="w-20 h-20 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Hapus Permanen?</h3>
+        <p class="text-gray-500 text-sm mb-8">Data <span class="text-rose-600 font-bold" x-text="actionName"></span> akan dihapus selamanya.</p>
+        <div class="flex gap-3">
+            <button @click="showForceDeleteModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400">Batal</button>
+            <button @click="confirmPermanentDelete()" class="flex-1 py-3 rounded-xl font-bold bg-rose-600 text-white">Hapus!</button>
+        </div>
+    </div>
+</div>
+
+@if (session('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "{{ session('success') }}",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: {
+                popup: 'rounded-[2rem]', 
+            }
+        });
+    </script>
+    
 @endif
 </body>
 
