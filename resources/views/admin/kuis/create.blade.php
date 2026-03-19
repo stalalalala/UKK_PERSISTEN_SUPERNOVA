@@ -139,60 +139,104 @@
                         return;
                     }
 
-                    // =========================================
-                    // ✅ 1. Ambil Subtes & Waktu dari BARIS PERTAMA SAJA
-                    // =========================================
-                    const globalSubtes = jsonData[0]["Kategori Subtes"] || "";
-                    const globalWaktu = jsonData[0]["Waktu"] || 20;
+                    // =========================
+                    // 🔥 VALIDASI GLOBAL
+                    // =========================
 
-                    // Set dropdown UI
+                    const allowedSubtes = [
+                        "Penalaran Umum",
+                        "Penalaran & Pemahaman Umum",
+                        "Pemahaman Bacaan & Menulis",
+                        "Pengetahuan Kuantitatif",
+                        "Penalaran Matematika",
+                        "Literasi Bahasa Indonesia",
+                        "Literasi Bahasa Inggris"
+                    ];
+
+                    const globalSubtes = (jsonData[0]["Kategori Subtes"] || "").trim();
+                    const globalWaktu = (jsonData[0]["Waktu"] || "").toString().trim();
+
+                    // ✅ Validasi Subtes
+                    if (!allowedSubtes.includes(globalSubtes)) {
+                        alert("Subtes tidak valid! Harus sesuai format lengkap.");
+                        return;
+                    }
+
+                    // ✅ Validasi Waktu (20–60 menit kelipatan 5)
+                    const allowedWaktu = [
+                        "20 Menit", "25 Menit", "30 Menit",
+                        "35 Menit", "40 Menit", "45 Menit",
+                        "50 Menit", "55 Menit", "60 Menit"
+                    ];
+
+                    if (!allowedWaktu.includes(globalWaktu)) {
+                        alert("Waktu harus 20 - 60 Menit (kelipatan 5)");
+                        return;
+                    }
+
+                    // 🔥 KONVERSI "45 Menit" → 45
+                    const waktuAngka = parseInt(globalWaktu.replace(" Menit", ""));
+
+                    // =========================
+                    // 🔥 VALIDASI PER BARIS
+                    // =========================
+                    for (let i = 0; i < jsonData.length; i++) {
+                        let row = jsonData[i];
+
+                        let jawaban = (row["Jawaban Benar"] || "").toString().trim();
+
+                        if (!['a', 'b', 'c', 'd', 'e'].includes(jawaban)) {
+                            alert(`Error di baris ${i + 2}: Jawaban harus huruf kecil (a/b/c/d/e)`);
+                            return;
+                        }
+
+                        if (jawaban !== jawaban.toLowerCase()) {
+                            alert(`Error di baris ${i + 2}: Jangan pakai huruf besar!`);
+                            return;
+                        }
+                    }
+
+                    // =========================
+                    // ✅ MAPPING DATA
+                    // =========================
+
                     this.selectedSubtes = globalSubtes;
-                    this.selectedWaktu = globalWaktu;
+                    this.selectedWaktu = waktuAngka;
 
-                    // =========================================
-                    // ✅ 2. Mapping soal TANPA ambil subtes per baris
-                    // =========================================
-                    // Di dalam fungsi importExcel(event)
                     this.questions = jsonData.slice(0, 20).map((row) => ({
                         subtes: globalSubtes,
-                        waktu: globalWaktu,
-                        materi: row["Materi"] || "", // Pastikan kolom di Excel namanya tepat "Materi"
+                        waktu: waktuAngka,
+
+                        materi: row["Materi"] || "",
                         pertanyaan: row["Pertanyaan"] || "",
-                        gambar: (() => {
-                            let url = (row["URL Gambar"] || "").trim();
 
-                            if (url === "") return null;
+                        gambar: (row["URL Gambar"] || "").startsWith("http") ?
+                            row["URL Gambar"] :
+                            null,
 
-                            if (!url.startsWith("http")) return null;
-
-                            return url;
-                        })(),
                         opsi_a: row["Opsi A"] || "",
                         opsi_b: row["Opsi B"] || "",
                         opsi_c: row["Opsi C"] || "",
                         opsi_d: row["Opsi D"] || "",
                         opsi_e: row["Opsi E"] || "",
-                        // Samakan format jawaban_benar dengan loadQuestion
-                        jawaban_benar: (row["Jawaban Benar"] || "").toString().trim().toLowerCase(),
+
+                        jawaban_benar: (row["Jawaban Benar"] || "").toLowerCase().trim(),
                     }));
 
-                    // =========================================
-                    // ✅ 3. Reset state
-                    // =========================================
                     this.soalTersimpan = this.questions.length;
                     this.activeQuestion = 1;
                     this.loadQuestion();
 
                     this.showImportModal = false;
 
-                    alert("Berhasil import soal dari Excel!");
+                    alert("Import berhasil & valid!");
                 };
 
                 reader.readAsArrayBuffer(file);
             },
 
-
-            downloadTemplate() {
+            unduhTemplate() {
+                const wb = XLSX.utils.book_new();
 
                 const data = [
                     [
@@ -206,32 +250,70 @@
                         "Opsi C",
                         "Opsi D",
                         "Opsi E",
-                        "Jawaban Benar",
+                        "Jawaban Benar"
                     ],
-
                     [
                         "Penalaran Umum",
-                        20,
-                        "Teks bacaan atau materi soal",
+                        "20 Menit",
+                        "Teks bacaan...",
                         "Apa ibukota Indonesia?",
-                        "https://i.imgur.com/contoh.jpg",
+                        "https://contoh.com/gambar.jpg",
                         "Jakarta",
                         "Bandung",
                         "Surabaya",
                         "Medan",
                         "Bali",
-                        "a",
-                        1
+                        "a"
                     ]
                 ];
 
                 const ws = XLSX.utils.aoa_to_sheet(data);
-                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Template");
 
-                XLSX.utils.book_append_sheet(wb, ws, "Template Soal");
-
-                XLSX.writeFile(wb, "Template_Persisten_20_Soal.xlsx");
+                XLSX.writeFile(wb, "Template_Soal.xlsx");
             },
+
+
+            // downloadTemplate() {
+
+            //     const data = [
+            //         [
+            //             "Kategori Subtes",
+            //             "Waktu",
+            //             "Materi",
+            //             "Pertanyaan",
+            //             "URL Gambar",
+            //             "Opsi A",
+            //             "Opsi B",
+            //             "Opsi C",
+            //             "Opsi D",
+            //             "Opsi E",
+            //             "Jawaban Benar",
+            //         ],
+
+            //         [
+            //             "Penalaran Umum",
+            //             20,
+            //             "Teks bacaan atau materi soal",
+            //             "Apa ibukota Indonesia?",
+            //             "https://i.imgur.com/contoh.jpg",
+            //             "Jakarta",
+            //             "Bandung",
+            //             "Surabaya",
+            //             "Medan",
+            //             "Bali",
+            //             "a",
+            //             1
+            //         ]
+            //     ];
+
+            //     const ws = XLSX.utils.aoa_to_sheet(data);
+            //     const wb = XLSX.utils.book_new();
+
+            //     XLSX.utils.book_append_sheet(wb, ws, "Template Soal");
+
+            //     XLSX.writeFile(wb, "Template_Persisten_20_Soal.xlsx");
+            // },
 
 
 
@@ -1060,8 +1142,7 @@ window.scrollTo({top:0,behavior:'smooth'})"
                         <span class="text-[11px] font-bold text-blue-700 uppercase tracking-tight">Belum punya
                             formatnya?</span>
                     </div>
-                    <a href="https://docs.google.com/spreadsheets/d/1NteyIa-UdkroBZKt5IQzPyYD5TYDJVrFYABlRhJ-dnA/copy"
-                        target="_blank" @click="downloadTemplate()"
+                    <a href="#" @click.prevent="unduhTemplate()"
                         class="text-[11px] font-black text-[#4A72D4] hover:underline">
                         DOWNLOAD TEMPLATE
                     </a>

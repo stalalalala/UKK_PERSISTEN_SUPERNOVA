@@ -42,7 +42,7 @@
             currentSet: @json($kuis->set_ke),
 
             // 🔥 INI YANG PENTING
-            selectedSubtes: @json($kuis->subtes),
+            selectedSubtes: @json($kuis->subtes ?? ($questions[0]->subtes ?? null)),
             selectedWaktu: @json($kuis->durasi),
 
             activeQuestionIndex: 0,
@@ -65,6 +65,11 @@
                 }))
 
                 this.currentQuestion = this.questions[0]
+
+                // 🔥 fallback kalau kosong
+                if (!this.selectedSubtes && this.currentQuestion) {
+                    this.selectedSubtes = this.currentQuestion.subtes
+                }
             },
 
             // get activeQuestionIndex() {
@@ -470,16 +475,16 @@
                                         {{-- Subtes --}}
                                         <div class="flex-1 min-w-0 flex flex-col gap-2" x-data="{
                                             open: false,
-                                            selectedSubtes: '',
                                             options: [
-                                                'Penalaran Umum', 'Pemahaman & Pengetahuan Umum', 'Pemahaman Bacaan & Menulis', 'Pengetahuan Kuantitatif', 'Penalaran Matematika', 'Literasi Bahasa Indonesia', 'Literasi Bahasa Ingris'
+                                                'Penalaran Umum',
+                                                'Pemahaman & Pengetahuan Umum',
+                                                'Pemahaman Bacaan & Menulis',
+                                                'Pengetahuan Kuantitatif',
+                                                'Penalaran Matematika',
+                                                'Literasi Bahasa Indonesia',
+                                                'Literasi Bahasa Ingris'
                                             ]
                                         }"
-                                            x-effect="
-        if(currentQuestion){
-            selectedSubtes = currentQuestion.subtes
-        }
-    "
                                             @click.away="open = false">
 
                                             <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Kategori
@@ -558,14 +563,14 @@
                                     <div x-show="currentQuestion" x-cloak :key="activeQuestionIndex">
 
                                         <div class="relative group">
-                                            <textarea x-model="currentQuestion.materi" name="materi" x-data="{
+                                            <textarea x-model="currentQuestion.materi" x-data="{
                                                 resize() {
                                                     $el.style.height = 'auto';
                                                     $el.style.height =
                                                         ($el.scrollHeight < 140 ? 140 : $el.scrollHeight) + 'px';
                                                 }
-                                            }" x-init="resize()"
-                                                x-effect="resize()" @input="resize(); markChanged()"
+                                            }" x-init="resize()" x-effect="resize()"
+                                                @input="resize(); markChanged()"
                                                 class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm
            focus:bg-white focus:ring-2 focus:ring-blue-100
            outline-none shadow-inner transition-all
@@ -673,14 +678,14 @@ markChanged();
                                             </span>
 
                                             <!-- Textarea Jawaban Auto Resize -->
-                                            <textarea x-model="currentQuestion['opsi_' + opt.toLowerCase()]" name="opsi[]" x-data="{
+                                            <textarea x-model="currentQuestion['opsi_' + opt.toLowerCase()]" x-data="{
                                                 resize() {
                                                     $el.style.height = 'auto';
                                                     $el.style.height =
                                                         ($el.scrollHeight < 60 ? 60 : $el.scrollHeight) + 'px';
                                                 }
-                                            }"
-                                                x-init="resize()" x-effect="resize()" @input="resize(); markChanged()"
+                                            }" x-init="resize()"
+                                                x-effect="resize()" @input="resize(); markChanged()"
                                                 class="flex-1 bg-white/40 rounded-xl px-4 py-3
                        border-none outline-none text-sm font-medium
                        resize-none overflow-hidden leading-relaxed
@@ -690,7 +695,7 @@ markChanged();
 
                                             <!-- Radio Jawaban Benar -->
                                             <div class="pt-3">
-                                                <input type="radio" name="jawaban_benar" :value="opt"
+                                                <input type="radio" :value="opt"
                                                     x-model="currentQuestion.jawaban_benar" @change="markChanged()"
                                                     class="w-5 h-5 accent-emerald-500 cursor-pointer">
                                             </div>
