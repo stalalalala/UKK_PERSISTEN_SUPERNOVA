@@ -102,7 +102,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/monitoringLaporan/update-status-multiple', [HalamanMonitoringLaporanController::class, 'updateStatusMultiple'])->name('laporan.update-status-multiple');
 
         Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
-
+     
+        //video
         Route::get('videoPembelajaran/history', [AdminVideoController::class, 'history'])->name('videoPembelajaran.history');
         Route::post('videoPembelajaran/{id}/restore', [AdminVideoController::class, 'restore'])->name('videoPembelajaran.restore');
         Route::delete('videoPembelajaran/{id}/force-delete', [AdminVideoController::class, 'forceDelete'])->name('videoPembelajaran.force-delete');
