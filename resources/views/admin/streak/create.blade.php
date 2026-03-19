@@ -489,9 +489,6 @@
             </div>
         </main>
     </div>
-
-
-
     <script>
         function streakForm() {
 

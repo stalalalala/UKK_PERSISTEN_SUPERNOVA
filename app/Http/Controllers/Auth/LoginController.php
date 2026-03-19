@@ -84,7 +84,7 @@ class LoginController extends Controller
                 ->with('warning', 'Silakan verifikasi email terlebih dahulu.');
         }
 
-        // 🔥 XP LOGIN
+    
         $xpService = new XpService();
         $xpService->addXp($user, 'login', 50);
 
@@ -116,10 +116,10 @@ public function redirectToGoogle()
                 'google_id'         => $googleUser->id,
                 'role'              => 'peserta',
                 'password'          => Hash::make(uniqid()),
-                'email_verified_at' => now(), // 🔥 penting
+                'email_verified_at' => now(), 
             ]);
         } else {
-            // Kalau user sudah ada tapi belum verified
+            
             if (!$user->email_verified_at) {
                 $user->email_verified_at = now();
                 $user->save();

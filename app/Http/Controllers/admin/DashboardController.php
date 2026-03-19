@@ -11,13 +11,14 @@ use App\Models\admin\AdminVideo;
 use App\Models\Kuis;
 use Illuminate\Support\Facades\DB;
 use App\Models\SystemLog;
+use App\Models\Setting;
 
 class DashboardController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+   public function index()
 {
     $totalUsers = User::where('role', 'peserta')->count(); 
     $totalAdmins = User::where('role', 'admin')->count(); 
@@ -26,7 +27,6 @@ class DashboardController extends Controller
     $totalLatihan = Latihan::count();
     $totalVideo   = AdminVideo::count();
     $totalKuis    = Kuis::count();
-
 
     $usersPerMonth = User::where('role', 'peserta') 
         ->select(
@@ -50,6 +50,33 @@ class DashboardController extends Controller
 
     $recentLogs = \App\Models\SystemLog::with('user')->latest()->take(3)->get();
 
-    return view('admin.dashboard', compact('months', 'totalUsers','totalAdmins','totalTryout','totalLatihan','totalVideo','totalKuis','recentLogs'));
+
+    $setting = Setting::firstOrCreate([]);
+
+    return view('admin.dashboard', compact(
+        'months',
+        'totalUsers',
+        'totalAdmins',
+        'totalTryout',
+        'totalLatihan',
+        'totalVideo',
+        'totalKuis',
+        'recentLogs',
+        'setting'
+    ));
+}
+
+public function setSNBT(Request $request)
+{
+    $request->validate([
+        'snbt_date' => 'required|date'
+    ]);
+
+    Setting::updateOrCreate(
+        ['id' => 1],
+        ['snbt_date' => $request->snbt_date]
+    );
+
+    return back()->with('success', 'Jadwal SNBT berhasil disimpan!');
 }
 }

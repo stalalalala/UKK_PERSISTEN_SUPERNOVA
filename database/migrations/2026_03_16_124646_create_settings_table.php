@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('streaks', function (Blueprint $table) {
-        $table->integer('recovery_used')->default(0);
-        $table->string('recovery_month')->nullable(); // Karena di error juga ada recovery_month
-    });
+        Schema::create('settings', function (Blueprint $table) {
+            $table->id();
+            $table->dateTime('snbt_date')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -22,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('streaks', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('settings');
     }
 };

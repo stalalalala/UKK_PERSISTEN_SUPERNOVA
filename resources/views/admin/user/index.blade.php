@@ -338,16 +338,36 @@
                         Edit
                     </button>
 
-                    <button 
-                        @click="
-                            selectedId = user.id;
-                            selectedName = user.name;
-                            isTrashed = user.deleted_at ? true : false;
-                            showDeleteConfirm = true;
-                        "
-                        class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
-                        Hapus
-                    </button>
+                   <button 
+    @click="
+        Swal.fire({
+            title: 'Hapus User?',
+            text: 'User akan dipindahkan ke History',
+            icon: 'warning',
+            width: '340px',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'Ya, Hapus!',
+           customClass: { popup: 'rounded-3xl shadow-xl' }
+        }).then((result) => {
+            if(result.isConfirmed){
+                $el.nextElementSibling.submit()
+            }
+        })
+    "
+   class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+        </svg>
+</button>
+
+<form 
+    :action="`/admin/user/${user.id}`" 
+    method="POST" 
+    class="hidden">
+    @csrf
+    @method('DELETE')
+</form>
 
                 </div>
             </td>
@@ -408,26 +428,67 @@
             <td class="p-4">
                 <div class="flex gap-2">
 
-                    <!-- Pulihkan -->
-                    <form :action="`/admin/user/${user.id}/restore`" method="POST">
-                        @csrf
-                        <button type="submit"
-                            class="px-3 py-2 bg-green-500 text-white rounded-lg text-xs font-semibold hover:bg-green-600">
-                            Pulihkan
-                        </button>
-                    </form>
+                  <button 
+    @click="
+        Swal.fire({
+            title: 'Pulihkan user?',
+            text: 'Data akan dikembalikan ke daftar user',
+            icon: 'question',
+            width: '340px',
+            showCancelButton: true,
+            confirmButtonColor: '#22c55e',
+            confirmButtonText: 'Ya, Pulihkan!',
+            cancelButtonText: 'Batal',
+            customClass: { popup: 'rounded-3xl shadow-xl' }
+        }).then((result) => {
+            if(result.isConfirmed) {
+                $el.nextElementSibling.submit()
+            }
+        })
+    "
+    class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> 
+<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+     <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+</svg>
+</button>
 
-                    <!-- Hapus Permanen -->
-                    <button
-                        @click="
-                            selectedId = user.id;
-                            selectedName = user.name;
-                            isTrashed = true;
-                            showDeleteConfirm = true;
-                        "
-                        class="px-3 py-1 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">
-                        Hapus Permanen
-                    </button>
+<form 
+    :action="`/admin/user/${user.id}/restore`" 
+    method="POST" 
+    class="hidden">
+    @csrf
+</form>
+<button 
+    @click="
+        Swal.fire({
+            title: 'Hapus permanen?',
+            text: 'Data tidak bisa dikembalikan!',
+            icon: 'error',
+            width: '340px',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            customClass: { popup: 'rounded-3xl shadow-xl' }
+        }).then((result) => {
+            if(result.isConfirmed) {
+                $el.nextElementSibling.submit()
+            }
+        })
+    "
+    class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+     <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+</svg>
+</button>
+
+<form 
+    :action="`/admin/user/${user.id}/force-delete`" 
+    method="POST" 
+    class="hidden">
+    @csrf
+    @method('DELETE')
+</form>
 
                 </div>
             </td>
@@ -602,55 +663,7 @@
     </div>
 </div>
 
-      <div x-show="showDeleteConfirm" x-cloak class="fixed inset-0 z-[120] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-     x-transition>
-    <div @click.away="showDeleteConfirm = false"
-         class="bg-white w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl relative">
-
-        <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i class="fa-solid fa-trash-can text-3xl"></i>
-        </div>
-
-        <h3 class="text-xl font-extrabold text-slate-800 mb-2">
-            Konfirmasi Hapus
-        </h3>
-
-        <p class="text-sm text-slate-500 mb-8 px-4">
-            Apakah anda yakin ingin menghapus
-            <span class="font-bold text-slate-800" x-text="selectedName"></span>?
-        </p>
-
-        <div class="flex gap-3">
-            <button @click="showDeleteConfirm=false"
-                    class="flex-1 bg-slate-50 text-slate-400 font-bold py-3 rounded-2xl hover:bg-slate-100 transition-all">
-                Batal
-            </button>
-
-           
-            <template x-if="isTrashed">
-                <form :action="'/admin/user/' + selectedId + '/force-delete'" method="POST" class="flex-1">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                            class="w-full bg-red-500 text-white font-bold py-3 rounded-2xl hover:bg-red-600 shadow-lg shadow-red-100 transition-all">
-                        Hapus Permanen
-                    </button>
-                </form>
-            </template>
-
-            <template x-if="!isTrashed">
-                <form :action="'/admin/user/' + selectedId" method="POST" class="flex-1">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                            class="w-full bg-yellow-500 text-white font-bold py-3 rounded-2xl hover:bg-yellow-600 shadow-lg shadow-yellow-100 transition-all">
-                        Hapus Sementara
-                    </button>
-                </form>
-            </template>
-        </div>
-    </div>
-</div>
+     
 
     </div>
 </main>
@@ -725,7 +738,7 @@
 <script>
 function userApp() {
     return {
-    mobileMenuOpen: false,
+        mobileMenuOpen: false,
         tab: 'admin',
         search: '', 
         admins: @json($admins),
@@ -734,10 +747,6 @@ function userApp() {
 
         openModal: false,
         isEdit: false,
-        showDeleteConfirm: false,
-        selectedName: '',
-        selectedId: '',
-        isTrashed: false,
 
         form: {
             id: '',
@@ -782,12 +791,7 @@ function userApp() {
             this.openModal = true;
         },
 
-        confirmDelete(user) {
-            this.selectedId = user.id;
-            this.selectedName = user.name;
-            this.isTrashed = user.deleted_at ? true : false;
-            this.showDeleteConfirm = true;
-        },
+        
 
         resetForm() {
             this.isEdit = false;

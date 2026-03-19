@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @vite('resources/css/app.css')
 </head>
@@ -433,54 +434,109 @@
             </div>
         </div>
     </div>
+  <div class="col-span-12 lg:col-span-5 space-y-4.5">
 
-    <div class="col-span-12 lg:col-span-5 bg-white rounded-[20px] p-6 shadow-sm border border-blue-50 flex flex-col overflow-hidden">
-        <h2 class="text-xl font-bold mb-4 text-[#4A72D4]">Aktivitas Admin Terbaru</h2>
-        <div class="space-y-2 relative flex-1">
-            <div class="absolute left-6 top-2 bottom-10 w-0.5 bg-blue-50"></div>
-            @forelse($recentLogs as $log)
-        <div class="relative flex items-start gap-4 mb-8 group">
-            <div class="w-12 h-12 bg-blue-100 text-[#4A72D4] rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm group-hover:bg-[#4A72D4] group-hover:text-white transition-colors">
-                @if(str_contains(strtoupper($log->category), 'TAMBAH'))
-                    <i class="fa-solid fa-plus text-sm"></i>
-                @elseif(str_contains(strtoupper($log->category), 'HAPUS'))
-                    <i class="fa-solid fa-trash-can text-sm"></i>
-                @elseif(str_contains(strtoupper($log->category), 'UPDATE') || str_contains(strtoupper($log->category), 'EDIT'))
-                    <i class="fa-solid fa-pen-to-square text-sm"></i>
-                @else
-                    <i class="fa-solid fa-bolt text-sm"></i>
-                @endif
+    <div class="bg-white rounded-[20px] shadow-sm border border-blue-50 p-6">
+        <h2 class="text-lg font-bold text-[#4A72D4] mb-2">Pengaturan SNBT</h2>
+        <form action="{{ route('admin.setsnbt') }}" method="POST" class="space-y-1">
+            @csrf
+            <div>
+                <input type="datetime-local" name="snbt_date" value="{{ isset($setting) ? \Carbon\Carbon::parse($setting->snbt_date)->format('Y-m-d\TH:i') : '' }}" 
+                    class="w-full bg-blue-50/50 border border-blue-100 rounded-xl px-4 py-2  text-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
             </div>
-
-            <div class="pt-1 overflow-hidden">
-                <p class="text-sm font-bold text-gray-600 leading-tight">
-                    {{ $log->user->name ?? 'Admin' }} 
-                    <span class="text-[#4A72D4] lowercase font-medium">
-                        {{ str_replace('TRYOUT', '', $log->category) }}
-                    </span> 
-                    <span class="block text-gray-400 font-medium truncate italic mt-0.5">
-                        {{ $log->title }}
-                    </span>
-                </p>
-                <span class="text-[11px] font-medium text-gray-400">
-                    {{ $log->created_at->diffForHumans() }}
-                </span>
-            </div>
-        </div>
-    @empty
-        <div class="py-10 text-center opacity-30">
-            <p class="text-[10px] font-bold uppercase tracking-widest">Belum Ada Riwayat</p>
-        </div>
-    @endforelse
-        </div>
-        <a href="{{ route('admin.laporan.index') }}" 
-       class="w-full py-4 mt-8 bg-blue-50/50 hover:bg-[#4A72D4] hover:text-white text-[#4A72D4] text-[10px] font-black rounded-2xl transition-all border border-blue-100/50 text-center uppercase tracking-[0.2em]">
-        Semua Aktivitas
-    </a>
+            <button type="submit" class="w-full bg-[#4A72D4] text-white font-bold py-2 rounded-xl hover:bg-blue-600 transition-all active:scale-95 shadow-sm text-xs">
+                Simpan Jadwal
+            </button>
+        </form>
     </div>
+
+    <div class="bg-white rounded-[20px] p-6 shadow-sm border border-blue-50 flex flex-col h-fit">
+        <h2 class="text-xl font-bold mb-3 text-[#4A72D4]">Aktivitas Admin</h2>
+        
+        <div class="max-h-[100px] overflow-y-auto pr-2 custom-scrollbar">
+            <div class="space-y-2 relative">
+                <div class="absolute left-6 top-2 bottom-10 w-0.5 bg-blue-50"></div>
+                
+                @forelse($recentLogs as $log)
+                <div class="relative flex items-start gap-4 mb-6 group">
+                    <div class="w-12 h-12 bg-blue-100 text-[#4A72D4] rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm border border-white group-hover:bg-[#4A72D4] group-hover:text-white transition-colors">
+                        @if(str_contains(strtoupper($log->category), 'TAMBAH'))
+                            <i class="fa-solid fa-plus text-xs"></i>
+                        @elseif(str_contains(strtoupper($log->category), 'HAPUS'))
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        @elseif(str_contains(strtoupper($log->category), 'UPDATE') || str_contains(strtoupper($log->category), 'EDIT'))
+                            <i class="fa-solid fa-pen-to-square text-xs"></i>
+                        @else
+                            <i class="fa-solid fa-bolt text-xs"></i>
+                        @endif
+                    </div>
+
+                    <div class="pt-1 overflow-hidden">
+                        <p class="text-sm font-bold text-gray-600 leading-tight">
+                            {{ $log->user->name ?? 'Admin' }} 
+                            <span class="text-[#4A72D4] lowercase font-medium">
+                                {{ str_replace('TRYOUT', '', $log->category) }}
+                            </span> 
+                            <span class="block text-gray-400 font-medium truncate italic mt-0.5">
+                                {{ $log->title }}
+                            </span>
+                        </p>
+                        <span class="text-[11px] font-medium text-gray-400">
+                            {{ $log->created_at->diffForHumans() }}
+                        </span>
+                    </div>
+                </div>
+                @empty
+                <div class="py-10 text-center opacity-30">
+                    <p class="text-[10px] font-bold uppercase tracking-widest">Belum Ada Riwayat</p>
+                </div>
+                @endforelse
+            </div>
+        </div>
+
+        <a href="{{ route('admin.laporan.index') }}" 
+           class="w-full py-3 mt-4 bg-blue-50/50 hover:bg-[#4A72D4] hover:text-white text-[#4A72D4] text-[10px] font-black rounded-xl transition-all border border-blue-100/50 text-center uppercase tracking-[0.2em]">
+            Semua Aktivitas
+        </a>
+    </div>
+
+</div>
     </div>
         </main>
     </div>
+    @if(session('success'))
+<div 
+    x-data
+    x-init="
+        Swal.fire({
+            icon: 'success',
+            title: '{{ session('success') }}',
+
+            width: '340px',
+            padding: '1.8rem',
+
+            background: '#ffffff',
+            color: '#334155',
+
+            confirmButtonText: 'Oke',
+            confirmButtonColor: '#4A72D4',
+
+            customClass: {
+                popup: 'rounded-3xl shadow-xl',
+                title: 'text-lg font-bold',
+                confirmButton: 'rounded-xl px-6 py-2'
+            },
+
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        })
+    "
+></div>
+@endif
 
     <style>
         .custom-scrollbar::-webkit-scrollbar {

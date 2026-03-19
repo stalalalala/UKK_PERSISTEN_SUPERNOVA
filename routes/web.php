@@ -82,6 +82,9 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('dashboard', DashboardController::class)->only(['index']);
+        Route::post('set-snbt', [DashboardController::class, 'setSNBT'])->name('setsnbt');
+
+        
          Route::get('user/history', [UserController::class, 'history'])
             ->name('user.history');
 
