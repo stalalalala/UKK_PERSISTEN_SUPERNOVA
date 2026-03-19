@@ -41,8 +41,8 @@
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="inline" id="logout-form">
                         @csrf
-                        <button type="submit" 
-                                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
+                        <button type="submit"
+                            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -126,153 +126,143 @@
                         </p>
                     </div>
 
-                   <div 
-                    x-data="{
+                    <div x-data="{
                         target: new Date('{{ $snbtDate }}').getTime(),
-                        days:0,
-                        hours:0,
-                        minutes:0,
-
-                        update(){
+                        days: 0,
+                        hours: 0,
+                        minutes: 0,
+                    
+                        update() {
                             let now = new Date().getTime()
                             let distance = this.target - now
-
-                            if(distance < 0){
+                    
+                            if (distance < 0) {
                                 this.days = 0
                                 this.hours = 0
                                 this.minutes = 0
                                 return
                             }
-
-                            this.days = Math.floor(distance/(1000*60*60*24))
-                            this.hours = Math.floor((distance%(1000*60*60*24))/(1000*60*60))
-                            this.minutes = Math.floor((distance%(1000*60*60))/(1000*60))
+                    
+                            this.days = Math.floor(distance / (1000 * 60 * 60 * 24))
+                            this.hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+                            this.minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
                         },
-
-                        start(){
+                    
+                        start() {
                             this.update()
-                            setInterval(() => this.update(),1000)
+                            setInterval(() => this.update(), 1000)
                         }
-                    }" 
+                    }" x-init="start()"
+                        class="relative z-10 w-full max-w-xs md:max-w-none md:w-auto">
 
-                    x-init="start()"
+                        <div class="bg-white rounded-[35px] pb-6 relative shadow-xl">
 
-                    class="relative z-10 w-full max-w-xs md:max-w-none md:w-auto"
-                    >
+                            <div
+                                class="relative bg-[#4375D1] text-white rounded-[35px] px-10 md:px-20 py-8 md:py-10 z-10">
 
-                    <div class="bg-white rounded-[35px] pb-6 relative shadow-xl">
+                                <h2 class="text-5xl md:text-[75px] font-extrabold text-center leading-none">
+                                    H-<span x-text="days"></span>
+                                </h2>
 
-                    <div class="relative bg-[#4375D1] text-white rounded-[35px] px-10 md:px-20 py-8 md:py-10 z-10">
+                                <div
+                                    class="bg-white text-[#4375D1] font-semibold rounded-full px-4 py-2 mt-4 text-center text-xs md:text-sm">
+                                    Menjelang Pelaksanaan SNBT
+                                </div>
 
-                    <h2 class="text-5xl md:text-[75px] font-extrabold text-center leading-none">
-                    H-<span x-text="days"></span>
-                    </h2>
+                            </div>
 
-                    <div class="bg-white text-[#4375D1] font-semibold rounded-full px-4 py-2 mt-4 text-center text-xs md:text-sm">
-                    Menjelang Pelaksanaan SNBT
-                    </div>
+                            <div
+                                class="absolute bottom-[58px] left-[10%] w-[80%] h-14 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 rounded-[40px] z-0">
+                            </div>
 
-                    </div>
+                            <div class="flex justify-around mt-8 text-xs md:text-sm text-[#4375D1] font-medium">
 
-                    <div class="absolute bottom-[58px] left-[10%] w-[80%] h-14 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 rounded-[40px] z-0"></div>
+                                <div class="flex items-center gap-1 md:gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
 
-                    <div class="flex justify-around mt-8 text-xs md:text-sm text-[#4375D1] font-medium">
+                                    <span x-text="days + ' hari'"></span>
 
-                    <div class="flex items-center gap-1 md:gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="2" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                    </svg>
+                                </div>
 
-                    <span x-text="days + ' hari'"></span>
+                                <div class="flex items-center gap-1 md:gap-2">
 
-                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
 
-                    <div class="flex items-center gap-1 md:gap-2">
+                                    <span x-text="hours + ' jam'"></span>
 
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="2" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                    </svg>
+                                </div>
 
-                    <span x-text="hours + ' jam'"></span>
+                                <div class="flex items-center gap-1 md:gap-2">
 
-                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
 
-                    <div class="flex items-center gap-1 md:gap-2">
+                                    <span x-text="minutes + ' menit'"></span>
 
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="2" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                    </svg>
+                                </div>
 
-                    <span x-text="minutes + ' menit'"></span>
+                            </div>
 
-                    </div>
-
-                    </div>
-
-                    </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section class="mt-6 flex justify-center px-4">
-    <div 
-        x-data="{
-            keyword: '',
-            routes: {
-                'tryout': '{{ route('tryout.index') }}',
-                'latihan': '{{ route('latihan.index') }}',
-                'kuis': '{{ route('kuis.index') }}',
-                'video': '{{ route('video.index') }}',
-                'streak': '{{ route('streak.index') }}',
-                'profil': '{{ route('profile.index') }}',
-                'minat bakat': '{{ route('minatbakat.soal') }}'
-            },
-            goToPage(){
-                let search = this.keyword.toLowerCase().trim();
-                if (search === '') return;
-
-                // Cari kunci yang mengandung kata kunci pencarian
-                for (let key in this.routes) {
-                    if (key.includes(search)) {
-                        window.location.href = this.routes[key];
-                        return;
+                <div x-data="{
+                    keyword: '',
+                    routes: {
+                        'tryout': '{{ route('tryout.index') }}',
+                        'latihan': '{{ route('latihan.index') }}',
+                        'kuis': '{{ route('kuis.index') }}',
+                        'video': '{{ route('video.index') }}',
+                        'streak': '{{ route('streak.index') }}',
+                        'profil': '{{ route('profile.index') }}',
+                        'minat bakat': '{{ route('minatbakat.soal') }}'
+                    },
+                    goToPage() {
+                        let search = this.keyword.toLowerCase().trim();
+                        if (search === '') return;
+                
+                        // Cari kunci yang mengandung kata kunci pencarian
+                        for (let key in this.routes) {
+                            if (key.includes(search)) {
+                                window.location.href = this.routes[key];
+                                return;
+                            }
+                        }
+                
+                        // Jika tidak ketemu di navigasi, arahkan ke pencarian global di controller (opsional)
+                        window.location.href = '{{ route('beranda') }}?search=' + this.keyword;
                     }
-                }
+                }" class="flex flex-col md:flex-row items-center gap-4 w-full max-w-3xl">
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
+                        </div>
 
-                // Jika tidak ketemu di navigasi, arahkan ke pencarian global di controller (opsional)
-                window.location.href = '{{ route('beranda') }}?search=' + this.keyword;
-            }
-        }"
-        class="flex flex-col md:flex-row items-center gap-4 w-full max-w-3xl"
-    >
-        <div class="relative w-full">
-            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
-            </div>
+                        <input type="text" x-model="keyword" @keydown.enter="goToPage()"
+                            placeholder="Cari Halaman Try Out, Latihan Soal dll... "
+                            class="w-full bg-white border border-gray-200 rounded-full py-4 pl-12 pr-4 shadow-md focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm">
+                    </div>
 
-            <input 
-                type="text"
-                x-model="keyword"
-                @keydown.enter="goToPage()"
-                placeholder="Cari Halaman Try Out, Latihan Soal dll... "
-                class="w-full bg-white border border-gray-200 rounded-full py-4 pl-12 pr-4 shadow-md focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm"
-            >
-        </div>
-
-        <button 
-            @click="goToPage()"
-            class="w-full md:w-auto bg-blue-400 hover:bg-blue-500 text-white px-10 py-4 rounded-full font-semibold text-sm shadow-md transition-all active:scale-95 shrink-0"
-        >
-            Cari
-        </button>
-    </div>
-</section>
+                    <button @click="goToPage()"
+                        class="w-full md:w-auto bg-blue-400 hover:bg-blue-500 text-white px-10 py-4 rounded-full font-semibold text-sm shadow-md transition-all active:scale-95 shrink-0">
+                        Cari
+                    </button>
+                </div>
+            </section>
 
             <section class="mt-8 px-4 md:px-10">
                 @php
@@ -330,8 +320,9 @@
                         $hasilTes = \App\Models\HasilMinatBakat::where('user_id', Auth::id())->exists();
                     @endphp
 
-                    <a href="{{ route('minatbakat.intruksi') }}">
-                        <button class="mt-7 bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-100">
+                    <a href="{{ route('kuis.index') }}">
+                        <button
+                            class="mt-7 bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-100">
                             {{ $hasilTes ? 'Lihat Hasil Tes' : 'Mulai Tes' }}
                             <span class="bg-white/30 w-8 h-8 flex items-center justify-center rounded-full text-white">
                                 ➜

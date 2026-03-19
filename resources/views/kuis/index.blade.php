@@ -27,7 +27,7 @@
             </ul>
             <div class="flex items-center gap-2">
                 <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full">
-                    <a href="/profile/index"
+                    <a href="{{ route('profile.index') }}"
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" class="size-5 md:size-6">
@@ -37,8 +37,8 @@
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="inline" id="logout-form">
                         @csrf
-                        <button type="submit" 
-                                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
+                        <button type="submit"
+                            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -47,6 +47,7 @@
                         </button>
                     </form>
                 </div>
+
                 <button @click="open = true" class="lg:hidden p-2 text-gray-600 hover:bg-gray-200 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">

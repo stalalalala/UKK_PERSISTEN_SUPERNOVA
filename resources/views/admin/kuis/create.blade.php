@@ -211,8 +211,7 @@
                         pertanyaan: row["Pertanyaan"] || "",
 
                         gambar: (row["URL Gambar"] || "").startsWith("http") ?
-                            row["URL Gambar"] :
-                            null,
+                            row["URL Gambar"] : null,
 
                         opsi_a: row["Opsi A"] || "",
                         opsi_b: row["Opsi B"] || "",
@@ -270,7 +269,7 @@
                 const ws = XLSX.utils.aoa_to_sheet(data);
                 XLSX.utils.book_append_sheet(wb, ws, "Template");
 
-                XLSX.writeFile(wb, "Template_Soal.xlsx");
+                XLSX.writeFile(wb, "TEMPLATE_SOAL_KUIS.xlsx");
             },
 
 

@@ -75,11 +75,13 @@
                 if (!file) return;
 
                 const reader = new FileReader();
+
                 reader.onload = (e) => {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {
                         type: "array"
                     });
+
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(sheet);
 
@@ -88,17 +90,79 @@
                         return;
                     }
 
-                    // Ambil config dari baris pertama excel
-                    this.selectedSubtes = jsonData[0]["Kategori Subtes"] || "";
-                    this.selectedWaktu = jsonData[0]["Waktu"] || 20;
+                    // =========================
+                    // 🔥 VALIDASI GLOBAL
+                    // =========================
+
+                    const allowedSubtes = [
+                        "Penalaran Umum",
+                        "Penalaran & Pemahaman Umum",
+                        "Pemahaman Bacaan & Menulis",
+                        "Pengetahuan Kuantitatif",
+                        "Penalaran Matematika",
+                        "Literasi Bahasa Indonesia",
+                        "Literasi Bahasa Inggris"
+                    ];
+
+                    const globalSubtes = (jsonData[0]["Kategori Subtes"] || "").trim();
+                    const globalWaktu = (jsonData[0]["Waktu"] || "").toString().trim();
+
+                    // ✅ Validasi Subtes
+                    if (!allowedSubtes.includes(globalSubtes)) {
+                        alert("Subtes tidak valid! Harus sesuai format lengkap.");
+                        return;
+                    }
+
+                    // ✅ Validasi Waktu (20–60 menit kelipatan 5)
+                    const allowedWaktu = [
+                        "20 Menit", "25 Menit", "30 Menit",
+                        "35 Menit", "40 Menit", "45 Menit",
+                        "50 Menit", "55 Menit", "60 Menit"
+                    ];
+
+                    if (!allowedWaktu.includes(globalWaktu)) {
+                        alert("Waktu harus 20 - 60 Menit (kelipatan 5)");
+                        return;
+                    }
+
+                    // 🔥 KONVERSI "45 Menit" → 45
+                    const waktuAngka = parseInt(globalWaktu.replace(" Menit", ""));
+
+                    // =========================
+                    // 🔥 VALIDASI PER BARIS
+                    // =========================
+                    for (let i = 0; i < jsonData.length; i++) {
+                        let row = jsonData[i];
+
+                        let jawaban = (row["Jawaban Benar"] || "").toString().trim();
+
+                        if (!['a', 'b', 'c', 'd', 'e'].includes(jawaban)) {
+                            alert(`Error di baris ${i + 2}: Jawaban harus huruf kecil (a/b/c/d/e)`);
+                            return;
+                        }
+
+                        if (jawaban !== jawaban.toLowerCase()) {
+                            alert(`Error di baris ${i + 2}: Jangan pakai huruf besar!`);
+                            return;
+                        }
+                    }
+
+                    // =========================
+                    // ✅ MAPPING DATA
+                    // =========================
+
+                    this.selectedSubtes = globalSubtes;
+                    this.selectedWaktu = waktuAngka;
 
                     this.questions = jsonData.slice(0, 20).map((row) => ({
+                        subtes: globalSubtes,
+                        waktu: waktuAngka,
 
                         materi: row["Materi"] || "",
-
-                        gambar: row["Gambar"] || row["Image"] || row["URL Gambar"] || "",
-
                         pertanyaan: row["Pertanyaan"] || "",
+
+                        gambar: (row["URL Gambar"] || "").startsWith("http") ?
+                            row["URL Gambar"] : null,
 
                         opsi_a: row["Opsi A"] || "",
                         opsi_b: row["Opsi B"] || "",
@@ -106,23 +170,60 @@
                         opsi_d: row["Opsi D"] || "",
                         opsi_e: row["Opsi E"] || "",
 
-                        jawaban_benar: (row["Jawaban Benar"] || "")
-                            .toString()
-                            .trim()
-                            .toLowerCase(),
-
-                        pembahasan: row["Pembahasan"] || ""
-
+                        jawaban_benar: (row["Jawaban Benar"] || "").toLowerCase().trim(),
+                        pembahasan: row["Pembahasan"] || "",
                     }));
 
                     this.soalTersimpan = this.questions.length;
                     this.activeQuestion = 1;
                     this.loadQuestion();
-                    this.currentQuestion.gambar = this.questions[0]?.gambar || '';
+
                     this.showImportModal = false;
-                    alert("Berhasil import " + this.soalTersimpan + " soal!");
+
+                    alert("Import berhasil & valid!");
                 };
+
                 reader.readAsArrayBuffer(file);
+            },
+
+            unduhTemplate() {
+                const wb = XLSX.utils.book_new();
+
+                const data = [
+                    [
+                        "Kategori Subtes",
+                        "Waktu",
+                        "Materi",
+                        "Pertanyaan",
+                        "URL Gambar",
+                        "Opsi A",
+                        "Opsi B",
+                        "Opsi C",
+                        "Opsi D",
+                        "Opsi E",
+                        "Jawaban Benar",
+                        "Pembahasan"
+                    ],
+                    [
+                        "Penalaran Umum",
+                        "20 Menit",
+                        "Teks bacaan...",
+                        "Apa ibukota Indonesia?",
+                        "https://contoh.com/gambar.jpg",
+                        "Jakarta",
+                        "Bandung",
+                        "Surabaya",
+                        "Medan",
+                        "Bali",
+                        "a",
+                        "Pembahasan..."
+                    ]
+                ];
+
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, "Template");
+
+                XLSX.writeFile(wb, "TEMPLATE_SOAL_LATIHAN.xlsx");
             },
 
             saveCurrentDraft() {
@@ -945,8 +1046,7 @@
                         <span class="text-[11px] font-bold text-blue-700 uppercase tracking-tight">Belum punya
                             formatnya?</span>
                     </div>
-                    <a href="https://docs.google.com/spreadsheets/d/1X4qNRhciTWbocmGl4IZ4DU5sH0v6LxukLgGMnfyPFLo/copy"
-                        target="_blank" @click="downloadTemplate()"
+                    <a href="#" @click.prevent="unduhTemplate()"
                         class="text-[11px] font-black text-[#4A72D4] hover:underline">
                         DOWNLOAD TEMPLATE
                     </a>
