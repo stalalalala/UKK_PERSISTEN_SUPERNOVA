@@ -8,6 +8,7 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -38,7 +39,13 @@
         showConfirm: false, 
         showImportModal: false,
         isEditModeUniv: false,
+        showValidationErrors: false,
+        showProdiError: false,
         prodiMode: 'manual',
+        showRestoreModal: false, 
+        showForceDeleteModal: false,
+        actionId: null,
+        actionName: '',
         confirmData: { type: '', id: null, title: '', message: '' },
         newUnivName: '', newUnivLocation: '', selectedUnivId: null, selectedUnivName: '',
         newProdiName: '', newProdiKuota: '', newProdiPeminat: '',
@@ -131,6 +138,42 @@
                 const res = await fetch(`/admin/peluangPtn/${id}/force`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content } });
                 if(res.ok) window.location.reload();
             }
+        },
+
+        prepareRestore(id, name) {
+            this.actionId = id;
+            this.actionName = name;
+            this.showRestoreModal = true;
+        },
+
+        prepareForceDelete(id, name) {
+            this.actionId = id;
+            this.actionName = name;
+            this.showForceDeleteModal = true;
+        },
+
+        confirmRestore() {
+            fetch(`/admin/peluangPtn/${this.actionId}/restore`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if(response.ok) window.location.reload();
+            });
+        },
+
+        confirmPermanentDelete() {
+            fetch(`/admin/peluangPtn/${this.actionId}/force`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if(response.ok) window.location.reload();
+            });
         },
 
         openAddUniv() { this.isEditModeUniv = false; this.newUnivName = ''; this.newUnivLocation = ''; this.showModalUniv = true; },
@@ -389,7 +432,7 @@ laporan</span>
             </div>
 
             <div x-show="currentPage === 'peluang_ptn'" class="flex-1 overflow-y-auto main-content-scroll p-4 lg:p-10 pb-20">
-                <div class="max-w-6xl mx-auto space-y-4">
+                <div class="max-w-none mx-auto space-y-4">
                     <template x-for="univ in univList" :key="univ.id">
                         <div class="bg-white rounded-[1.5rem] lg:rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                             <div @click="expandedUniv = (expandedUniv === univ.id ? null : univ.id)" class="p-4 lg:p-8 flex items-center justify-between cursor-pointer hover:bg-gray-50/50 transition-all shrink-0">
@@ -415,7 +458,7 @@ laporan</span>
                                         <table class="w-full min-w-[500px] text-left">
                                             <thead class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest sticky top-0 z-10">
                                                 <tr>
-                                                    <th class="px-6 lg:px-10 py-4">Nama Prodi</th>
+                                                    <th class="px-6 lg:px-10 py-4 w-full">Nama Prodi</th>
                                                     <th class="px-6 lg:px-10 py-4 text-center">Kuota</th>
                                                     <th class="px-6 lg:px-10 py-4 text-center">Peminat</th>
                                                     <th class="px-6 lg:px-10 py-4 text-center">Aksi</th>
@@ -443,7 +486,7 @@ laporan</span>
             </div>
 
             <div x-show="currentPage === 'history'" x-cloak class="flex-1 overflow-y-auto p-4 lg:p-10 pb-20">
-                <div class="max-w-4xl mx-auto bg-white rounded-[1.5rem] lg:rounded-[2.5rem] shadow-sm border overflow-hidden">
+                <div class="max-w-none mx-auto bg-white rounded-[1.5rem] lg:rounded-[2.5rem] shadow-sm border overflow-hidden">
                     <div class="flex border-b bg-gray-50/50">
                         <button @click="historyTab = 'univ'" :class="historyTab === 'univ' ? 'bg-white border-b-2 border-[#4A72D4] text-[#4A72D4]' : 'text-gray-400'" class="flex-1 py-4 lg:py-6 font-black uppercase text-[10px] lg:text-xs">Riwayat Univ</button>
                         <button @click="historyTab = 'prodi'" :class="historyTab === 'prodi' ? 'bg-white border-b-2 border-[#4A72D4] text-[#4A72D4]' : 'text-gray-400'" class="flex-1 py-4 lg:py-6 font-black uppercase text-[10px] lg:text-xs">Riwayat Prodi</button>
@@ -459,8 +502,8 @@ laporan</span>
                                     </div>
                                 </div>
                                 <div class="flex gap-1 lg:gap-2">
-                                    <button @click="restoreData(log.id)" class="bg-emerald-50 text-emerald-600 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Pulihkan</button>
-                                    <button @click="permanentDelete(log.id)" class="bg-red-50 text-red-500 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Hapus</button>
+                                    <button @click="prepareRestore(log.id, log.name)" class="bg-emerald-50 text-emerald-600 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Pulihkan</button>
+                                    <button @click="prepareForceDelete(log.id, log.name)" class="bg-red-50 text-red-500 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Hapus</button>
                                 </div>
                             </div>
                         </template>
@@ -476,8 +519,8 @@ laporan</span>
                                     </div>
                                 </div>
                                 <div class="flex gap-1 lg:gap-2">
-                                    <button @click="restoreData(log.id)" class="bg-emerald-50 text-emerald-600 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Pulihkan</button>
-                                    <button @click="permanentDelete(log.id)" class="bg-red-50 text-red-500 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Hapus</button>
+                                    <button @click="prepareRestore(log.id, log.name)" class="bg-emerald-50 text-emerald-600 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Pulihkan</button>
+                                    <button @click="prepareForceDelete(log.id, log.name)" class="bg-red-50 text-red-500 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Hapus Permanen</button>
                                 </div>
                             </div>
                         </template>
@@ -504,47 +547,88 @@ laporan</span>
     </div>
 
     <div x-show="showModalProdi" x-transition x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">
-            <div class="bg-[#4A72D4] p-6 text-white text-center">
-                <h4 class="text-lg font-black italic uppercase">Tambah Prodi</h4>
-                <p class="text-[9px] opacity-70 font-bold uppercase tracking-widest mt-1" x-text="selectedUnivName"></p>
-            </div>
-            <div class="flex border-b">
-                <button @click="prodiMode = 'manual'" :class="prodiMode === 'manual' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-400'" class="flex-1 py-3 font-black text-[9px] uppercase">Manual</button>
-                <button @click="prodiMode = 'excel'" :class="prodiMode === 'excel' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-400'" class="flex-1 py-3 font-black text-[9px] uppercase">Excel</button>
-            </div>
-            <div class="p-6">
-                <div x-show="prodiMode === 'manual'" class="space-y-3">
-                    <input x-model="newProdiName" type="text" placeholder="Nama Prodi" class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-bold text-sm">
-                    <div class="grid grid-cols-2 gap-3">
-                        <input x-model="newProdiKuota" type="number" placeholder="Kuota" class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-black text-center text-blue-600">
-                        <input x-model="newProdiPeminat" type="number" placeholder="Peminat" class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-black text-center text-indigo-500">
-                    </div>
-                    <button @click="saveProdi()" class="w-full bg-[#4A72D4] text-white py-3 rounded-xl font-black uppercase text-[9px] tracking-widest shadow-lg mt-2">Simpan Prodi</button>
+    <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">
+        <div class="bg-[#4A72D4] p-6 text-white text-center">
+            <h4 class="text-lg font-black italic uppercase">Tambah Prodi</h4>
+            <p class="text-[9px] opacity-70 font-bold uppercase tracking-widest mt-1" x-text="selectedUnivName"></p>
+        </div>
+        <div class="flex border-b">
+            <button @click="prodiMode = 'manual'" :class="prodiMode === 'manual' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-400'" class="flex-1 py-3 font-black text-[9px] uppercase">Manual</button>
+            <button @click="prodiMode = 'excel'" :class="prodiMode === 'excel' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-400'" class="flex-1 py-3 font-black text-[9px] uppercase">Excel</button>
+        </div>
+        <div class="p-6">
+            <div x-show="prodiMode === 'manual'" class="space-y-3">
+                <input x-model="newProdiName" type="text" placeholder="Nama Prodi" 
+                    class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-bold text-sm focus:ring-2 focus:ring-[#4A72D4]"
+                    :class="{'ring-2 ring-red-500': !newProdiName && showProdiError}">
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <input x-model="newProdiKuota" type="number" placeholder="Kuota" 
+                        class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-black text-center text-blue-600 focus:ring-2 focus:ring-[#4A72D4]"
+                        :class="{'ring-2 ring-red-500': (!newProdiKuota || newProdiKuota <= 0) && showProdiError}">
+                    
+                    <input x-model="newProdiPeminat" type="number" placeholder="Peminat" 
+                        class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-black text-center text-indigo-500 focus:ring-2 focus:ring-[#4A72D4]"
+                        :class="{'ring-2 ring-red-500': (!newProdiPeminat || newProdiPeminat <= 0) && showProdiError}">
                 </div>
-                <div x-show="prodiMode === 'excel'" class="space-y-4 text-center">
-                    <button @click="unduhTemplate('prodi')" class="w-full bg-emerald-50 border border-dashed border-emerald-200 py-3 rounded-xl text-emerald-600 font-bold text-[9px] uppercase">Unduh Template Prodi</button>
-                    <div class="relative">
-                        <input type="file" @change="importExcel($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                        <div class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black text-center uppercase text-[9px] tracking-widest">Upload Excel Prodi</div>
-                    </div>
-                </div>
-                <button @click="showModalProdi = false" class="w-full font-black text-gray-400 uppercase text-[9px] tracking-widest mt-4">Batal</button>
+
+                <template x-if="showProdiError && (!newProdiName || !newProdiKuota || !newProdiPeminat)">
+                    <p class="text-[10px] text-red-500 font-bold text-center uppercase tracking-tighter">* Semua data manual wajib diisi!</p>
+                </template>
+
+                <button @click="if(newProdiName && newProdiKuota > 0 && newProdiPeminat > 0) { saveProdi(); showProdiError = false; } else { showProdiError = true; }" 
+                    class="w-full bg-[#4A72D4] text-white py-3 rounded-xl font-black uppercase text-[9px] tracking-widest shadow-lg mt-2">
+                    Simpan Prodi
+                </button>
             </div>
+
+            <div x-show="prodiMode === 'excel'" class="space-y-4 text-center">
+                <button @click="unduhTemplate('prodi')" class="w-full bg-emerald-50 border border-dashed border-emerald-200 py-3 rounded-xl text-emerald-600 font-bold text-[9px] uppercase">Unduh Template Prodi</button>
+                <div class="relative">
+                    <input type="file" @change="importExcel($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    <div class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black text-center uppercase text-[9px] tracking-widest">Upload Excel Prodi</div>
+                </div>
+            </div>
+
+            <button @click="showModalProdi = false; showProdiError = false;" class="w-full font-black text-gray-400 uppercase text-[9px] tracking-widest mt-4">Batal</button>
         </div>
     </div>
+</div>
 
     <div x-show="showModalUniv" x-transition x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">
-            <div class="bg-[#4A72D4] p-6 text-white text-center"><h4 class="text-lg font-black italic uppercase" x-text="isEditModeUniv ? 'Edit PTN' : 'Tambah PTN'"></h4></div>
-            <div class="p-6 space-y-3">
-                <input x-model="newUnivName" type="text" placeholder="Nama Universitas" class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-bold text-sm">
-                <input x-model="newUnivLocation" type="text" placeholder="Lokasi" class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-bold text-sm">
-                <button @click="saveUniv()" class="w-full bg-[#4A72D4] py-3 rounded-xl font-black text-white uppercase text-[9px] tracking-widest shadow-lg mt-2">Simpan</button>
-                <button @click="showModalUniv = false" class="w-full font-black text-gray-400 uppercase text-[9px] tracking-widest">Batal</button>
-            </div>
+    <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">
+        <div class="bg-[#4A72D4] p-6 text-white text-center">
+            <h4 class="text-lg font-black italic uppercase" x-text="isEditModeUniv ? 'Edit PTN' : 'Tambah PTN'"></h4>
+        </div>
+        <div class="p-6 space-y-3">
+            <input x-model="newUnivName" 
+                   type="text" 
+                   placeholder="Nama Universitas" 
+                   class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-bold text-sm focus:ring-2 focus:ring-[#4A72D4]"
+                   :class="{'ring-2 ring-red-500': !newUnivName && showValidationErrors}">
+            
+            <input x-model="newUnivLocation" 
+                   type="text" 
+                   placeholder="Lokasi" 
+                   class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-bold text-sm focus:ring-2 focus:ring-[#4A72D4]"
+                   :class="{'ring-2 ring-red-500': !newUnivLocation && showValidationErrors}">
+
+            <template x-if="showValidationErrors && (!newUnivName || !newUnivLocation)">
+                <p class="text-[10px] text-red-500 font-bold text-center uppercase tracking-tighter">* Semua field wajib diisi!</p>
+            </template>
+
+            <button @click="if(newUnivName && newUnivLocation) { saveUniv(); showValidationErrors = false; } else { showValidationErrors = true; }" 
+                    class="w-full bg-[#4A72D4] py-3 rounded-xl font-black text-white uppercase text-[9px] tracking-widest shadow-lg mt-2">
+                Simpan
+            </button>
+            
+            <button @click="showModalUniv = false; showValidationErrors = false;" 
+                    class="w-full font-black text-gray-400 uppercase text-[9px] tracking-widest">
+                Batal
+            </button>
         </div>
     </div>
+</div>
 
     <div x-show="showConfirm" x-transition x-cloak class="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
         <div class="bg-white rounded-[2rem] w-full max-w-xs p-6 text-center shadow-2xl">
@@ -556,5 +640,54 @@ laporan</span>
             </div>
         </div>
     </div>
+
+
+@if (session('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: "{{ session('success') }}",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            customClass: {
+                popup: 'rounded-[2rem]', 
+            }
+        });
+    </script>
+@endif
+
+{{-- MODAL PULIHKAN --}}
+<div x-show="showRestoreModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showRestoreModal = false"></div>
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" x-show="showRestoreModal" x-transition>
+        <div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2 uppercase italic">Pulihkan Data?</h3>
+        <p class="text-gray-500 text-xs font-bold uppercase mb-8" x-text="actionName"></p>
+        <div class="flex gap-3">
+            <button @click="showRestoreModal = false" class="flex-1 py-3 rounded-xl font-black uppercase text-[9px] bg-gray-100 text-gray-400">Batal</button>
+            <button @click="confirmRestore()" class="flex-1 py-3 rounded-xl font-black uppercase text-[9px] bg-emerald-500 text-white">Ya, Pulihkan</button>
+        </div>
+    </div>
+</div>
+
+{{-- MODAL HAPUS PERMANEN --}}
+<div x-show="showForceDeleteModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showForceDeleteModal = false"></div>
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" x-show="showForceDeleteModal" x-transition>
+        <div class="w-20 h-20 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2 uppercase italic">Hapus Permanen?</h3>
+        <p class="text-gray-500 text-[10px] font-bold uppercase mb-8">Data <span class="text-rose-600 font-black" x-text="actionName"></span> akan dihapus selamanya.</p>
+        <div class="flex gap-3">
+            <button @click="showForceDeleteModal = false" class="flex-1 py-3 rounded-xl font-black uppercase text-[9px] bg-gray-100 text-gray-400">Batal</button>
+            <button @click="confirmPermanentDelete()" class="flex-1 py-3 rounded-xl font-black uppercase text-[9px] bg-rose-600 text-white">Hapus!</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>

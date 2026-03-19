@@ -16,27 +16,24 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminMinatBakatController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-
-    // Hapus ->withCount('soals')
     public function index()
 {
-    // Mengambil kategori sambil menghitung jumlah soal yang terkait
-    // Asumsi: Nama relasi di Model MinatBakatKategori adalah 'soals'
-    $categories = MinatBakatKategori::withCount('soals')->get(); 
-    
+    $categories = MinatBakatKategori::withCount('soals')
+        ->latest('updated_at') 
+        ->get(); 
+        
     $participants = MinatBakatPartisipan::latest()->get();
+    
+    $trashedCategories = MinatBakatKategori::onlyTrashed()
+        ->latest('deleted_at')
+        ->get();
 
-    return view('admin.minatBakat.index', compact('categories', 'participants'));
+    return view('admin.minatBakat.index', compact('categories', 'participants', 'trashedCategories'));
 }
 
     private function logAktivitas($aksi, $judul, $deskripsi, $status = 'active')
     {
-        // Jika karena suatu alasan judul null, berikan nilai fallback agar database tidak error
         $fixJudul = $judul ?? 'Aktivitas Minat Bakat';
-
         SystemLog::create([
             'id_pengguna' => Auth::id(),
             'category'    => $aksi,
@@ -46,22 +43,12 @@ class AdminMinatBakatController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $category = MinatBakatKategori::create([
             'name' => $request->name,
             'color' => $request->color,
+            'description' => $request->description,
             'soal' => 0
         ]);
 
@@ -69,25 +56,6 @@ class AdminMinatBakatController extends Controller
         return response()->json($category);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(AdminMinatBakat $adminMinatBakat)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(AdminMinatBakat $adminMinatBakat)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -104,65 +72,73 @@ class AdminMinatBakatController extends Controller
         ]);
 
         $this->logAktivitas('UPDATE MINAT BAKAT', $kategori->name, "Admin memperbarui deskripsi/warna kategori");
-
         return response()->json($kategori);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
-{
-    // Temukan kategori berdasarkan ID
-    $category = MinatBakatKategori::find($id);
+    {
+        $category = MinatBakatKategori::find($id);
+        if ($category) {
+            $namaKategori = $category->name;
+            // Soft delete soal terkait agar sinkron di history
+            MinatBakatSoal::where('kategori_name', $namaKategori)->delete();
+            $category->delete();
+            
+            $this->logAktivitas('HAPUS MINAT BAKAT', $namaKategori, "Admin menghapus kategori ke history", 'deleted');
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['message' => 'Data tidak ditemukan'], 404);
+    }
 
+    public function restore($id)
+{
+    $category = MinatBakatKategori::onlyTrashed()->find($id);
     if ($category) {
-        $category->delete();
+        MinatBakatSoal::onlyTrashed()->where('kategori_name', $category->name)->restore();
+        
+        $category->restore();
+        $category->touch(); 
+
         return response()->json(['success' => true]);
     }
-
-    if ($category) {
-        $namaKategori = $category->name;
-        $category->delete();
-    }
-
-    $this->logAktivitas('HAPUS MINAT BAKAT', $namaKategori, "Admin menghapus kategori minat bakat", 'deleted');
-    return response()->json(['message' => 'Data tidak ditemukan'], 404);
+    return response()->json(['success' => false], 404);
 }
+
+    public function forceDelete($id)
+    {
+        $category = MinatBakatKategori::onlyTrashed()->find($id);
+        if ($category) {
+            // Hapus permanen soal terkait
+            MinatBakatSoal::onlyTrashed()->where('kategori_name', $category->name)->forceDelete();
+            $category->forceDelete();
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false], 404);
+    }
 
     public function manajemenSoal(Request $request) 
     {
         $categoryName = $request->query('category', 'Umum');
-        // Ambil soal yang hanya sesuai kategori ini
         $questions = MinatBakatSoal::where('kategori_name', $categoryName)->latest()->get();
-        
         return view('admin.minatBakat.soal', compact('questions', 'categoryName'));
     }
 
     public function storeSoal(Request $request)
     {
-        $request->validate([
-            'text' => 'required',
-            'category' => 'required'
-        ]);
-
+        $request->validate(['text' => 'required', 'category' => 'required']);
         $soal = MinatBakatSoal::create([
             'kategori_name' => $request->category,
             'text' => $request->text
         ]);
-
         return response()->json($soal);
     }
 
-    // Hapus (Masuk ke History)
     public function destroySoal($id)
     {
-        // Jika Anda ingin benar-benar 'menghapus' dari daftar utama tapi tetap ada di history UI saja:
         MinatBakatSoal::destroy($id);
         return response()->json(['success' => true]);
     }
 
-    // Pulihkan (Simpan ulang ke database)
     public function restoreSoal(Request $request)
     {
         $soal = MinatBakatSoal::create([
@@ -173,118 +149,84 @@ class AdminMinatBakatController extends Controller
     }
 
     public function exportPartisipan()
-{
-    $fileName = 'laporan-partisipan-' . date('Y-m-d') . '.csv';
-    $participants = MinatBakatPartisipan::all();
-
-    $headers = [
-        "Content-type"        => "text/csv",
-        "Content-Disposition" => "attachment; filename=$fileName",
-        "Pragma"              => "no-cache",
-        "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-        "Expires"             => "0"
-    ];
-
-    $columns = ['ID', 'Nama', 'Hasil', 'Tanggal'];
-
-    $callback = function() use($participants, $columns) {
-        $file = fopen('php://output', 'w');
-        fputcsv($file, $columns);
-
-        foreach ($participants as $p) {
-            fputcsv($file, [$p->id, $p->name, $p->hasil, $p->created_at]);
-        }
-        fclose($file);
-    };
-
-    return response()->stream($callback, 200, $headers);
-}
-
-public function resetPartisipan()
-{
-    // 1. Menghapus data dari tabel partisipan
-    MinatBakatPartisipan::truncate();
-
-    // 2. Menghapus juga data dari tabel hasil (Gunakan DB karena mungkin tidak ada modelnya)
-    DB::table('hasil_minat_bakats')->truncate();
-
-    $this->logAktivitas('RESET DATA MINAT BAKAT', 'Database Partisipan', 'Admin membersihkan seluruh data hasil tes minat bakat peserta', 'deleted');
-    return back()->with('success', 'Semua data peserta dan hasil berhasil direset!');
-}
-
-public function generatePdf($id)
-{
-    // Ambil data orang (ID 1, 2, dst)
-    $participant = MinatBakatPartisipan::findOrFail($id);
-    
-    // Ambil data hasil (Cari yang ID-nya sama dengan partisipan)
-    $hasilTable = DB::table('hasil_minat_bakats')->where('id', $id)->first();
-
-    $top_categories = [];
-
-    // Jika tabel hasil ada isinya
-    if ($hasilTable) {
-        $top_names = [$hasilTable->top_1, $hasilTable->top_2, $hasilTable->top_3];
-
-        foreach ($top_names as $name) {
-            if (!empty($name)) {
-                $catInfo = MinatBakatKategori::where('name', 'like', trim($name))->first();
-                $top_categories[] = (object)[
-                    'name' => strtoupper($name),
-                    'description' => $catInfo->description ?? "Memiliki potensi yang sangat baik pada bidang " . strtoupper($name) . "."
-                ];
+    {
+        $fileName = 'laporan-partisipan-' . date('Y-m-d') . '.csv';
+        $participants = MinatBakatPartisipan::all();
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+        $columns = ['ID', 'Nama', 'Hasil', 'Tanggal'];
+        $callback = function() use($participants, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            foreach ($participants as $p) {
+                fputcsv($file, [$p->id, $p->name, $p->hasil, $p->created_at]);
             }
-        }
+            fclose($file);
+        };
+        return response()->stream($callback, 200, $headers);
     }
 
-    $data = [
-        'nama' => $participant->name,
-        'tanggal' => $participant->created_at->format('d F Y'),
-        'hasil' => strtoupper($participant->hasil),
-        'top_categories' => $top_categories
-    ];
+    public function resetPartisipan()
+    {
+        MinatBakatPartisipan::truncate();
+        DB::table('hasil_minat_bakats')->truncate();
+        $this->logAktivitas('RESET DATA MINAT BAKAT', 'Database Partisipan', 'Admin membersihkan seluruh data hasil tes minat bakat peserta', 'deleted');
+        return back()->with('success', 'Semua data peserta dan hasil berhasil direset!');
+    }
 
-    $pdf = Pdf::loadView('admin.minatBakat.cetak_pdf', $data);
-    return $pdf->stream('Laporan_'.$participant->name.'.pdf');
-}
-
-public function importSoalBulk(Request $request)
-{
-    try {
-        $rows = $request->data; // Data JSON dari frontend
-        if (!$rows || count($rows) <= 1) {
-            return response()->json(['success' => false, 'message' => 'File kosong atau format salah'], 400);
-        }
-
-        $count = 0;
-        DB::beginTransaction();
-
-        foreach ($rows as $index => $row) {
-            // Lewati header (baris pertama)
-            if ($index === 0) continue;
-
-            // Mapping kolom (0: No, 1: Pertanyaan, 2: Kategori)
-            $pertanyaan = $row[1] ?? null;
-            $kategori   = $row[2] ?? null;
-
-            if (!empty($pertanyaan) && !empty($kategori)) {
-                \App\Models\MinatBakatSoal::create([
-                    'text'          => trim($pertanyaan),
-                    'kategori_name' => trim($kategori)
-                ]);
-                $count++;
+    public function generatePdf($id)
+    {
+        $participant = MinatBakatPartisipan::findOrFail($id);
+        $hasilTable = DB::table('hasil_minat_bakats')->where('id', $id)->first();
+        $top_categories = [];
+        if ($hasilTable) {
+            $top_names = [$hasilTable->top_1, $hasilTable->top_2, $hasilTable->top_3];
+            foreach ($top_names as $name) {
+                if (!empty($name)) {
+                    $catInfo = MinatBakatKategori::where('name', 'like', trim($name))->first();
+                    $top_categories[] = (object)[
+                        'name' => strtoupper($name),
+                        'description' => $catInfo->description ?? "Memiliki potensi yang sangat baik pada bidang " . strtoupper($name) . "."
+                    ];
+                }
             }
         }
-
-        DB::commit();
-        return response()->json([
-            'success' => true, 
-            'message' => "Berhasil mengimpor $count soal dari Excel/CSV!"
-        ]);
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        $data = [
+            'nama' => $participant->name,
+            'tanggal' => $participant->created_at->format('d F Y'),
+            'hasil' => strtoupper($participant->hasil),
+            'top_categories' => $top_categories
+        ];
+        $pdf = Pdf::loadView('admin.minatBakat.cetak_pdf', $data);
+        return $pdf->stream('Laporan_'.$participant->name.'.pdf');
     }
-}
+
+    public function importSoalBulk(Request $request)
+    {
+        try {
+            $rows = $request->data;
+            if (!$rows || count($rows) <= 1) return response()->json(['success' => false, 'message' => 'File kosong'], 400);
+            $count = 0;
+            DB::beginTransaction();
+            foreach ($rows as $index => $row) {
+                if ($index === 0) continue;
+                $pertanyaan = $row[1] ?? null;
+                $kategori   = $row[2] ?? null;
+                if (!empty($pertanyaan) && !empty($kategori)) {
+                    MinatBakatSoal::create(['text' => trim($pertanyaan), 'kategori_name' => trim($kategori)]);
+                    $count++;
+                }
+            }
+            DB::commit();
+            return response()->json(['success' => true, 'message' => "Berhasil mengimpor $count soal!"]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
 }

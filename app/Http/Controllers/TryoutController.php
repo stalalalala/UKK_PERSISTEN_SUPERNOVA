@@ -56,25 +56,28 @@ class TryoutController extends Controller
 
         // 5. Ambil ID tryout yang sudah pernah dikerjakan
         $userResults = DB::table('tryout_jawaban_peserta')
-            ->join('soal_tryouts', 'tryout_jawaban_peserta.soal_id', '=', 'soal_tryouts.id')
-            ->join('tryout_categories', 'soal_tryouts.category_id', '=', 'tryout_categories.id')
-            ->where('tryout_jawaban_peserta.user_id', $userId)
-            ->select('tryout_categories.admin_tryout_id as tryout_id')
-            ->distinct()
-            ->get();
+        ->join('soal_tryouts', 'tryout_jawaban_peserta.soal_id', '=', 'soal_tryouts.id')
+        ->join('tryout_categories', 'soal_tryouts.category_id', '=', 'tryout_categories.id')
+        ->where('tryout_jawaban_peserta.user_id', $userId)
+        ->select('tryout_categories.admin_tryout_id as tryout_id')
+        ->distinct()
+        ->pluck('tryout_id') 
+        ->toArray();
 
         // 6. Tentukan status ketersediaan & Kunci Tryout
         $tryouts->transform(function ($item) use ($now, $userResults, $userTarget) {
-            $isWithinDate = ($now >= $item->tanggal && $now <= $item->tanggal_akhir);
-            $sudahDikerjakan = $userResults->contains('tryout_id', $item->id);
+        $isWithinDate = ($now >= $item->tanggal && $now <= $item->tanggal_akhir);
+        
+        // Pengecekan apakah ID tryout ada di dalam array hasil pengerjaan
+        $sudahDikerjakan = in_array($item->id, $userResults);
 
-            // LOGIKA UTAMA: Tersedia jika aktif, di dalam tanggal, belum dikerjakan, DAN SUDAH ISI TARGET
-            $item->is_available = ($item->is_active && $isWithinDate && !$sudahDikerjakan && $userTarget);
-            
-            $item->is_locked_by_target = !$userTarget;
-            $item->sudah_dikerjakan = $sudahDikerjakan;
+        // LOGIKA BARU: is_available hanya untuk akses "Mengerjakan" (tombol biru)
+        $item->is_available = ($item->is_active && $isWithinDate && !$sudahDikerjakan && $userTarget);
+        
+        $item->is_locked_by_target = !$userTarget;
+        $item->sudah_dikerjakan = $sudahDikerjakan;
 
-            return $item;
+        return $item;
         });
 
         return view('tryout.index', compact('tryouts', 'userResults', 'userTarget', 'peluangLolos', 'allUnivs'));
@@ -135,19 +138,43 @@ class TryoutController extends Controller
         return view('tryout.intruksi', compact('tryout', 'firstCategory'));
     }
 
-    // --- Fungsi lainnya (soal, jeda, hasil, ranking, simpanJawaban, generateSertifikat) 
-    // tetap sama persis dengan kode awal Anda tanpa perubahan fitur ---
     public function soal($id, $category_id = null) 
-    {
-        $tryout = AdminTryout::findOrFail($id);
-        $categories = DB::table('tryout_categories')->where('admin_tryout_id', $id)->orderBy('id', 'asc')->get();
-        if (!$category_id) { $currentCategory = $categories->first(); } 
-        else { $currentCategory = $categories->where('id', $category_id)->first(); }
-        $nextCategory = $categories->where('id', '>', $currentCategory->id)->first();
-        $soals = SoalTryout::where('category_id', $currentCategory->id)->get();
-        $totalDurasi = $currentCategory->durasi;
-        return view('tryout.soal', compact('tryout', 'soals', 'totalDurasi', 'currentCategory', 'nextCategory', 'categories'));
+{
+    $tryout = AdminTryout::findOrFail($id);
+    
+    $categories = DB::table('tryout_categories')
+        ->where('admin_tryout_id', $id)
+        ->orderBy('id', 'asc')
+        ->get();
+
+    if ($categories->isEmpty()) {
+        return redirect()->route('tryout.index')->with('error', 'Kategori (Subtes) belum tersedia.');
     }
+
+    if (!$category_id) {
+        $currentCategory = $categories->first();
+    } else {
+        $currentCategory = DB::table('tryout_categories')->where('id', $category_id)->first();
+    }
+
+    $soals = SoalTryout::where('category_id', $currentCategory->id)->get();
+
+    $nextCategory = $categories->where('id', '>', $currentCategory->id)->first();
+    
+    $totalDurasi = $currentCategory->durasi;
+
+    $totalSoal = $soals->count();
+
+    return view('tryout.soal', compact(
+        'tryout', 
+        'soals', 
+        'totalDurasi', 
+        'currentCategory', 
+        'nextCategory', 
+        'categories',
+        'totalSoal'
+    ));
+}
 
     public function jeda($id, $next_category_id)
     {

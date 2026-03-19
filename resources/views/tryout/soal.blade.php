@@ -9,15 +9,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @vite('resources/css/app.css')
+    <style>
+        [x-cloak] { display: none !important; }
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
 </head>
 <body class="bg-slate-100 font-po min-h-screen py-10 overflow-x-hidden px-6 md:px-10">
 
     <div x-data="{ 
         soalAktif: parseInt(localStorage.getItem('last_soal_{{ $tryout->id }}_{{ $currentCategory->id }}')) || 1, 
         totalSoal: {{ $soals->count() }}, 
-        // jawabanTerpilih sekarang menyimpan { 'ID_SOAL': 'JAWABAN' }
         jawabanTerpilih: JSON.parse(localStorage.getItem('jawaban_to_{{ $tryout->id }}_{{ $currentCategory->id }}')) || {},
-        timeLeft: {{ ($totalDurasi ?? 30) * 60 }}, 
+        
+        // PERBAIKAN TIMER: Cek localStorage dulu, jika tidak ada baru pakai durasi asli
+        timeLeft: parseInt(localStorage.getItem('timer_{{ $tryout->id }}_{{ $currentCategory->id }}')) ?? {{ ($totalDurasi ?? 30) * 60 }}, 
+        
         timerText: '',
         showExitModal: false,
         showConfirmNextModal: false, 
@@ -26,7 +32,6 @@
             return Object.keys(this.jawabanTerpilih).length < this.totalSoal;
         },
 
-        // INI FUNGSI PENGIRIMAN OTOMATIS SAAT WAKTU HABIS
         pindahHalaman() {
             this.sendData().then(() => {
                 this.clearData();
@@ -37,7 +42,6 @@
                 @endif
             }).catch(error => {
                 console.error('Gagal mengirim jawaban:', error);
-                // Tetap pindah jika gagal agar tidak stuck, tapi idealnya beri peringatan
                 window.location.reload(); 
             });
         },
@@ -55,6 +59,11 @@
         },
 
         init() {
+            // Jika di localStorage nilainya null (pertama kali buka), set ke durasi asli
+            if (isNaN(this.timeLeft) || this.timeLeft === null) {
+                this.timeLeft = {{ ($totalDurasi ?? 30) * 60 }};
+            }
+
             this.updateTimerText();
             this.startTimer();
             this.lockHistory();
@@ -87,9 +96,11 @@
                 if (this.timeLeft > 0) {
                     this.timeLeft--;
                     this.updateTimerText();
+                    // SIMPAN SISA WAKTU KE STORAGE TIAP DETIK
+                    localStorage.setItem('timer_{{ $tryout->id }}_{{ $currentCategory->id }}', this.timeLeft);
                 } else {
                     clearInterval(timer);
-                    this.pindahHalaman(); // OTOMATIS PINDAH SAAT 0
+                    this.pindahHalaman();
                 }
             }, 1000);
         },
@@ -97,6 +108,7 @@
         clearData() {
             localStorage.removeItem('jawaban_to_{{ $tryout->id }}_{{ $currentCategory->id }}');
             localStorage.removeItem('last_soal_{{ $tryout->id }}_{{ $currentCategory->id }}');
+            localStorage.removeItem('timer_{{ $tryout->id }}_{{ $currentCategory->id }}');
         }
     }" x-init="init()" x-cloak class="max-w-[1440px] mx-auto">
 
@@ -115,9 +127,27 @@
         <div class="bg-white rounded-[35px] shadow-sm overflow-hidden border border-gray-100 flex flex-col lg:flex-row">
             <div class="flex-1 p-5 sm:p-10 md:p-14 lg:p-16 border-b lg:border-b-0 lg:border-r border-gray-100">
                 @foreach($soals as $index => $soal)
-                <div x-show="soalAktif === {{ $index + 1 }}">
-                    <p class="text-xs md:text-sm font-semibold text-[#2E3B66] mb-6">Subtes: {{ $currentCategory->nama_kategori }}</p>
-                    <div class="mb-10 text-gray-800 text-base sm:text-lg md:text-xl leading-relaxed">
+                <div x-show="soalAktif === {{ $index + 1 }}" x-cloak>
+                    <p class="text-xs md:text-sm font-semibold text-[#2E3B66] mb-4">Subtes: {{ $currentCategory->nama_kategori }}</p>
+
+                    @if($soal->materi_teks)
+                    <div class="mb-6 p-4 bg-slate-50 border-l-4 border-[#3B82F6] rounded-r-xl text-gray-700 text-sm md:text-base leading-relaxed italic">
+                        {!! $soal->materi_teks !!}
+                    </div>
+                    @endif
+
+                    @if($soal->image_url)
+                    <div class="mb-8 flex justify-center">
+                        <div class="max-w-full overflow-hidden rounded-2xl border-2 border-gray-100 shadow-sm bg-white">
+                            <img src="{{ str_contains($soal->image_url, 'http') ? $soal->image_url : asset('storage/' . $soal->image_url) }}" 
+                                alt="Gambar Soal" 
+                                class="max-h-[300px] md:max-h-[450px] w-auto object-contain p-2"
+                                onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=Gambar+Tidak+Ditemukan';">
+                        </div>
+                    </div>
+                    @endif
+
+                    <div class="mb-10 text-gray-800 text-base sm:text-lg md:text-xl font-medium leading-relaxed">
                         {!! $soal->pertanyaan !!}
                     </div>
                 </div>
@@ -182,7 +212,7 @@
             </div>
         </div>
 
-        <div x-show="showExitModal" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
+        <div x-show="showExitModal" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-transition x-cloak>
             <div class="fixed inset-0 bg-black/50" @click="showExitModal = false"></div>
             <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-10 text-center shadow-2xl">
                 <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
@@ -197,7 +227,7 @@
             </div>
         </div>
 
-        <div x-show="showConfirmNextModal" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
+        <div x-show="showConfirmNextModal" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-transition x-cloak>
             <div class="fixed inset-0 bg-black/50" @click="showConfirmNextModal = false"></div>
             <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-10 text-center shadow-2xl">
                 <div class="w-20 h-20 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
