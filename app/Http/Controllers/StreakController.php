@@ -65,6 +65,17 @@ $currentStreak = StreakCharacter::where('min_level', '<=', $userLevel)
     ->orderByDesc('min_level') // ambil yang tertinggi <= level user
     ->first();
 
+    // 2. TAMBAHKAN INI: Ambil karakter berikutnya (yang belum terbuka)
+$nextEvolution = StreakCharacter::where('min_level', '>', $userLevel)
+    ->orderBy('min_level', 'ASC')
+    ->first();
+
+    $userHasNextEvolution = false;
+
+if ($nextEvolution) {
+    $userHasNextEvolution = $userLevel >= $nextEvolution->min_level;
+}
+
     return view('streak.index', compact(
         'user',
         'todayXp',
@@ -74,7 +85,9 @@ $currentStreak = StreakCharacter::where('min_level', '<=', $userLevel)
         'latihanDone',
         'tryoutDone',
         'userLevel',
-        'currentStreak'
+        'currentStreak',
+        'nextEvolution',
+        'userHasNextEvolution'
     ));
 }
 

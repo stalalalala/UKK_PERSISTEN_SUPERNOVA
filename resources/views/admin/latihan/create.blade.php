@@ -11,6 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -48,10 +49,24 @@
 
             currentQuestion: {
                 materi: '',
+                gambar: '',
                 pertanyaan: '',
                 opsi: ['', '', '', '', ''],
                 benar: null,
                 pembahasan: ''
+            },
+
+            previewImage(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                    this.currentQuestion.gambar = e.target.result;
+                };
+
+                reader.readAsDataURL(file);
             },
 
             // Pastikan format import sesuai dengan kolom di Controller
@@ -78,24 +93,58 @@
                     this.selectedWaktu = jsonData[0]["Waktu"] || 20;
 
                     this.questions = jsonData.slice(0, 20).map((row) => ({
+
                         materi: row["Materi"] || "",
+
+                        gambar: row["Gambar"] || row["Image"] || row["URL Gambar"] || "",
+
                         pertanyaan: row["Pertanyaan"] || "",
+
                         opsi_a: row["Opsi A"] || "",
                         opsi_b: row["Opsi B"] || "",
                         opsi_c: row["Opsi C"] || "",
                         opsi_d: row["Opsi D"] || "",
                         opsi_e: row["Opsi E"] || "",
-                        jawaban_benar: (row["Jawaban Benar"] || "").toString().trim().toLowerCase(),
+
+                        jawaban_benar: (row["Jawaban Benar"] || "")
+                            .toString()
+                            .trim()
+                            .toLowerCase(),
+
                         pembahasan: row["Pembahasan"] || ""
+
                     }));
 
                     this.soalTersimpan = this.questions.length;
                     this.activeQuestion = 1;
                     this.loadQuestion();
+                    this.currentQuestion.gambar = this.questions[0]?.gambar || '';
                     this.showImportModal = false;
                     alert("Berhasil import " + this.soalTersimpan + " soal!");
                 };
                 reader.readAsArrayBuffer(file);
+            },
+
+            saveCurrentDraft() {
+
+                let index = this.activeQuestion - 1;
+
+                // simpan tanpa validasi
+                this.questions[index] = {
+                    materi: this.currentQuestion.materi,
+                    gambar: this.currentQuestion.gambar,
+                    pertanyaan: this.currentQuestion.pertanyaan,
+                    opsi_a: this.currentQuestion.opsi[0],
+                    opsi_b: this.currentQuestion.opsi[1],
+                    opsi_c: this.currentQuestion.opsi[2],
+                    opsi_d: this.currentQuestion.opsi[3],
+                    opsi_e: this.currentQuestion.opsi[4],
+                    jawaban_benar: this.currentQuestion.benar !== null ? ['a', 'b', 'c', 'd', 'e'][this
+                        .currentQuestion.benar
+                    ] : null,
+                    pembahasan: this.currentQuestion.pembahasan
+                };
+
             },
 
             simpanSoal() {
@@ -117,6 +166,7 @@
                 // Bungkus data agar sesuai dengan struktur database LatihanQuestion
                 this.questions[index] = {
                     materi: this.currentQuestion.materi,
+                    gambar: this.currentQuestion.gambar,
                     pertanyaan: this.currentQuestion.pertanyaan,
                     opsi_a: this.currentQuestion.opsi[0],
                     opsi_b: this.currentQuestion.opsi[1],
@@ -130,6 +180,7 @@
                 this.soalTersimpan = this.questions.filter(q => q).length;
 
                 if (this.activeQuestion < 20) {
+                    this.saveCurrentDraft();
                     this.activeQuestion++;
                     this.loadQuestion();
                     alert("Soal ke-" + (this.activeQuestion - 1) + " tersimpan sementara.");
@@ -149,6 +200,7 @@
                     let q = this.questions[index];
                     this.currentQuestion = {
                         materi: q.materi,
+                        gambar: q.gambar || '',
                         pertanyaan: q.pertanyaan,
                         opsi: [q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e],
                         benar: ['a', 'b', 'c', 'd', 'e'].indexOf(q.jawaban_benar),
@@ -158,6 +210,7 @@
                     // Reset form untuk soal baru
                     this.currentQuestion = {
                         materi: '',
+                        gambar: '',
                         pertanyaan: '',
                         opsi: ['', '', '', '', ''],
                         benar: null,
@@ -187,13 +240,79 @@
             }
         }
     }
+
+    function PageGuard() {
+
+        return {
+
+            allowLeave: false,
+
+            init() {
+
+                history.pushState({
+                    page: 1
+                }, "", location.href);
+                history.pushState({
+                    page: 2
+                }, "", location.href);
+
+                window.addEventListener("popstate", () => {
+
+                    if (!this.allowLeave) {
+                        this.confirmLeave();
+                        history.pushState({
+                            page: 2
+                        }, "", location.href);
+                    }
+
+                });
+
+                window.addEventListener("beforeunload", (e) => {
+
+                    if (!this.allowLeave) {
+                        e.preventDefault();
+                        e.returnValue = "";
+                    }
+
+                });
+
+            },
+
+            confirmLeave() {
+
+                Swal.fire({
+                    title: "Kembali ke halaman daftar?",
+                    text: "Data latihan yang belum dipublikasikan akan hilang.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#4A72D4",
+                    cancelButtonColor: "#9CA3AF",
+                    confirmButtonText: "Ya, kembali",
+                    cancelButtonText: "Tetap di sini",
+                    scrollbarPadding: false
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        this.allowLeave = true;
+                        window.location.href = "{{ route('admin.latihan.index') }}";
+
+                    }
+
+                });
+
+            }
+
+        }
+
+    }
 </script>
 
 
 
-<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="latihanForm()">
+<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="{ ...PageGuard(), ...latihanForm() }" x-init="init()">
 
-    <div class="flex h-full w-full">
+    <div class="flex h-screen w-full relative">
         <aside x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
             class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
@@ -350,7 +469,7 @@
 
         <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
 
-             <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+            <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
                 <div class="flex items-center w-full gap-4">
                     <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
                         <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,8 +478,7 @@
                         </svg>
                     </button>
 
-                  <div 
-                    x-data="{
+                    <div x-data="{
                         keyword: '',
                         routes: {
                             'dashboard': '{{ route('admin.dashboard.index') }}',
@@ -374,48 +492,37 @@
                             'kuis': '{{ route('admin.kuis.index') }}',
                             'latihan': '{{ route('admin.latihan.index') }}'
                         },
-                        goToPage(){
+                        goToPage() {
                             let search = this.keyword.toLowerCase()
-
+                    
                             for (let key in this.routes) {
                                 if (key.includes(search)) {
                                     window.location.href = this.routes[key]
                                     return
                                 }
                             }
-
+                    
                             alert('Halaman tidak ditemukan')
                         }
-                    }"
-                    class="relative w-full group flex items-center gap-2"
-                    >
+                    }" class="relative w-full group flex items-center gap-2">
 
                         <div class="relative w-full">
-                            
+
                             <!-- ICON -->
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" 
-                                    class="w-5 h-5 text-gray-500" 
-                                    fill="none"
-                                    viewBox="0 0 24 24" 
-                                    stroke="currentColor" 
-                                    stroke-width="2">
-                                    <path stroke-linecap="round" 
-                                        stroke-linejoin="round"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                                 </svg>
                             </div>
 
-                            <input 
-                                type="text"
-                                x-model="keyword"
-                                placeholder="Cari halaman..."
+                            <input type="text" x-model="keyword" placeholder="Cari halaman..."
                                 @keydown.enter="goToPage()"
                                 class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
                         </div>
 
-                        <button 
-                            @click="goToPage()"
+                        <button @click="goToPage()"
                             class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                             Cari
                         </button>
@@ -424,21 +531,22 @@
                 </div>
 
                 @php
-                use Illuminate\Support\Facades\Auth;
-                $user = Auth::user();
-            @endphp
-                    <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
-    
-                    <div @click="open = !open" 
+                    use Illuminate\Support\Facades\Auth;
+                    $user = Auth::user();
+                @endphp
+                <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
+
+                    <div @click="open = !open"
                         class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
                                 ml-auto md:ml-0 cursor-pointer">
-                        
+
                         <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" alt="Admin">
+                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
+                                alt="Admin">
                         </div>
-                        
+
                         <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-                        
+
                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                     </div>
 
@@ -474,6 +582,11 @@
                         class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95">
                         <i class="fa-solid fa-file-excel text-lg"></i> Import via Excel
                     </button>
+
+                    <a href="{{ route('admin.latihan.index') }}" @click.prevent="confirmLeave()"
+                        class="px-5 py-2.5 rounded-xl border items-center justify-center  border-gray-200 text-gray-600 bg-white font-bold text-sm hover:bg-gray-50 transition-all">
+                        Batal
+                    </a>
                 </div>
             </div>
 
@@ -494,8 +607,8 @@
                                     </div>
                                 </div>
 
-                                <form id="latihanForm" action="{{ route('admin.latihan.store') }}" method="POST"
-                                    class="space-y-8">
+                                <form id="latihanForm" action="{{ route('admin.latihan.store') }}"
+                                    @submit="allowLeave = true" method="POST" class="space-y-8">
 
 
                                     @csrf
@@ -600,6 +713,7 @@
                                                 <div class="absolute right-4 bottom-4">
                                                     <label
                                                         class="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-gray-100 cursor-pointer hover:bg-blue-50 hover:border-blue-200 transition-all">
+
                                                         <svg xmlns="http://www.w3.org/2000/svg"
                                                             class="h-4 w-4 text-blue-500" fill="none"
                                                             viewBox="0 0 24 24" stroke="currentColor">
@@ -607,27 +721,30 @@
                                                                 stroke-width="2"
                                                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                         </svg>
-                                                        <span
-                                                            class="text-[10px] font-bold text-blue-600 uppercase">Tambah
-                                                            Foto</span>
-                                                        <input type="file" class="hidden" accept="image/*"
-                                                            @change="
-                                                            const file = $event.target.files[0];
-                                                            if(file){
-                                                                currentQuestion.gambar = file.name;
-                                                                imageUrl = URL.createObjectURL(file);
-                                                            }
-                                                        ">
+
+                                                        <span class="text-[10px] font-bold text-blue-600 uppercase">
+                                                            Tambah Foto
+                                                        </span>
+
+                                                        <input type="file" accept="image/*"
+                                                            @change="previewImage($event)" class="hidden">
 
                                                     </label>
+
                                                 </div>
                                             </div>
 
-                                            <template x-if="imageUrl">
-                                                <div class="relative mt-3 inline-block">
-                                                    <img :src="imageUrl"
-                                                        class="max-h-48 rounded-2xl border-2 border-white shadow-sm ring-1 ring-gray-100">
-                                                    <button @click="imageUrl = null"
+                                            <template x-if="currentQuestion.gambar">
+                                                <div x-show="currentQuestion.gambar"
+                                                    class="relative mt-3 inline-block">
+                                                    <img :src="currentQuestion.gambar.startsWith('http') ?
+                                                        currentQuestion.gambar :
+                                                        (currentQuestion.gambar.startsWith('data:image') ?
+                                                            currentQuestion.gambar :
+                                                            '/storage/' + currentQuestion.gambar)"
+                                                        referrerpolicy="no-referrer" crossorigin="anonymous"
+                                                        class="max-h-48 rounded-lg border">
+                                                    <button @click="currentQuestion.gambar=''"
                                                         class="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:scale-110 transition-all shadow-md">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3"
                                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -717,7 +834,7 @@
                                             <button type="button"
                                                 @click="currentQuestion = {
                                                         materi: '',
-                                                        gambar: null,
+                                                       gambar: '',
                                                         pertanyaan: '',
                                                         opsi: ['', '', '', '', ''],
                                                         benar: null,
@@ -746,7 +863,7 @@
 
                                 <div class="grid grid-cols-5 gap-3">
                                     <template x-for="n in 20">
-                                        <button @click="activeQuestion = n; loadQuestion()"
+                                        <button @click="saveCurrentDraft(); activeQuestion = n; loadQuestion()"
                                             :class="{
                                                 'bg-blue-500 text-white': activeQuestion === n,
                                                 'bg-emerald-500 text-white': questions[n - 1]?.pertanyaan,
@@ -772,7 +889,7 @@
 
                                 <button type="button" @click="submitFinal()" :disabled="questions.length < 20"
                                     class="w-full mt-6 bg-emerald-500 text-white py-3 rounded-xl font-bold disabled:opacity-40 disabled:cursor-not-allowed">
-                                    Publikasikan Kuis
+                                    Publikasikan Latihan
                                 </button>
 
 

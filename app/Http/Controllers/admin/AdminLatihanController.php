@@ -70,8 +70,8 @@ $subtesMap = [
     $questions = $latihans->questions->map(function ($q) {
     return [
         'id' => $q->id,
-
         'materi' => $q->materi,
+        'gambar' => $q->gambar,
         'subtes' => $q->subtes,
         'pertanyaan' => $q->pertanyaan,
 
@@ -82,7 +82,7 @@ $subtesMap = [
         'opsi_e' => $q->opsi_e,
 
         'jawaban_benar' => $q->jawaban_benar,
-        'pembahasan' => $q->pembahasan,
+        'pembahasan' => $q->pembahasan ?? null,
 
         'status' => 'original'
     ];
@@ -106,7 +106,7 @@ public function update(Request $request, $id)
 ]);
 
 
-    if ($request->questions_json) {
+    if ($request->filled('questions_json')) {
 
         $questions = json_decode($request->questions_json, true);
 
@@ -115,20 +115,60 @@ public function update(Request $request, $id)
             $question = $latihans->questions()->where('id', $q['id'])->first();
 
             if ($question) {
-                $question->update([
-    'materi'     => $q['materi'] ?? null,
-    'subtes'     => $q['subtes'] ?? null,
-    'pertanyaan' => $q['pertanyaan'],
+                $gambarPath = $question->gambar; // default gambar lama
 
-    'opsi_a' => $q['opsi_a'],
-    'opsi_b' => $q['opsi_b'],
-    'opsi_c' => $q['opsi_c'],
-    'opsi_d' => $q['opsi_d'],
-    'opsi_e' => $q['opsi_e'],
+// =========================
+// BASE64 IMAGE
+// =========================
+if (!empty($q['gambar']) && str_starts_with($q['gambar'], 'data:image')) {
 
-    'jawaban_benar' => $q['jawaban_benar'],
-    'pembahasan' => $q['pembahasan'],
-]);
+    if (preg_match('/^data:image\/(\w+);base64,/', $q['gambar'], $type)) {
+
+        $extension = strtolower($type[1]);
+        if (!in_array($extension, ['png','jpg','jpeg','webp'])) {
+            $extension = 'png';
+        }
+
+        $imageData = substr($q['gambar'], strpos($q['gambar'], ',') + 1);
+        $imageData = base64_decode($imageData);
+
+        if ($imageData !== false) {
+
+            $imageName = 'soal_' . uniqid() . '.' . $extension;
+
+            Storage::disk('public')->put('latihan/' . $imageName, $imageData);
+
+            $gambarPath = 'latihan/' . $imageName;
+        }
+    }
+
+}
+
+// =========================
+// URL IMAGE
+// =========================
+elseif (!empty($q['gambar']) && filter_var($q['gambar'], FILTER_VALIDATE_URL)) {
+
+    $gambarPath = $q['gambar'];
+
+}
+
+// 🔥 INI YANG KURANG
+    $question->update([
+        'materi' => $q['materi'] ?? null,
+        'subtes' => $q['subtes'] ?? null,
+        'pertanyaan' => $q['pertanyaan'],
+        'gambar' => $gambarPath,
+
+        'opsi_a' => $q['opsi_a'],
+        'opsi_b' => $q['opsi_b'],
+        'opsi_c' => $q['opsi_c'],
+        'opsi_d' => $q['opsi_d'],
+        'opsi_e' => $q['opsi_e'],
+
+        'jawaban_benar' => $q['jawaban_benar'],
+        'pembahasan' => $q['pembahasan'] ?? null,
+    ]);
 
             }
         }
@@ -138,7 +178,7 @@ public function update(Request $request, $id)
 
     return redirect()
         ->route('admin.latihan.index')
-        ->with('success', 'Kuis berhasil diperbarui!');
+        ->with('success', 'Latihan berhasil diperbarui!');
 }
 
     // ============================
@@ -159,10 +199,12 @@ public function update(Request $request, $id)
     public function store(Request $request)
     {
         $request->validate([
-            'subtes' => 'required',
-            'durasi' => 'required|integer',
-            'questions_json' => 'required'
-        ]);
+    'subtes' => 'required',
+    'durasi' => 'required|integer',
+    'materi' => 'nullable',
+    'video_url' => 'nullable',
+    'questions_json' => 'required'
+]);
 
         $questions = json_decode($request->questions_json, true);
 
@@ -177,29 +219,69 @@ $lastSet = Latihan::where('subtes', $request->subtes)
 $setKe = $lastSet ? $lastSet + 1 : 1;
 
         // Simpan Header Latihan
-        $latihan = Latihan::create([
-            'judul'        => "Latihan " . $request->subtes . " Set $setKe",
-            'subtes'       => $request->subtes,
-            'set_ke'       => $setKe,
-            'durasi'       => $request->durasi,
-            'is_active'    => true,
-            'is_published' => true,
-        ]);
+       $latihan = Latihan::create([
+    'judul'        => "Latihan " . $request->subtes . " Set $setKe",
+    'subtes'       => $request->subtes,
+    'set_ke'       => $setKe,
+    'durasi'       => $request->durasi,
+    'materi'       => $request->materi,
+    'video_url'    => $request->video_url,
+    'is_active'    => true,
+    'is_published' => true,
+]);
 
         // Simpan Butir Soal
         foreach ($questions as $q) {
-            $latihan->questions()->create([
-                'materi'        => $q['materi'] ?? null,
-                'pertanyaan'    => $q['pertanyaan'],
-                'opsi_a'        => $q['opsi_a'],
-                'opsi_b'        => $q['opsi_b'],
-                'opsi_c'        => $q['opsi_c'],
-                'opsi_d'        => $q['opsi_d'],
-                'opsi_e'        => $q['opsi_e'],
-                'jawaban_benar' => $q['jawaban_benar'],
-                'pembahasan'    => $q['pembahasan'] ?? null,
-            ]);
+
+    $gambarPath = null;
+
+    // =========================
+    // BASE64 IMAGE
+    // =========================
+    if (!empty($q['gambar']) && str_starts_with($q['gambar'], 'data:image')) {
+
+        if (preg_match('/^data:image\/(\w+);base64,/', $q['gambar'], $type)) {
+
+            $extension = strtolower($type[1]);
+            if (!in_array($extension, ['png','jpg','jpeg','webp'])) {
+                $extension = 'png';
             }
+
+            $imageData = substr($q['gambar'], strpos($q['gambar'], ',') + 1);
+            $imageData = base64_decode($imageData);
+
+            if ($imageData !== false) {
+                $imageName = 'soal_' . uniqid() . '.' . $extension;
+
+                Storage::disk('public')->put('latihan/' . $imageName, $imageData);
+
+                $gambarPath = 'latihan/' . $imageName;
+            }
+        }
+
+    }
+    // =========================
+    // URL IMAGE
+    // =========================
+    elseif (!empty($q['gambar']) && filter_var($q['gambar'], FILTER_VALIDATE_URL)) {
+        $gambarPath = $q['gambar'];
+    }
+
+    $latihan->questions()->create([
+        'materi' => $q['materi'] ?? null,
+        'gambar' => $gambarPath,
+        'pertanyaan' => $q['pertanyaan'],
+
+        'opsi_a' => $q['opsi_a'],
+        'opsi_b' => $q['opsi_b'],
+        'opsi_c' => $q['opsi_c'],
+        'opsi_d' => $q['opsi_d'],
+        'opsi_e' => $q['opsi_e'],
+
+        'jawaban_benar' => $q['jawaban_benar'],
+        'pembahasan' => $q['pembahasan'] ?? null,
+    ]);
+}
 
         $this->logAktivitas('TAMBAH LATIHAN', $latihan->judul, "Admin menambahkan set latihan baru");
         return redirect()

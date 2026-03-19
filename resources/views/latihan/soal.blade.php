@@ -93,6 +93,17 @@
 
                 <div class="flex-grow overflow-y-auto custom-scroll px-4 md:px-6">
                     <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-6">
+                        <template x-if="questions[soalAktifIdx].gambar">
+                            <div class="flex justify-center mb-6">
+                                <div class="bg-white p-3 rounded-xl shadow border border-gray-100">
+                                    <img :src="questions[soalAktifIdx].gambar.startsWith('http') ?
+                                        questions[soalAktifIdx].gambar :
+                                        '/storage/' + questions[soalAktifIdx].gambar"
+                                        class="max-w-full max-h-[320px] md:max-h-[380px] object-contain rounded-lg"
+                                        loading="lazy">
+                                </div>
+                            </div>
+                        </template>
                         <div class="text-[#2E3B66] text-lg leading-relaxed whitespace-pre-line"
                             x-text="questions[soalAktifIdx].materi || 'Baca teks berikut untuk menjawab pertanyaan.'">
                         </div>
