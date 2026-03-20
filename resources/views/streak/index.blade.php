@@ -173,11 +173,13 @@
 
                 @if ($isLocked)
                     <!-- Tombol Pulihkan -->
-                    <button
-                        class="w-full bg-yellow-400 text-blue-900 font-bold py-2.5 rounded-full shadow-md hover:bg-yellow-500 transition-all"
-                        @click="alert('Pulihkan karakter ini!');">
-                        Pulihkan Karakter
-                    </button>
+                    <form action="{{ route('streak.restore') }}" method="POST">
+                        @csrf
+                        <button type="submit"
+                            class="w-full bg-yellow-400 text-blue-900 font-bold py-2.5 rounded-full shadow-md hover:bg-yellow-500 transition-all">
+                            Pulihkan Karakter
+                        </button>
+                    </form>
                 @else
                     <!-- Progress XP normal -->
                     <div

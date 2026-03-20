@@ -1098,7 +1098,7 @@ window.scrollTo({top:0,behavior:'smooth'})"
         </main>
     </div>
 
-    <div x-show="showImportModal" class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
+    <div x-show="showImportModal" x-cloak class="fixed inset-0 z-[100] overflow-y-auto">
 
         <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="showImportModal = false">
         </div>
@@ -1111,7 +1111,7 @@ window.scrollTo({top:0,behavior:'smooth'})"
 
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
-                        <i class="fa-solid fa-file-import text-emerald-500"></i> Import Data Kuis
+                        <i class="fa-solid fa-video text-emerald-500"></i> Import Soal dari Excel
                     </h3>
                     <button @click="showImportModal = false"
                         class="text-gray-400 hover:text-red-500 transition-colors">
@@ -1120,40 +1120,42 @@ window.scrollTo({top:0,behavior:'smooth'})"
                 </div>
 
                 <div
-                    class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-200 transition-all bg-gray-50/50">
+                    class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-300 transition-all bg-gray-50/50">
                     <div
                         class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
                     </div>
-                    <p class="text-sm font-bold text-gray-600">Klik atau seret file Excel ke sini</p>
-                    <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 5MB (.xlsx, .xls)</p>
-                    <input type="file" class="hidden" id="excel_upload" @change="importExcel($event)"
-                        accept=".xlsx, .xls">
-                    <button onclick="document.getElementById('excel_upload').click()"
+                    <p class="text-sm font-bold text-gray-600">Klik di sini</p>
+                    <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 100MB (.xlsx, .xls)</p>
+
+                    <input type="file" class="hidden" x-ref="videoExcelInput" @change="importExcel($event)"
+                        accept=".xlsx,.xls">
+                    <button @click="$refs.videoExcelInput.click()"
                         class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">
                         Pilih File
                     </button>
                 </div>
 
-                <div class="mt-8 p-4 bg-blue-50 rounded-2xl flex items-center justify-between">
+                <div class="mt-8 p-4 bg-emerald-50 rounded-2xl flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-circle-info text-blue-500"></i>
-                        <span class="text-[11px] font-bold text-blue-700 uppercase tracking-tight">Belum punya
+                        <i class="fa-solid fa-circle-info text-emerald-500"></i>
+                        <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-tight">Belum punya
                             formatnya?</span>
                     </div>
-                    <a href="#" @click.prevent="unduhTemplate()"
-                        class="text-[11px] font-black text-[#4A72D4] hover:underline">
-                        DOWNLOAD TEMPLATE
-                    </a>
+                    <button @click="unduhTemplate()"
+                        class="text-[11px] font-black text-emerald-600 hover:underline cursor-pointer uppercase">
+                        Unduh Template Excel
+                    </button>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mt-8">
                     <button @click="showImportModal = false"
-                        class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">Batalkan</button>
-                    <button
-                        class="py-4 bg-[#4A72D4] text-white rounded-2xl text-sm font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">Proses
-                        Import</button>
+                        class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                        Batalkan
+                    </button>
+
                 </div>
+
             </div>
         </div>
     </div>

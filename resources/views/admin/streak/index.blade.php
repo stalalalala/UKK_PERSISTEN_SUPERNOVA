@@ -383,7 +383,7 @@
                                 <tr>
                                     <th class="px-10 py-6 text-center">Visual Pet</th>
                                     <th class="px-10 py-6 text-center">Level Perubahan</th>
-                                    <th class="px-10 py-6 text-center">Animasi</th>
+                                    <th class="px-10 py-6 text-center">SVG Animasi</th>
                                     <th class="px-10 py-6 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -588,73 +588,63 @@
 
         </main>
     </div>
-@if(session('success'))
-<div 
-    x-data
-    x-init="
-        Swal.fire({
+    @if (session('success'))
+        <div x-data x-init="Swal.fire({
             icon: 'success',
             title: '{{ session('success') }}',
-
+        
             width: '340px',
             padding: '1.8rem',
-
+        
             background: '#ffffff',
             color: '#334155',
-
+        
             confirmButtonText: 'Oke',
             confirmButtonColor: '#4A72D4',
-
+        
             customClass: {
                 popup: 'rounded-3xl shadow-xl',
                 title: 'text-lg font-bold',
                 confirmButton: 'rounded-xl px-6 py-2'
             },
-
+        
             showClass: {
                 popup: 'animate__animated animate__fadeInDown'
             },
             hideClass: {
                 popup: 'animate__animated animate__fadeOutUp'
             }
-        })
-    "
-></div>
-@endif
+        })"></div>
+    @endif
 
-@if(session('error'))
-<div 
-    x-data
-    x-init="
-        Swal.fire({
+    @if (session('error'))
+        <div x-data x-init="Swal.fire({
             icon: 'error',
             title: '{{ session('error') }}',
-
+        
             width: '340px',
             padding: '1.8rem',
-
+        
             background: '#ffffff',
             color: '#334155',
-
+        
             confirmButtonText: 'Coba Lagi',
             confirmButtonColor: '#ef4444',
-
+        
             customClass: {
                 popup: 'rounded-3xl shadow-xl',
                 title: 'text-lg font-bold',
                 confirmButton: 'rounded-xl px-6 py-2'
             },
-
+        
             showClass: {
                 popup: 'animate__animated animate__fadeInDown'
             },
             hideClass: {
                 popup: 'animate__animated animate__fadeOutUp'
             }
-        })
-    "
-></div>
-@endif
+        })"></div>
+    @endif
 </body>
 
 </html>
