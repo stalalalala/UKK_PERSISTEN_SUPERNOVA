@@ -157,15 +157,7 @@
                 [&::-webkit-scrollbar-track]:bg-transparent 
                 [&::-webkit-scrollbar-thumb]:bg-white/20 
                 [&::-webkit-scrollbar-thumb]:rounded-full">
-
-            <a href="#"
-                class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                <div
-                    class="w-5 h-5 border-2 border-white/50 rounded group-hover:border-white transition-colors shrink-0">
-                </div>
-                <span class="text-md font-regular">Dashboard</span>
-            </a>
-
+                
             <a href="{{ route('admin.dashboard.index') }}"
                 class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -689,6 +681,7 @@
         })
     "
 ></div>
+@endif
 
 {{-- MODAL PULIHKAN DAN HAPUS PERMANEN --}}
 <div x-show="showRestoreModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
