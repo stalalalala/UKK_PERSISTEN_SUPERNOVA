@@ -16,7 +16,6 @@ class StreakCharacter extends Model
         'svg_path',
         'min_level',
          'svg_animated_path',
-        // 'animation'
     'is_default',
     ];
 

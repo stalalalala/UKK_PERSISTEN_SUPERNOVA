@@ -551,7 +551,7 @@
                                                 <div
                                                     class="relative group border-2 border-dashed border-gray-200 hover:border-[#4A72D4] hover:bg-blue-50/30 rounded-[1.5rem] p-8 text-center transition-all">
 
-                                                    <input type="file" name="svg_path" accept=".svg"
+                                                    <input type="file" name="svg_static" accept=".svg"
                                                         @change="previewSvg($event, 'normal')"
                                                         class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
 
@@ -646,7 +646,7 @@
                                                 <div
                                                     class="relative group border-2 border-dashed border-gray-200 hover:border-purple-400 hover:bg-purple-50/30 rounded-[1.5rem] p-8 text-center transition-all">
 
-                                                    <input type="file" name="svg_animasi" accept=".svg"
+                                                    <input type="file" name="svg_animated" accept=".svg"
                                                         @change="previewSvg($event, 'animasi')"
                                                         class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
 

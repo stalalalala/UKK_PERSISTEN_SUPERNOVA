@@ -110,13 +110,15 @@
                 <div
                     class="bg-gradient-to-r from-blue-100 to-blue-50 rounded-[35px] px-6 md:px-8 py-8 flex flex-col lg:flex-row justify-between items-center lg:items-end relative overflow-hidden gap-10">
 
-                    <object data="{{ asset('img/pet-1.svg') }}" type="image/svg+xml"
-                        class="absolute z-0 pointer-events-none
-           top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2
-           w-40 md:w-[340px]
-           lg:top-[50%] lg:left-1/6
-           lg:-translate-x-1/2 lg:-translate-y-1/2">
-                    </object>
+                    @if ($character && $character->svg_animated)
+                        <object data="{{ asset('storage/' . $character->svg_animated) }}" type="image/svg+xml"
+                            class="absolute z-0 pointer-events-none
+        top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2
+        w-40 md:w-[340px]
+        lg:top-[50%] lg:left-1/6
+        lg:-translate-x-1/2 lg:-translate-y-1/2">
+                        </object>
+                    @endif
 
                     <div class="max-w-xl relative z-10 text-center lg:text-left">
                         <h1 class="text-3xl md:text-5xl text-[#2E3B66] font-extrabold leading-tight">

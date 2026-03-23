@@ -394,8 +394,8 @@
                                         <td class="px-10 py-8 text-center">
                                             <div
                                                 class="w-60 h-60 bg-white rounded-3xl p-3 mx-auto flex items-center justify-center overflow-hidden">
-                                                <img src="{{ asset('storage/' . $streak->svg_path) }}"
-                                                    class="w-full h-full object-contain animate-{{ $streak->animation }}">
+                                                <img src="{{ $streak->svg_path ? asset('storage/' . $streak->svg_path) : '' }}"
+                                                    class="w-full h-full object-contain">
                                             </div>
                                             <p
                                                 class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">
@@ -410,10 +410,24 @@
                                             </span>
                                         </td>
 
-                                        <td class="px-10 py-8 text-center">
-                                            <span class="inline-flex items-center gap-2 px-6 py-3font-bold text-lg">
-                                                {{ $streak->animation }}
-                                            </span>
+                                        <td class="px-10 py-8">
+                                            <div class="flex justify-center items-center">
+                                                @if ($streak->svg_animated_path)
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-8 w-8 text-green-500" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                @else
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-8 w-8 text-gray-300" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                @endif
+                                            </div>
                                         </td>
 
                                         <td class="px-10 py-8 text-center">
@@ -494,24 +508,29 @@
                                 <tr>
                                     <th class="px-8 py-4 text-center">Pet</th>
                                     <th class="px-8 py-4 text-center">Level</th>
-                                    {{-- <th class="px-8 py-4 text-center">Animasi</th> --}}
+                                    <th class="px-8 py-4 text-center">SVG Animasi</th>
                                     <th class="px-8 py-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
 
                             <tbody class="divide-y divide-gray-100">
-
-                                @foreach ($trash as $streak)
+                                @forelse ($trash as $streak)
                                     <tr class="hover:bg-gray-50 transition-all">
 
                                         <!-- PET -->
                                         <td class="px-8 py-6 text-center">
                                             <div class="flex flex-col items-center gap-2">
+
                                                 <div
-                                                    class="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center">
-                                                    <img src="{{ asset('storage/' . $streak->svg_path) }}"
-                                                        class="w-60 h-60 grayscale opacity-60 object-contain">
+                                                    class="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden">
+                                                    @if ($streak->svg_path)
+                                                        <img src="{{ asset('storage/' . $streak->svg_path) }}"
+                                                            class="w-full h-full object-contain grayscale opacity-60">
+                                                    @else
+                                                        <span class="text-gray-300 text-xs">No Image</span>
+                                                    @endif
                                                 </div>
+
                                                 <span class="text-xs font-semibold text-gray-400 uppercase">
                                                     {{ $streak->nama }}
                                                 </span>
@@ -526,41 +545,40 @@
                                             </span>
                                         </td>
 
-                                        {{-- <!-- ANIMATION -->
+                                        <!-- ANIMASI -->
                                         <td class="px-8 py-6 text-center">
-                                            <span class="text-xs font-semibold text-gray-400 uppercase">
-                                                {{ $streak->animation ?? 'static' }}
-                                            </span>
-                                        </td> --}}
+                                            @if ($streak->svg_animated_path)
+                                                <svg class="h-6 w-6 text-green-500 mx-auto" fill="none"
+                                                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            @else
+                                                <svg class="h-6 w-6 text-gray-300 mx-auto" fill="none"
+                                                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            @endif
+                                        </td>
 
                                         <!-- ACTION -->
-                                        <td
-                                            class="px-8 py-6 text-center flex flex-row gap-2 items-center justify-center">
+                                        <td class="px-8 py-6 text-center flex gap-2 justify-center">
 
                                             <!-- Restore -->
                                             <form action="{{ route('admin.streak.restore', $streak->id) }}"
                                                 method="POST">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-[11px] uppercase shadow-lg shadow-green-200 transition-all">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                        class="size-6">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                                                    </svg>
+                                                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl shadow-lg transition-all">
+                                                    <i class="fa-solid fa-rotate-left"></i>
                                                 </button>
                                             </form>
 
                                             <!-- Permanent Delete -->
                                             <button @click="confirmPermanentDelete({{ $streak->id }})"
-                                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-[11px] uppercase shadow-lg shadow-red-200 transition-all">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                    class="size-6">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                </svg>
+                                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl shadow-lg transition-all">
+                                                <i class="fa-solid fa-trash"></i>
                                             </button>
 
                                             <form id="force-{{ $streak->id }}"
@@ -573,8 +591,14 @@
                                         </td>
 
                                     </tr>
-                                @endforeach
-
+                                @empty
+                                    <!-- EMPTY STATE -->
+                                    <tr>
+                                        <td colspan="4" class="text-center py-10 text-gray-400">
+                                            Tidak ada data history 🚫
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
 
                         </table>
