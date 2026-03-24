@@ -15,7 +15,7 @@ class StreakCharacter extends Model
         'nama',
         'svg_path',
         'min_level',
-        // 'animation'
+         'svg_animated_path',
     'is_default',
     ];
 

@@ -33,7 +33,7 @@
 
             <div class="flex items-center gap-2">
                 <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full">
-                    <a href="/profile/index"
+                    <a href="{{ route('profile.index') }}"
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" class="size-5 md:size-6">
@@ -173,11 +173,13 @@
 
                 @if ($isLocked)
                     <!-- Tombol Pulihkan -->
-                    <button
-                        class="w-full bg-yellow-400 text-blue-900 font-bold py-2.5 rounded-full shadow-md hover:bg-yellow-500 transition-all"
-                        @click="alert('Pulihkan karakter ini!');">
-                        Pulihkan Karakter
-                    </button>
+                    <form action="{{ route('streak.restore') }}" method="POST">
+                        @csrf
+                        <button type="submit"
+                            class="w-full bg-yellow-400 text-blue-900 font-bold py-2.5 rounded-full shadow-md hover:bg-yellow-500 transition-all">
+                            Pulihkan Karakter
+                        </button>
+                    </form>
                 @else
                     <!-- Progress XP normal -->
                     <div
@@ -368,7 +370,8 @@
                             @if ($userHasNextEvolution)
                                 {{-- Sudah punya next evolution → tampil normal --}}
                                 <img src="{{ asset('storage/' . $nextEvolution->svg_path) }}"
-                                    class="w-32 md:w-64 h-auto object-contain">
+                                    class="w-32 md:w-64 h-auto object-contain"
+                                    style="filter: grayscale(100%) brightness(0%); opacity: 0.5;">>
                             @else
                                 {{-- Belum punya → tampil siluet next evolution --}}
                                 <img src="{{ asset('storage/' . $nextEvolution->svg_path) }}"

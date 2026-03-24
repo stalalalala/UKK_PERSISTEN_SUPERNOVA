@@ -65,6 +65,33 @@ class TryoutController extends Controller
         ->pluck('tryout_id') 
         ->toArray();
 
+        // Ambil 3 TO terbaru yang aktif & tanggal sekarang masih dalam rentang
+    $latestTryouts = AdminTryout::where('is_active', true)
+        ->orderBy('tanggal', 'desc')
+        ->take(3)
+        ->get()
+        ->map(function ($to) use ($now, $userId) {
+            // Status sudah dikerjakan
+            $sudahDikerjakan = DB::table('tryout_jawaban_peserta')
+                ->join('soal_tryouts', 'tryout_jawaban_peserta.soal_id', '=', 'soal_tryouts.id')
+                ->join('tryout_categories', 'soal_tryouts.category_id', '=', 'tryout_categories.id')
+                ->where('tryout_jawaban_peserta.user_id', $userId)
+                ->where('tryout_categories.admin_tryout_id', $to->id)
+                ->exists();
+
+            // Apakah TO bisa dikerjakan sekarang
+            $is_open = $to->tanggal <= $now && $to->tanggal_akhir >= $now;
+
+            // Bisa pakai logika “locked” misal belum pilih target
+            $hasTarget = DB::table('user_target_tryouts')->where('user_id', $userId)->exists();
+
+            $to->sudah_dikerjakan = $sudahDikerjakan;
+            $to->is_open = $is_open && !$sudahDikerjakan;
+            $to->is_locked = !$hasTarget;
+
+            return $to;
+        });
+
         // 6. Tentukan status ketersediaan & Kunci Tryout
         $tryouts->transform(function ($item) use ($now, $userResults, $userTarget) {
         $isWithinDate = ($now >= $item->tanggal && $now <= $item->tanggal_akhir);
@@ -81,7 +108,7 @@ class TryoutController extends Controller
         return $item;
         });
 
-        return view('tryout.index', compact('tryouts', 'userResults', 'userTarget', 'peluangLolos', 'allUnivs'));
+        return view('tryout.index', compact('tryouts', 'userResults', 'userTarget', 'peluangLolos', 'allUnivs', 'latestTryouts'));
     }
 
     /**

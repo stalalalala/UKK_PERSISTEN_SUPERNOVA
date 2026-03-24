@@ -41,8 +41,8 @@
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="inline" id="logout-form">
                         @csrf
-                        <button type="submit" 
-                                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
+                        <button type="submit"
+                            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -110,9 +110,15 @@
                 <div
                     class="bg-gradient-to-r from-blue-100 to-blue-50 rounded-[35px] px-6 md:px-8 py-8 flex flex-col lg:flex-row justify-between items-center lg:items-end relative overflow-hidden gap-10">
 
-                    <object data="{{ asset('img/pet-1.svg') }}" type="image/svg+xml"
-                        class="absolute top-[30%] md:top-[45%] left-1/2 md:left-1/6 -translate-x-1/2 -translate-y-1/2 w-50 md:w-[340px] z-0 pointer-events-none">
-                    </object>
+                    @if ($character && $character->svg_animated_path)
+                        <object data="{{ asset('storage/' . $character->svg_animated_path) }}" type="image/svg+xml"
+                            class="absolute z-0 pointer-events-none
+        top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2
+        w-40 md:w-[340px]
+        lg:top-[50%] lg:left-1/6
+        lg:-translate-x-1/2 lg:-translate-y-1/2">
+                        </object>
+                    @endif
 
                     <div class="max-w-xl relative z-10 text-center lg:text-left">
                         <h1 class="text-3xl md:text-5xl text-[#2E3B66] font-extrabold leading-tight">
@@ -126,153 +132,143 @@
                         </p>
                     </div>
 
-                   <div 
-                    x-data="{
+                    <div x-data="{
                         target: new Date('{{ $snbtDate }}').getTime(),
-                        days:0,
-                        hours:0,
-                        minutes:0,
-
-                        update(){
+                        days: 0,
+                        hours: 0,
+                        minutes: 0,
+                    
+                        update() {
                             let now = new Date().getTime()
                             let distance = this.target - now
-
-                            if(distance < 0){
+                    
+                            if (distance < 0) {
                                 this.days = 0
                                 this.hours = 0
                                 this.minutes = 0
                                 return
                             }
-
-                            this.days = Math.floor(distance/(1000*60*60*24))
-                            this.hours = Math.floor((distance%(1000*60*60*24))/(1000*60*60))
-                            this.minutes = Math.floor((distance%(1000*60*60))/(1000*60))
+                    
+                            this.days = Math.floor(distance / (1000 * 60 * 60 * 24))
+                            this.hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+                            this.minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
                         },
-
-                        start(){
+                    
+                        start() {
                             this.update()
-                            setInterval(() => this.update(),1000)
+                            setInterval(() => this.update(), 1000)
                         }
-                    }" 
+                    }" x-init="start()"
+                        class="relative z-10 w-full max-w-xs md:max-w-none md:w-auto">
 
-                    x-init="start()"
+                        <div class="bg-white rounded-[35px] pb-6 relative shadow-xl">
 
-                    class="relative z-10 w-full max-w-xs md:max-w-none md:w-auto"
-                    >
+                            <div
+                                class="relative bg-[#4375D1] text-white rounded-[35px] px-10 md:px-20 py-8 md:py-10 z-10">
 
-                    <div class="bg-white rounded-[35px] pb-6 relative shadow-xl">
+                                <h2 class="text-5xl md:text-[75px] font-extrabold text-center leading-none">
+                                    H-<span x-text="days"></span>
+                                </h2>
 
-                    <div class="relative bg-[#4375D1] text-white rounded-[35px] px-10 md:px-20 py-8 md:py-10 z-10">
+                                <div
+                                    class="bg-white text-[#4375D1] font-semibold rounded-full px-4 py-2 mt-4 text-center text-xs md:text-sm">
+                                    Menjelang Pelaksanaan SNBT
+                                </div>
 
-                    <h2 class="text-5xl md:text-[75px] font-extrabold text-center leading-none">
-                    H-<span x-text="days"></span>
-                    </h2>
+                            </div>
 
-                    <div class="bg-white text-[#4375D1] font-semibold rounded-full px-4 py-2 mt-4 text-center text-xs md:text-sm">
-                    Menjelang Pelaksanaan SNBT
-                    </div>
+                            <div
+                                class="absolute bottom-[58px] left-[10%] w-[80%] h-14 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 rounded-[40px] z-0">
+                            </div>
 
-                    </div>
+                            <div class="flex justify-around mt-8 text-xs md:text-sm text-[#4375D1] font-medium">
 
-                    <div class="absolute bottom-[58px] left-[10%] w-[80%] h-14 bg-gradient-to-r from-yellow-400 via-white to-yellow-400 rounded-[40px] z-0"></div>
+                                <div class="flex items-center gap-1 md:gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
 
-                    <div class="flex justify-around mt-8 text-xs md:text-sm text-[#4375D1] font-medium">
+                                    <span x-text="days + ' hari'"></span>
 
-                    <div class="flex items-center gap-1 md:gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="2" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                    </svg>
+                                </div>
 
-                    <span x-text="days + ' hari'"></span>
+                                <div class="flex items-center gap-1 md:gap-2">
 
-                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
 
-                    <div class="flex items-center gap-1 md:gap-2">
+                                    <span x-text="hours + ' jam'"></span>
 
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="2" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                    </svg>
+                                </div>
 
-                    <span x-text="hours + ' jam'"></span>
+                                <div class="flex items-center gap-1 md:gap-2">
 
-                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
 
-                    <div class="flex items-center gap-1 md:gap-2">
+                                    <span x-text="minutes + ' menit'"></span>
 
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="2" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                    </svg>
+                                </div>
 
-                    <span x-text="minutes + ' menit'"></span>
+                            </div>
 
-                    </div>
-
-                    </div>
-
-                    </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section class="mt-6 flex justify-center px-4">
-    <div 
-        x-data="{
-            keyword: '',
-            routes: {
-                'tryout': '{{ route('tryout.index') }}',
-                'latihan': '{{ route('latihan.index') }}',
-                'kuis': '{{ route('kuis.index') }}',
-                'video': '{{ route('video.index') }}',
-                'streak': '{{ route('streak.index') }}',
-                'profil': '{{ route('profile.index') }}',
-                'minat bakat': '{{ route('minatbakat.soal') }}'
-            },
-            goToPage(){
-                let search = this.keyword.toLowerCase().trim();
-                if (search === '') return;
-
-                // Cari kunci yang mengandung kata kunci pencarian
-                for (let key in this.routes) {
-                    if (key.includes(search)) {
-                        window.location.href = this.routes[key];
-                        return;
+                <div x-data="{
+                    keyword: '',
+                    routes: {
+                        'tryout': '{{ route('tryout.index') }}',
+                        'latihan': '{{ route('latihan.index') }}',
+                        'kuis': '{{ route('kuis.index') }}',
+                        'video': '{{ route('video.index') }}',
+                        'streak': '{{ route('streak.index') }}',
+                        'profil': '{{ route('profile.index') }}',
+                        'minat bakat': '{{ route('minatbakat.soal') }}'
+                    },
+                    goToPage() {
+                        let search = this.keyword.toLowerCase().trim();
+                        if (search === '') return;
+                
+                        // Cari kunci yang mengandung kata kunci pencarian
+                        for (let key in this.routes) {
+                            if (key.includes(search)) {
+                                window.location.href = this.routes[key];
+                                return;
+                            }
+                        }
+                
+                        // Jika tidak ketemu di navigasi, arahkan ke pencarian global di controller (opsional)
+                        window.location.href = '{{ route('beranda') }}?search=' + this.keyword;
                     }
-                }
+                }" class="flex flex-col md:flex-row items-center gap-4 w-full max-w-3xl">
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
+                        </div>
 
-                // Jika tidak ketemu di navigasi, arahkan ke pencarian global di controller (opsional)
-                window.location.href = '{{ route('beranda') }}?search=' + this.keyword;
-            }
-        }"
-        class="flex flex-col md:flex-row items-center gap-4 w-full max-w-3xl"
-    >
-        <div class="relative w-full">
-            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
-            </div>
+                        <input type="text" x-model="keyword" @keydown.enter="goToPage()"
+                            placeholder="Cari Halaman Try Out, Latihan Soal dll... "
+                            class="w-full bg-white border border-gray-200 rounded-full py-4 pl-12 pr-4 shadow-md focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm">
+                    </div>
 
-            <input 
-                type="text"
-                x-model="keyword"
-                @keydown.enter="goToPage()"
-                placeholder="Cari Halaman Try Out, Latihan Soal dll... "
-                class="w-full bg-white border border-gray-200 rounded-full py-4 pl-12 pr-4 shadow-md focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm"
-            >
-        </div>
-
-        <button 
-            @click="goToPage()"
-            class="w-full md:w-auto bg-blue-400 hover:bg-blue-500 text-white px-10 py-4 rounded-full font-semibold text-sm shadow-md transition-all active:scale-95 shrink-0"
-        >
-            Cari
-        </button>
-    </div>
-</section>
+                    <button @click="goToPage()"
+                        class="w-full md:w-auto bg-blue-400 hover:bg-blue-500 text-white px-10 py-4 rounded-full font-semibold text-sm shadow-md transition-all active:scale-95 shrink-0">
+                        Cari
+                    </button>
+                </div>
+            </section>
 
             <section class="mt-8 px-4 md:px-10">
                 @php
@@ -330,8 +326,9 @@
                         $hasilTes = \App\Models\HasilMinatBakat::where('user_id', Auth::id())->exists();
                     @endphp
 
-                    <a href="{{ route('minatbakat.intruksi') }}">
-                        <button class="mt-7 bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-100">
+                    <a href="{{ route('kuis.index') }}">
+                        <button
+                            class="mt-7 bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-100">
                             {{ $hasilTes ? 'Lihat Hasil Tes' : 'Mulai Tes' }}
                             <span class="bg-white/30 w-8 h-8 flex items-center justify-center rounded-full text-white">
                                 ➜
@@ -348,84 +345,61 @@
                     </p>
                 </div>
 
-                <div x-show="currentPage === 1" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-                    x-transition>
-                    <div
-                        class="bg-blue-50 rounded-[2rem] p-6 flex flex-col items-center relative hover:shadow-lg transition-all border border-blue-100 group">
-                        <div class="w-full flex justify-between items-start mb-2">
-                            <span class="text-blue-400 font-bold pt-1 text-lg uppercase tracking-tighter">Try
-                                Out</span>
-                            <span class="bg-blue-600 text-white text-lg px-4 py-1 rounded-full font-bold">UTBK</span>
-                        </div>
-                        <div
-                            class="text-[100px] font-black text-blue-500 leading-none my-6 group-hover:scale-110 transition-transform">
-                            1</div>
-                        <div
-                            class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium text-blue-500 shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="2" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @foreach ($latestTryouts as $to)
+                        <a href="{{ $to->sudah_dikerjakan ? route('tryout.hasil', $to->id) : ($to->is_open ? route('tryout.intruksi', $to->id) : '#') }}"
+                            @if (!$to->is_open && $to->is_locked) onclick="alert('Silakan pilih Universitas & Jurusan terlebih dahulu!')" @endif>
+                            <div
+                                class="rounded-[2rem] p-6 flex flex-col items-center relative transition-all group
+                            {{ $to->sudah_dikerjakan ? 'bg-emerald-50 border-emerald-100 hover:shadow-lg' : ($to->is_open ? 'bg-blue-50 border-blue-100 hover:shadow-lg' : 'bg-gray-100 opacity-60 border-gray-200 cursor-not-allowed grayscale') }}">
 
-                            <span>Selesai</span>
-                        </div>
-                    </div>
+                                {{-- Label TO --}}
+                                <div class="w-full flex justify-between items-start mb-2">
+                                    <span
+                                        class="{{ $to->is_open ? 'text-blue-400' : ($to->sudah_dikerjakan ? 'text-emerald-400' : 'text-gray-400') }} font-bold pt-1 text-lg uppercase tracking-tighter">Try
+                                        Out</span>
+                                    <span
+                                        class="{{ $to->is_open ? 'bg-blue-600' : ($to->sudah_dikerjakan ? 'bg-emerald-600' : 'bg-gray-400') }} text-white text-lg px-4 py-1 rounded-full font-bold">UTBK</span>
+                                </div>
 
-                    <div
-                        class="bg-blue-50 rounded-[2rem] p-6 flex flex-col items-center relative hover:shadow-lg transition-all border border-blue-100 group">
-                        <div class="w-full flex justify-between items-start mb-2">
-                            <span class="text-blue-400 font-bold pt-1 text-lg uppercase tracking-tighter">Try
-                                Out</span>
-                            <span class="bg-blue-600 text-white text-lg px-4 py-1 rounded-full font-bold">UTBK</span>
-                        </div>
-                        <div
-                            class="text-[100px] font-black text-blue-500 leading-none my-6 group-hover:scale-110 transition-transform">
-                            2</div>
-                        <div
-                            class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium text-blue-500 shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="2" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
+                                {{-- Nomor TO --}}
+                                <div
+                                    class="{{ $to->is_open ? 'text-blue-500 group-hover:scale-110' : ($to->sudah_dikerjakan ? 'text-emerald-500' : 'text-gray-300') }} text-[100px] font-black leading-none mt-6 mb-1 transition-transform">
+                                    {{ $loop->iteration }}
+                                </div>
 
-                            <span>20-27 Maret</span>
-                        </div>
-                    </div>
+                                {{-- Nama TO --}}
+                                <div class="w-full mb-6 text-center">
+                                    <div
+                                        class="{{ $to->is_open || $to->sudah_dikerjakan ? 'text-[#2E3B66]' : 'text-gray-400' }} text-sm font-black uppercase tracking-[0.15em] line-clamp-2 px-2">
+                                        {{ $to->nama_tryout }}
+                                    </div>
+                                </div>
 
-                    <div
-                        class="bg-gray-50 opacity-60 rounded-[2rem] p-6 flex flex-col items-center relative border border-gray-200">
-                        <div class="w-full flex justify-between items-start mb-2">
-                            <span class="text-gray-400 font-bold pt-1 text-lg uppercase tracking-tighter">Try
-                                Out</span>
-                            <span class="bg-gray-400 text-white text-lg px-4 py-1 rounded-full font-bold">UTBK</span>
-                        </div>
-                        <div class="text-[100px] font-black text-gray-300 leading-none my-6">3</div>
-                        <div
-                            class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium text-gray-400 shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="2" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                            </svg>
+                                {{-- Status / tanggal --}}
+                                <div
+                                    class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium shadow-sm w-full justify-center mt-auto
+                                {{ $to->is_open ? 'text-blue-500' : ($to->sudah_dikerjakan ? 'text-emerald-500' : 'text-gray-400') }}">
+                                    <i
+                                        class="fa-solid {{ $to->is_open ? 'fa-clock' : ($to->sudah_dikerjakan ? 'fa-circle-check' : 'fa-lock') }} text-[10px]"></i>
+                                    <span class="text-[11px] font-bold">
+                                        {{ $to->sudah_dikerjakan ? 'Lihat Hasil' : ($to->is_open ? $to->tanggal->format('d M') . ' - ' . $to->tanggal_akhir->format('d M') : ($to->is_locked ? 'Pilih Jurusan' : 'Belum Tersedia')) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
 
-                            <span>Belum Tersedia</span>
-                        </div>
-                    </div>
-
+                    {{-- Tombol Lainnya --}}
                     <div class="flex-1 flex flex-col items-center justify-center min-h-[200px]">
                         <img src="{{ asset('img/slime.png') }}" class="w-44 md:w-52 mb-4" alt="Slime">
                         <a href="{{ route('tryout.index') }}">
-
                             <button
                                 class="bg-blue-500 hover:bg-blue-600 text-white px-10 py-2.5 rounded-full font-bold shadow-md transition-all hover:scale-105">
                                 Lainnya
                             </button>
                         </a>
                     </div>
-
-
                 </div>
             </section>
         </div>

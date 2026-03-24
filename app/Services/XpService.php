@@ -79,21 +79,24 @@ class XpService
     $days = Carbon::parse($user->last_xp_date)
             ->diffInDays(now());
 
-    if ($days >= 1) {
+    if ($days >= 1 && !$user->character_locked) {
 
-        // 🔥 RESET TOTAL
-        $user->streak_days = 1;
-        $user->streak_active = false;
+    // 💾 SIMPAN DATA LAMA
+    $user->backup_xp = $user->total_xp;
+    $user->backup_streak_days = $user->streak_days;
+    $user->backup_level = $user->level;
 
-        // XP reset
-        $user->total_xp = 0;
-        $user->level = 1;
+    // 🔥 RESET
+    $user->streak_days = 1;
+    $user->streak_active = false;
 
-        // 🔒 Lock karakter
-        $user->character_locked = true;
+    $user->total_xp = 0;
+    $user->level = 1;
 
-        $user->save();
-    }
+    $user->character_locked = true;
+
+    $user->save();
+}
 }
 
     public function restoreStreak($user)
@@ -115,12 +118,20 @@ class XpService
     ]);
 
     // 🔥 RESTORE
-    $user->streak_active = true;
-    $user->streak_days = 1;
-    $user->last_xp_date = now();
+    // 🔥 BALIKIN DATA LAMA
+$user->total_xp = $user->backup_xp ?? 0;
+$user->streak_days = $user->backup_streak_days ?? 1;
+$user->level = $user->backup_level ?? 1;
 
-    // 🔓 Unlock karakter
-    $user->character_locked = false;
+$user->streak_active = true;
+$user->last_xp_date = now();
+
+$user->character_locked = false;
+
+// ❗ HAPUS BACKUP BIAR GA BISA DIPAKE LAGI
+$user->backup_xp = null;
+$user->backup_streak_days = null;
+$user->backup_level = null;
 
     // (Optional) kasih XP awal biar ga terlalu kejam
     // $user->total_xp = 50;
@@ -132,13 +143,18 @@ class XpService
 
     public function getCurrentCharacter($user)
 {
+    // 🔥 kalau ke-lock → ambil default
     if ($user->character_locked) {
-        return null; // atau return karakter default "locked"
+        return StreakCharacter::where('is_default', true)->first();
     }
 
-    return StreakCharacter::where('min_level', '<=', $user->level)
+    // 🔥 kalau normal → ambil berdasarkan level
+    $character = StreakCharacter::where('min_level', '<=', $user->level)
         ->orderByDesc('min_level')
         ->first();
+
+    // 🔥 fallback kalau ga ketemu
+    return $character ?? StreakCharacter::where('is_default', true)->first();
 }
 
     private function calculateLevel($xp)

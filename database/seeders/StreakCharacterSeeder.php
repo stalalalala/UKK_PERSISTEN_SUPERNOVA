@@ -14,7 +14,8 @@ class StreakCharacterSeeder extends Seeder
             ['nama' => 'Slime'],
             [
                 'min_level' => 1,
-                'svg_path' => 'streak/pet-1-default.svg', // letakkan file svg di storage/app/public/characters/
+                'svg_path' => 'streak/default-pet.svg', // letakkan file svg di storage/app/public/characters/
+                'svg_animated_path' => 'streak-animasi/default-pet.svg',
                 'is_default' => true,
             ]
         );

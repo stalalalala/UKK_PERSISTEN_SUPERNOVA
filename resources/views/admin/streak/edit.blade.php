@@ -111,7 +111,7 @@
 
                 Swal.fire({
                     title: "Kembali ke halaman daftar?",
-                    text: "Perubahan data akan hilang",
+                    text: "Karakter streak yang sedang dibuat akan hilang.",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: "#4A72D4",
@@ -136,7 +136,9 @@
     }
 </script>
 
-<body class="bg-[#F4F7FF] text-[#2D3B61] overflow-hidden" x-data="{ ...streakPageGuard(), activeMenu: 'Manajemen Streak', mobileMenuOpen: false }" x-init="init()">
+<body x-data="{ ...streakPageGuard(), ...streakForm(), activeMenu: 'Manajemen Streak', mobileMenuOpen: false }" x-init="init();
+svgPreview = null;
+svgPreviewAnimasi = null">
 
     <div class="flex h-screen w-full relative">
 
@@ -289,7 +291,6 @@
             class="fixed inset-0 bg-black/50 z-40 lg:hidden">
         </div>
 
-
         <!-- CONTENT -->
         <main class="flex-1 main-content p-6 lg:p-10 bg-[#F8FAFC]">
             <header class="flex flex-col md:flex-row items-center justify-between pb-4 gap-4 flex-shrink-0">
@@ -392,6 +393,7 @@
 
             <div class="w-full mx-auto">
 
+
                 <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
                     <div>
                         {{-- <nav
@@ -428,12 +430,13 @@
                     </div>
                 </div>
 
-                <form action="{{ route('admin.streak.update', $character->id) }}" @submit="allowLeave = true"
-                    method="POST" enctype="multipart/form-data" x-data="streakForm()">
+                <form action="{{ route('admin.streak.update', $character->id) }}" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+                    <div class="space-y-8">
 
                         <div class="lg:col-span-7 space-y-6">
 
@@ -461,8 +464,12 @@
                                         <label
                                             class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-[#4A72D4] transition-colors">Nama
                                             Karakter</label>
-                                        <input type="text" name="nama" value="{{ $character->nama }}" required
-                                            class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-5 py-4 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-[#4A72D4] transition-all outline-none text-gray-700 font-medium"
+                                        <input type="text" name="nama" required
+                                            value="{{ old('nama', $character->nama) }}"
+                                            class="w-full
+                                            bg-gray-50/50 border border-gray-200 rounded-2xl px-5 py-4 focus:bg-white
+                                            focus:ring-4 focus:ring-blue-100 focus:border-[#4A72D4] transition-all
+                                            outline-none text-gray-700 font-medium"
                                             placeholder="John Doe">
                                     </div>
 
@@ -471,8 +478,8 @@
                                             class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-[#4A72D4] transition-colors">Minimum
                                             Level</label>
                                         <div class="relative">
-                                            <input type="number" name="min_level"
-                                                value="{{ $character->min_level }}" required min="1"
+                                            <input type="number" name="min_level" required min="1"
+                                                value="{{ old('min_level', $character->min_level) }}"
                                                 class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-5 pr-14 py-4 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-[#4A72D4] transition-all outline-none text-gray-700 font-medium"
                                                 placeholder="1">
                                             <div
@@ -483,187 +490,272 @@
                                 </div>
                             </div>
 
-                            <div
-                                class="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 p-8">
-                                <div class="flex items-center gap-4 mb-8">
-                                    <div
-                                        class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-500">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h2 class="text-lg font-bold text-gray-800">Visual & Motion</h2>
-                                        <p class="text-xs text-gray-400">Upload asset vektor dan tentukan perilaku
-                                            animasi.</p>
-                                    </div>
-                                </div>
+                            <div class="grid grid-cols-1 gap-8 items-start">
 
-                                <div class="space-y-6">
-                                    <div
-                                        class="relative group border-2 border-dashed border-gray-200 hover:border-[#4A72D4] hover:bg-blue-50/30 rounded-[1.5rem] p-8 transition-all text-center">
-                                        <input type="file" name="svg" accept=".svg"
-                                            @change="previewSvg($event)"
-                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                        <div class="space-y-3">
-                                            <div
-                                                class="w-14 h-14 bg-white shadow-sm border border-gray-100 rounded-2xl flex items-center justify-center mx-auto transition-transform group-hover:scale-110">
-                                                <svg class="w-6 h-6 text-[#4A72D4]" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M12 4v16m8-8H4" stroke-width="2"
-                                                        stroke-linecap="round" />
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <p class="text-sm font-bold text-gray-700">Tarik atau Klik untuk Upload
-                                                </p>
-                                                <p class="text-[11px] text-gray-400 mt-1 uppercase tracking-tighter">
-                                                    Vector SVG saja (Maks. 2MB)</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {{-- <div class="group">
-                                        <label
-                                            class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">Behavior
-                                            Animasi</label>
-                                        <div class="relative">
-                                            <select name="animation" x-model="animation"
-                                                class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-5 py-4">
-
-                                                <option value="">Static (Tanpa Animasi)</option>
-
-                                                <option value="bounce"
-                                                    {{ $character->animation == 'bounce' ? 'selected' : '' }}>
-                                                    Bounce - Ceria
-                                                </option>
-
-                                                <option value="float"
-                                                    {{ $character->animation == 'float' ? 'selected' : '' }}>
-                                                    Float - Melayang Halus
-                                                </option>
-
-                                                <option value="wiggle"
-                                                    {{ $character->animation == 'wiggle' ? 'selected' : '' }}>
-                                                    Wiggle - Enerjik
-                                                </option>
-
-                                                <option value="spin"
-                                                    {{ $character->animation == 'spin' ? 'selected' : '' }}>
-                                                    Spin - Berputar
-                                                </option>
-
-                                                <option value="pulse"
-                                                    {{ $character->animation == 'pulse' ? 'selected' : '' }}>
-                                                    Pulse - Berdenyut
-                                                </option>
-
-                                            </select>
-                                            <div
-                                                class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </div> --}}
-                                </div>
-                            </div>
-
-                            <div class="pt-4">
-                                <button type="submit"
-                                    class="w-full bg-[#4A72D4] hover:bg-[#3b5eb8] text-white rounded-2xl py-4 font-black text-lg shadow-xl">
-                                    Update Karakter
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="lg:col-span-5 sticky top-10">
-                            <div class="bg-gray-900 rounded-xl p-3 shadow-2xl">
+                                <!-- KOLOM KIRI -->
                                 <div
-                                    class="bg-[#1A1C1E] rounded-[2rem] p-8 flex flex-col items-center relative overflow-hidden">
+                                    class="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 p-8">
 
-                                    <div
-                                        class="absolute top-[-10%] right-[-10%] w-40 h-40 bg-[#4A72D4] opacity-20 blur-[80px]">
-                                    </div>
-
-                                    <div class="w-full flex justify-between items-center mb-10 relative z-10">
-                                        <h3 class="text-white font-bold text-sm tracking-widest uppercase">Preview
-                                        </h3>
-                                        <div class="flex gap-1.5">
-                                            <div class="w-2.5 h-2.5 rounded-full bg-[#FF5F57]"></div>
-                                            <div class="w-2.5 h-2.5 rounded-full bg-[#FEBC2E]"></div>
-                                            <div class="w-2.5 h-2.5 rounded-full bg-[#28C840]"></div>
+                                    <!-- HEADER -->
+                                    <div class="flex items-center gap-4 mb-8">
+                                        <div
+                                            class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-500">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h2 class="text-lg font-bold text-gray-800">Visual & Motion</h2>
+                                            <p class="text-xs text-gray-400">Upload asset vektor dan tentukan perilaku
+                                                animasi.</p>
                                         </div>
                                     </div>
 
-                                    <div
-                                        class="w-full aspect-square bg-[#0D0F10] rounded-[2rem] border border-white/5 flex items-center justify-center relative overflow-hidden shadow-inner group">
+                                    <!-- 🔥 GRID DI DALAM CARD -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-                                        <div class="absolute inset-0 opacity-[0.03]"
-                                            style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 20px 20px;">
-                                        </div>
+                                        <!-- KOLOM 1 -->
+                                        <div class="space-y-6">
 
-                                        <template x-if="svgPreview || '{{ $character->svg_path }}'">
-                                            <img :src="svgPreview ? svgPreview : '{{ asset('storage/' . $character->svg_path) }}'"
-                                                :class="'relative w-48 h-48 object-contain transition-all duration-500 ' +
-                                                animationClass">
-                                        </template>
+                                            <!-- UPLOAD -->
+                                            <div
+                                                class="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 p-8">
 
-
-                                    </div>
-
-                                    {{-- <div class="w-full mt-8 grid grid-cols-2 gap-4">
-                                        <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
-                                            <p class="text-[10px] font-black text-gray-500 uppercase mb-1">Animation
-                                            </p>
-                                            <p class="text-sm font-bold text-white truncate"
-                                                x-text="animation ? animation : 'Static'"></p>
-                                        </div>
-                                        <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
-                                            <p class="text-[10px] font-black text-gray-500 uppercase mb-1">Status</p>
-                                            <div class="flex items-center gap-2">
-                                                <div
-                                                    class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)]">
+                                                <!-- TITLE -->
+                                                <div class="flex items-center gap-4 mb-4">
+                                                    <div
+                                                        class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-[#4A72D4]">
+                                                        🎨
+                                                    </div>
+                                                    <div>
+                                                        <h2 class="text-lg font-bold text-gray-800">SVG Karakter</h2>
+                                                        <p class="text-xs text-gray-400">
+                                                            Upload aset visual karakter dalam format SVG
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <p class="text-sm font-bold text-white uppercase tracking-tighter">
-                                                    Ready</p>
-                                            </div>
-                                        </div>
-                                    </div> --}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </main>
-    </div>
 
+                                                <!-- 🔥 INFO BOX -->
+                                                <div
+                                                    class="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-700 leading-relaxed">
+                                                    <ul class="space-y-1">
+                                                        <li>• Format wajib: <span class="font-semibold">.svg</span>
+                                                        </li>
+                                                        <li>• Disarankan ukuran: <span class="font-semibold">1:1
+                                                                (square)</span></li>
+                                                        <li>• Maksimal size: <span class="font-semibold">2MB</span>
+                                                        </li>
+                                                        <li>• Gunakan <span class="font-semibold">vector clean (tanpa
+                                                                background)</span></li>
+                                                        <li>• SVG akan digunakan sebagai <span
+                                                                class="font-semibold">tampilan karakter utama</span>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+                                                <!-- UPLOAD AREA -->
+                                                <div
+                                                    class="relative group border-2 border-dashed border-gray-200 hover:border-[#4A72D4] hover:bg-blue-50/30 rounded-[1.5rem] p-8 text-center transition-all">
+
+                                                    <input type="file" name="svg_static" accept=".svg"
+                                                        @change="previewSvg($event, 'normal')"
+                                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+
+                                                    <div class="space-y-3">
+                                                        <div
+                                                            class="w-14 h-14 bg-white shadow-sm border border-gray-100 rounded-2xl flex items-center justify-center mx-auto text-xl">
+                                                            +
+                                                        </div>
+
+                                                        <p class="text-sm font-bold text-gray-700">
+                                                            Upload SVG
+                                                        </p>
+
+                                                        <p class="text-xs text-gray-400">
+                                                            Klik atau drag file ke sini
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- OPTIONAL ERROR (Laravel Validation) -->
+                                                @error('svg')
+                                                    <p class="text-xs text-red-500 mt-3">{{ $message }}</p>
+                                                @enderror
+
+                                            </div>
+
+                                            <!-- PREVIEW -->
+                                            <div class="bg-gray-900 rounded-xl p-3 shadow-2xl">
+                                                <div class="bg-[#1A1C1E] rounded-[2rem] p-6">
+                                                    <p class="text-xs text-gray-400 mb-4 uppercase text-center">
+                                                        Static Preview
+                                                    </p>
+
+                                                    <div
+                                                        class="aspect-square bg-[#0D0F10] rounded-2xl flex items-center justify-center">
+                                                        <template x-if="svgPreview || defaultSvg">
+                                                            <img :src="svgPreview ? svgPreview : defaultSvg"
+                                                                class="w-72 h-72 object-contain">
+                                                        </template>
+
+                                                        <div x-show="!svgPreview && !defaultSvg"
+                                                            class="text-gray-500 text-xs">
+                                                            Belum ada SVG
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- KOLOM 2 -->
+                                        <div class="space-y-6">
+
+                                            <!-- UPLOAD -->
+                                            <div
+                                                class="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 p-8">
+
+                                                <!-- TITLE -->
+                                                <div class="flex items-center gap-4 mb-4">
+                                                    <div
+                                                        class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-500">
+                                                        ✨
+                                                    </div>
+                                                    <div>
+                                                        <h2 class="text-lg font-bold text-gray-800">SVG Animasi</h2>
+                                                        <p class="text-xs text-gray-400">
+                                                            Versi karakter dengan efek animasi (opsional)
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- INFO -->
+                                                <div
+                                                    class="mb-6 p-4 rounded-xl bg-purple-50 border border-purple-100 text-xs text-purple-700 leading-relaxed">
+                                                    <ul class="space-y-1">
+                                                        <li>• Format wajib: <span class="font-semibold">.svg</span>
+                                                        </li>
+                                                        <li>• Disarankan ukuran: <span class="font-semibold">1:1
+                                                                (square)</span></li>
+                                                        <li>• Maksimal size: <span class="font-semibold">2MB</span>
+                                                        </li>
+                                                        <li>• Disarankan sudah memiliki <span
+                                                                class="font-semibold">animasi bawaan (SVG
+                                                                animate)</span></li>
+
+                                                        <li>• Gunakan <span class="font-semibold">vector clean (tanpa
+                                                                background)</span></li>
+
+                                                    </ul>
+                                                </div>
+
+                                                <!-- UPLOAD -->
+                                                <div
+                                                    class="relative group border-2 border-dashed border-gray-200 hover:border-purple-400 hover:bg-purple-50/30 rounded-[1.5rem] p-8 text-center transition-all">
+
+                                                    <input type="file" name="svg_animated" accept=".svg"
+                                                        @change="previewSvg($event, 'animasi')"
+                                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+
+                                                    <div class="space-y-3">
+                                                        <div
+                                                            class="w-14 h-14 bg-white shadow-sm border border-gray-100 rounded-2xl flex items-center justify-center mx-auto text-xl">
+                                                            ✨
+                                                        </div>
+
+                                                        <p class="text-sm font-bold text-gray-700">
+                                                            Upload SVG Animasi
+                                                        </p>
+
+                                                        <p class="text-xs text-gray-400">
+                                                            Klik atau drag file ke sini
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- ERROR -->
+                                                @error('svg_animasi')
+                                                    <p class="text-xs text-red-500 mt-3">{{ $message }}</p>
+                                                @enderror
+
+                                            </div>
+
+                                            <!-- PREVIEW -->
+                                            <div class="bg-gray-900 rounded-xl p-3 shadow-2xl">
+                                                <div class="bg-[#1A1C1E] rounded-[2rem] p-6">
+                                                    <p class="text-xs text-gray-400 mb-4 uppercase text-center">
+                                                        Animasi Preview
+                                                    </p>
+
+                                                    <div
+                                                        class="aspect-square bg-[#0D0F10] rounded-2xl flex items-center justify-center">
+                                                        <template x-if="svgPreviewAnimasi || defaultSvgAnimasi">
+                                                            <img :src="svgPreviewAnimasi ? svgPreviewAnimasi : defaultSvgAnimasi"
+                                                                class="w-72 h-72 object-contain">
+                                                        </template>
+
+                                                        <div x-show="!svgPreviewAnimasi && !defaultSvgAnimasi"
+                                                            class="text-gray-500 text-xs">
+                                                            Belum ada SVG
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="pt-4">
+                        <button type="submit"
+                            class="w-full bg-[#4A72D4] hover:bg-[#3b5eb8] text-white rounded-2xl py-4 font-black text-lg shadow-xl">
+                            Update Karakter
+                        </button>
+                    </div>
+            </div>
+            </form>
+    </div>
+    </main>
+    </div>
     <script>
         function streakForm() {
-
             return {
-
                 svgPreview: null,
-                animation: '{{ $character->animation }}',
+                svgPreviewAnimasi: null,
 
-                previewSvg(event) {
+                defaultSvg: "{{ $character->svg_path ? asset('storage/' . $character->svg_path) : '' }}",
+                defaultSvgAnimasi: "{{ $character->svg_animated_path ? asset('storage/' . $character->svg_animated_path) : '' }}",
 
-                    const file = event.target.files[0]
+                previewSvg(event, type) {
+
+                    const file = event.target.files[0
+
+                    ]
 
                     if (file) {
 
-                        if (this.svgPreview) {
-                            URL.revokeObjectURL(this.svgPreview)
+                        const url = URL.createObjectURL(file)
+
+                        if (type === 'normal') {
+                            if (this.svgPreview) URL.revokeObjectURL(this.svgPreview)
+                            this.svgPreview = url
                         }
 
-                        this.svgPreview = URL.createObjectURL(file)
+                        if (type === 'animasi') {
+                            if (this.svgPreviewAnimasi) URL.revokeObjectURL(this.svgPreviewAnimasi)
+                            this.svgPreviewAnimasi = url
+                        }
 
                     }
 
