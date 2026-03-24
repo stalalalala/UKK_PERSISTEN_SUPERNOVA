@@ -4,17 +4,18 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EmailVerificationController extends Controller
 {
-   public function notice()
+    public function notice()
     {
+        // Pastikan user sudah login sebelum melihat halaman ini
         return view('Auth.verify-email');
     }
 
-   public function verify(Request $request)
+    public function verify(Request $request)
     {
         $user = User::findOrFail($request->route('id'));
 
@@ -32,7 +33,23 @@ class EmailVerificationController extends Controller
 
         return redirect('/masuk')->with('success', 'Email berhasil diverifikasi! Silakan login kembali.');
     }
+
+    // TAMBAHKAN METHOD INI UNTUK MEMPERBAIKI ERROR
+    public function resend(Request $request)
+    {
+        // Jika user sudah verifikasi, langsung arahkan ke home
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect('/');
+        }
+
+        try {
+            // Mengirim ulang notifikasi email
+            $request->user()->sendEmailVerificationNotification();
+            
+            return back()->with('success', 'Link verifikasi baru telah dikirim ke email Anda.');
+        } catch (\Exception $e) {
+            // Menangkap error jika SMTP Google masih bermasalah/timeout
+            return back()->with('error', 'Gagal mengirim email. Silakan cek koneksi internet atau coba lagi nanti.');
+        }
+    }
 }
-
-   
-

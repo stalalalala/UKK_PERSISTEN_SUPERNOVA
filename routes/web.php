@@ -292,8 +292,8 @@ Route::middleware('auth')->group(function () {
         ->name('verification.notice');
 
     Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
+    ->middleware(['auth', 'throttle:6,1'])
+    ->name('verification.send');
 
     Route::post('/logout', [LoginController::class,'logout'])
         ->name('logout');
