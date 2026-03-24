@@ -110,8 +110,8 @@
                 <div
                     class="bg-gradient-to-r from-blue-100 to-blue-50 rounded-[35px] px-6 md:px-8 py-8 flex flex-col lg:flex-row justify-between items-center lg:items-end relative overflow-hidden gap-10">
 
-                    @if ($character && $character->svg_animated)
-                        <object data="{{ asset('storage/' . $character->svg_animated) }}" type="image/svg+xml"
+                    @if ($character && $character->svg_animated_path)
+                        <object data="{{ asset('storage/' . $character->svg_animated_path) }}" type="image/svg+xml"
                             class="absolute z-0 pointer-events-none
         top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2
         w-40 md:w-[340px]

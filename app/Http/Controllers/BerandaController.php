@@ -10,6 +10,7 @@ use App\Models\StreakCharacter;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\XpService;
 
 class BerandaController extends Controller
 {
@@ -22,9 +23,13 @@ class BerandaController extends Controller
     $now = Carbon::now();
     $user = Auth::user();
 
-    $character = StreakCharacter::where('min_level', '<=', $user->level)
-    ->orderByDesc('min_level')
-    ->first();
+   $xpService = new XpService();
+
+// 🔥 SYNC STATUS DULU
+$xpService->checkStreakExpired($user);
+
+// 🔥 BARU AMBIL KARAKTER
+$character = $xpService->getCurrentCharacter($user);
 
     $latestTryouts = DB::table('admin_tryouts')
         ->where('is_active', true)

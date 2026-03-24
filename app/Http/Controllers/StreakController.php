@@ -22,9 +22,7 @@ class StreakController extends Controller
     // Cek apakah streak hangus
     $xpService->checkStreakExpired($user);
 
-     $character = StreakCharacter::where('min_level', '<=', $user->level)
-        ->orderByDesc('min_level')
-        ->first();
+     $character = $xpService->getCurrentCharacter($user);
 
     // Ambil karakter evolusi
     // $character = $xpService->getCurrentCharacter($user);

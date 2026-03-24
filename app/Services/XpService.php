@@ -143,13 +143,18 @@ $user->backup_level = null;
 
     public function getCurrentCharacter($user)
 {
+    // 🔥 kalau ke-lock → ambil default
     if ($user->character_locked) {
-        return null; // atau return karakter default "locked"
+        return StreakCharacter::where('is_default', true)->first();
     }
 
-    return StreakCharacter::where('min_level', '<=', $user->level)
+    // 🔥 kalau normal → ambil berdasarkan level
+    $character = StreakCharacter::where('min_level', '<=', $user->level)
         ->orderByDesc('min_level')
         ->first();
+
+    // 🔥 fallback kalau ga ketemu
+    return $character ?? StreakCharacter::where('is_default', true)->first();
 }
 
     private function calculateLevel($xp)

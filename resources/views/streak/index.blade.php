@@ -370,7 +370,8 @@
                             @if ($userHasNextEvolution)
                                 {{-- Sudah punya next evolution → tampil normal --}}
                                 <img src="{{ asset('storage/' . $nextEvolution->svg_path) }}"
-                                    class="w-32 md:w-64 h-auto object-contain">
+                                    class="w-32 md:w-64 h-auto object-contain"
+                                    style="filter: grayscale(100%) brightness(0%); opacity: 0.5;">>
                             @else
                                 {{-- Belum punya → tampil siluet next evolution --}}
                                 <img src="{{ asset('storage/' . $nextEvolution->svg_path) }}"
