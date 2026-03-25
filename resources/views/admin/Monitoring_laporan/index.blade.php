@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -345,9 +346,50 @@
                                                         <button @click="openDraft(item.tahun, bln.nama, mgg)" class="flex-1 text-left p-2 pl-4 text-[10px] font-bold text-slate-400 group-hover:text-[#4A72D4]">
                                                             <span x-text="'Minggu ' + mgg"></span>
                                                         </button>
-                                                        <button @click="confirmSoftDelete(item.tahun, bln.nama, mgg)" class="p-2 opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                                        </button>
+                                                       <form 
+                                                        action="{{ route('admin.laporan.update-status-multiple') }}"
+                                                        method="POST"
+                                                        class="hidden">
+                                                        @csrf
+
+                                                    <template 
+                                                    x-for="log in mappedLogs.filter(l => 
+                                                        l.tahun === item.tahun && 
+                                                        l.bulan === bln.nama && 
+                                                        l.minggu === mgg && 
+                                                        l.status === 'active'
+                                                    )" :key="log.id">
+
+                                                        <input type="hidden" name="ids[]" :value="log.id">
+
+                                                    </template>
+
+                                                    <input type="hidden" name="status" value="deleted">
+                                                    </form>
+
+                                                    <button 
+                                                    @click="
+                                                    Swal.fire({
+                                                    title: 'Hapus Aktivitas?',
+                                                    text: 'Aktivitas akan dipindahkan ke History',
+                                                    icon: 'warning',
+                                                    width: '340px',
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#ef4444',
+                                                    confirmButtonText: 'Ya, Hapus!',
+                                                    customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                                    }).then((result) => {
+                                                    if(result.isConfirmed){
+                                                        $el.previousElementSibling.submit()
+                                                    }
+                                                })
+                                                    "
+                                                    class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                                        </svg>
+
+                                                    </button>
                                                     </div>
                                                 </template>
                                             </div>
@@ -373,8 +415,94 @@
                                                     <div class="bg-white p-3 rounded-2xl shadow-sm">
                                                         <p class="text-[10px] font-black text-slate-800 mb-3" x-text="'Minggu ' + mgg"></p>
                                                         <div class="flex gap-2">
-                                                            <button @click="restoreWeekly(item.tahun, bln.nama, mgg)" class="flex-1 py-2 bg-green-50 text-green-600 rounded-lg text-[8px] font-black uppercase hover:bg-green-600 hover:text-white transition-all">Pulihkan</button>
-                                                            <button @click="confirmPermanentDelete(item.tahun, bln.nama, mgg)" class="flex-1 py-2 bg-red-50 text-red-600 rounded-lg text-[8px] font-black uppercase hover:bg-red-600 hover:text-white transition-all">Hapus Permanen</button>
+                                                            <form 
+                                                            action="{{ route('admin.laporan.update-status-multiple') }}"
+                                                            method="POST"
+                                                            class="hidden">
+                                                            @csrf
+
+                                                            <!-- ambil semua ID dalam minggu -->
+                                                            <template 
+                                                            x-for="log in mappedLogs.filter(l => 
+                                                                l.tahun === item.tahun && 
+                                                                l.bulan === bln.nama && 
+                                                                l.minggu === mgg && 
+                                                                l.status === 'deleted'
+                                                            )" :key="log.id">
+
+                                                                <input type="hidden" name="ids[]" :value="log.id">
+
+                                                            </template>
+
+                                                            <input type="hidden" name="status" value="active">
+                                                        </form>
+
+                                                        <button 
+                                                        @click="
+                                                        Swal.fire({
+                                                        title: 'Pulihkan Aktivitas?',
+                                                        text: 'Data akan dikembalikan ke daftar Aktivitas',
+                                                        icon: 'question',
+                                                        width: '340px',
+                                                        showCancelButton: true,
+                                                        confirmButtonColor: '#22c55e',
+                                                        confirmButtonText: 'Ya, Pulihkan!',
+                                                        cancelButtonText: 'Batal',
+                                                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                                        }).then((result) => {
+                                                        if(result.isConfirmed){
+                                                            $el.previousElementSibling.submit()
+                                                        }
+                                                    })
+                                                    "
+                                class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> 
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                                </svg>
+                                </button>
+                                                                                            <form 
+                                    action="{{ route('admin.laporan.destroy-multiple') }}"
+                                    method="POST"
+                                    class="hidden">
+                                    @csrf
+
+                                    <!-- ambil semua ID dalam minggu -->
+                                    <template 
+                                    x-for="log in mappedLogs.filter(l => 
+                                        l.tahun === item.tahun && 
+                                        l.bulan === bln.nama && 
+                                        l.minggu === mgg && 
+                                        l.status === 'deleted'
+                                    )" :key="log.id">
+
+                                        <input type="hidden" name="ids[]" :value="log.id">
+
+                                    </template>
+                                </form>
+
+                                <button 
+                                @click="
+                                Swal.fire({
+                                title: 'Hapus Permanen?',
+                                text: 'Data tidak bisa dikembalikan!',
+                                width: '340px',
+                                icon: 'error',
+                                showCancelButton: true,
+                                confirmButtonColor: '#ef4444',
+                                confirmButtonText: 'Ya, Hapus!',
+                                cancelButtonText: 'Batal',
+                                customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                }).then((result) => {
+                                if(result.isConfirmed){
+                                    $el.previousElementSibling.submit()
+                                }
+                            })
+                            "
+                            class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                            </svg>
+                            </button>
                                                         </div>
                                                     </div>
                                                 </template>
@@ -388,17 +516,6 @@
                 </div>
             </div>
         </main>
-    </div>
-
-    <div x-show="showPermanentDeleteModal" x-transition x-cloak class="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] w-full max-w-sm p-8 text-center shadow-2xl">
-            <h4 class="text-lg font-black text-slate-800 uppercase mb-2">Hapus Permanen?</h4>
-            <p class="text-xs text-slate-500 italic mb-8">Data yang sudah dihapus permanen tidak dapat dikembalikan lagi.</p>
-            <div class="flex gap-3">
-                <button @click="showPermanentDeleteModal = false" class="flex-1 py-4 rounded-2xl bg-slate-100 text-slate-500 font-bold text-[10px] uppercase">Batal</button>
-                <button @click="deletePermanent()" class="flex-1 py-4 rounded-2xl bg-red-600 text-white font-black text-[10px] uppercase">Hapus!</button>
-            </div>
-        </div>
     </div>
 
     <div x-show="showDraftDetail" x-transition x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
@@ -425,166 +542,164 @@
         </div>
     </div>
 
-    <script>
-        function monitoringApp() {
-            return {
-                currentAdminId: "{{ (string) Auth::id() }}",
-                currentAdminName: "{{ Auth::user()->name }}",
-                activeTab: 'archive',
-                openYear: new Date().getFullYear(),
-                openMonth: null,
-                showDraftDetail: false,
-                showPermanentDeleteModal: false,
-                deleteTarget: { year: null, month: null, week: null },
-                selectedDraftTitle: '',
-                selectedCriteria: { year: null, month: null, week: null },
-                mobileMenuOpen: false,
-                adminDropdownOpen: false,
-                searchQuery: '',
-                logs: @json($logs),
+    @if(session('success'))
+<div 
+    x-data
+    x-init="
+        Swal.fire({
+            icon: 'success',
+            title: '{{ session('success') }}',
 
-                getNow() {
-                    const today = new Date();
-                    return {
-                        week: Math.ceil(today.getDate() / 7),
-                        month: today.toLocaleDateString('id-ID', { month: 'long' }),
-                        year: today.getFullYear()
-                    };
-                },
+            width: '340px',
+            padding: '1.8rem',
 
-                get mappedLogs() {
-                    return this.logs.map(log => {
-                        const date = new Date(log.created_at);
-                        return {
-                            id: log.id,
-                            id_pengguna: log.id_pengguna ? String(log.id_pengguna) : null, 
-                            nama_admin: log.user ? log.user.name : this.currentAdminName,
-                            hari: date.toLocaleDateString('id-ID', { weekday: 'long' }),
-                            aksi: log.category,
-                            objek: log.title,
-                            detail: log.description,
-                            jam: date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-                            tahun: date.getFullYear(),
-                            bulan: date.toLocaleDateString('id-ID', { month: 'long' }),
-                            minggu: Math.ceil(date.getDate() / 7),
-                            status: log.status || 'active'
-                        };
-                    });
-                },
+            background: '#ffffff',
+            color: '#334155',
 
-                get myLogs() {
-                    const now = this.getNow();
-                    return this.mappedLogs.filter(log => 
-                        log.status === 'active' && 
-                        log.id_pengguna === this.currentAdminId && 
-                        log.minggu === now.week && log.bulan === now.month && log.tahun === now.year
-                    );
-                },
+            confirmButtonText: 'Oke',
+            confirmButtonColor: '#4A72D4',
 
-                get filteredLogs() {
-                    const now = this.getNow();
-                    let base = this.mappedLogs.filter(log => log.status === 'active' && log.minggu === now.week && log.bulan === now.month && log.tahun === now.year);
-                    if (this.searchQuery) {
-                        const q = this.searchQuery.toLowerCase();
-                        base = base.filter(log => log.objek.toLowerCase().includes(q) || log.aksi.toLowerCase().includes(q));
-                    }
-                    return base;
-                },
+            customClass: {
+                popup: 'rounded-3xl shadow-xl',
+                title: 'text-lg font-bold',
+                confirmButton: 'rounded-xl px-6 py-2'
+            },
 
-                // LOGIKA OTOMATIS HILANG: Build Tree akan menyaring tahun/bulan yang kosong
-                buildTree(sourceLogs) {
-                    const tree = [];
-                    sourceLogs.forEach(log => {
-                        let yearEntry = tree.find(a => a.tahun === log.tahun);
-                        if (!yearEntry) {
-                            yearEntry = { tahun: log.tahun, bulan: [] };
-                            tree.push(yearEntry);
-                        }
-                        let monthEntry = yearEntry.bulan.find(b => b.nama === log.bulan);
-                        if (!monthEntry) {
-                            monthEntry = { nama: log.bulan, minggu: [] };
-                            yearEntry.bulan.push(monthEntry);
-                        }
-                        if (!monthEntry.minggu.includes(log.minggu)) {
-                            monthEntry.minggu.push(log.minggu);
-                            monthEntry.minggu.sort((a, b) => a - b);
-                        }
-                    });
-                    return tree.sort((a, b) => b.tahun - a.tahun);
-                },
-
-                get archiveData() {
-                    return this.buildTree(this.mappedLogs.filter(l => l.status === 'active'));
-                },
-
-                get historyData() {
-                    return this.buildTree(this.mappedLogs.filter(l => l.status === 'deleted'));
-                },
-
-                get filteredLogsByDraft() {
-                    return this.mappedLogs.filter(log => 
-                        log.tahun === this.selectedCriteria.year &&
-                        log.bulan === this.selectedCriteria.month &&
-                        log.minggu === this.selectedCriteria.week
-                    );
-                },
-
-                // Soft Delete
-                async confirmSoftDelete(year, month, week) {
-                    const ids = this.mappedLogs.filter(l => l.tahun === year && l.bulan === month && l.minggu === week && l.status === 'active').map(l => l.id);
-                    await this.updateStatusBulk(ids, 'deleted');
-                },
-
-                // Restore
-                async restoreWeekly(year, month, week) {
-                    const ids = this.mappedLogs.filter(l => l.tahun === year && l.bulan === month && l.minggu === week && l.status === 'deleted').map(l => l.id);
-                    await this.updateStatusBulk(ids, 'active');
-                },
-
-                // Delete Permanent
-                confirmPermanentDelete(year, month, week) {
-                    this.deleteTarget = { year, month, week };
-                    this.showPermanentDeleteModal = true;
-                },
-
-                async deletePermanent() {
-                    const ids = this.mappedLogs.filter(l => l.tahun === this.deleteTarget.year && l.bulan === this.deleteTarget.month && l.minggu === this.deleteTarget.week && l.status === 'deleted').map(l => l.id);
-                    try {
-                        const response = await fetch("{{ route('admin.laporan.destroy-multiple') }}", {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                            body: JSON.stringify({ ids })
-                        });
-                        if (response.ok) {
-                            this.logs = this.logs.filter(l => !ids.includes(l.id));
-                            this.showPermanentDeleteModal = false;
-                        }
-                    } catch (e) { alert("Error!"); }
-                },
-
-                async updateStatusBulk(ids, status) {
-                    try {
-                        const response = await fetch("{{ route('admin.laporan.update-status-multiple') }}", {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                            body: JSON.stringify({ ids, status })
-                        });
-                        if (response.ok) {
-                            this.logs = this.logs.map(log => {
-                                if (ids.includes(log.id)) log.status = status;
-                                return log;
-                            });
-                        }
-                    } catch (e) { alert("Sistem Error!"); }
-                },
-
-                openDraft(year, month, week) {
-                    this.selectedCriteria = { year, month, week };
-                    this.selectedDraftTitle = `Minggu ${week} - ${month} ${year}`;
-                    this.showDraftDetail = true;
-                }
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
             }
+        })
+    "
+></div>
+@endif
+
+   <script>
+function monitoringApp() {
+    return {
+        currentAdminId: "{{ (string) Auth::id() }}",
+        currentAdminName: "{{ Auth::user()->name }}",
+        activeTab: 'archive',
+        openYear: new Date().getFullYear(),
+        openMonth: null,
+        showDraftDetail: false,
+        selectedDraftTitle: '',
+        selectedCriteria: { year: null, month: null, week: null },
+        mobileMenuOpen: false,
+        adminDropdownOpen: false,
+        searchQuery: '',
+        logs: @json($logs),
+
+        getNow() {
+            const today = new Date();
+            return {
+                week: Math.ceil(today.getDate() / 7),
+                month: today.toLocaleDateString('id-ID', { month: 'long' }),
+                year: today.getFullYear()
+            };
+        },
+
+        get mappedLogs() {
+            return this.logs.map(log => {
+                const date = new Date(log.created_at);
+                return {
+                    id: log.id,
+                    id_pengguna: log.id_pengguna ? String(log.id_pengguna) : null,
+                    nama_admin: log.user ? log.user.name : this.currentAdminName,
+                    hari: date.toLocaleDateString('id-ID', { weekday: 'long' }),
+                    aksi: log.category,
+                    objek: log.title,
+                    detail: log.description,
+                    jam: date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                    tahun: date.getFullYear(),
+                    bulan: date.toLocaleDateString('id-ID', { month: 'long' }),
+                    minggu: Math.ceil(date.getDate() / 7),
+                    status: log.status || 'active'
+                };
+            });
+        },
+
+        get myLogs() {
+            const now = this.getNow();
+            return this.mappedLogs.filter(log =>
+                log.status === 'active' &&
+                log.id_pengguna === this.currentAdminId &&
+                log.minggu === now.week &&
+                log.bulan === now.month &&
+                log.tahun === now.year
+            );
+        },
+
+        get filteredLogs() {
+            const now = this.getNow();
+            let base = this.mappedLogs.filter(log =>
+                log.status === 'active' &&
+                log.minggu === now.week &&
+                log.bulan === now.month &&
+                log.tahun === now.year
+            );
+
+            if (this.searchQuery) {
+                const q = this.searchQuery.toLowerCase();
+                base = base.filter(log =>
+                    log.objek.toLowerCase().includes(q) ||
+                    log.aksi.toLowerCase().includes(q)
+                );
+            }
+
+            return base;
+        },
+
+        buildTree(sourceLogs) {
+            const tree = [];
+
+            sourceLogs.forEach(log => {
+                let yearEntry = tree.find(a => a.tahun === log.tahun);
+                if (!yearEntry) {
+                    yearEntry = { tahun: log.tahun, bulan: [] };
+                    tree.push(yearEntry);
+                }
+
+                let monthEntry = yearEntry.bulan.find(b => b.nama === log.bulan);
+                if (!monthEntry) {
+                    monthEntry = { nama: log.bulan, minggu: [] };
+                    yearEntry.bulan.push(monthEntry);
+                }
+
+                if (!monthEntry.minggu.includes(log.minggu)) {
+                    monthEntry.minggu.push(log.minggu);
+                    monthEntry.minggu.sort((a, b) => a - b);
+                }
+            });
+
+            return tree.sort((a, b) => b.tahun - a.tahun);
+        },
+
+        get archiveData() {
+            return this.buildTree(this.mappedLogs.filter(l => l.status === 'active'));
+        },
+
+        get historyData() {
+            return this.buildTree(this.mappedLogs.filter(l => l.status === 'deleted'));
+        },
+
+        get filteredLogsByDraft() {
+            return this.mappedLogs.filter(log =>
+                log.tahun === this.selectedCriteria.year &&
+                log.bulan === this.selectedCriteria.month &&
+                log.minggu === this.selectedCriteria.week
+            );
+        },
+
+        openDraft(year, month, week) {
+            this.selectedCriteria = { year, month, week };
+            this.selectedDraftTitle = `Minggu ${week} - ${month} ${year}`;
+            this.showDraftDetail = true;
         }
-    </script>
+    }
+}
+</script>
 </body>
 </html>

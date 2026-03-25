@@ -30,156 +30,175 @@
 </head>
 <body class="bg-[#F8FAFC] text-[#1E293B]" 
       x-data="{ 
-        currentPage: 'peluang_ptn', 
-        mobileMenuOpen: false,
-        historyTab: 'univ', 
-        expandedUniv: null, 
-        showModalUniv: false, 
-        showModalProdi: false, 
-        showConfirm: false, 
-        showImportModal: false,
-        isEditModeUniv: false,
-        showValidationErrors: false,
-        showProdiError: false,
-        prodiMode: 'manual',
-        showRestoreModal: false, 
-        showForceDeleteModal: false,
-        actionId: null,
-        actionName: '',
-        confirmData: { type: '', id: null, title: '', message: '' },
-        newUnivName: '', newUnivLocation: '', selectedUnivId: null, selectedUnivName: '',
-        newProdiName: '', newProdiKuota: '', newProdiPeminat: '',
+    currentPage: 'peluang_ptn', 
+    mobileMenuOpen: false,
+    historyTab: 'univ', 
+    expandedUniv: null, 
+    showModalUniv: false, 
+    showModalProdi: false, 
+    showConfirm: false, 
+    showImportModal: false,
+    isEditModeUniv: false,
+    showValidationErrors: false,
+    showProdiError: false,
+    prodiMode: 'manual',
 
-        univList: {{ $univs->map(fn($u) => [
-            'id' => $u->id, 'name' => $u->nama_univ, 'location' => $u->lokasi,
-            'prodis' => $u->prodis->map(fn($p) => ['id' => $p->id, 'nama' => $p->nama_prodi, 'kuota' => $p->kuota, 'peminat' => $p->peminat])
-        ])->values()->toJson() }},
-        
-        historyUnivList: {{ $historyUniv->map(fn($h) => ['id' => $h->id, 'name' => $h->nama_univ, 'time' => $h->updated_at->format('d M Y, H:i')])->toJson() }},
-        historyProdiList: {{ $historyProdi->map(fn($p) => ['id' => $p->id, 'name' => $p->nama_prodi, 'univ_name' => $p->universitas->nama_univ ?? 'N/A', 'time' => $p->updated_at->format('d M Y, H:i')])->toJson() }},
+    confirmData: { type: '', id: null, title: '', message: '' },
 
-        unduhTemplate(type) {
-            const wb = XLSX.utils.book_new();
-            let header, data, fileName;
-            if(type === 'utama') {
-                header = [['Nama Universitas', 'Lokasi', 'Nama Prodi', 'Kuota', 'Peminat']];
-                data = [['Universitas Gadjah Mada', 'Yogyakarta', 'Kedokteran', '100', '2500']];
-                fileName = 'Template_PTN_Lengkap.xlsx';
-            } else {
-                header = [['Nama Universitas', 'Nama Prodi', 'Kuota', 'Peminat']];
-                data = [[this.selectedUnivName, 'Sains Data', '50', '500']];
-                fileName = 'Template_Prodi_Massal.xlsx';
+    newUnivName: '', 
+    newUnivLocation: '', 
+    selectedUnivId: null, 
+    selectedUnivName: '',
+    newProdiName: '', 
+    newProdiKuota: '', 
+    newProdiPeminat: '',
+
+    univList: {{ $univs->map(fn($u) => [
+        'id' => $u->id, 
+        'name' => $u->nama_univ, 
+        'location' => $u->lokasi,
+        'prodis' => $u->prodis->map(fn($p) => [
+            'id' => $p->id, 
+            'nama' => $p->nama_prodi, 
+            'kuota' => $p->kuota, 
+            'peminat' => $p->peminat
+        ])
+    ])->values()->toJson() }},
+    
+    historyUnivList: {{ $historyUniv->map(fn($h) => [
+        'id' => $h->id, 
+        'name' => $h->nama_univ, 
+        'time' => $h->updated_at->format('d M Y, H:i')
+    ])->toJson() }},
+
+    historyProdiList: {{ $historyProdi->map(fn($p) => [
+        'id' => $p->id, 
+        'name' => $p->nama_prodi, 
+        'univ_name' => $p->universitas->nama_univ ?? 'N/A', 
+        'time' => $p->updated_at->format('d M Y, H:i')
+    ])->toJson() }},
+
+    unduhTemplate(type) {
+        const wb = XLSX.utils.book_new();
+        let header, data, fileName;
+
+        if(type === 'utama') {
+            header = [['Nama Universitas', 'Lokasi', 'Nama Prodi', 'Kuota', 'Peminat']];
+            data = [['Universitas Gadjah Mada', 'Yogyakarta', 'Kedokteran', '100', '2500']];
+            fileName = 'Template_PTN_Lengkap.xlsx';
+        } else {
+            header = [['Nama Universitas', 'Nama Prodi', 'Kuota', 'Peminat']];
+            data = [[this.selectedUnivName, 'Sains Data', '50', '500']];
+            fileName = 'Template_Prodi_Massal.xlsx';
+        }
+
+        const ws = XLSX.utils.aoa_to_sheet([...header, ...data]);
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        XLSX.writeFile(wb, fileName);
+    },
+
+    async importExcel(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const workbook = XLSX.read(e.target.result, { type: 'binary' });
+            const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+
+            const res = await fetch('{{ route('admin.peluang.import') }}', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content 
+                },
+                body: JSON.stringify({ data: jsonData })
+            });
+
+            if (res.ok) window.location.reload();
+        };
+
+        reader.readAsBinaryString(file);
+    },
+
+    async saveUniv() {
+        let payload = { 
+            id: this.isEditModeUniv ? this.selectedUnivId : null, 
+            nama_univ: this.newUnivName, 
+            lokasi: this.newUnivLocation 
+        };
+
+        const res = await fetch('{{ route('admin.peluang.store') }}', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content 
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if(res.ok) window.location.reload();
+    },
+
+    async saveProdi() {
+        let payload = { 
+            id: this.selectedUnivId, 
+            nama_univ: this.selectedUnivName, 
+            lokasi: this.newUnivLocation, 
+            prodis: [{
+                nama: this.newProdiName, 
+                kuota: this.newProdiKuota, 
+                peminat: this.newProdiPeminat
+            }] 
+        };
+
+        const res = await fetch('{{ route('admin.peluang.store') }}', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content 
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if(res.ok) window.location.reload();
+    },
+
+    async executeDelete() {
+        const res = await fetch(`/admin/peluangPtn/${this.confirmData.id}`, {
+            method: 'DELETE',
+            headers: { 
+                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content 
             }
-            const ws = XLSX.utils.aoa_to_sheet([...header, ...data]);
-            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-            XLSX.writeFile(wb, fileName);
-        },
+        });
 
-        async importExcel(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const bstr = e.target.result;
-                const workbook = XLSX.read(bstr, { type: 'binary' });
-                const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                const res = await fetch('{{ route('admin.peluang.import') }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
-                    body: JSON.stringify({ data: jsonData })
-                });
-                if (res.ok) window.location.reload();
-            };
-            reader.readAsBinaryString(file);
-        },
+        if(res.ok) window.location.reload();
+    },
 
-        async saveUniv() {
-            let payload = { id: this.isEditModeUniv ? this.selectedUnivId : null, nama_univ: this.newUnivName, lokasi: this.newUnivLocation };
-            const res = await fetch('{{ route('admin.peluang.store') }}', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
-                body: JSON.stringify(payload)
-            });
-            if(res.ok) window.location.reload();
-        },
+    openAddUniv() {
+        this.isEditModeUniv = false;
+        this.newUnivName = '';
+        this.newUnivLocation = '';
+        this.showModalUniv = true;
+    },
 
-        async saveProdi() {
-            let payload = { 
-                id: this.selectedUnivId, 
-                nama_univ: this.selectedUnivName, 
-                lokasi: this.newUnivLocation, 
-                prodis: [{ nama: this.newProdiName, kuota: this.newProdiKuota, peminat: this.newProdiPeminat }] 
-            };
-            const res = await fetch('{{ route('admin.peluang.store') }}', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
-                body: JSON.stringify(payload)
-            });
-            if(res.ok) window.location.reload();
-        },
+    openEditUniv(univ) {
+        this.isEditModeUniv = true;
+        this.selectedUnivId = univ.id;
+        this.newUnivName = univ.name;
+        this.newUnivLocation = univ.location;
+        this.showModalUniv = true;
+    },
 
-        triggerDelete(type, data) {
-            this.confirmData = { type: type, id: data.id, title: type === 'univ' ? 'Hapus Universitas?' : 'Hapus Prodi?', message: 'Pindahkan ke riwayat?' };
-            this.showConfirm = true;
-        },
-
-        async executeDelete() {
-            const res = await fetch(`/admin/peluangPtn/${this.confirmData.id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content } });
-            if(res.ok) window.location.reload();
-        },
-
-        async restoreData(id) {
-            const res = await fetch(`/admin/peluangPtn/${id}/restore`, { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content } });
-            if(res.ok) window.location.reload();
-        },
-
-        async permanentDelete(id) {
-            if(confirm('Hapus permanen?')) {
-                const res = await fetch(`/admin/peluangPtn/${id}/force`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content } });
-                if(res.ok) window.location.reload();
-            }
-        },
-
-        prepareRestore(id, name) {
-            this.actionId = id;
-            this.actionName = name;
-            this.showRestoreModal = true;
-        },
-
-        prepareForceDelete(id, name) {
-            this.actionId = id;
-            this.actionName = name;
-            this.showForceDeleteModal = true;
-        },
-
-        confirmRestore() {
-            fetch(`/admin/peluangPtn/${this.actionId}/restore`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => {
-                if(response.ok) window.location.reload();
-            });
-        },
-
-        confirmPermanentDelete() {
-            fetch(`/admin/peluangPtn/${this.actionId}/force`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => {
-                if(response.ok) window.location.reload();
-            });
-        },
-
-        openAddUniv() { this.isEditModeUniv = false; this.newUnivName = ''; this.newUnivLocation = ''; this.showModalUniv = true; },
-        openEditUniv(univ) { this.isEditModeUniv = true; this.selectedUnivId = univ.id; this.newUnivName = univ.name; this.newUnivLocation = univ.location; this.showModalUniv = true; },
-        openAddProdi(univ) { this.selectedUnivId = univ.id; this.selectedUnivName = univ.name; this.newUnivLocation = univ.location; this.newProdiName = ''; this.prodiMode = 'manual'; this.showModalProdi = true; }
-      }">
+    openAddProdi(univ) {
+        this.selectedUnivId = univ.id;
+        this.selectedUnivName = univ.name;
+        this.newUnivLocation = univ.location;
+        this.newProdiName = '';
+        this.prodiMode = 'manual';
+        this.showModalProdi = true;
+    }
+}">
 
     <div class="admin-layout">
         <aside x-data="{ currentPage: 'peluang' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
@@ -447,7 +466,37 @@ laporan</span>
                                 </div>
                                 <div class="flex gap-1 lg:gap-2">
                                     <button @click.stop="openEditUniv(univ)" class="p-2 lg:p-3 text-gray-300 hover:text-blue-500"><svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
-                                    <button @click.stop="triggerDelete('univ', univ)" class="p-2 lg:p-3 text-red-300 hover:text-red-500"><svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                                    <button 
+                            @click="
+                            Swal.fire({
+                            title: 'Hapus Universitas?',
+                            text: 'Universitas akan dipindahkan ke History',
+                            icon: 'warning',
+                            width: '340px',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            confirmButtonText: 'Ya, Hapus!',
+                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                            }).then(async (result) => {
+                                if(result.isConfirmed){
+                                    const res = await fetch(`/admin/peluangPtn/${univ.id}`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                        }
+                                    })
+
+                                    if(res.ok){
+                                        location.reload()
+                                    }
+                                }
+                            })
+                            "
+                            class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                            </button>
                                     <button @click.stop="openAddProdi(univ)" class="p-2 lg:p-3 bg-[#4A72D4] text-white rounded-xl lg:rounded-2xl shadow-md"><svg class="w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M12 4.5v15m7.5-7.5h-15" /></svg></button>
                                 </div>
                             </div>
@@ -471,7 +520,39 @@ laporan</span>
                                                         <td class="px-6 lg:px-10 py-5 text-center font-black text-[10px] lg:text-xs text-blue-600 whitespace-nowrap" x-text="prodi.kuota"></td>
                                                         <td class="px-6 lg:px-10 py-5 text-center font-black text-[10px] lg:text-xs text-indigo-500 whitespace-nowrap" x-text="prodi.peminat"></td>
                                                         <td class="px-6 lg:px-10 py-5 text-center">
-                                                            <button @click="triggerDelete('prodi', prodi)" class="text-[10px] font-black text-red-400 uppercase">Hapus</button>
+                                                            <td class="px-6 lg:px-10 py-5 text-center">
+                            <button 
+                            @click="
+                            Swal.fire({
+                            title: 'Hapus Prodi?',
+                            text: 'Prodi akan dipindahkan ke History',
+                            icon: 'warning',
+                            width: '340px',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            confirmButtonText: 'Ya, Hapus!',
+                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                            }).then(async (result) => {
+                                if(result.isConfirmed){
+                                    const res = await fetch(`/admin/peluangPtn/${prodi.id}`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                        }
+                                    })
+
+                                    if(res.ok){
+                                        location.reload()
+                                    }
+                                }
+                            })
+                            "
+                            class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                            </svg>
+                            </button>
+                        </td>
                                                         </td>
                                                     </tr>
                                                 </template>
@@ -502,8 +583,68 @@ laporan</span>
                                     </div>
                                 </div>
                                 <div class="flex gap-1 lg:gap-2">
-                                    <button @click="prepareRestore(log.id, log.name)" class="bg-emerald-50 text-emerald-600 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Pulihkan</button>
-                                    <button @click="prepareForceDelete(log.id, log.name)" class="bg-red-50 text-red-500 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Hapus</button>
+                                     <button 
+                        @click="
+                            Swal.fire({
+                            title: 'Pulihkan Universitas?',
+                            text: 'Data akan dikembalikan ke daftar Universitas',
+                            icon: 'question',
+                            width: '340px',
+                            showCancelButton: true,
+                            confirmButtonColor: '#22c55e',
+                            confirmButtonText: 'Ya, Pulihkan!',
+                            cancelButtonText: 'Batal',
+                            customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+       
+                            }).then((result) => {
+                                if(result.isConfirmed){
+                                    fetch(`/admin/peluangPtn/${log.id}/restore`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        }
+                                    }).then(res => {
+                                        if(res.ok) window.location.reload()
+                                    })
+                                }
+                            })
+                        "
+                        class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> 
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                        </svg>
+                        </button>
+                                    <button 
+                            @click="
+                                Swal.fire({
+                            title: 'Hapus Permanen?',
+                            text: 'Data tidak bisa dikembalikan!',
+                            width: '340px',
+                            icon: 'error',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            confirmButtonText: 'Ya, Hapus!',
+                            cancelButtonText: 'Batal',
+                            customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+        
+                            }).then((result) => {
+                                if(result.isConfirmed){
+                                    fetch(`/admin/peluangPtn/${log.id}/force`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        }
+                                    }).then(res => {
+                                        if(res.ok) window.location.reload()
+                                    })
+                                }
+                            })
+                        "
+                        class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                        </button>
                                 </div>
                             </div>
                         </template>
@@ -519,8 +660,68 @@ laporan</span>
                                     </div>
                                 </div>
                                 <div class="flex gap-1 lg:gap-2">
-                                    <button @click="prepareRestore(log.id, log.name)" class="bg-emerald-50 text-emerald-600 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Pulihkan</button>
-                                    <button @click="prepareForceDelete(log.id, log.name)" class="bg-red-50 text-red-500 px-3 lg:px-6 py-2 rounded-lg lg:rounded-xl text-[8px] lg:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">Hapus Permanen</button>
+                                    <button 
+                        @click="
+                            Swal.fire({
+                            title: 'Pulihkan Prodi?',
+                            text: 'Data akan dikembalikan ke daftar Prodi',
+                            icon: 'question',
+                            width: '340px',
+                            showCancelButton: true,
+                            confirmButtonColor: '#22c55e',
+                            confirmButtonText: 'Ya, Pulihkan!',
+                            cancelButtonText: 'Batal',
+                            customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+       
+                            }).then((result) => {
+                                if(result.isConfirmed){
+                                    fetch(`/admin/peluangPtn/${log.id}/restore`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        }
+                                    }).then(res => {
+                                        if(res.ok) window.location.reload()
+                                    })
+                                }
+                            })
+                        "
+                        class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> 
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                        </svg>
+                        </button>
+                                    <button 
+                        @click="
+                            Swal.fire({
+                            title: 'Hapus Permanen?',
+                            text: 'Data tidak bisa dikembalikan!',
+                            width: '340px',
+                            icon: 'error',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            confirmButtonText: 'Ya, Hapus!',
+                            cancelButtonText: 'Batal',
+                            customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+       
+                            }).then((result) => {
+                                if(result.isConfirmed){
+                                    fetch(`/admin/peluangPtn/${log.id}/force`, {
+                                        method: 'DELETE',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        }
+                                    }).then(res => {
+                                        if(res.ok) window.location.reload()
+                                    })
+                                }
+                            })
+                        "
+                        class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                        </button>
                                 </div>
                             </div>
                         </template>
@@ -630,16 +831,7 @@ laporan</span>
     </div>
 </div>
 
-    <div x-show="showConfirm" x-transition x-cloak class="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] w-full max-w-xs p-6 text-center shadow-2xl">
-            <h4 class="text-lg font-black text-gray-800 uppercase" x-text="confirmData.title"></h4>
-            <p class="text-[10px] text-gray-500 mt-2 font-bold" x-text="confirmData.message"></p>
-            <div class="flex gap-3 mt-6">
-                <button @click="showConfirm = false" class="flex-1 py-3 font-black text-gray-400 uppercase text-[9px]">Batal</button>
-                <button @click="executeDelete()" class="flex-[2] bg-red-500 text-white py-3 rounded-xl font-black uppercase text-[9px] shadow-lg">Pindahkan</button>
-            </div>
-        </div>
-    </div>
+   
 
     @if(session('success'))
 <div 
@@ -710,53 +902,6 @@ laporan</span>
 @endif
 
 
-@if (session('success'))
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: "{{ session('success') }}",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            customClass: {
-                popup: 'rounded-[2rem]', 
-            }
-        });
-    </script>
-@endif
-
-{{-- MODAL PULIHKAN --}}
-<div x-show="showRestoreModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showRestoreModal = false"></div>
-    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" x-show="showRestoreModal" x-transition>
-        <div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-        </div>
-        <h3 class="text-xl font-black text-[#2E3B66] mb-2 uppercase italic">Pulihkan Data?</h3>
-        <p class="text-gray-500 text-xs font-bold uppercase mb-8" x-text="actionName"></p>
-        <div class="flex gap-3">
-            <button @click="showRestoreModal = false" class="flex-1 py-3 rounded-xl font-black uppercase text-[9px] bg-gray-100 text-gray-400">Batal</button>
-            <button @click="confirmRestore()" class="flex-1 py-3 rounded-xl font-black uppercase text-[9px] bg-emerald-500 text-white">Ya, Pulihkan</button>
-        </div>
-    </div>
-</div>
-
-{{-- MODAL HAPUS PERMANEN --}}
-<div x-show="showForceDeleteModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showForceDeleteModal = false"></div>
-    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" x-show="showForceDeleteModal" x-transition>
-        <div class="w-20 h-20 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-        </div>
-        <h3 class="text-xl font-black text-[#2E3B66] mb-2 uppercase italic">Hapus Permanen?</h3>
-        <p class="text-gray-500 text-[10px] font-bold uppercase mb-8">Data <span class="text-rose-600 font-black" x-text="actionName"></span> akan dihapus selamanya.</p>
-        <div class="flex gap-3">
-            <button @click="showForceDeleteModal = false" class="flex-1 py-3 rounded-xl font-black uppercase text-[9px] bg-gray-100 text-gray-400">Batal</button>
-            <button @click="confirmPermanentDelete()" class="flex-1 py-3 rounded-xl font-black uppercase text-[9px] bg-rose-600 text-white">Hapus!</button>
-        </div>
-    </div>
-</div>
 
 </body>
 </html>
