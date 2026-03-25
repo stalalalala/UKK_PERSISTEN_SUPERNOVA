@@ -18,9 +18,6 @@ class HalamanMonitoringLaporanController extends Controller
         return view('admin.Monitoring_laporan.index', compact('logs'));
     }
 
-    public function create()
-    {
-    }
 
     /**
      * Fungsi untuk mencatat log otomatis.
@@ -45,18 +42,6 @@ class HalamanMonitoringLaporanController extends Controller
         return redirect()->back();
     }
 
-    public function show(SystemLog $systemLog)
-    {
-    }
-
-    public function edit(SystemLog $systemLog)
-    {
-    }
-
-    public function update(Request $request, SystemLog $systemLog)
-    {
-    }
-
     /**
      * Menghapus riwayat log jika diperlukan.
      */
@@ -69,11 +54,11 @@ class HalamanMonitoringLaporanController extends Controller
 
     public function updateStatusMultiple(Request $request) {
         SystemLog::whereIn('id', $request->ids)->update(['status' => $request->status]);
-        return response()->json(['status' => 'success']);
+        return redirect()->back()->with('success', 'Status berhasil diupdate');
     }
 
     public function destroyMultiple(Request $request) {
         SystemLog::whereIn('id', $request->ids)->delete();
-        return response()->json(['status' => 'success']);
+        return redirect()->back()->with('success', 'Data berhasil dihapus permanen');
     }
 }

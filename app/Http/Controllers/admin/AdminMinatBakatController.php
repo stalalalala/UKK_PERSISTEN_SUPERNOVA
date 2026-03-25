@@ -43,25 +43,32 @@ class AdminMinatBakatController extends Controller
         ]);
     }
 
-    public function store(Request $request)
-    {
-        $category = MinatBakatKategori::create([
-            'name' => $request->name,
-            'color' => $request->color,
-            'description' => $request->description,
-            'soal' => 0
-        ]);
+        public function store(Request $request)
+        {
+            $request->validate([
+                'name' => 'required|string',
+                'description' => 'required|string',
+                'color' => 'required'
+            ]);
 
-        $this->logAktivitas('TAMBAH MINAT BAKAT', $category->name, "Admin menambah kategori minat bakat baru");
-        return response()->json($category);
-    }
+            $category = MinatBakatKategori::create([
+                'name' => $request->name,
+                'color' => $request->color,
+                'description' => $request->description,
+                'soal' => 0
+            ]);
+
+            $this->logAktivitas('TAMBAH MINAT BAKAT', $category->name, "Admin menambah kategori minat bakat baru");
+
+            return redirect()->back()->with('success', 'Kategori berhasil ditambahkan');
+        }
 
     public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required|string',
-            'description' => 'nullable|string',
-            'color' => 'required'
+        'description' => 'required|string',
+        'color' => 'required'
         ]);
 
         $kategori = MinatBakatKategori::findOrFail($id);
@@ -72,7 +79,8 @@ class AdminMinatBakatController extends Controller
         ]);
 
         $this->logAktivitas('UPDATE MINAT BAKAT', $kategori->name, "Admin memperbarui deskripsi/warna kategori");
-        return response()->json($kategori);
+
+        return redirect()->back()->with('success', 'Kategori berhasil diupdate');
     }
 
     public function destroy($id)
@@ -85,9 +93,9 @@ class AdminMinatBakatController extends Controller
             $category->delete();
             
             $this->logAktivitas('HAPUS MINAT BAKAT', $namaKategori, "Admin menghapus kategori ke history", 'deleted');
-            return response()->json(['success' => true]);
+           return redirect()->back()->with('success', 'Kategori dipindahkan ke history');
         }
-        return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        return redirect()->back()->with('error', 'Data tidak ditemukan');
     }
 
     public function restore($id)
@@ -99,9 +107,9 @@ class AdminMinatBakatController extends Controller
         $category->restore();
         $category->touch(); 
 
-        return response()->json(['success' => true]);
+        return redirect()->back()->with('success', 'Kategori berhasil dipulihkan');
     }
-    return response()->json(['success' => false], 404);
+    return redirect()->back()->with('error', 'Data tidak ditemukan');
 }
 
     public function forceDelete($id)
@@ -111,9 +119,9 @@ class AdminMinatBakatController extends Controller
             // Hapus permanen soal terkait
             MinatBakatSoal::onlyTrashed()->where('kategori_name', $category->name)->forceDelete();
             $category->forceDelete();
-            return response()->json(['success' => true]);
+           return redirect()->back()->with('success', 'Kategori berhasil dihapus permanen');
         }
-        return response()->json(['success' => false], 404);
+        return redirect()->back()->with('error', 'Data tidak ditemukan');
     }
 
     public function manajemenSoal(Request $request) 

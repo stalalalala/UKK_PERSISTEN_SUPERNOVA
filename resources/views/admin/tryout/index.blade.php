@@ -11,7 +11,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -52,10 +51,6 @@
         activeTab: 'list',
         currentPage: 1,
         itemsPerPage: 5,
-        showRestoreModal: false,
-        showForceDeleteModal: false,
-        actionUrl: '',
-        actionName: '',
         
         allTryout: {{ $tryouts->map(function($t) {
             return [
@@ -94,26 +89,6 @@
             form.submit();
         },
 
-        confirmRestore() {
-            const form = document.createElement('form');
-            form.action = this.actionUrl;
-            form.method = 'POST';
-            form.innerHTML = `<input type='hidden' name='_token' value='{{ csrf_token() }}'>`;
-            document.body.appendChild(form);
-            form.submit();
-        },
-
-        confirmPermanentDelete() {
-            const form = document.createElement('form');
-            form.action = this.actionUrl;
-            form.method = 'POST';
-            form.innerHTML = `
-                <input type='hidden' name='_token' value='{{ csrf_token() }}'>
-                <input type='hidden' name='_method' value='DELETE'>
-            `;
-            document.body.appendChild(form);
-            form.submit();
-        },
 
         get totalPages() {
             let data = this.activeTab === 'list' ? this.allTryout : this.historyTryout;
@@ -157,14 +132,6 @@
                 [&::-webkit-scrollbar-track]:bg-transparent 
                 [&::-webkit-scrollbar-thumb]:bg-white/20 
                 [&::-webkit-scrollbar-thumb]:rounded-full">
-
-            <a href="#"
-                class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                <div
-                    class="w-5 h-5 border-2 border-white/50 rounded group-hover:border-white transition-colors shrink-0">
-                </div>
-                <span class="text-md font-regular">Dashboard</span>
-            </a>
 
             <a href="{{ route('admin.dashboard.index') }}"
                 class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
@@ -515,11 +482,36 @@
                                             class="p-2 text-blue-400 hover:bg-blue-50 rounded-lg transition-all" title="Edit">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </a>
-                                        <button type="button" 
-                                                @click="deleteToHistory(to.id)" 
-                                                class="cursor-pointer w-9 h-9 flex items-center justify-center rounded-xl text-rose-600 transition-all shadow-sm">
-                                            <i class="fa-solid fa-trash-can text-xs"></i>
+                                       <button type="button" 
+                                        @click="
+                                            Swal.fire({
+                                                    title: 'Hapus TryOut?',
+                                                    text: 'TryOut akan dipindahkan ke History',
+                                                    icon: 'warning',
+                                                    width: '340px',
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#ef4444',
+                                                    confirmButtonText: 'Ya, Hapus!',
+                                                customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                            }).then((result) => {
+                                                if(result.isConfirmed) {
+                                                    $el.nextElementSibling.submit()
+                                                }
+                                            })
+                                        "
+                                       class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
                                         </button>
+
+                                        <form 
+                                            :action="`/admin/tryout/${to.id}`" 
+                                            method="POST" 
+                                            class="hidden">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -565,16 +557,64 @@
                                     </td>
                                     <td class="px-8 py-5 text-center">
                                         <div class="flex items-center justify-center gap-3">
-                                            <button @click="showRestoreModal = true; actionUrl = '/admin/tryout/' + hist.id + '/restore'; actionName = hist.judul"
-                                                class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all shadow-md">
-                                                <i class="fa-solid fa-rotate-left"></i> Pulihkan
+                                            <button 
+                                            @click="
+                                            Swal.fire({
+                                                        title: 'Pulihkan TryOut?',
+                                                        text: 'Data akan dikembalikan ke daftar TryOut',
+                                                        icon: 'question',
+                                                        width: '340px',
+                                                        showCancelButton: true,
+                                                        confirmButtonColor: '#22c55e',
+                                                        confirmButtonText: 'Ya, Pulihkan!',
+                                                        cancelButtonText: 'Batal',
+                                                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                                }).then((result) => {
+                                                    if(result.isConfirmed) {
+                                                        $el.nextElementSibling.submit()
+                                                    }
+                                                })
+                                            "
+                                            class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> 
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                            </svg>
                                             </button>
-                                            <button @click="showForceDeleteModal = true; actionUrl = '/admin/tryout/' + hist.id + '/force-delete'; actionName = hist.judul"
-                                                class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-bold transition-all shadow-md">
-                                                <i class="fa-solid fa-circle-xmark"></i> Hapus Permanen
+
+                                            <form 
+                                                :action="`/admin/tryout/${hist.id}/restore`" 
+                                                method="POST" 
+                                                class="hidden">
+                                                @csrf
+                                            </form>
+                                                                                    <button 
+                                            @click="
+                                                Swal.fire({
+                                                        title: 'Hapus Permanen?',
+                                                        text: 'Data tidak bisa dikembalikan!',
+                                                        width: '340px',
+                                                        icon: 'error',
+                                                        showCancelButton: true,
+                                                        confirmButtonColor: '#ef4444',
+                                                        confirmButtonText: 'Ya, Hapus!',
+                                                        cancelButtonText: 'Batal',
+                                                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                                }).then((result) => {
+                                                    if(result.isConfirmed) {
+                                                        $el.nextElementSibling.submit()
+                                                    }
+                                                })
+                                            "
+                                             class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                            </svg>
                                             </button>
-                                            <form :id="'delete-form-' + hist.id" :action="'/admin/tryout/' + hist.id"
-                                                method="POST" class="hidden">
+
+                                            <form 
+                                                :action="`/admin/tryout/${hist.id}/force-delete`" 
+                                                method="POST" 
+                                                class="hidden">
                                                 @csrf
                                                 @method('DELETE')
                                             </form>
@@ -689,37 +729,8 @@
         })
     "
 ></div>
+@endif
 
-{{-- MODAL PULIHKAN DAN HAPUS PERMANEN --}}
-<div x-show="showRestoreModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showRestoreModal = false"></div>
-    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" x-show="showRestoreModal" x-transition>
-        <div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-        </div>
-        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Pulihkan Tryout?</h3>
-        <p class="text-gray-500 text-sm mb-8" x-text="actionName"></p>
-        <div class="flex gap-3">
-            <button @click="showRestoreModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400">Batal</button>
-            <button @click="confirmRestore()" class="flex-1 py-3 rounded-xl font-bold bg-emerald-500 text-white">Ya, Pulihkan</button>
-        </div>
-    </div>
-</div>
-
-<div x-show="showForceDeleteModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showForceDeleteModal = false"></div>
-    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" x-show="showForceDeleteModal" x-transition>
-        <div class="w-20 h-20 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-        </div>
-        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Hapus Permanen?</h3>
-        <p class="text-gray-500 text-sm mb-8">Data <span class="text-rose-600 font-bold" x-text="actionName"></span> akan dihapus selamanya.</p>
-        <div class="flex gap-3">
-            <button @click="showForceDeleteModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400">Batal</button>
-            <button @click="confirmPermanentDelete()" class="flex-1 py-3 rounded-xl font-bold bg-rose-600 text-white">Hapus!</button>
-        </div>
-    </div>
-</div>
 
 @if (session('success'))
     <script>

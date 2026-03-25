@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,31 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-<<<<<<< HEAD
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-
-        [x-cloak] {
-            display: none !important;
-        }
-
-        .active-page {
-            background-color: #4A72D4 !important;
-            color: white !important;
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(74, 114, 212, 0.3);
-        }
-
-        .custom-scroll::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #BFDBFE;
-            border-radius: 10px;
-        }
-=======
         body { font-family: 'Poppins', sans-serif; }
         [x-cloak] { display: none !important; }
         .active-page { background-color: #4A72D4 !important; color: white !important; transform: scale(1.1); box-shadow: 0 4px 12px rgba(74, 114, 212, 0.3); }
@@ -44,12 +18,10 @@
         
         /* Smooth transition untuk auto-resize */
         textarea { transition: height 0.1s ease; }
->>>>>>> perubahan
     </style>
 </head>
 
 <body class="bg-[#E9EFFF] min-h-screen p-3 sm:p-6 md:p-8">
-
 
     <div class="max-w-full mx-auto px-2 md:px-10 lg:px-20" x-data="soalApp()">
         
@@ -68,30 +40,8 @@
                 MANAJEMEN SOAL
                 <span class="text-blue-500 text-[10px] md:text-sm bg-blue-100/50 px-2 md:px-3 py-1 rounded-lg" x-text="categoryName"></span>
             </h1>
-
+            
             <div class="flex gap-2">
-
-                <label
-                    class="cursor-pointer flex items-center justify-center w-12 h-12 bg-emerald-500 text-white rounded-2xl shadow-lg hover:bg-emerald-600 transition-all group relative">
-                    <i class="fa-solid fa-file-excel"></i>
-                    <input type="file" class="hidden" @change="importExcel($event)" accept=".csv, .xlsx, .xls">
-                    <span
-                        class="absolute -bottom-10 scale-0 group-hover:scale-100 transition-all bg-gray-800 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap shadow-xl z-50">Import
-                        Excel/CSV</span>
-                </label>
-
-                <button @click="showHistory = true"
-                    class="relative w-12 h-12 bg-white rounded-2xl shadow-sm border border-blue-50 flex items-center justify-center">
-                    <i class="fa-solid fa-clock-rotate-left text-blue-400"></i>
-                    <template x-if="history.length > 0">
-                        <span
-                            class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] flex items-center justify-center rounded-full border-2 border-[#E9EFFF]"
-                            x-text="history.length"></span>
-                    </template>
-                </button>
-                <button @click="showFormAdd = !showFormAdd"
-                    class="px-6 bg-[#4A72D4] text-white rounded-2xl font-bold text-xs uppercase shadow-lg hover:bg-[#3A5BB2]">
-
                 <button @click="showImportModal = true" class="w-10 h-10 md:w-12 md:h-12 bg-emerald-500 text-white rounded-xl md:rounded-2xl shadow-lg hover:bg-emerald-600 transition-all flex items-center justify-center group relative">
                     <i class="fa-solid fa-file-excel text-sm md:text-base"></i>
                     <span class="absolute -bottom-10 scale-0 group-hover:scale-100 transition-all bg-gray-800 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap shadow-xl z-50">Import Soal</span>
@@ -111,7 +61,6 @@
 
         {{-- SEARCH --}}
         <div class="relative mb-6">
-
             <input type="text" x-model="searchQuery" @input="currentPage = 1" placeholder="Cari pertanyaan..." 
                 class="w-full pl-10 md:pl-12 pr-6 py-3 md:py-5 bg-white rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-blue-400 outline-none text-sm md:text-lg">
             <i class="fa-solid fa-magnifying-glass absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-blue-300 text-sm md:text-xl"></i>
@@ -131,7 +80,6 @@
                 <div class="flex justify-end gap-2 md:gap-3">
                     <button @click="showFormAdd = false" class="text-[10px] md:text-xs font-bold text-blue-400 px-3">Batal</button>
                     <button @click="saveNew()" class="px-6 md:px-8 py-2 md:py-3 bg-[#4A72D4] text-white rounded-xl text-[10px] md:text-xs font-bold shadow-lg">Simpan</button>
-
                 </div>
             </div>
         </div>
@@ -157,6 +105,7 @@
             </template>
         </div>
 
+        {{-- PAGINATION --}}
         <div class="mt-10 flex items-center justify-center gap-1 md:gap-2" x-show="totalPages > 1">
             <button @click="currentPage--" :disabled="currentPage === 1" class="w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-white disabled:opacity-20 shadow-sm"><i class="fa-solid fa-chevron-left text-xs"></i></button>
             <div class="flex gap-1 md:gap-2">
@@ -323,7 +272,7 @@
                 actionId: null,
                 actionText: '',
                 selectedItem: null,
-
+                
                 history: JSON.parse(localStorage.getItem('recycle_bin_soal') || '[]'),
 
                 saveHistory() { localStorage.setItem('recycle_bin_soal', JSON.stringify(this.history)); },
@@ -345,32 +294,6 @@
                     if(type === 'restore') this.showRestoreModal = true;
                     if(type === 'forceDelete') this.showForceDeleteModal = true;
                 },
-
-                async saveNew() {
-                    if (!this.newText.trim()) return;
-                    try {
-                        const response = await fetch('{{ route('admin.minatBakat.soal.store') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                text: this.newText,
-                                category: this.categoryName
-                            })
-                        });
-                        if (response.ok) {
-                            const newSoal = await response.json();
-                            this.questions.unshift(newSoal);
-                            this.newText = '';
-                            this.showFormAdd = false;
-                            this.currentPage = 1;
-                        }
-                    } catch (e) {
-                        console.error(e);
-                    }
 
                 unduhTemplate() {
                     const wb = XLSX.utils.book_new();
@@ -418,9 +341,6 @@
                     reader.readAsArrayBuffer(file);
                 },
 
-                async deleteSoal(soal) {
-                    if (!confirm('Pindahkan soal ke History?')) return;
-
                 async saveNew() {
                     if(!this.newText.trim()) return;
                     try {
@@ -445,12 +365,8 @@
                     try {
                         const response = await fetch(`{{ url('admin/minat-bakat/soal') }}/${this.actionId}`, {
                             method: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json'
-                            }
+                            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
                         });
-
                         if(response.ok) {
                             const now = new Date();
                             const deletedAt = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
@@ -458,28 +374,9 @@
                             this.saveHistory();
                             this.questions = this.questions.filter(q => q.id !== this.actionId);
                             this.showDeleteConfirmModal = false;
-
                         }
-                    } catch (e) {
-                        alert('Gagal menghapus');
-                    }
+                    } catch (e) { alert('Gagal menghapus'); }
                 },
-
-
-                async restoreSoal(h) {
-                    if (!confirm('Pulihkan soal ini?')) return;
-                    try {
-                        const response = await fetch('{{ route('admin.minatBakat.soal.restore') }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                text: h.text,
-                                category: this.categoryName
-                            })
 
                 async confirmRestore() {
                     try {
@@ -487,39 +384,24 @@
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
                             body: JSON.stringify({ text: this.selectedItem.text, category: this.categoryName })
-
                         });
-                        if (response.ok) {
+                        if(response.ok) {
                             const restored = await response.json();
                             this.questions.unshift(restored);
-
                             this.history = this.history.filter(item => item.id_history !== this.selectedItem.id_history);
-
                             this.saveHistory();
                             this.showRestoreModal = false;
                         }
-                    } catch (e) {
-                        alert('Gagal memulihkan');
-                    }
+                    } catch (e) { alert('Gagal memulihkan'); }
                 },
-
-
-                forceDelete(id) {
-                    if (confirm('Hapus PERMANEN dari history?')) {
-                        this.history = this.history.filter(h => h.id !== id);
-                        this.saveHistory();
-                    }
 
                 confirmForceDelete() {
                     this.history = this.history.filter(h => h.id_history !== this.selectedItem.id_history);
                     this.saveHistory();
                     this.showForceDeleteModal = false;
-
                 }
             }
         }
     </script>
-
 </body>
-
 </html>
