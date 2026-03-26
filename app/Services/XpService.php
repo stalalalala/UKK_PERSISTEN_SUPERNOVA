@@ -73,50 +73,88 @@ class XpService
     }
 
     public function checkStreakExpired($user)
-    {
-        if (!$user->last_xp_date) return;
+{
+    if (!$user->last_xp_date) return;
 
-        $days = Carbon::parse($user->last_xp_date)
-                ->diffInDays(now());
+    $days = Carbon::parse($user->last_xp_date)
+            ->diffInDays(now());
 
-        if ($days >= 5) {
-            $user->streak_days = 0;
-            $user->streak_active = false;
-            $user->save();
-        }
-    }
+    if ($days >= 1 && !$user->character_locked) {
+
+    // 💾 SIMPAN DATA LAMA
+    $user->backup_xp = $user->total_xp;
+    $user->backup_streak_days = $user->streak_days;
+    $user->backup_level = $user->level;
+
+    // 🔥 RESET
+    $user->streak_days = 1;
+    $user->streak_active = false;
+
+    $user->total_xp = 0;
+    $user->level = 1;
+
+    $user->character_locked = true;
+
+    $user->save();
+}
+}
 
     public function restoreStreak($user)
-    {
-        if ($user->streak_active) return false;
+{
+    if ($user->streak_active) return false;
 
-        $month = now()->month;
+    $month = now()->month;
 
-        $used = StreakRestore::where('user_id', $user->id)
-            ->whereMonth('restore_date', $month)
-            ->exists();
+    $used = StreakRestore::where('user_id', $user->id)
+        ->whereMonth('restore_date', $month)
+        ->exists();
 
-        if ($used) return false;
+    if ($used) return false;
 
-        StreakRestore::create([
-            'user_id' => $user->id,
-            'restore_date' => now()
-        ]);
+    // Catat pemakaian
+    StreakRestore::create([
+        'user_id' => $user->id,
+        'restore_date' => now()
+    ]);
 
-        $user->streak_active = true;
-        $user->streak_days = 1;
-        $user->last_xp_date = now();
-        $user->save();
+    // 🔥 RESTORE
+    // 🔥 BALIKIN DATA LAMA
+$user->total_xp = $user->backup_xp ?? 0;
+$user->streak_days = $user->backup_streak_days ?? 1;
+$user->level = $user->backup_level ?? 1;
 
-        return true;
-    }
+$user->streak_active = true;
+$user->last_xp_date = now();
+
+$user->character_locked = false;
+
+// ❗ HAPUS BACKUP BIAR GA BISA DIPAKE LAGI
+$user->backup_xp = null;
+$user->backup_streak_days = null;
+$user->backup_level = null;
+
+    // (Optional) kasih XP awal biar ga terlalu kejam
+    // $user->total_xp = 50;
+
+    $user->save();
+
+    return true;
+}
 
     public function getCurrentCharacter($user)
 {
-    // Ambil karakter streak sesuai level user
-    return StreakCharacter::where('min_level', '<=', $user->level)
-        ->orderByDesc('min_level') // yang tertinggi <= level user
+    // 🔥 kalau ke-lock → ambil default
+    if ($user->character_locked) {
+        return StreakCharacter::where('is_default', true)->first();
+    }
+
+    // 🔥 kalau normal → ambil berdasarkan level
+    $character = StreakCharacter::where('min_level', '<=', $user->level)
+        ->orderByDesc('min_level')
         ->first();
+
+    // 🔥 fallback kalau ga ketemu
+    return $character ?? StreakCharacter::where('is_default', true)->first();
 }
 
     private function calculateLevel($xp)

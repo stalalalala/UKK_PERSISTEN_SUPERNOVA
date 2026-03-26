@@ -32,7 +32,7 @@
 
             <div class="flex items-center gap-2">
                 <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full">
-                    <a href="/profile/index"
+                    <a href="{{ route('profile.index') }}"
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" class="size-5 md:size-6">
@@ -42,8 +42,8 @@
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="inline" id="logout-form">
                         @csrf
-                        <button type="submit" 
-                                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
+                        <button type="submit"
+                            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -110,7 +110,7 @@
         pages: {
             'Penalaran Umum': 1,
             'Pemahaman Bacaan & Menulis': 1,
-            'Pengetahuan & Pemahaman Umum': 1,
+            'Pemahaman & Pengetahuan Umum': 1,
             'Pengetahuan Kuantitatif': 1,
             'Penalaran Matematika': 1,
             'Literasi Bahasa Indonesia': 1,
@@ -149,9 +149,9 @@
                         Latihan!</p>
                 </div>
 
-                <div @click="selectedSub = 'Pengetahuan & Pemahaman Umum'; currentPage = 1"
+                <div @click="selectedSub = 'Pemahaman & Pengetahuan Umum'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#FF908E]"
-                    :class="selectedSub === 'Pengetahuan & Pemahaman Umum' ?
+                    :class="selectedSub === 'Pemahaman & Pengetahuan Umum' ?
                         'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
@@ -347,7 +347,7 @@
                 $allSubtes = [
                     'Penalaran Umum',
                     'Pemahaman Bacaan & Menulis',
-                    'Pengetahuan & Pemahaman Umum',
+                    'Pemahaman & Pengetahuan Umum',
                     'Pengetahuan Kuantitatif',
                     'Penalaran Matematika',
                     'Literasi Bahasa Indonesia',

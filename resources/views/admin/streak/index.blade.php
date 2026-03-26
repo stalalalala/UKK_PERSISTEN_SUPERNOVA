@@ -118,9 +118,8 @@
                     <span class="text-md font-regular">Manajemen user</span>
                 </a>
 
-                <a href="{{ route('admin.streak.index') }}"
-                    class="w-full flex items-center gap-4 px-4 bg-[#D4DEF7]  text-[#2E3B66] py-3 rounded-2xl transition-all duration-200 group text-left"
-                    x-init="if (currentPage === 'streak') { $el.scrollIntoView({ block: 'center' }) }">
+                <a href="{{ route('admin.streak.index') }}" x-init="if (currentPage === 'streak') { $el.scrollIntoView({ block: 'center' }) }"
+                    class="w-full flex items-center gap-4 px-4 py-3 bg-[#D4DEF7]  text-[#2E3B66] rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -152,7 +151,7 @@
                 </a>
 
                 <a href="{{ route('admin.latihan.index') }}"
-                    class="w-full flex items-center gap-4 px-4 py-3  rounded-2xl transition-all duration-200 group text-left">
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="size-7">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -204,13 +203,26 @@
                 </a>
             </nav>
 
-            <button
-                class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
-                <i class="fa-solid fa-right-from-bracket text-lg"></i>
-                <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
-            </button>
+            <form action="{{ route('logout') }}" method="POST" class="w-full inline">
+                @csrf
+                <button type="submit"
+                    class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-5 md:size-6 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                    </svg>
+                    <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
+                </button>
+            </form>
         </aside>
 
+        <div x-show="mobileMenuOpen" x-transition:enter="transition opacity-ease-out duration-300"
+            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+            x-transition:leave="transition opacity-ease-in duration-300" x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0" @click="mobileMenuOpen = false"
+            class="fixed inset-0 bg-black/50 z-40 lg:hidden">
+        </div>
 
         <!-- CONTENT -->
         <main class="flex-1 main-content custom-scrollbar">
@@ -371,7 +383,7 @@
                                 <tr>
                                     <th class="px-10 py-6 text-center">Visual Pet</th>
                                     <th class="px-10 py-6 text-center">Level Perubahan</th>
-                                    <th class="px-10 py-6 text-center">Animasi</th>
+                                    <th class="px-10 py-6 text-center">SVG Animasi</th>
                                     <th class="px-10 py-6 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -382,8 +394,8 @@
                                         <td class="px-10 py-8 text-center">
                                             <div
                                                 class="w-60 h-60 bg-white rounded-3xl p-3 mx-auto flex items-center justify-center overflow-hidden">
-                                                <img src="{{ asset('storage/' . $streak->svg_path) }}"
-                                                    class="w-full h-full object-contain animate-{{ $streak->animation }}">
+                                                <img src="{{ $streak->svg_path ? asset('storage/' . $streak->svg_path) : '' }}"
+                                                    class="w-full h-full object-contain">
                                             </div>
                                             <p
                                                 class="text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-widest">
@@ -398,10 +410,24 @@
                                             </span>
                                         </td>
 
-                                        <td class="px-10 py-8 text-center">
-                                            <span class="inline-flex items-center gap-2 px-6 py-3font-bold text-lg">
-                                                {{ $streak->animation }}
-                                            </span>
+                                        <td class="px-10 py-8">
+                                            <div class="flex justify-center items-center">
+                                                @if ($streak->svg_animated_path)
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-8 w-8 text-green-500" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                @else
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-8 w-8 text-gray-300" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                @endif
+                                            </div>
                                         </td>
 
                                         <td class="px-10 py-8 text-center">
@@ -482,24 +508,29 @@
                                 <tr>
                                     <th class="px-8 py-4 text-center">Pet</th>
                                     <th class="px-8 py-4 text-center">Level</th>
-                                    {{-- <th class="px-8 py-4 text-center">Animasi</th> --}}
+                                    <th class="px-8 py-4 text-center">SVG Animasi</th>
                                     <th class="px-8 py-4 text-center">Aksi</th>
                                 </tr>
                             </thead>
 
                             <tbody class="divide-y divide-gray-100">
-
-                                @foreach ($trash as $streak)
+                                @forelse ($trash as $streak)
                                     <tr class="hover:bg-gray-50 transition-all">
 
                                         <!-- PET -->
                                         <td class="px-8 py-6 text-center">
                                             <div class="flex flex-col items-center gap-2">
+
                                                 <div
-                                                    class="w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center">
-                                                    <img src="{{ asset('storage/' . $streak->svg_path) }}"
-                                                        class="w-60 h-60 grayscale opacity-60 object-contain">
+                                                    class="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden">
+                                                    @if ($streak->svg_path)
+                                                        <img src="{{ asset('storage/' . $streak->svg_path) }}"
+                                                            class="w-full h-full object-contain grayscale opacity-60">
+                                                    @else
+                                                        <span class="text-gray-300 text-xs">No Image</span>
+                                                    @endif
                                                 </div>
+
                                                 <span class="text-xs font-semibold text-gray-400 uppercase">
                                                     {{ $streak->nama }}
                                                 </span>
@@ -514,41 +545,40 @@
                                             </span>
                                         </td>
 
-                                        {{-- <!-- ANIMATION -->
+                                        <!-- ANIMASI -->
                                         <td class="px-8 py-6 text-center">
-                                            <span class="text-xs font-semibold text-gray-400 uppercase">
-                                                {{ $streak->animation ?? 'static' }}
-                                            </span>
-                                        </td> --}}
+                                            @if ($streak->svg_animated_path)
+                                                <svg class="h-6 w-6 text-green-500 mx-auto" fill="none"
+                                                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            @else
+                                                <svg class="h-6 w-6 text-gray-300 mx-auto" fill="none"
+                                                    stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            @endif
+                                        </td>
 
                                         <!-- ACTION -->
-                                        <td
-                                            class="px-8 py-6 text-center flex flex-row gap-2 items-center justify-center">
+                                        <td class="px-8 py-6 text-center flex gap-2 justify-center">
 
                                             <!-- Restore -->
                                             <form action="{{ route('admin.streak.restore', $streak->id) }}"
                                                 method="POST">
                                                 @csrf
                                                 <button type="submit"
-                                                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl font-bold text-[11px] uppercase shadow-lg shadow-green-200 transition-all">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                        class="size-6">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                                                    </svg>
+                                                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl shadow-lg transition-all">
+                                                    <i class="fa-solid fa-rotate-left"></i>
                                                 </button>
                                             </form>
 
                                             <!-- Permanent Delete -->
                                             <button @click="confirmPermanentDelete({{ $streak->id }})"
-                                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-[11px] uppercase shadow-lg shadow-red-200 transition-all">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
-                                                    class="size-6">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                </svg>
+                                                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl shadow-lg transition-all">
+                                                <i class="fa-solid fa-trash"></i>
                                             </button>
 
                                             <form id="force-{{ $streak->id }}"
@@ -561,8 +591,14 @@
                                         </td>
 
                                     </tr>
-                                @endforeach
-
+                                @empty
+                                    <!-- EMPTY STATE -->
+                                    <tr>
+                                        <td colspan="4" class="text-center py-10 text-gray-400">
+                                            Tidak ada data history 🚫
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
 
                         </table>
@@ -576,73 +612,63 @@
 
         </main>
     </div>
-@if(session('success'))
-<div 
-    x-data
-    x-init="
-        Swal.fire({
+    @if (session('success'))
+        <div x-data x-init="Swal.fire({
             icon: 'success',
             title: '{{ session('success') }}',
-
+        
             width: '340px',
             padding: '1.8rem',
-
+        
             background: '#ffffff',
             color: '#334155',
-
+        
             confirmButtonText: 'Oke',
             confirmButtonColor: '#4A72D4',
-
+        
             customClass: {
                 popup: 'rounded-3xl shadow-xl',
                 title: 'text-lg font-bold',
                 confirmButton: 'rounded-xl px-6 py-2'
             },
-
+        
             showClass: {
                 popup: 'animate__animated animate__fadeInDown'
             },
             hideClass: {
                 popup: 'animate__animated animate__fadeOutUp'
             }
-        })
-    "
-></div>
-@endif
+        })"></div>
+    @endif
 
-@if(session('error'))
-<div 
-    x-data
-    x-init="
-        Swal.fire({
+    @if (session('error'))
+        <div x-data x-init="Swal.fire({
             icon: 'error',
             title: '{{ session('error') }}',
-
+        
             width: '340px',
             padding: '1.8rem',
-
+        
             background: '#ffffff',
             color: '#334155',
-
+        
             confirmButtonText: 'Coba Lagi',
             confirmButtonColor: '#ef4444',
-
+        
             customClass: {
                 popup: 'rounded-3xl shadow-xl',
                 title: 'text-lg font-bold',
                 confirmButton: 'rounded-xl px-6 py-2'
             },
-
+        
             showClass: {
                 popup: 'animate__animated animate__fadeInDown'
             },
             hideClass: {
                 popup: 'animate__animated animate__fadeOutUp'
             }
-        })
-    "
-></div>
-@endif
+        })"></div>
+    @endif
 </body>
 
 </html>

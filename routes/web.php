@@ -96,14 +96,14 @@ Route::middleware(['auth'])->group(function () {
 
             Route::resource('user', UserController::class);
 
-        Route::resource('streak', HalamanStreakController::class);
 
         // Monitoring Laporan
         Route::post('/monitoringLaporan/destroy-multiple', [HalamanMonitoringLaporanController::class, 'destroyMultiple'])->name('laporan.destroy-multiple');
         Route::post('/monitoringLaporan/update-status-multiple', [HalamanMonitoringLaporanController::class, 'updateStatusMultiple'])->name('laporan.update-status-multiple');
 
         Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
-
+     
+        //video
         Route::get('videoPembelajaran/history', [AdminVideoController::class, 'history'])->name('videoPembelajaran.history');
         Route::post('videoPembelajaran/{id}/restore', [AdminVideoController::class, 'restore'])->name('videoPembelajaran.restore');
         Route::delete('videoPembelajaran/{id}/force-delete', [AdminVideoController::class, 'forceDelete'])->name('videoPembelajaran.force-delete');
@@ -208,16 +208,18 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/', [BerandaController::class, 'index'])->name('beranda');
         Route::get('/profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile.index');
+        
 
        Route::get('/profile/edit', [ProfileController::class, 'edit'])->middleware('auth')->name('profile.edit');
        Route::post('/profile/update', [ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
+       Route::get('/log', [ProfileController::class, 'log'])->name('log.index');
 
 
         /* =======================
            Streak & Video
         ======================= */
         Route::get('/streak', [StreakController::class, 'index'])->name('streak.index');
-        Route::post('/streak/restore', [StreakController::class,'restore'])->name('streak.restore');
+        Route::post('/streak/restore', [StreakController::class, 'restore'])->name('streak.restore');
         Route::get('/video', [VideoController::class, 'index'])->name('video.index');
         Route::post('/video/ditonton/{id}', [VideoController::class, 'tonton']);
 

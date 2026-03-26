@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body { font-family: 'Poppins', sans-serif; }
@@ -321,9 +322,36 @@
                                 <button @click.stop="openEditModal(cat)" class="w-8 h-8 bg-white text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all shadow-md flex items-center justify-center">
                                     <i class="fa-solid fa-pen-to-square text-xs"></i>
                                 </button>
-                                <button @click.stop="prepareDelete(cat)" class="w-8 h-8 bg-white text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-md flex items-center justify-center">
-                                    <i class="fa-solid fa-trash text-xs"></i>
-                                </button>
+
+                               <button 
+                            type="button"
+                            @click.stop="
+                            Swal.fire({
+                            title: 'Hapus Kategori?',
+                            text: 'Kategori akan dipindahkan ke History',
+                            icon: 'warning',
+                            width: '340px',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            confirmButtonText: 'Ya, Hapus!',
+                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                        }).then((result) => {
+                            if(result.isConfirmed) $el.nextElementSibling.submit()
+                        })
+                        "
+                        class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                </button>
+
+                <form 
+                :action="`/admin/minatBakat/${cat.id}`" 
+                method="POST" 
+                class="hidden">
+                    @csrf
+                    @method('DELETE')
+                </form>
                             </div>
 
                             <div class="flex flex-col gap-3 relative z-0">
@@ -383,41 +411,100 @@
         </main>
     </div>
 
-    <div x-show="showModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div @click="showModal = false" class="absolute inset-0 bg-[#2D3B61]/40 backdrop-blur-sm"></div>
-        <div class="bg-white rounded-[28px] w-full max-w-md p-8 relative shadow-2xl" 
-             x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90">
-            
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-bold text-gray-800 uppercase tracking-widest" x-text="isEdit ? 'Edit Kategori' : 'Tambah Kategori'"></h3>
-                <button @click="showModal = false" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
+   <div x-show="showModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div @click="showModal = false" class="absolute inset-0 bg-[#2D3B61]/40 backdrop-blur-sm"></div>
 
-            <div class="space-y-5">
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2 tracking-widest">Nama Kategori</label>
-                    <input type="text" x-model="formData.name" class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#4A72D4] outline-none">
-                </div>
+    <div class="bg-white rounded-[28px] w-full max-w-md p-8 relative shadow-2xl"
+         x-transition:enter="transition ease-out duration-300" 
+         x-transition:enter-start="opacity-0 scale-90">
 
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2 tracking-widest">Deskripsi Minat Bakat</label>
-                    <textarea x-model="formData.description" rows="3" class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#4A72D4] outline-none resize-none"></textarea>
-                </div>
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-bold text-gray-800 uppercase tracking-widest" 
+                x-text="isEdit ? 'Edit Kategori' : 'Tambah Kategori'"></h3>
 
-                <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2 tracking-widest">Warna Identitas</label>
-                    <div class="flex gap-3">
-                        <input type="color" x-model="formData.color" class="h-12 w-20 rounded-xl border-none cursor-pointer bg-transparent">
-                        <div class="flex-1 px-5 py-3 bg-gray-50 rounded-2xl text-[10px] font-bold uppercase text-gray-400 flex items-center" x-text="formData.color"></div>
+            <button @click="showModal = false" class="text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+
+
+        <form 
+            method="POST"
+            @submit.prevent="
+                if(!formData.name || !formData.description || !formData.color){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lengkapi Data!',
+                        text: 'Semua field wajib diisi',
+                        width: '340px'
+                    });
+                    return;
+                }
+                $el.submit();
+            "
+            :action="isEdit 
+                ? `/admin/minatBakat/${formData.id}` 
+                : '{{ route('admin.minatBakat.kategori.store') }}'">
+
+                    @csrf
+                    <template x-if="isEdit">
+                        <input type="hidden" name="_method" value="PUT">
+                    </template>
+
+                    <div class="space-y-5">
+
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2 tracking-widest">
+                                Nama Kategori
+                            </label>
+                            <input 
+                                type="text" 
+                                name="name"
+                                x-model="formData.name"
+                                required
+                                class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#4A72D4] outline-none">
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2 tracking-widest">
+                                Deskripsi Minat Bakat
+                            </label>
+                            <textarea 
+                                name="description"
+                                x-model="formData.description"
+                                rows="3"
+                                class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#4A72D4] outline-none resize-none"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2 tracking-widest">
+                                Warna Identitas
+                            </label>
+                            <div class="flex gap-3">
+                                <input 
+                                    type="color" 
+                                    name="color"
+                                    x-model="formData.color"
+                                    class="h-12 w-20 rounded-xl border-none cursor-pointer bg-transparent">
+
+                                <div class="flex-1 px-5 py-3 bg-gray-50 rounded-2xl text-[10px] font-bold uppercase text-gray-400 flex items-center" 
+                                    x-text="formData.color"></div>
+                            </div>
+                        </div>
+
+                        <!-- 🔥 BUTTON SUBMIT -->
+                        <button 
+                            type="submit"
+                            class="w-full py-4 bg-[#4A72D4] text-white rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg active:scale-95">
+                            
+                            <span x-text="isEdit ? 'Simpan Perubahan' : 'Buat Kategori Baru'"></span>
+                        </button>
+
                     </div>
-                </div>
-
-                <button @click="saveCategory()" class="w-full py-4 bg-[#4A72D4] text-white rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg active:scale-95">
-                    <span x-text="isEdit ? 'Simpan Perubahan' : 'Buat Kategori Baru'"></span>
-                </button>
+                </form>
+                <!-- 🔥 FORM END -->
             </div>
         </div>
-    </div>
 
     <div x-show="showAllParticipants" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center lg:p-10">
         <div @click="showAllParticipants = false" class="absolute inset-0 bg-[#2D3B61]/60 backdrop-blur-md"></div>
@@ -517,8 +604,6 @@
             showAllParticipants: false,
             showHistoryModal: false,
             isEdit: false,
-            showRestoreModal: false,
-            showForceDeleteModal: false,
             actionId: null,
             actionName: '',
             pagiCurrentPage: 1,
@@ -598,120 +683,7 @@
                 this.showModal = true;
             },
 
-            async saveCategory() {
-                let url = this.isEdit 
-                    ? '{{ route("admin.minatBakat.kategori.update", ":id") }}'.replace(':id', this.formData.id)
-                    : '{{ route("admin.minatBakat.kategori.store") }}';
-                
-                let method = this.isEdit ? 'PUT' : 'POST';
-
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        name: this.formData.name,
-                        color: this.formData.color,
-                        description: this.formData.description
-                    })
-                });
-
-                if (response.ok) {
-                    const newCategory = await response.json();
-                    if (this.isEdit) {
-                        window.location.reload(); 
-                    } else {
-                        this.categories.unshift(newCategory); 
-                        this.showModal = false;
-                    }
-                }
-            },
-
-            async deleteCategory(id) {
-                if(confirm('Pindahkan kategori ini ke History?')) {
-                    let url = '{{ route('admin.minatBakat.kategori.destroy', ':id') }}'.replace(':id', id);
-                    const response = await fetch(url, {
-                        method: 'DELETE',
-                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
-                    });
-                    if (response.ok) {
-                        const item = this.categories.find(c => c.id === id);
-                        this.deletedSubtests.push(item);
-                        this.categories = this.categories.filter(c => c.id !== id);
-                    }
-                }
-            },
-
-            prepareRestore(item) {
-                this.actionId = item.id;
-                this.actionName = item.name;
-                this.showRestoreModal = true;
-            },
-
-            prepareForceDelete(item) {
-                this.actionId = item.id;
-                this.actionName = item.name;
-                this.showForceDeleteModal = true;
-            },
-
-            async confirmRestore() {
-                let url = '{{ route('admin.minatBakat.kategori.restore', ':id') }}'.replace(':id', this.actionId);
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
-                });
-                
-                if (response.ok) {
-                    const item = this.deletedSubtests.find(c => c.id === this.actionId);
-                    this.categories.unshift(item);
-                    this.deletedSubtests = this.deletedSubtests.filter(c => c.id !== this.actionId);
-                    this.showRestoreModal = false;
-                }
-            },
-
-            // Fungsi untuk memicu modal konfirmasi pindah ke history
-            prepareDelete(item) {
-                this.actionId = item.id;
-                this.actionName = item.name;
-                this.showDeleteConfirmModal = true;
-            },
-
-            // Fungsi eksekusi setelah klik "Ya" di modal konfirmasi
-            async confirmDeleteToHistory() {
-                let url = '{{ route("admin.minatBakat.kategori.destroy", ":id") }}'.replace(':id', this.actionId);
-                
-                const response = await fetch(url, {
-                    method: 'DELETE',
-                    headers: { 
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json' 
-                    }
-                });
-
-                if (response.ok) {
-                    const item = this.categories.find(c => c.id === this.actionId);
-                    this.deletedSubtests.push(item);
-                    this.categories = this.categories.filter(c => c.id !== this.actionId);
-                    this.showDeleteConfirmModal = false; // Tutup modal
-                }
-            },
-
-            async confirmPermanentDelete() {
-                let url = '{{ route('admin.minatBakat.kategori.forceDelete', ':id') }}'.replace(':id', this.actionId);
-                const response = await fetch(url, {
-                    method: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
-                });
-
-                if (response.ok) {
-                    this.deletedSubtests = this.deletedSubtests.filter(c => c.id !== this.actionId);
-                    this.showForceDeleteModal = false;
-                }
-            },
-
+           
             goToSoal(name) {
                 const baseUrl = '{{ route("admin.minatBakat.manajemen") }}';
                 window.location.href = `${baseUrl}?category=${encodeURIComponent(name)}`;
@@ -766,14 +738,65 @@
                         </div>
                         
                         <div class="flex items-center gap-2 w-full sm:w-auto">
-                            <button @click="prepareRestore(item)" 
-                                    class="flex-1 sm:flex-none px-5 py-2.5 bg-emerald-50 text-emerald-600 rounded-xl text-[10px] font-bold uppercase hover:bg-emerald-500 hover:text-white transition-all">
-                                <i class="fa-solid fa-rotate-left mr-1.5"></i> Pulihkan
+                            <button 
+                            type="button"
+                            @click.stop="
+                            Swal.fire({
+                            title: 'Pulihkan Kategori?',
+                            text: 'Data akan dikembalikan ke daftar Kategori',
+                            icon: 'question',
+                            width: '340px',
+                            showCancelButton: true,
+                            confirmButtonColor: '#22c55e',
+                            confirmButtonText: 'Ya, Pulihkan!',
+                            cancelButtonText: 'Batal',
+                            customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                            }).then((result) => {
+                                if(result.isConfirmed) $el.nextElementSibling.submit()
+                            })
+                            "
+                            class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> 
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                            </svg>
                             </button>
-                            <button @click="prepareForceDelete(item)" 
-                                    class="flex-1 sm:flex-none px-5 py-2.5 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold uppercase hover:bg-red-500 hover:text-white transition-all">
-                                <i class="fa-solid fa-trash-can mr-1.5"></i> Hapus
-                            </button>
+
+                            <form 
+                            :action="`/admin/minat-bakat/${item.id}/restore`" 
+                            method="POST" 
+                            class="hidden">
+                                @csrf
+                            </form>
+                                                    <button 
+                            type="button"
+                            @click.stop="
+                            Swal.fire({
+                            title: 'Hapus Permanen?',
+                            text: 'Data tidak bisa dikembalikan!',
+                            width: '340px',
+                            icon: 'error',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            confirmButtonText: 'Ya, Hapus!',
+                            cancelButtonText: 'Batal',
+                            customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                        }).then((result) => {
+                            if(result.isConfirmed) $el.nextElementSibling.submit()
+                        })
+                        "
+                        class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                        </button>
+
+                        <form 
+                        :action="`/admin/minat-bakat/${item.id}/force-delete`" 
+                        method="POST" 
+                        class="hidden">
+                            @csrf
+                            @method('DELETE')
+                        </form>
                         </div>
                     </div>
                 </template>
@@ -782,63 +805,72 @@
 
     </div>
 </div>
+@if(session('success'))
+<div 
+    x-data
+    x-init="
+        Swal.fire({
+            icon: 'success',
+            title: '{{ session('success') }}',
 
-{{-- MODAL PULIHKAN --}}
-<div x-show="showRestoreModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showRestoreModal = false" x-transition:opacity></div>
-    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" 
-         x-show="showRestoreModal" 
-         x-transition:enter="ease-out duration-300"
-         x-transition:enter-start="opacity-0 scale-90">
-        <div class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-inner">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-        </div>
-        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Pulihkan Kategori?</h3>
-        <p class="text-gray-500 text-sm mb-8 italic">" <span class="font-bold" x-text="actionName"></span> "</p>
-        <div class="flex gap-3">
-            <button @click="showRestoreModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400 hover:bg-gray-200 transition-all">Batal</button>
-            <button @click="confirmRestore()" class="flex-1 py-3 rounded-xl font-bold bg-emerald-500 text-white shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all">Ya, Pulihkan</button>
-        </div>
-    </div>
-</div>
+            width: '340px',
+            padding: '1.8rem',
 
-{{-- MODAL HAPUS PERMANEN --}}
-<div x-show="showForceDeleteModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showForceDeleteModal = false" x-transition:opacity></div>
-    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" 
-         x-show="showForceDeleteModal" 
-         x-transition:enter="ease-out duration-300"
-         x-transition:enter-start="opacity-0 scale-90">
-        <div class="w-20 h-20 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl shadow-inner">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-        </div>
-        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Hapus Permanen?</h3>
-        <p class="text-gray-500 text-sm mb-8">Data <span class="text-rose-600 font-bold" x-text="actionName"></span> akan dihapus selamanya dari sistem.</p>
-        <div class="flex gap-3">
-            <button @click="showForceDeleteModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400 hover:bg-gray-200 transition-all">Batal</button>
-            <button @click="confirmPermanentDelete()" class="flex-1 py-3 rounded-xl font-bold bg-rose-600 text-white shadow-lg shadow-rose-100 hover:bg-rose-700 transition-all">Hapus!</button>
-        </div>
-    </div>
-</div>
+            background: '#ffffff',
+            color: '#334155',
 
+            confirmButtonText: 'Oke',
+            confirmButtonColor: '#4A72D4',
 
-{{-- MODAL KONFIRMASI PINDAH KE HISTORY --}}
-<div x-show="showDeleteConfirmModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showDeleteConfirmModal = false"></div>
-    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[1000] text-center shadow-2xl" 
-         x-show="showDeleteConfirmModal" 
-         x-transition>
-        <div class="w-20 h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-            <i class="fa-solid fa-box-archive"></i>
-        </div>
-        <h3 class="text-xl font-black text-[#2E3B66] mb-2 uppercase tracking-tight">Hapus Kategori?</h3>
-        <p class="text-gray-500 text-xs mb-8">Kategori <span class="font-bold text-[#4A72D4]" x-text="actionName"></span> akan dipindahkan ke folder History.</p>
-        <div class="flex gap-3">
-            <button @click="showDeleteConfirmModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400 text-[10px] uppercase">Batal</button>
-            <button @click="confirmDeleteToHistory()" class="flex-1 py-3 rounded-xl font-bold bg-amber-500 text-white shadow-lg shadow-amber-100 text-[10px] uppercase">Ya, Arsipkan</button>
-        </div>
-    </div>
-</div>
+            customClass: {
+                popup: 'rounded-3xl shadow-xl',
+                title: 'text-lg font-bold',
+                confirmButton: 'rounded-xl px-6 py-2'
+            },
 
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        })
+    "
+></div>
+@endif
+
+@if(session('error'))
+<div 
+    x-data
+    x-init="
+        Swal.fire({
+            icon: 'error',
+            title: '{{ session('error') }}',
+
+            width: '340px',
+            padding: '1.8rem',
+
+            background: '#ffffff',
+            color: '#334155',
+
+            confirmButtonText: 'Coba Lagi',
+            confirmButtonColor: '#ef4444',
+
+            customClass: {
+                popup: 'rounded-3xl shadow-xl',
+                title: 'text-lg font-bold',
+                confirmButton: 'rounded-xl px-6 py-2'
+            },
+
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        })
+    "
+></div>
+@endif
 </body>
 </html>

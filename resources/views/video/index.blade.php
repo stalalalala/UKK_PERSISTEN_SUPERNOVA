@@ -28,12 +28,13 @@
                 <li><a href="{{ route('streak.index') }}" class="hover:text-blue-500">Pet Streak</a></li>
                 <li><a href="{{ route('tryout.index') }}" class=" hover:text-blue-500">Try Out</a></li>
                 <li><a href="{{ route('latihan.index') }}" class="hover:text-blue-500">Latihan Soal</a></li>
-                <li><a href="{{ route('video.index') }}" class="font-bold hover:text-blue-500">Video Pembelajaran</a></li>
+                <li><a href="{{ route('video.index') }}" class="font-bold hover:text-blue-500">Video Pembelajaran</a>
+                </li>
             </ul>
 
             <div class="flex items-center gap-2">
                 <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full">
-                    <a href="/profile/index"
+                    <a href="{{ route('profile.index') }}"
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#3171CD] flex items-center justify-center text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" class="size-5 md:size-6">
@@ -43,8 +44,8 @@
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="inline" id="logout-form">
                         @csrf
-                        <button type="submit" 
-                                class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
+                        <button type="submit"
+                            class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#4B8A81] flex items-center justify-center text-white hover:bg-red-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -106,49 +107,48 @@
         </div>
     </div>
 
-   <main class="max-w-[1440px] mx-auto py-10" x-data="{
+    <main class="max-w-[1440px] mx-auto py-10" x-data="{
         selectedSub: 'Penalaran Umum',
         currentPage: 1,
         perPage: 4, // Lo bisa atur mau berapa video per halaman di sini
-        
+    
         // Fungsi untuk ngitung total halaman berdasarkan subtes yang dipilih
         getTotalPages() {
             let count = 0;
-            @foreach($videos as $video)
-                if('{{ $video->subtes }}' === this.selectedSub) count++;
-            @endforeach
+            @foreach ($videos as $video)
+                if('{{ $video->subtes }}' === this.selectedSub) count++; @endforeach
             return Math.ceil(count / this.perPage) || 1;
         },
-
+    
         // Fungsi untuk nentuin video mana yang muncul (Logic Pagination)
         shouldShow(subtes, index) {
             if (this.selectedSub !== subtes) return false;
-            
+    
             // Itung index relatif video di dalam subtes yang sama
             let relativeIndex = 0;
             let found = false;
-            @foreach($videos as $i => $v)
+            @foreach ($videos as $i => $v)
                 if('{{ $v->subtes }}' === this.selectedSub) {
                     if({{ $i }} === index) {
                         found = true;
                     } else if (!found) {
                         relativeIndex++;
                     }
-                }
-            @endforeach
-            
+                } @endforeach
+    
             let start = (this.currentPage - 1) * this.perPage;
             let end = start + this.perPage;
             return relativeIndex >= start && relativeIndex < end;
         }
     }">
 
-    <section class="px-4 md:px-10 mb-10">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-[#2E3B66]">Subtes Video Pembelajaran</h1>
-        <p class="text-gray-500 mt-2">Tentukan materi yang ingin kamu pelajari dan mulai tonton videonya sekarang!</p>
-    </section>
+        <section class="px-4 md:px-10 mb-10">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-[#2E3B66]">Subtes Video Pembelajaran</h1>
+            <p class="text-gray-500 mt-2">Tentukan materi yang ingin kamu pelajari dan mulai tonton videonya sekarang!
+            </p>
+        </section>
 
-   <section class="px-4 md:px-10 mb-12">
+        <section class="px-4 md:px-10 mb-12">
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-5">
 
                 <div @click="selectedSub = 'Penalaran Umum'; currentPage = 1"
@@ -164,7 +164,8 @@
 
                 <div @click="selectedSub = 'Pemahaman Bacaan dan Menulis'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#9885FB]"
-                    :class="selectedSub === 'Pemahaman Bacaan dan Menulis' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Pemahaman Bacaan dan Menulis' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -175,7 +176,8 @@
 
                 <div @click="selectedSub = 'Pengetahuan dan Pemahaman Umum'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#FF908E]"
-                    :class="selectedSub === 'Pengetahuan dan Pemahaman Umum' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Pengetahuan dan Pemahaman Umum' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -186,7 +188,8 @@
 
                 <div @click="selectedSub = 'Pengetahuan Kuantitatif'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#4CAA60]"
-                    :class="selectedSub === 'Pengetahuan Kuantitatif' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Pengetahuan Kuantitatif' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -197,7 +200,8 @@
 
                 <div @click="selectedSub = 'Penalaran Matematika'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#CEA4EC]"
-                    :class="selectedSub === 'Penalaran Matematika' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Penalaran Matematika' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -208,7 +212,8 @@
 
                 <div @click="selectedSub = 'Literasi dalam Bahasa Indonesia'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#A5BBEC]"
-                    :class="selectedSub === 'Literasi dalam Bahasa Indonesia' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Literasi dalam Bahasa Indonesia' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -219,7 +224,8 @@
 
                 <div @click="selectedSub = 'Literasi dalam Bahasa Inggris'; currentPage = 1"
                     class="rounded-[35px] w-full h-full text-white shadow-lg transition-all duration-300 cursor-pointer text-center p-4 border-4 bg-[#4B8A81]"
-                    :class="selectedSub === 'Literasi dalam Bahasa Inggris' ? 'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
+                    :class="selectedSub === 'Literasi dalam Bahasa Inggris' ?
+                        'border-blue-400 scale-105 ring-4 ring-blue-100 opacity-100' :
                         'border-transparent opacity-80 hover:opacity-100 hover:-translate-y-2'">
                     <div
                         class="w-14 h-14 md:w-16 md:h-16 bg-white/30 rounded-full mx-auto flex items-center justify-center font-bold text-xl mb-3">
@@ -231,107 +237,103 @@
             </div>
         </section>
 
-    <div class="px-4 md:px-10"><hr class="mb-12 border-gray-300"></div>
-
-    <section class="px-4 md:px-10">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            @foreach($videos as $index => $video)
-              <div 
-            x-data="{ ditonton: {{ $video->ditonton ? 'true' : 'false' }} }"
-            x-show="shouldShow('{{ $video->subtes }}', {{ $index }})"
-            x-transition
-            @click="ditonton = true; tontonVideo({{ $video->id }})"
-            class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group cursor-pointer">
-
-            <div class="flex-1 flex flex-col justify-between">
-
-            <div>
-            <h3 class="text-blue-600 font-bold text-xl mb-3">{{ $video->subtes }}</h3>
-
-            <div class="space-y-3">
-
-            <div class="flex items-center gap-3 text-blue-500 font-semibold">
-            <i class="fa-solid fa-book-open"></i>
-            <span>{{ $video->judul_video }}</span>
-            </div>
-
-            <div class="flex items-center gap-3 text-blue-500 font-semibold">
-            <span>Video Pembelajaran</span>
-            </div>
-
-            </div>
-            </div>
-
-            <div class="mt-6">
-
-            <span 
-            x-show="!ditonton"
-            class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
-            Belum Ditonton
-            </span>
-
-            <span 
-            x-show="ditonton"
-            class="bg-green-500 text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
-            Ditonton
-            </span>
-
-            </div>
-            </div>
-
-            <!-- VIDEO -->
-            <div 
-            @click="ditonton = true; tontonVideo({{ $video->id }})"
-            class="w-full sm:w-56 h-36 rounded-3xl overflow-hidden bg-gray-100 relative cursor-pointer">
-
-            <div class="absolute inset-0">
-            {!! preg_replace(['/width=".*?"/','/height=".*?"/'],['width="100%"','height="100%"'],$video->iframe) !!}
-            </div>
-
-            </div>
-
-            </div>
-            @endforeach
+        <div class="px-4 md:px-10">
+            <hr class="mb-12 border-gray-300">
         </div>
 
-        <div class="flex justify-center items-center gap-3 mt-16" x-show="getTotalPages() > 1">
-            <button @click="if(currentPage > 1) currentPage--"
-                class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
-                <i class="fa-solid fa-chevron-left text-xs"></i>
-            </button>
+        <section class="px-4 md:px-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                @foreach ($videos as $index => $video)
+                    <div x-data="{ ditonton: {{ $video->ditonton ? 'true' : 'false' }} }" x-show="shouldShow('{{ $video->subtes }}', {{ $index }})"
+                        x-transition @click="ditonton = true; tontonVideo({{ $video->id }})"
+                        class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group cursor-pointer">
 
-            <template x-for="p in getTotalPages()" :key="p">
-                <button @click="currentPage = p"
-                    :class="currentPage === p ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
-                    class="w-10 h-10 rounded-full font-bold" x-text="p"></button>
-            </template>
+                        <div class="flex-1 flex flex-col justify-between">
 
-            <button @click="if(currentPage < getTotalPages()) currentPage++"
-                class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
-                <i class="fa-solid fa-chevron-right text-xs"></i>
-            </button>
-        </div>
-    </section>
-</main>
+                            <div>
+                                <h3 class="text-blue-600 font-bold text-xl mb-3">{{ $video->subtes }}</h3>
+
+                                <div class="space-y-3">
+
+                                    <div class="flex items-center gap-3 text-blue-500 font-semibold">
+                                        <i class="fa-solid fa-book-open"></i>
+                                        <span>{{ $video->judul_video }}</span>
+                                    </div>
+
+                                    <div class="flex items-center gap-3 text-blue-500 font-semibold">
+                                        <span>Video Pembelajaran</span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="mt-6">
+
+                                <span x-show="!ditonton"
+                                    class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
+                                    Belum Ditonton
+                                </span>
+
+                                <span x-show="ditonton"
+                                    class="bg-green-500 text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
+                                    Ditonton
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <!-- VIDEO -->
+                        <div @click="ditonton = true; tontonVideo({{ $video->id }})"
+                            class="w-full sm:w-56 h-36 rounded-3xl overflow-hidden bg-gray-100 relative cursor-pointer">
+
+                            <div class="absolute inset-0">
+                                {!! preg_replace(['/width=".*?"/', '/height=".*?"/'], ['width="100%"', 'height="100%"'], $video->iframe) !!}
+                            </div>
+
+                        </div>
+
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="flex justify-center items-center gap-3 mt-16" x-show="getTotalPages() > 1">
+                <button @click="if(currentPage > 1) currentPage--"
+                    class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+
+                <template x-for="p in getTotalPages()" :key="p">
+                    <button @click="currentPage = p"
+                        :class="currentPage === p ? 'bg-blue-500 text-white shadow-lg' : 'text-blue-500 hover:bg-blue-50'"
+                        class="w-10 h-10 rounded-full font-bold" x-text="p"></button>
+                </template>
+
+                <button @click="if(currentPage < getTotalPages()) currentPage++"
+                    class="w-10 h-10 rounded-full border border-gray-200 text-gray-400 hover:bg-blue-500 hover:text-white">
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+        </section>
+    </main>
     @include('layouts.footer')
-<script>
-        function tontonVideo(id){
+    <script>
+        function tontonVideo(id) {
 
-        console.log("klik video", id)
+            console.log("klik video", id)
 
-        fetch(`/video/ditonton/${id}`,{
-        method:'POST',
-        headers:{
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        'Content-Type':'application/json'
+            fetch(`/video/ditonton/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => console.log(data))
+                .catch(err => console.log(err))
+
         }
-        })
-        .then(res => res.json())
-        .then(data => console.log(data))
-        .catch(err => console.log(err))
-
-        }
-</script>
+    </script>
 
 </body>
 

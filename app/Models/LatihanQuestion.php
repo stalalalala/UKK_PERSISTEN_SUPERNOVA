@@ -13,6 +13,7 @@ class LatihanQuestion extends Model
         'latihan_id',
         'materi',
         'pertanyaan',
+        'gambar',
         'opsi_a',
         'opsi_b',
         'opsi_c',

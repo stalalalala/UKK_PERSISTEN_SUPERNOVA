@@ -46,25 +46,33 @@ $trash = StreakCharacter::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
 public function store(Request $request)
 {
     $request->validate([
-        'nama' => 'required|string|max:100',
-        'min_level' => 'required|integer|min:1',
-        'svg' => 'nullable|file|mimes:svg,xml|max:2048',
-        // 'animation' => 'nullable|in:bounce,float,wiggle,spin,pulse'
-    ]);
+    'nama' => 'required|string|max:100',
+    'min_level' => 'required|integer|min:1',
+    'svg_static' => 'nullable|file|mimes:svg,xml|max:2048',
+    'svg_animated' => 'nullable|file|mimes:svg,xml|max:2048',
+]);
 
-    $svgPath = null;
-    if ($request->hasFile('svg')) {
-        $svgPath = $request->file('svg')->store('streak', 'public');
-    }
+    $svgStaticPath = null;
+$svgAnimatedPath = null;
+
+// TANPA ANIMASI
+if ($request->hasFile('svg_static')) {
+    $svgStaticPath = $request->file('svg_static')->store('streak', 'public');
+}
+
+// DENGAN ANIMASI
+if ($request->hasFile('svg_animated')) {
+    $svgAnimatedPath = $request->file('svg_animated')->store('streak-animasi', 'public');
+}
 
  
 
     StreakCharacter::create([
-        'nama' => $request->nama,
-        'svg_path' => $svgPath,
-        'min_level' => $request->min_level,
-        // 'animation' => $request->animation
-    ]);
+    'nama' => $request->nama,
+    'svg_path' => $svgStaticPath,
+    'svg_animated_path' => $svgAnimatedPath,
+    'min_level' => $request->min_level,
+]);
 
     return redirect()->route('admin.streak.index')->with('success', 'Berhasil disimpan!');
 }
@@ -96,23 +104,41 @@ public function update(Request $request, $id)
     $request->validate([
         'nama' => 'required|string|max:100',
         'min_level' => 'required|integer|min:1',
-        'svg' => 'nullable|file|mimes:svg,xml|max:2048',
+        'svg_static' => 'sometimes|file|mimes:svg,xml|max:2048',
+'svg_animated' => 'sometimes|file|mimes:svg,xml|max:2048',
     ]);
 
-    $svgPath = $character->svg_path;
+    // =====================
+    // SVG STATIC
+    // =====================
+    if ($request->hasFile('svg_static')) {
 
-    if ($request->hasFile('svg')) {
-        if ($character->svg_path && Storage::disk('public')->exists($character->svg_path)) {
+        if ($character->svg_path) {
             Storage::disk('public')->delete($character->svg_path);
         }
-        $svgPath = $request->file('svg')->store('streak', 'public');
+
+        $character->svg_path = $request->file('svg_static')->store('streak', 'public');
     }
 
-    $character->update([
-        'nama' => $request->nama,
-        'svg_path' => $svgPath,
-        'min_level' => $request->min_level,
-    ]);
+    // =====================
+    // SVG ANIMASI
+    // =====================
+    if ($request->hasFile('svg_animated')) {
+
+        if ($character->svg_animated_path) {
+            Storage::disk('public')->delete($character->svg_animated_path);
+        }
+
+        $character->svg_animated_path = $request->file('svg_animated')->store('streak-animasi', 'public');
+    }
+
+    // =====================
+    // UPDATE DATA
+    // =====================
+    $character->nama = $request->nama;
+    $character->min_level = $request->min_level;
+
+    $character->save(); // 🔥 penting
 
     return redirect()->route('admin.streak.index')
         ->with('success', 'Karakter streak berhasil diperbarui');

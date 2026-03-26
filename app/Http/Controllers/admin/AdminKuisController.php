@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Kuis;
 use Illuminate\Http\Request;
 use App\Models\SystemLog;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
 class AdminKuisController extends Controller
@@ -15,32 +16,22 @@ class AdminKuisController extends Controller
     // ============================
     public function index()
     {
-        $kuis = Kuis::withCount('questions')
-        ->orderBy('set_ke', 'desc')
-        ->get();
-
-        $trash = Kuis::onlyTrashed() 
-            ->withCount('questions')
-            ->latest()
-            ->get();
-
-
+        $kuis = Kuis::withCount('questions')->orderBy('set_ke', 'desc')->get();
+        $trash = Kuis::onlyTrashed()->withCount('questions')->latest()->get();
         $allKuis = Kuis::withCount('questions')->latest()->get();
-$historyData = Kuis::onlyTrashed()->withCount('questions')->latest()->get();
+        $historyData = Kuis::onlyTrashed()->withCount('questions')->latest()->get();
 
-return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData'));
-
+        return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData'));
     }
 
     private function logAktivitas($aksi, $judul, $deskripsi, $status = 'active')
     {
-        // Jika karena suatu alasan judul null, berikan nilai fallback agar database tidak error
         $fixJudul = $judul ?? 'Aktivitas Kuis';
 
         SystemLog::create([
             'id_pengguna' => Auth::id(),
             'category'    => $aksi,
-            'title'       => $fixJudul, 
+            'title'       => $fixJudul,
             'description' => $deskripsi,
             'status'      => $status,
         ]);
@@ -52,13 +43,13 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
     public function create()
     {
         $lastSet = Kuis::max('set_ke');
-    $nextSet = $lastSet ? $lastSet + 1 : 1;
+        $nextSet = $lastSet ? $lastSet + 1 : 1;
 
-    return view('admin.kuis.create', compact('nextSet'));
+        return view('admin.kuis.create', compact('nextSet'));
     }
 
     // ============================
-    // STORE QUIZ + 20 QUESTIONS
+    // STORE QUIZ + QUESTIONS
     // ============================
     public function store(Request $request)
     {
@@ -70,22 +61,15 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
             'questions_json' => 'required'
         ]);
 
-        // decode soal dari hidden input
         $questions = json_decode($request->questions_json, true);
 
         if (!$questions || count($questions) < 20) {
             return back()->with('error', 'Harus mengisi minimal 20 soal!');
         }
 
-        // ============================
-        // AUTO SET NUMBER
-        // ============================
         $lastSet = Kuis::max('set_ke'); 
-    $setKe = $lastSet ? $lastSet + 1 : 1;
+        $setKe = $lastSet ? $lastSet + 1 : 1;
 
-        // ============================
-        // CREATE QUIZ SET
-        // ============================
         $kuis = Kuis::create([
             'judul'     => "Kuis Fundamental Set $setKe",
             'kategori'  => $request->kategori,
@@ -95,31 +79,57 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
             'video_url' => $request->video_url,
             'is_active' => true,
         ]);
+
         $this->logAktivitas('TAMBAH KUIS', $kuis->judul, "Admin menambahkan kuis baru pada kategori");
 
-        // ============================
-        // SAVE QUESTIONS
-        // ============================
+        // ====== LOOP SOAL ======
         foreach ($questions as $q) {
-    $kuis->questions()->create([
-        'materi'     => $q['materi'] ?? null,
-        'pertanyaan' => $q['pertanyaan'],
-        'subtes'     => $q['subtes'] ?? null,
+            $gambarPath = null;
 
-        'opsi_a' => $q['opsi_a'],
-        'opsi_b' => $q['opsi_b'],
-        'opsi_c' => $q['opsi_c'],
-        'opsi_d' => $q['opsi_d'],
-        'opsi_e' => $q['opsi_e'],
+            // =========================
+            // PROSES GAMBAR BASE64
+            // =========================
+            if (!empty($q['gambar']) && str_starts_with($q['gambar'], 'data:image')) {
+                if (preg_match('/^data:image\/(\w+);base64,/', $q['gambar'], $type)) {
+                    $extension = strtolower($type[1]);
+                    if (!in_array($extension, ['png','jpg','jpeg','webp'])) $extension = 'png';
+                    $imageData = substr($q['gambar'], strpos($q['gambar'], ',') + 1);
+                    $imageData = base64_decode($imageData);
 
-        'jawaban_benar' => $q['jawaban_benar'],
-        'bobot' => $q['bobot'] ?? 1,
-    ]);
-}
+                    if ($imageData !== false) {
+                        $imageName = 'soal_' . uniqid() . '.' . $extension;
+                        Storage::disk('public')->put('kuis/' . $imageName, $imageData);
+                        $gambarPath = 'kuis/' . $imageName;
+                    }
+                }
+            }
+            // =========================
+            // PROSES GAMBAR URL
+            // =========================
+            elseif (!empty($q['gambar']) && filter_var($q['gambar'], FILTER_VALIDATE_URL)) {
+                $gambarPath = $q['gambar'];
+            }
 
+            // =========================
+            // SIMPAN SOAL
+            // =========================
+            $kuis->questions()->create([
+                'materi' => $q['materi'] ?? null,
+                'gambar' => $gambarPath,
+                'pertanyaan' => $q['pertanyaan'],
+                'subtes' => $q['subtes'] ?? null,
+                'opsi_a' => $q['opsi_a'],
+                'opsi_b' => $q['opsi_b'],
+                'opsi_c' => $q['opsi_c'],
+                'opsi_d' => $q['opsi_d'],
+                'opsi_e' => $q['opsi_e'],
+                'jawaban_benar' => $q['jawaban_benar'],
+                'bobot' => $q['bobot'] ?? 1,
+                'waktu' => $q['waktu'] ?? 30,
+            ]);
+        }
 
-        return redirect()
-            ->route('admin.kuis.index')
+        return redirect()->route('admin.kuis.index')
             ->with('success', 'Kuis Fundamental berhasil dipublish!');
     }
 
@@ -127,177 +137,169 @@ return view('admin.kuis.index', compact('kuis', 'trash', 'allKuis', 'historyData
     // EDIT FORM
     // ============================
     public function edit($id)
-{
-    $kuis = Kuis::with('questions')->findOrFail($id);
+    {
+        $kuis = Kuis::with('questions')->findOrFail($id);
 
-    $questions = $kuis->questions->map(function ($q) {
+        // Pastikan tiap soal punya object unik
+        $questions = $kuis->questions->map(function ($q) {
     return [
         'id' => $q->id,
-
         'materi' => $q->materi,
+        'gambar' => $q->gambar,
         'subtes' => $q->subtes,
+        'waktu' => $q->waktu,
         'pertanyaan' => $q->pertanyaan,
-
         'opsi_a' => $q->opsi_a,
         'opsi_b' => $q->opsi_b,
         'opsi_c' => $q->opsi_c,
         'opsi_d' => $q->opsi_d,
         'opsi_e' => $q->opsi_e,
-
         'jawaban_benar' => $q->jawaban_benar,
         'bobot' => $q->bobot,
-
         'status' => 'original'
     ];
 });
 
-
-    return view('admin.kuis.edit', compact('kuis', 'questions'));
-}
-
-
-
+        return view('admin.kuis.edit', compact('kuis', 'questions'));
+    }
 
     // ============================
-    // UPDATE QUIZ + QUESTIONS OPTIONAL
+    // UPDATE QUIZ + QUESTIONS
     // ============================
     public function update(Request $request, $id)
-{
-    $kuis = Kuis::findOrFail($id);
-
-    $kuis->update([
-    'durasi' => $request->durasi ?? $kuis->durasi,
-    'materi' => $request->materi ?? $kuis->materi,
-    'video_url' => $request->video_url ?? $kuis->video_url,
-]);
-    $this->logAktivitas('UPDATE KUIS', $kuis->judul, "Admin memperbarui data kuis");
-
-    if ($request->questions_json) {
-
-        $questions = json_decode($request->questions_json, true);
-
-        foreach ($questions as $q) {
-
-            $question = $kuis->questions()->where('id', $q['id'])->first();
-
-            if ($question) {
-                $question->update([
-    'materi'     => $q['materi'] ?? null,
-    'subtes'     => $q['subtes'] ?? null,
-    'pertanyaan' => $q['pertanyaan'],
-
-    'opsi_a' => $q['opsi_a'],
-    'opsi_b' => $q['opsi_b'],
-    'opsi_c' => $q['opsi_c'],
-    'opsi_d' => $q['opsi_d'],
-    'opsi_e' => $q['opsi_e'],
-
-    'jawaban_benar' => $q['jawaban_benar'],
-    'bobot' => $q['bobot'] ?? 1,
-]);
-
-            }
-        }
-    }
-
-    return redirect()
-        ->route('admin.kuis.index')
-        ->with('success', 'Kuis berhasil diperbarui!');
-}
-
-
-
-    // ============================
-    // DELETE (SOFT DELETE)
-    // ============================
-    public function destroy($id)
-{
-    $kuis = Kuis::findOrFail($id);
-    $deletedSetNumber = $kuis->set_ke;
-    $judulKuis = $kuis->judul;
-
-    // 1. Hapus kuis (Soft Delete)
-    $kuis->delete();
-
-    // 2. Geser nomor set yang lain ke bawah (decrement)
-    // Semua kuis yang set_ke-nya di atas nomor yang dihapus akan dikurangi 1
-    Kuis::where('set_ke', '>', $deletedSetNumber)
-        ->decrement('set_ke');
-    
-    SystemLog::where('title', $judulKuis)->update(['status' => 'deleted']);
-    
-    // 3. Update Judul agar sesuai dengan nomor set yang baru
-    // Karena judulmu mengandung kata "Set X", maka judulnya perlu di-refresh
-    $kuisToUpdate = Kuis::where('set_ke', '>=', $deletedSetNumber)->get();
-    foreach($kuisToUpdate as $k) {
-        $k->update([
-            'judul' => "Kuis Fundamental Set " . $k->set_ke
-        ]);
-    }
-
-    return back()->with('success', 'Kuis dihapus dan urutan set diperbarui!');
-}
-
-    // ============================
-    // RESTORE FROM TRASH
-    // ============================
-    public function restore($id)
-{
-    $kuis = Kuis::onlyTrashed()->findOrFail($id);
-    
-    // Cari angka set tertinggi saat ini di tabel aktif
-    $lastSet = Kuis::max('set_ke');
-    $newSet = $lastSet ? $lastSet + 1 : 1;
-
-    SystemLog::where('title', $kuis->judul)->update(['status' => 'active']);
-
-    // Pulihkan dengan nomor set baru di urutan paling akhir
-    $kuis->restore();
-    $kuis->update([
-        'set_ke' => $newSet,
-        'judul'  => "Kuis Fundamental Set $newSet"
-    ]);
-
-    return back()->with('success', 'Kuis dipulihkan sebagai Set terakhir!');
-}
-
-    // ============================
-    // TOGGLE ACTIVE / HIDDEN
-    // ============================
-    public function toggle($id)
     {
         $kuis = Kuis::findOrFail($id);
 
+        // Update data utama kuis
         $kuis->update([
-            'is_active' => !$kuis->is_active
+            'durasi' => $request->durasi ?? $kuis->durasi,
+            'materi' => $request->materi ?? $kuis->materi,
+            'video_url' => $request->video_url ?? $kuis->video_url,
         ]);
+
+        $this->logAktivitas('UPDATE KUIS', $kuis->judul, "Admin memperbarui data kuis");
+
+        if ($request->questions_json) {
+            $questions = json_decode($request->questions_json, true);
+
+            foreach ($questions as $q) {
+                // Ambil soal berdasarkan ID
+                $question = $kuis->questions()->where('id', $q['id'])->first();
+                if (!$question) continue;
+
+                $gambarPath = $question->gambar; // default
+
+                // =========================
+                // Jika ada base64 baru
+                // =========================
+                if (!empty($q['gambar']) && str_starts_with($q['gambar'], 'data:image')) {
+                    if (preg_match('/^data:image\/(\w+);base64,/', $q['gambar'], $type)) {
+                        $extension = strtolower($type[1]);
+                        if (!in_array($extension, ['png','jpg','jpeg','webp'])) $extension = 'png';
+                        $imageData = substr($q['gambar'], strpos($q['gambar'], ',') + 1);
+                        $imageData = base64_decode($imageData);
+
+                        if ($imageData !== false) {
+                            $imageName = 'soal_' . uniqid() . '.' . $extension;
+                            Storage::disk('public')->put('kuis/' . $imageName, $imageData);
+                            $gambarPath = 'kuis/' . $imageName;
+                        }
+                    }
+                }
+                // =========================
+                // Jika masih URL, simpan langsung
+                // =========================
+                elseif (!empty($q['gambar']) && filter_var($q['gambar'], FILTER_VALIDATE_URL)) {
+                    $gambarPath = $q['gambar'];
+                }
+
+                // =========================
+                // UPDATE SOAL
+                // =========================
+                $question->update([
+                    'materi' => $q['materi'] ?? null,
+                    'subtes' => $q['subtes'] ?? null,
+                    'pertanyaan' => $q['pertanyaan'],
+                    'gambar' => $gambarPath,
+                    'opsi_a' => $q['opsi_a'],
+                    'opsi_b' => $q['opsi_b'],
+                    'opsi_c' => $q['opsi_c'],
+                    'opsi_d' => $q['opsi_d'],
+                    'opsi_e' => $q['opsi_e'],
+                    'jawaban_benar' => $q['jawaban_benar'],
+                    'bobot' => $q['bobot'] ?? 1,
+                    'waktu' => $q['waktu'] ?? 30,
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.kuis.index')
+            ->with('success', 'Kuis dan foto soal berhasil diperbarui!');
+    }
+
+    // ============================
+    // DELETE / RESTORE / FORCE DELETE / TOGGLE
+    // ============================
+    public function destroy($id)
+    {
+        $kuis = Kuis::findOrFail($id);
+        $deletedSetNumber = $kuis->set_ke;
+        $judulKuis = $kuis->judul;
+
+        $kuis->delete();
+
+        Kuis::where('set_ke', '>', $deletedSetNumber)
+            ->decrement('set_ke');
+
+        SystemLog::where('title', $judulKuis)->update(['status' => 'deleted']);
+
+        $kuisToUpdate = Kuis::where('set_ke', '>=', $deletedSetNumber)->get();
+        foreach($kuisToUpdate as $k) {
+            $k->update(['judul' => "Kuis Fundamental Set " . $k->set_ke]);
+        }
+
+        return back()->with('success', 'Kuis dihapus dan urutan set diperbarui!');
+    }
+
+    public function restore($id)
+    {
+        $kuis = Kuis::onlyTrashed()->findOrFail($id);
+        $lastSet = Kuis::max('set_ke');
+        $newSet = $lastSet ? $lastSet + 1 : 1;
+
+        SystemLog::where('title', $kuis->judul)->update(['status' => 'active']);
+
+        $kuis->restore();
+        $kuis->update([
+            'set_ke' => $newSet,
+            'judul'  => "Kuis Fundamental Set $newSet"
+        ]);
+
+        return back()->with('success', 'Kuis dipulihkan sebagai Set terakhir!');
+    }
+
+    public function toggle($id)
+    {
+        $kuis = Kuis::findOrFail($id);
+        $kuis->update(['is_active' => !$kuis->is_active]);
 
         return back()->with('success', 'Status kuis berhasil diubah!');
     }
 
-    // ============================
-// SHOW / PREVIEW
-// ============================
-public function show($id)
-{
-    $kuis = Kuis::with('questions')->findOrFail($id);
+    public function show($id)
+    {
+        $kuis = Kuis::with('questions')->findOrFail($id);
+        return view('admin.kuis.show', compact('kuis'));
+    }
 
-    return view('admin.kuis.show', compact('kuis'));
-}
+    public function forceDelete($id)
+    {
+        $kuis = Kuis::onlyTrashed()->findOrFail($id);
+        $judulKuis = $kuis->judul;
 
-// ============================
-// FORCE DELETE (HAPUS PERMANEN)
-// ============================
-public function forceDelete($id)
-{
-    $kuis = Kuis::onlyTrashed()->findOrFail($id);
-    $judulKuis = $kuis->judul;
+        SystemLog::where('title', $judulKuis)->delete();
+        $kuis->forceDelete();
 
-    SystemLog::where('title', $judulKuis)->delete();
-
-    $kuis->forceDelete();
-
-    return back()->with('success', 'Kuis berhasil dihapus permanen!');
-}
-
+        return back()->with('success', 'Kuis berhasil dihapus permanen!');
+    }
 }

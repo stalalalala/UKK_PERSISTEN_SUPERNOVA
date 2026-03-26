@@ -11,6 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -53,7 +54,69 @@
                 pertanyaan: '',
                 opsi: ['', '', '', '', ''],
                 benar: null,
-                bobot: 1,
+            },
+
+            autoSaveSoal() {
+
+                let index = this.activeQuestion - 1;
+
+                // jangan simpan kalau kosong
+                if (this.currentQuestion.pertanyaan.trim() === '') return;
+
+                this.questions[index] = {
+
+                    subtes: this.selectedSubtes,
+                    waktu: this.selectedWaktu,
+
+                    materi: this.currentQuestion.materi,
+                    gambar: this.currentQuestion.gambar,
+
+                    pertanyaan: this.currentQuestion.pertanyaan,
+
+                    opsi_a: this.currentQuestion.opsi[0],
+                    opsi_b: this.currentQuestion.opsi[1],
+                    opsi_c: this.currentQuestion.opsi[2],
+                    opsi_d: this.currentQuestion.opsi[3],
+                    opsi_e: this.currentQuestion.opsi[4],
+
+                    jawaban_benar: this.currentQuestion.benar !== null ? ['a', 'b', 'c', 'd', 'e'][this
+                        .currentQuestion.benar
+                    ] : null,
+
+                };
+
+            },
+
+            uploadGambar(e) {
+
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (file.size > 1024 * 1024) {
+                    alert("Ukuran gambar maksimal 1MB");
+                    e.target.value = "";
+                    return;
+                }
+
+                const allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
+                if (!allowed.includes(file.type)) {
+                    alert("Format gambar harus PNG/JPG/WEBP");
+                    e.target.value = "";
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = (event) => {
+
+                    this.currentQuestion.gambar = event.target.result;
+
+                    console.log("BASE64 OK:", this.currentQuestion.gambar.substring(0, 50));
+
+                };
+
+                reader.readAsDataURL(file);
             },
 
             importExcel(event) {
@@ -76,27 +139,79 @@
                         return;
                     }
 
-                    // =========================================
-                    // ✅ 1. Ambil Subtes & Waktu dari BARIS PERTAMA SAJA
-                    // =========================================
-                    const globalSubtes = jsonData[0]["Kategori Subtes"] || "";
-                    const globalWaktu = jsonData[0]["Waktu"] || 20;
+                    // =========================
+                    // 🔥 VALIDASI GLOBAL
+                    // =========================
 
-                    // Set dropdown UI
+                    const allowedSubtes = [
+                        "Penalaran Umum",
+                        "Penalaran & Pemahaman Umum",
+                        "Pemahaman Bacaan & Menulis",
+                        "Pengetahuan Kuantitatif",
+                        "Penalaran Matematika",
+                        "Literasi Bahasa Indonesia",
+                        "Literasi Bahasa Inggris"
+                    ];
+
+                    const globalSubtes = (jsonData[0]["Kategori Subtes"] || "").trim();
+                    const globalWaktu = (jsonData[0]["Waktu"] || "").toString().trim();
+
+                    // ✅ Validasi Subtes
+                    if (!allowedSubtes.includes(globalSubtes)) {
+                        alert("Subtes tidak valid! Harus sesuai format lengkap.");
+                        return;
+                    }
+
+                    // ✅ Validasi Waktu (20–60 menit kelipatan 5)
+                    const allowedWaktu = [
+                        "20 Menit", "25 Menit", "30 Menit",
+                        "35 Menit", "40 Menit", "45 Menit",
+                        "50 Menit", "55 Menit", "60 Menit"
+                    ];
+
+                    if (!allowedWaktu.includes(globalWaktu)) {
+                        alert("Waktu harus 20 - 60 Menit (kelipatan 5)");
+                        return;
+                    }
+
+                    // 🔥 KONVERSI "45 Menit" → 45
+                    const waktuAngka = parseInt(globalWaktu.replace(" Menit", ""));
+
+                    // =========================
+                    // 🔥 VALIDASI PER BARIS
+                    // =========================
+                    for (let i = 0; i < jsonData.length; i++) {
+                        let row = jsonData[i];
+
+                        let jawaban = (row["Jawaban Benar"] || "").toString().trim();
+
+                        if (!['a', 'b', 'c', 'd', 'e'].includes(jawaban)) {
+                            alert(`Error di baris ${i + 2}: Jawaban harus huruf kecil (a/b/c/d/e)`);
+                            return;
+                        }
+
+                        if (jawaban !== jawaban.toLowerCase()) {
+                            alert(`Error di baris ${i + 2}: Jangan pakai huruf besar!`);
+                            return;
+                        }
+                    }
+
+                    // =========================
+                    // ✅ MAPPING DATA
+                    // =========================
+
                     this.selectedSubtes = globalSubtes;
-                    this.selectedWaktu = globalWaktu;
+                    this.selectedWaktu = waktuAngka;
 
-                    // =========================================
-                    // ✅ 2. Mapping soal TANPA ambil subtes per baris
-                    // =========================================
                     this.questions = jsonData.slice(0, 20).map((row) => ({
-
-                        // ❌ Jangan lagi ambil dari row
                         subtes: globalSubtes,
-                        waktu: globalWaktu,
+                        waktu: waktuAngka,
 
                         materi: row["Materi"] || "",
                         pertanyaan: row["Pertanyaan"] || "",
+
+                        gambar: (row["URL Gambar"] || "").startsWith("http") ?
+                            row["URL Gambar"] : null,
 
                         opsi_a: row["Opsi A"] || "",
                         opsi_b: row["Opsi B"] || "",
@@ -104,31 +219,23 @@
                         opsi_d: row["Opsi D"] || "",
                         opsi_e: row["Opsi E"] || "",
 
-                        jawaban_benar: (row["Jawaban Benar"] || "")
-                            .toString()
-                            .trim()
-                            .toLowerCase(),
-
-                        bobot: row["Bobot"] || 1,
+                        jawaban_benar: (row["Jawaban Benar"] || "").toLowerCase().trim(),
                     }));
 
-                    // =========================================
-                    // ✅ 3. Reset state
-                    // =========================================
                     this.soalTersimpan = this.questions.length;
                     this.activeQuestion = 1;
                     this.loadQuestion();
 
                     this.showImportModal = false;
 
-                    alert("Berhasil import soal dari Excel!");
+                    alert("Import berhasil & valid!");
                 };
 
                 reader.readAsArrayBuffer(file);
             },
 
-
-            downloadTemplate() {
+            unduhTemplate() {
+                const wb = XLSX.utils.book_new();
 
                 const data = [
                     [
@@ -136,41 +243,82 @@
                         "Waktu",
                         "Materi",
                         "Pertanyaan",
+                        "URL Gambar",
                         "Opsi A",
                         "Opsi B",
                         "Opsi C",
                         "Opsi D",
                         "Opsi E",
-                        "Jawaban Benar",
-                        "Bobot"
+                        "Jawaban Benar"
                     ],
-
                     [
                         "Penalaran Umum",
-                        20,
-                        "Teks bacaan atau materi soal",
+                        "20 Menit",
+                        "Teks bacaan...",
                         "Apa ibukota Indonesia?",
+                        "https://contoh.com/gambar.jpg",
                         "Jakarta",
                         "Bandung",
                         "Surabaya",
                         "Medan",
                         "Bali",
-                        "a",
-                        1
+                        "a"
                     ]
                 ];
 
                 const ws = XLSX.utils.aoa_to_sheet(data);
-                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Template");
 
-                XLSX.utils.book_append_sheet(wb, ws, "Template Soal");
-
-                XLSX.writeFile(wb, "Template_Persisten_20_Soal.xlsx");
+                XLSX.writeFile(wb, "TEMPLATE_SOAL_KUIS.xlsx");
             },
+
+
+            // downloadTemplate() {
+
+            //     const data = [
+            //         [
+            //             "Kategori Subtes",
+            //             "Waktu",
+            //             "Materi",
+            //             "Pertanyaan",
+            //             "URL Gambar",
+            //             "Opsi A",
+            //             "Opsi B",
+            //             "Opsi C",
+            //             "Opsi D",
+            //             "Opsi E",
+            //             "Jawaban Benar",
+            //         ],
+
+            //         [
+            //             "Penalaran Umum",
+            //             20,
+            //             "Teks bacaan atau materi soal",
+            //             "Apa ibukota Indonesia?",
+            //             "https://i.imgur.com/contoh.jpg",
+            //             "Jakarta",
+            //             "Bandung",
+            //             "Surabaya",
+            //             "Medan",
+            //             "Bali",
+            //             "a",
+            //             1
+            //         ]
+            //     ];
+
+            //     const ws = XLSX.utils.aoa_to_sheet(data);
+            //     const wb = XLSX.utils.book_new();
+
+            //     XLSX.utils.book_append_sheet(wb, ws, "Template Soal");
+
+            //     XLSX.writeFile(wb, "Template_Persisten_20_Soal.xlsx");
+            // },
 
 
 
             simpanSoal() {
+
+                this.autoSaveSoal();
 
                 // ==========================
                 // VALIDASI
@@ -190,6 +338,8 @@
                     return;
                 }
 
+
+
                 // ==========================
                 // SIMPAN BERDASARKAN NOMOR
                 // ==========================
@@ -197,6 +347,7 @@
 
                 this.questions[index] = {
                     subtes: this.selectedSubtes,
+                    waktu: this.selectedWaktu,
 
                     materi: this.currentQuestion.materi,
                     gambar: this.currentQuestion.gambar,
@@ -210,7 +361,6 @@
                     opsi_e: this.currentQuestion.opsi[4],
 
                     jawaban_benar: ['a', 'b', 'c', 'd', 'e'][this.currentQuestion.benar],
-                    bobot: this.currentQuestion.bobot,
                 };
 
 
@@ -238,7 +388,10 @@
 
 
             loadQuestion() {
+
                 let index = this.activeQuestion - 1;
+
+
 
                 if (this.questions[index]) {
                     let q = this.questions[index];
@@ -252,19 +405,20 @@
                         pertanyaan: q.pertanyaan,
                         opsi: [q.opsi_a, q.opsi_b, q.opsi_c, q.opsi_d, q.opsi_e],
                         benar: ['a', 'b', 'c', 'd', 'e'].indexOf(q.jawaban_benar),
-                        bobot: q.bobot,
                     };
+
                 } else {
-                    // ✅ RESET kalau belum ada soal
+
                     this.currentQuestion = {
                         materi: '',
                         gambar: null,
                         pertanyaan: '',
                         opsi: ['', '', '', '', ''],
                         benar: null,
-                        bobot: 1,
                     };
+
                 }
+
             },
 
 
@@ -273,27 +427,94 @@
 
                 let totalTerisi = this.questions.filter(q => q).length;
 
-                if (totalTerisi < 2) {
+                if (totalTerisi < 20) {
                     alert("Wajib isi 20 soal sebelum publish!");
                     return;
                 }
 
-                // Masukkan JSON ke hidden input
+                console.log("DATA SOAL FULL:", this.questions);
+                console.log("GAMBAR SOAL 1:", this.questions[0].gambar);
+
                 document.getElementById("questions_json").value =
                     JSON.stringify(this.questions);
 
-                // Submit form
                 document.getElementById("kuisForm").submit();
             }
         }
+    }
+
+    function PageGuard() {
+
+        return {
+
+            allowLeave: false,
+
+            init() {
+
+                history.pushState({
+                    page: 1
+                }, "", location.href);
+                history.pushState({
+                    page: 2
+                }, "", location.href);
+
+                window.addEventListener("popstate", () => {
+
+                    if (!this.allowLeave) {
+                        this.confirmLeave();
+                        history.pushState({
+                            page: 2
+                        }, "", location.href);
+                    }
+
+                });
+
+                window.addEventListener("beforeunload", (e) => {
+
+                    if (!this.allowLeave) {
+                        e.preventDefault();
+                        e.returnValue = "";
+                    }
+
+                });
+
+            },
+
+            confirmLeave() {
+
+                Swal.fire({
+                    title: "Kembali ke halaman daftar?",
+                    text: "Data kuis yang belum dipublikasikan akan hilang.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#4A72D4",
+                    cancelButtonColor: "#9CA3AF",
+                    confirmButtonText: "Ya, kembali",
+                    cancelButtonText: "Tetap di sini",
+                    scrollbarPadding: false
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        this.allowLeave = true;
+                        window.location.href = "{{ route('admin.kuis.index') }}";
+
+                    }
+
+                });
+
+            }
+
+        }
+
     }
 </script>
 
 
 
-<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="kuisForm()">
+<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="{ ...PageGuard(), ...kuisForm() }" x-init="init()">
 
-    <div class="flex h-full w-full">
+    <div class="flex h-screen w-full relative">
         <aside x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
             class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
@@ -462,8 +683,7 @@
                         </svg>
                     </button>
 
-                  <div 
-                    x-data="{
+                    <div x-data="{
                         keyword: '',
                         routes: {
                             'dashboard': '{{ route('admin.dashboard.index') }}',
@@ -477,48 +697,37 @@
                             'kuis': '{{ route('admin.kuis.index') }}',
                             'latihan': '{{ route('admin.latihan.index') }}'
                         },
-                        goToPage(){
+                        goToPage() {
                             let search = this.keyword.toLowerCase()
-
+                    
                             for (let key in this.routes) {
                                 if (key.includes(search)) {
                                     window.location.href = this.routes[key]
                                     return
                                 }
                             }
-
+                    
                             alert('Halaman tidak ditemukan')
                         }
-                    }"
-                    class="relative w-full group flex items-center gap-2"
-                    >
+                    }" class="relative w-full group flex items-center gap-2">
 
                         <div class="relative w-full">
-                            
+
                             <!-- ICON -->
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" 
-                                    class="w-5 h-5 text-gray-500" 
-                                    fill="none"
-                                    viewBox="0 0 24 24" 
-                                    stroke="currentColor" 
-                                    stroke-width="2">
-                                    <path stroke-linecap="round" 
-                                        stroke-linejoin="round"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                                 </svg>
                             </div>
 
-                            <input 
-                                type="text"
-                                x-model="keyword"
-                                placeholder="Cari halaman..."
+                            <input type="text" x-model="keyword" placeholder="Cari halaman..."
                                 @keydown.enter="goToPage()"
                                 class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
                         </div>
 
-                        <button 
-                            @click="goToPage()"
+                        <button @click="goToPage()"
                             class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                             Cari
                         </button>
@@ -527,21 +736,22 @@
                 </div>
 
                 @php
-                use Illuminate\Support\Facades\Auth;
-                $user = Auth::user();
-            @endphp
-                    <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
-    
-                    <div @click="open = !open" 
+                    use Illuminate\Support\Facades\Auth;
+                    $user = Auth::user();
+                @endphp
+                <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
+
+                    <div @click="open = !open"
                         class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
                                 ml-auto md:ml-0 cursor-pointer">
-                        
+
                         <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" alt="Admin">
+                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
+                                alt="Admin">
                         </div>
-                        
+
                         <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-                        
+
                         <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                     </div>
 
@@ -577,7 +787,14 @@
                         class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95">
                         <i class="fa-solid fa-file-excel text-lg"></i> Import via Excel
                     </button>
+
+                    <a href="{{ route('admin.kuis.index') }}" @click.prevent="confirmLeave()"
+                        class="px-5 py-2.5 rounded-xl border items-center justify-center  border-gray-200 text-gray-600 bg-white font-bold text-sm hover:bg-gray-50 transition-all">
+                        Batal
+                    </a>
                 </div>
+
+
             </div>
 
             <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar pb-4 lg:pb-8">
@@ -597,8 +814,8 @@
                                     </div>
                                 </div>
 
-                                <form id="kuisForm" action="{{ route('admin.kuis.store') }}" method="POST"
-                                    class="space-y-8">
+                                <form id="kuisForm" action="{{ route('admin.kuis.store') }}"
+                                    @submit="allowLeave = true" method="POST" class="space-y-8">
 
 
                                     @csrf
@@ -686,7 +903,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="space-y-6" x-data="{ imageUrl: null }">
+                                    <div class="space-y-6">
 
                                         <div class="space-y-2">
                                             <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Materi
@@ -721,24 +938,24 @@
                                                         <span
                                                             class="text-[10px] font-bold text-blue-600 uppercase">Tambah
                                                             Foto</span>
-                                                        <input type="file" class="hidden" accept="image/*"
-                                                            @change="
-                                                            const file = $event.target.files[0];
-                                                            if(file){
-                                                                currentQuestion.gambar = file.name;
-                                                                imageUrl = URL.createObjectURL(file);
-                                                            }
-                                                        ">
-
+                                                        <input type="file" x-ref="imageInput" class="hidden"
+                                                            accept="image/png,image/jpeg,image/jpg,image/webp"
+                                                            @change="uploadGambar($event)">
                                                     </label>
                                                 </div>
                                             </div>
 
-                                            <template x-if="imageUrl">
+                                            @if (session('error'))
+                                                <div class="bg-red-500 text-white p-3 rounded mb-3">
+                                                    {{ session('error') }}
+                                                </div>
+                                            @endif
+
+                                            <template x-if="currentQuestion.gambar !== null">
                                                 <div class="relative mt-3 inline-block">
-                                                    <img :src="imageUrl"
+                                                    <img :src="currentQuestion.gambar" referrerpolicy="no-referrer"
                                                         class="max-h-48 rounded-2xl border-2 border-white shadow-sm ring-1 ring-gray-100">
-                                                    <button @click="imageUrl = null"
+                                                    <button @click="currentQuestion.gambar = null"
                                                         class="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:scale-110 transition-all shadow-md">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3"
                                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -811,8 +1028,7 @@
                                                         gambar: null,
                                                         pertanyaan: '',
                                                         opsi: ['', '', '', '', ''],
-                                                        benar: null,
-                                                        bobot: 1
+                                                        benar: null
                                                     }"
                                                 class="px-4 py-2 text-sm font-bold text-gray-400 hover:text-red-400">
                                                 Reset
@@ -837,7 +1053,12 @@
 
                                 <div class="grid grid-cols-5 gap-3">
                                     <template x-for="n in 20">
-                                        <button @click="activeQuestion = n; loadQuestion()"
+                                        <button
+                                            @click="
+autoSaveSoal();
+activeQuestion = n;
+loadQuestion();
+window.scrollTo({top:0,behavior:'smooth'})"
                                             :class="{
                                                 'bg-blue-500 text-white': activeQuestion === n,
                                                 'bg-emerald-500 text-white': questions[n - 1]?.pertanyaan,
@@ -862,7 +1083,7 @@
                                 </div>
 
                                 <button type="button" @click="submitFinal()"
-                                    :disabled="questions.filter(q => q).length < 2"
+                                    :disabled="questions.filter(q => q?.pertanyaan).length < 20"
                                     class="w-full mt-6 bg-emerald-500 text-white py-3 rounded-xl font-bold disabled:opacity-40 disabled:cursor-not-allowed">
                                     Publikasikan Kuis
                                 </button>
@@ -877,7 +1098,7 @@
         </main>
     </div>
 
-    <div x-show="showImportModal" class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
+    <div x-show="showImportModal" x-cloak class="fixed inset-0 z-[100] overflow-y-auto">
 
         <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="showImportModal = false">
         </div>
@@ -890,7 +1111,7 @@
 
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
-                        <i class="fa-solid fa-file-import text-emerald-500"></i> Import Data Kuis
+                        <i class="fa-solid fa-video text-emerald-500"></i> Import Soal dari Excel
                     </h3>
                     <button @click="showImportModal = false"
                         class="text-gray-400 hover:text-red-500 transition-colors">
@@ -899,41 +1120,42 @@
                 </div>
 
                 <div
-                    class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-200 transition-all bg-gray-50/50">
+                    class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-300 transition-all bg-gray-50/50">
                     <div
                         class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
                     </div>
-                    <p class="text-sm font-bold text-gray-600">Klik atau seret file Excel ke sini</p>
-                    <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 5MB (.xlsx, .xls)</p>
-                    <input type="file" class="hidden" id="excel_upload" @change="importExcel($event)"
-                        accept=".xlsx, .xls">
-                    <button onclick="document.getElementById('excel_upload').click()"
+                    <p class="text-sm font-bold text-gray-600">Klik di sini</p>
+                    <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 100MB (.xlsx, .xls)</p>
+
+                    <input type="file" class="hidden" x-ref="videoExcelInput" @change="importExcel($event)"
+                        accept=".xlsx,.xls">
+                    <button @click="$refs.videoExcelInput.click()"
                         class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">
                         Pilih File
                     </button>
                 </div>
 
-                <div class="mt-8 p-4 bg-blue-50 rounded-2xl flex items-center justify-between">
+                <div class="mt-8 p-4 bg-emerald-50 rounded-2xl flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-circle-info text-blue-500"></i>
-                        <span class="text-[11px] font-bold text-blue-700 uppercase tracking-tight">Belum punya
+                        <i class="fa-solid fa-circle-info text-emerald-500"></i>
+                        <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-tight">Belum punya
                             formatnya?</span>
                     </div>
-                    <a href="https://docs.google.com/spreadsheets/d/1NteyIa-UdkroBZKt5IQzPyYD5TYDJVrFYABlRhJ-dnA/copy"
-                        target="_blank" @click="downloadTemplate()"
-                        class="text-[11px] font-black text-[#4A72D4] hover:underline">
-                        DOWNLOAD TEMPLATE
-                    </a>
+                    <button @click="unduhTemplate()"
+                        class="text-[11px] font-black text-emerald-600 hover:underline cursor-pointer uppercase">
+                        Unduh Template Excel
+                    </button>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mt-8">
                     <button @click="showImportModal = false"
-                        class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">Batalkan</button>
-                    <button
-                        class="py-4 bg-[#4A72D4] text-white rounded-2xl text-sm font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all">Proses
-                        Import</button>
+                        class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                        Batalkan
+                    </button>
+
                 </div>
+
             </div>
         </div>
     </div>
