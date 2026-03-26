@@ -67,7 +67,7 @@
                                 <h3 class="text-2xl md:text-2xl font-black text-[#2E3B66] leading-tight mb-2">
                                     {{ $tryout->nama_tryout }}
                                 </h3>
-                                <p class="text-xs text-gray-400 font-medium">Pastikan Anda siap sebelum memulai sesi latihan ini.</p>
+                                <p class="text-xs text-gray-400 font-medium">Pastikan kamu siap sebelum memulai sesi ini.</p>
                             </div>
 
                             <div class="space-y-4">

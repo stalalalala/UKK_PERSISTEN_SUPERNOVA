@@ -237,7 +237,6 @@
                 let search = this.keyword.toLowerCase().trim();
                 if (search === '') return;
 
-                // Cari kunci yang mengandung kata kunci pencarian
                 for (let key in this.routes) {
                     if (key.includes(search)) {
                         window.location.href = this.routes[key];
@@ -245,7 +244,6 @@
                     }
                 }
 
-                // Jika tidak ketemu di navigasi, arahkan ke pencarian global di controller (opsional)
                 window.location.href = '{{ route('beranda') }}?search=' + this.keyword;
             }
         }"
@@ -287,10 +285,9 @@
                     ];
                 @endphp
 
-                <a href="{{ route('latihan.index') }}">
-                    <div
-                        class="grid justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-5">
-                        @foreach ($subs as $s)
+                <div class="grid justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-5">
+                    @foreach ($subs as $s)
+                        <a href="{{ route('latihan.index') }}" class="w-full">
                             <div
                                 class="{{ $s[1] }} rounded-[30px] w-full h-full text-white shadow-lg hover:shadow-2xl hover:-translate-y-3 transition duration-300 cursor-pointer text-center">
                                 <div class="px-2 py-3">
@@ -302,9 +299,9 @@
                                     <p class="font-medium text-md">Latihan!</p>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                </a>
+                        </a>
+                    @endforeach
+                </div>
             </section>
         </div>
     </div>
@@ -323,16 +320,12 @@
                     <h1 class="text-3xl md:text-5xl font-extrabold text-[#2E3B66]">Belajar dari Nol?</h1>
                     <p class="mt-3 text-base md:text-lg text-[#2E3B66]">
                         Kuasai fundamental dulu sebelum masuk <br> latihan tingkat lanjut.
-                        <br><span class="font-bold">Yuk latihan pemahaman dasarmu!</span>
+                        <br><span class="font-bold">Yuk kerjakan kuis pemahaman!</span>
                     </p>
-                    @php
-                        // Cek apakah user sudah pernah mengerjakan tes
-                        $hasilTes = \App\Models\HasilMinatBakat::where('user_id', Auth::id())->exists();
-                    @endphp
 
-                    <a href="{{ route('minatbakat.intruksi') }}">
-                        <button class="mt-7 bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-100">
-                            {{ $hasilTes ? 'Lihat Hasil Tes' : 'Mulai Tes' }}
+                    <a href="{{ route('kuis.index') }}">
+                        <button class="mt-7 bg-[#4375D1] hover:bg-blue-700 text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-100">
+                            Mulai Kuis
                             <span class="bg-white/30 w-8 h-8 flex items-center justify-center rounded-full text-white">
                                 ➜
                             </span>
@@ -348,8 +341,7 @@
                     </p>
                 </div>
 
-                <div x-show="currentPage === 1" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-                    x-transition>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div
                         class="bg-blue-50 rounded-[2rem] p-6 flex flex-col items-center relative hover:shadow-lg transition-all border border-blue-100 group">
                         <div class="w-full flex justify-between items-start mb-2">
@@ -417,15 +409,12 @@
                     <div class="flex-1 flex flex-col items-center justify-center min-h-[200px]">
                         <img src="{{ asset('img/slime.png') }}" class="w-44 md:w-52 mb-4" alt="Slime">
                         <a href="{{ route('tryout.index') }}">
-
                             <button
                                 class="bg-blue-500 hover:bg-blue-600 text-white px-10 py-2.5 rounded-full font-bold shadow-md transition-all hover:scale-105">
                                 Lainnya
                             </button>
                         </a>
                     </div>
-
-
                 </div>
             </section>
         </div>
@@ -448,11 +437,13 @@
                     dan karir yang sesuai dengan minat dan bakatmu!
                 </p>
                 <div class="mt-28 md:mt-8">
-
+                    @php
+                        $hasilTes = \App\Models\HasilMinatBakat::where('user_id', Auth::id())->exists();
+                    @endphp
                     <a href="{{ route('minatbakat.intruksi') }}">
                         <button
                             class="bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-105">
-                            Mulai Tes
+                            {{ $hasilTes ? 'Lihat Hasil Tes' : 'Mulai Tes' }}
                             <div class="bg-white w-6 h-6 rounded-full flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FCAE4B"
                                     class="w-4 h-4">
@@ -469,7 +460,6 @@
     </div>
 
     @include('layouts.footer')
-
 
 </body>
 

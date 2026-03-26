@@ -1,18 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PERSISTEN - {{ $tryout->nama_tryout }} - {{ $currentCategory->nama_kategori }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <title>PERSISTEN - Pengerjaan {{ $tryout->nama_tryout }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        [x-cloak] {
-            display: none !important;
     @vite('resources/css/app.css')
     <style>
         [x-cloak] { display: none !important; }
@@ -115,60 +110,17 @@
             localStorage.removeItem('last_soal_{{ $tryout->id }}_{{ $currentCategory->id }}');
             localStorage.removeItem('timer_{{ $tryout->id }}_{{ $currentCategory->id }}');
         }
+    }" x-init="init()" x-cloak class="max-w-[1440px] mx-auto">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .custom-scroll::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .custom-scroll::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-
-        /* Mencegah scroll bodi utama di laptop agar layout tetap fit di layar */
-        @media (min-width: 1024px) {
-            .desktop-fixed {
-                height: 100vh;
-                overflow: hidden;
-            }
-        }
-    </style>
-</head>
-
-<body class="p-4 md:p-6 pt-0 desktop-fixed">
-
-    <div x-data="kuisApp()" @keydown.window.enter="nextSoal()" x-init="startTimer()" x-cloak
-        class="h-full flex flex-col max-w-[1440px] mx-auto">
-
-        <div class="flex flex-row items-center justify-between mb-4 shrink-0">
-            <h1 class="text-lg md:text-xl font-bold text-[#2E3B66]">
-                {{ $tryout->nama_tryout }}
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 px-2">
+            <h1 class="text-2xl md:text-4xl font-black text-[#2E3B66] tracking-tight">
+                {{ $tryout->nama_tryout }} - {{ $currentCategory->nama_kategori }}
             </h1>
-            </h1>
-            <div class="flex items-center gap-2 md:gap-4">
-                <div
-                    class="flex items-center gap-2 bg-blue-50 border-2 border-[#4FAAFD] px-2 h-8  rounded-full shadow-sm transition-all">
-                    <svg class="w-5 h-5 text-[#4FAAFD]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <p class="text-base md:text-lg font-medium text-[#4FAAFD] leading-none"
-                        x-text="formatTime(timeLeft)">
-                    </p>
+            <div class="flex items-center justify-between md:justify-end gap-3 sm:gap-4">
+                <div class="bg-white border-2 border-[#4FAAFD] px-4 py-2 md:px-6 md:py-3 rounded-3xl">
+                    <p class="text-[18px] font-bold text-[#4FAAFD] font-mono leading-none" x-text="timerText"></p>
                 </div>
-
-                <button @click="confirmExit()"
-                    class="bg-red-500 hover:bg-red-600 text-white  border-2 border-red-600 px-3 h-8 rounded-full font-medium text-xs md:text-sm shadow-xl transition-all active:scale-95 flex items-center justify-center">
-                    KELUAR
-                </button>
+                <button @click="showExitModal = true" class="bg-[#3B82F6] px-6 py-3 rounded-3xl text-white font-bold text-sm">Keluar Ujian</button>
             </div>
         </div>
 
@@ -198,111 +150,79 @@
                     <div class="mb-10 text-gray-800 text-base sm:text-lg md:text-xl font-medium leading-relaxed">
                         {!! $soal->pertanyaan !!}
                     </div>
-                    <div class="w-full h-2.5 bg-gray-100 rounded-full mb-6">
-                        <div class="h-full bg-blue-400 rounded-full transition-all duration-500"
-                            :style="'width:' + (Object.keys(jawabanTerpilih).length / questions.length * 100) + '%'">
-                        </div>
-                    </div>
+                </div>
+                @endforeach
+
+                <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-4 max-w-md">
+                    @foreach($soals as $index => $soal)
+                        <button @click="soalAktif = {{ $index + 1 }}"
+                            class="relative aspect-square flex items-center justify-center rounded-xl font-bold text-lg border-2 transition-all"
+                            :class="soalAktif === {{ $index + 1 }} ? 'bg-[#4FAAFD] border-[#4FAAFD] text-white' : (jawabanTerpilih['{{ $soal->id }}'] ? 'border-[#4FAAFD] text-[#4FAAFD] bg-blue-50' : 'border-[#4FAAFD] text-[#4FAAFD] bg-white')">
+                            <span>{{ $index + 1 }}</span>
+                            <template x-if="jawabanTerpilih['{{ $soal->id }}']">
+                                <div class="absolute -top-2 -right-2 w-6 h-6 bg-white text-[#4FAAFD] text-xs rounded-full flex items-center justify-center border-2 border-[#4FAAFD] font-bold z-10">
+                                    <span x-text="jawabanTerpilih['{{ $soal->id }}']"></span>
+                                </div>
+                            </template>
+                        </button>
+                    @endforeach
                 </div>
 
-                <div class="flex-grow overflow-y-auto custom-scroll px-4 md:px-6">
-                    <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-6">
-                        <div class="text-[#2E3B66] text-lg leading-relaxed whitespace-pre-line"
-                            x-text="questions[soalAktifIdx].materi_teks || 'Baca teks berikut untuk menjawab pertanyaan.'">
+                <div class="flex items-center gap-3 mt-10 md:mt-14">
+                    <button @click="if(soalAktif > 1) soalAktif--" 
+                        :disabled="soalAktif === 1" 
+                        class="flex-1 py-3 border-2 rounded-3xl font-semibold transition-all"
+                        :class="soalAktif > 1 ? 'border-[#3B82F6] text-[#3B82F6] bg-blue-50' : 'border-gray-200 text-gray-400 opacity-50'">
+                        Kembali
+                    </button>
+                    
+                    <button @click="if(soalAktif < totalSoal) { 
+                                soalAktif++ 
+                            } else { 
+                                if(adaSoalKosong()) {
+                                    showConfirmNextModal = true;
+                                } else {
+                                    pindahHalaman();
+                                }
+                            }" 
+                        class="flex-[1] py-3 bg-[#3B82F6] text-white font-semibold rounded-3xl hover:bg-blue-600 transition">
+                        <span x-text="soalAktif === totalSoal ? 'Selesai Subtes' : 'Selanjutnya'"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-[380px] xl:w-[450px] p-5 sm:p-10 lg:p-14 bg-slate-50/50">
+                <h3 class="text-[18px] font-bold text-[#2E3B66] mb-6">Pilih Jawaban:</h3>
+                @foreach($soals as $index => $soal)
+                <div x-show="soalAktif === {{ $index + 1 }}" class="space-y-4">
+                    @foreach(['a', 'b', 'c', 'd', 'e'] as $opt)
+                    @php $kolom = 'opsi_' . $opt; @endphp
+                    <div @click="jawabanTerpilih['{{ $soal->id }}'] = '{{ strtoupper($opt) }}'"
+                        :class="jawabanTerpilih['{{ $soal->id }}'] === '{{ strtoupper($opt) }}' ? 'border-[#3378FF] ring-1 ring-[#3378FF]' : 'border-transparent'"
+                        class="group flex items-center p-4 rounded-2xl border-2 bg-[#E1F0FF] cursor-pointer shadow-sm hover:bg-[#D4E9FF] transition-all">
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold mr-4 shrink-0"
+                            :class="jawabanTerpilih['{{ $soal->id }}'] === '{{ strtoupper($opt) }}' ? 'bg-[#3378FF] text-white' : 'bg-white text-[#3378FF]'">
+                            {{ strtoupper($opt) }}
                         </div>
+                        <span class="text-sm md:text-base font-medium text-[#2E3B66]">{{ $soal->$kolom }}</span>
                     </div>
+                    @endforeach
+                </div>
+                @endforeach
+            </div>
+        </div>
 
-                    <div class="px-4 mb-10">
-                        <div class="text-[#2E3B66] text-lg font-medium leading-relaxed"
-                            x-text="questions[soalAktifIdx].pertanyaan">
-                        </div>
-                    </div>
-
-                    <div class="hidden lg:block mb-10 pt-6 border-t border-gray-100">
-                        <h4 class="text-xs font-semibold text-gray-400 uppercase mb-4">Navigasi Soal:</h4>
-                        <div class="grid grid-cols-10 gap-2">
-                            <template x-for="(q, index) in questions" :key="q.id">
-                                <button @click="soalAktifIdx = index"
-                                    class="relative aspect-square flex items-center justify-center rounded-lg font-bold text-xs transition-all border-2"
-                                    :class="soalAktifIdx === index ? 'bg-[#4FAAFD] border-[#4FAAFD] text-white shadow-md' :
-                                        (jawabanTerpilih[q.id] ? 'border-[#4FAAFD] text-[#4FAAFD] bg-blue-50' :
-                                            'border-gray-100 text-gray-300 bg-white hover:bg-gray-50')">
-
-                                    <span x-text="index + 1"></span>
-
-                                    <template x-if="jawabanTerpilih[q.id]">
-                                        <div class="absolute -top-2 -right-2 w-5 h-5 bg-white text-blue-400 text-[10px] flex items-center justify-center rounded-full border-2 border-blue-400 shadow-sm uppercase"
-                                            x-text="jawabanTerpilih[q.id]">
-                                        </div>
-                                    </template>
-                                </button>
-                            </template>
-                        </div>
-                    </div>
         <div x-show="showExitModal" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-transition x-cloak>
             <div class="fixed inset-0 bg-black/50" @click="showExitModal = false"></div>
             <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-10 text-center shadow-2xl">
                 <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
                     <i class="fa-solid fa-circle-exclamation"></i>
                 </div>
-
-                <div class="p-4 bg-white border-t border-gray-50 shrink-0">
-                    <div class="flex items-center gap-4">
-                        <button @click="prevSoal()" :disabled="soalAktifIdx === 0"
-                            class="flex-1 py-3 md:py-4 border-2 border-gray-200 rounded-2xl font-bold text-gray-400 hover:bg-gray-50 disabled:opacity-30 transition-all">
-                            Kembali
-                        </button>
-                        <button @click="nextSoal()"
-                            class="flex-1 py-3 md:py-4 bg-[#4FAAFD] text-white rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all active:scale-95">
-                            <span x-text="soalAktifIdx === questions.length - 1 ? 'Selesai' : 'Selanjutnya'"></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="w-full lg:w-[40%] bg-white p-4 flex flex-col ">
-                <h3 class="text-sm font-bold text-blue-500 uppercase tracking-widest mb-3">Pilih Jawaban</h3>
-                <p class="text-xs font-medium text-gray-400">Pilih satu jawaban yang paling tepat.</p>
-                <div class="space-y-4 overflow-y-auto custom-scroll">
-                    <template x-for="opt in ['a', 'b', 'c', 'd', 'e']" :key="opt">
-                        <div @click="pilihJawaban(questions[soalAktifIdx].id, opt)"
-                            class="group flex items-center p-5 rounded-xl border-2 cursor-pointer transition-all duration-200"
-                            :class="jawabanTerpilih[questions[soalAktifIdx].id] === opt ?
-                                'bg-[#D6E9FF] border-blue-400 shadow-sm' :
-                                'bg-[#F8FBFF] border-transparent hover:border-blue-100'">
-
-                            <div class="w-10 h-10  rounded-full flex items-center justify-center font-black mr-4 shrink-0 shadow-sm transition-all"
-                                :class="jawabanTerpilih[questions[soalAktifIdx].id] === opt ? 'bg-blue-500 text-white' :
-                                    'bg-white text-blue-500'">
-                                <span class="uppercase" x-text="opt"></span>
-                            </div>
-
-                            <span class="text-lg md:text-base text-[#2E3B66] leading-snug"
-                                x-text="questions[soalAktifIdx]['opsi_' + opt]"></span>
-                        </div>
-                    </template>
-                </div>
-
-                <div class="lg:hidden mt-10 pt-6 border-t border-gray-100">
-                    <h4 class="text-xs font-semibold text-gray-400 uppercase mb-4">Navigasi Soal:</h4>
-                    <div class="grid grid-cols-5 sm:grid-cols-8 gap-2">
-                        <template x-for="(q, index) in questions" :key="q.id">
-                            <button @click="soalAktifIdx = index"
-                                class="relative aspect-square flex items-center justify-center rounded-lg font-bold text-xs border-2"
-                                :class="soalAktifIdx === index ? 'bg-[#4FAAFD] border-[#4FAAFD] text-white' :
-                                    (jawabanTerpilih[q.id] ? 'border-[#4FAAFD] text-[#4FAAFD] bg-blue-50' :
-                                        'border-gray-100 text-gray-300 bg-white')">
-
-                                <span x-text="index + 1"></span>
-
-                                <template x-if="jawabanTerpilih[q.id]">
-                                    <div class="absolute -top-2 -right-2 w-5 h-5 bg-white text-blue-400 text-[10px] flex items-center justify-center rounded-full border-2 border-blue-400 shadow-sm uppercase"
-                                        x-text="jawabanTerpilih[q.id]">
-                                    </div>
-                                </template>
-                            </button>
-                        </template>
-                    </div>
+                <h3 class="text-xl font-black text-[#2E3B66] mb-2">Keluar Ujian?</h3>
+                <p class="text-gray-500 text-sm mb-8">Data pengerjaan subtes ini akan terhapus. Yakin ingin keluar?</p>
+                <div class="flex gap-4">
+                    <button @click="showExitModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500">Batal</button>
+                    <a href="{{ route('tryout.index') }}" @click="clearData()" class="flex-1 py-3 rounded-xl font-bold bg-red-500 text-white text-center">Ya, Keluar</a>
                 </div>
             </div>
         </div>
@@ -322,122 +242,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function kuisApp() {
-            // Nama unik untuk storage berdasarkan ID kuis agar tidak bentrok antar set kuis
-            const storageTimerKey = 'timer_tryout_{{ $tryout->id }}_{{ $currentCategory->id }}';
-            const storageJawabanKey = 'jawaban_tryout_{{ $tryout->id }}_{{ $currentCategory->id }}';
-
-            return {
-                soalAktifIdx: 0,
-                questions: @json($soals),
-
-                // Ambil jawaban dari localStorage jika ada, kalau tidak ada set object kosong
-                jawabanTerpilih: JSON.parse(localStorage.getItem(storageJawabanKey)) || {},
-
-                // Ambil timer dari localStorage, jika tidak ada pakai durasi asli
-                timeLeft: localStorage.getItem(storageTimerKey) ?
-                    parseInt(localStorage.getItem(storageTimerKey)) : {{ $currentCategory->durasi * 60 }},
-
-                startTimer() {
-
-                    // ambil waktu dari localStorage jika ada
-                    let savedTime = localStorage.getItem(storageTimerKey);
-
-                    if (savedTime !== null) {
-                        this.timeLeft = parseInt(savedTime);
-                    }
-
-                    let timer = setInterval(() => {
-
-                        if (this.timeLeft > 0) {
-                            this.timeLeft--;
-
-                            // simpan setiap detik
-                            localStorage.setItem(storageTimerKey, this.timeLeft);
-
-                        } else {
-
-                            clearInterval(timer);
-
-                            // hapus timer setelah selesai
-                            localStorage.removeItem(storageTimerKey);
-
-                            this.submitTryout();
-                        }
-
-                    }, 1000);
-                },
-
-                formatTime(seconds) {
-                    let min = Math.floor(seconds / 60);
-                    let sec = seconds % 60;
-                    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-                },
-
-                pilihJawaban(soalId, opsi) {
-                    this.jawabanTerpilih[soalId] = opsi;
-
-                    localStorage.setItem(storageJawabanKey, JSON.stringify(this.jawabanTerpilih));
-                },
-
-                nextSoal() {
-                    if (this.soalAktifIdx < this.questions.length - 1) {
-                        this.soalAktifIdx++;
-                        if (window.innerWidth < 1024) window.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
-                    } else {
-                        if (confirm('Selesaikan subtes ini?')) {
-                            this.submitTryout();
-                        }
-                    }
-                },
-
-                prevSoal() {
-                    if (this.soalAktifIdx > 0) this.soalAktifIdx--;
-                },
-
-                submitTryout() {
-
-                    fetch('{{ route('tryout.simpan', $tryout->id) }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({
-                                jawaban: this.jawabanTerpilih
-                            })
-                        })
-                        .then(() => {
-
-                            localStorage.removeItem(storageTimerKey);
-                            localStorage.removeItem(storageJawabanKey);
-
-                            @if ($nextCategory)
-                                window.location.href = '{{ route('tryout.jeda', [$tryout->id, $nextCategory->id]) }}';
-                            @else
-                                window.location.href = '{{ route('tryout.hasil', $tryout->id) }}';
-                            @endif
-
-                        });
-                },
-
-                confirmExit() {
-                    if (confirm('Progres akan hilang. Yakin ingin keluar?')) {
-                        // Hapus storage jika user sengaja keluar/batal
-                        localStorage.removeItem(storageTimerKey);
-                        localStorage.removeItem(storageJawabanKey);
-
-                        window.location.href = "{{ route('tryout.index') }}";
-                    }
-                }
-            }
-        }
-    </script>
 </body>
-
 </html>
