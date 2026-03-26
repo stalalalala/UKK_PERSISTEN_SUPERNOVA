@@ -95,7 +95,8 @@
         localStorage.removeItem('minat_bakat_jawaban');
         localStorage.removeItem('minat_bakat_step');
     }
-}" x-init="init()" x-cloak>
+}"
+    x-init="init()" x-cloak>
 
     <form action="{{ route('minatbakat.store') }}" method="POST" x-ref="minatBakatForm"
         class="w-full max-w-6xl mx-auto flex justify-center">
@@ -111,7 +112,8 @@
             <div class="p-5 md:p-10 flex flex-row justify-between items-center gap-2">
                 <h1 class="text-base md:text-2xl font-bold text-slate-800">Tes Minat & Bakat</h1>
                 <div class="flex items-center gap-2">
-                    <div class="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full text-[10px] md:text-sm font-semibold text-slate-500 shadow-sm whitespace-nowrap">
+                    <div
+                        class="bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full text-[10px] md:text-sm font-semibold text-slate-500 shadow-sm whitespace-nowrap">
                         <span x-text="step"></span> / {{ $soals->count() }}
                     </div>
                     <button type="button" @click="showExitModal = true"
@@ -135,7 +137,8 @@
                 @foreach ($soals as $index => $s)
                     <div x-show="step === {{ $index + 1 }}" x-cloak data-step="{{ $index + 1 }}"
                         data-soal-id="{{ $s->id }}">
-                        <p class="text-center text-slate-700 text-sm md:text-xl leading-relaxed font-medium mb-8 md:mb-16">
+                        <p
+                            class="text-center text-slate-700 text-sm md:text-xl leading-relaxed font-medium mb-8 md:mb-16">
                             {{ $s->text }}
                         </p>
                     </div>
@@ -147,59 +150,73 @@
                         <div class="flex flex-col items-center">
                             <button type="button" @click="selected = 5"
                                 class="w-full h-24 md:h-48 bg-blue-500 clip-slant rounded-md md:rounded-2xl flex items-end justify-center pb-3 md:pb-6 px-0.5 transition-all outline-none"
-                              :class="selected === 5 ? 'ring-2 md:ring-4 ring-blue-200 shadow-lg scale-105' : 'opacity-60 hover:opacity-100'">
-                                <span class="text-white btn-text font-bold uppercase text-center">Sangat<br>Setuju</span>
+                                :class="selected === 5 ? 'ring-2 md:ring-4 ring-blue-200 shadow-lg scale-105' :
+                                    'opacity-60 hover:opacity-100'">
+                                <span
+                                    class="text-white btn-text font-bold uppercase text-center">Sangat<br>Setuju</span>
                             </button>
                             <div class="py-2 md:py-4">
-                                <i class="fa-regular fa-face-laugh-beam text-lg md:text-4xl transition-all" :class="selected === 5 ? 'text-blue-500 scale-110' : 'text-blue-300 opacity-40'"></i>
+                                <i class="fa-regular fa-face-laugh-beam text-lg md:text-4xl transition-all"
+                                    :class="selected === 5 ? 'text-blue-500 scale-110' : 'text-blue-300 opacity-40'"></i>
                             </div>
                         </div>
 
                         <div class="flex flex-col items-center">
                             <button type="button" @click="selected = 4"
                                 class="w-full h-20 md:h-40 bg-blue-300 clip-slant rounded-md md:rounded-2xl flex items-end justify-center pb-3 md:pb-6 px-0.5 transition-all outline-none"
-                                :class="selected === 4 ? 'ring-2 md:ring-4 ring-blue-100 shadow-lg scale-105' : 'opacity-60 hover:opacity-100'">
+                                :class="selected === 4 ? 'ring-2 md:ring-4 ring-blue-100 shadow-lg scale-105' :
+                                    'opacity-60 hover:opacity-100'">
                                 <span class="text-white btn-text font-bold uppercase text-center">Setuju</span>
                             </button>
                             <div class="py-2 md:py-4">
-                                <i class="fa-regular fa-face-smile text-lg md:text-4xl transition-all" :class="selected === 4 ? 'text-blue-400 scale-110' : 'text-blue-200 opacity-40'"></i>
+                                <i class="fa-regular fa-face-smile text-lg md:text-4xl transition-all"
+                                    :class="selected === 4 ? 'text-blue-400 scale-110' : 'text-blue-200 opacity-40'"></i>
                             </div>
                         </div>
 
                         <div class="flex flex-col items-center">
                             <button type="button" @click="selected = 3"
                                 class="w-full h-16 md:h-32 bg-slate-400 clip-slant rounded-md md:rounded-2xl flex items-end justify-center pb-3 md:pb-6 px-0.5 transition-all outline-none"
-                                :class="selected === 3 ? 'ring-2 md:ring-4 ring-slate-200 shadow-lg scale-105' : 'opacity-60 hover:opacity-100'">
+                                :class="selected === 3 ? 'ring-2 md:ring-4 ring-slate-200 shadow-lg scale-105' :
+                                    'opacity-60 hover:opacity-100'">
                                 <span class="text-white btn-text font-bold uppercase text-center">Netral</span>
                             </button>
                             <div class="py-2 md:py-4">
-                                <i class="fa-regular fa-face-meh text-lg md:text-4xl transition-all" :class="selected === 3 ? 'text-slate-500 scale-110' : 'text-slate-300 opacity-40'"></i>
+                                <i class="fa-regular fa-face-meh text-lg md:text-4xl transition-all"
+                                    :class="selected === 3 ? 'text-slate-500 scale-110' : 'text-slate-300 opacity-40'"></i>
                             </div>
                         </div>
 
                         <div class="flex flex-col items-center">
                             <button type="button" @click="selected = 2"
                                 class="w-full h-14 md:h-28 bg-red-300 clip-slant rounded-md md:rounded-2xl flex items-end justify-center pb-3 md:pb-6 px-0.5 transition-all outline-none"
-                                :class="selected === 2 ? 'ring-2 md:ring-4 ring-red-100 shadow-lg scale-105' : 'opacity-60 hover:opacity-100'">
+                                :class="selected === 2 ? 'ring-2 md:ring-4 ring-red-100 shadow-lg scale-105' :
+                                    'opacity-60 hover:opacity-100'">
                                 <span class="text-white btn-text font-bold uppercase text-center">Tidak<br>Setuju</span>
                             </button>
                             <div class="py-2 md:py-4">
-                                <i class="fa-regular fa-face-frown text-lg md:text-4xl transition-all" :class="selected === 2 ? 'text-red-400 scale-110' : 'text-red-200 opacity-40'"></i>
+                                <i class="fa-regular fa-face-frown text-lg md:text-4xl transition-all"
+                                    :class="selected === 2 ? 'text-red-400 scale-110' : 'text-red-200 opacity-40'"></i>
                             </div>
                         </div>
 
                         <div class="flex flex-col items-center">
                             <button type="button" @click="selected = 1"
                                 class="w-full h-12 md:h-20 bg-red-500 clip-slant rounded-md md:rounded-2xl flex items-end justify-center pb-3 md:pb-6 px-0.5 transition-all outline-none"
-                                :class="selected === 1 ? 'ring-2 md:ring-4 ring-red-200 shadow-lg scale-105' : 'opacity-60 hover:opacity-100'">
-                                <span class="text-white btn-text font-bold uppercase text-center leading-[0.85]">Sangat<br>Tidak</span>
+                                :class="selected === 1 ? 'ring-2 md:ring-4 ring-red-200 shadow-lg scale-105' :
+                                    'opacity-60 hover:opacity-100'">
+                                <span
+                                    class="text-white btn-text font-bold uppercase text-center leading-[0.85]">Sangat<br>Tidak</span>
                             </button>
                             <div class="py-2 md:py-4">
-                                <i class="fa-regular fa-face-angry text-lg md:text-4xl transition-all" :class="selected === 1 ? 'text-red-600 scale-110' : 'text-red-300 opacity-40'"></i>
+                                <i class="fa-regular fa-face-angry text-lg md:text-4xl transition-all"
+                                    :class="selected === 1 ? 'text-red-600 scale-110' : 'text-red-300 opacity-40'"></i>
                             </div>
                         </div>
                     </div>
-                    <div class="h-1.5 w-full rounded-full bg-gradient-to-r from-blue-400 via-slate-300 to-red-400 opacity-20 mt-[-2px]"></div>
+                    <div
+                        class="h-1.5 w-full rounded-full bg-gradient-to-r from-blue-400 via-slate-300 to-red-400 opacity-20 mt-[-2px]">
+                    </div>
                 </div>
             </div>
 
@@ -221,14 +238,17 @@
     <div x-show="showExitModal" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-transition x-cloak>
         <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showExitModal = false"></div>
         <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-10 text-center shadow-2xl">
-            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+            <div
+                class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <h3 class="text-xl font-bold text-slate-800 mb-2">Hentikan Tes?</h3>
             <p class="text-slate-500 text-sm mb-6">Progres pengerjaan soal saat ini akan hilang jika kamu keluar.</p>
             <div class="flex gap-3">
-                <button @click="showExitModal = false" class="flex-1 py-3 rounded-xl font-bold bg-slate-100 text-slate-500">Batal</button>
-                <a href="/" @click="clearData()" class="flex-1 py-3 rounded-xl font-bold bg-red-500 text-white text-center">Keluar</a>
+                <button @click="showExitModal = false"
+                    class="flex-1 py-3 rounded-xl font-bold bg-slate-100 text-slate-500">Batal</button>
+                <a href="/" @click="clearData()"
+                    class="flex-1 py-3 rounded-xl font-bold bg-red-500 text-white text-center">Keluar</a>
             </div>
         </div>
     </div>
