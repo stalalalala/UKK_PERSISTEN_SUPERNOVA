@@ -10,20 +10,24 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Membuat Akun Admin
-        User::create([
-            'name'      => 'Administrator',
-            'email'     => 'admin@gmail.com',
-            'password'  => Hash::make('pw123'),
-            'role'      => 'admin',
-        ]);
+        // 1. Membuat atau Update Akun Admin
+        User::updateOrCreate(
+            ['email' => 'admin@gmail.com'], // Kunci pencarian
+            [
+                'name'     => 'Administrator',
+                'password' => Hash::make('pw123'),
+                'role'     => 'admin',
+            ]
+        );
 
-        // 2. Membuat Akun Peserta
-        User::create([
-            'name'      => 'Peserta Supernova',
-            'email'     => 'peserta@gmail.com',
-            'password'  => Hash::make('pw123'),
-            'role'      => 'peserta',
-        ]);
+        // 2. Membuat atau Update Akun Peserta
+        User::updateOrCreate(
+            ['email' => 'peserta@gmail.com'], // Kunci pencarian
+            [
+                'name'     => 'Peserta Supernova',
+                'password' => Hash::make('pw123'),
+                'role'     => 'peserta',
+            ]
+        );
     }
 }
