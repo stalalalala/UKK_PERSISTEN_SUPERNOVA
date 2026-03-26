@@ -25,6 +25,7 @@ class BerandaController extends Controller
 
    $xpService = new XpService();
 
+
 // 🔥 SYNC STATUS DULU
 $xpService->checkStreakExpired($user);
 

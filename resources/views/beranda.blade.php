@@ -226,26 +226,31 @@
             </section>
 
             <section class="mt-6 flex justify-center px-4">
-    <div 
-        x-data="{
-            keyword: '',
-            routes: {
-                'tryout': '{{ route('tryout.index') }}',
-                'latihan': '{{ route('latihan.index') }}',
-                'kuis': '{{ route('kuis.index') }}',
-                'video': '{{ route('video.index') }}',
-                'streak': '{{ route('streak.index') }}',
-                'profil': '{{ route('profile.index') }}',
-                'minat bakat': '{{ route('minatbakat.soal') }}'
-            },
-            goToPage(){
-                let search = this.keyword.toLowerCase().trim();
-                if (search === '') return;
-
-                for (let key in this.routes) {
-                    if (key.includes(search)) {
-                        window.location.href = this.routes[key];
-                        return;
+                <div x-data="{
+                    keyword: '',
+                    routes: {
+                        'tryout': '{{ route('tryout.index') }}',
+                        'latihan': '{{ route('latihan.index') }}',
+                        'kuis': '{{ route('kuis.index') }}',
+                        'video': '{{ route('video.index') }}',
+                        'streak': '{{ route('streak.index') }}',
+                        'profil': '{{ route('profile.index') }}',
+                        'minat bakat': '{{ route('minatbakat.soal') }}'
+                    },
+                    goToPage() {
+                        let search = this.keyword.toLowerCase().trim();
+                        if (search === '') return;
+                
+                        // Cari kunci yang mengandung kata kunci pencarian
+                        for (let key in this.routes) {
+                            if (key.includes(search)) {
+                                window.location.href = this.routes[key];
+                                return;
+                            }
+                        }
+                
+                        // Jika tidak ketemu di navigasi, arahkan ke pencarian global di controller (opsional)
+                        window.location.href = '{{ route('beranda') }}?search=' + this.keyword;
                     }
                 }" class="flex flex-col md:flex-row items-center gap-4 w-full max-w-3xl">
                     <div class="relative w-full">
@@ -257,15 +262,6 @@
                             placeholder="Cari Halaman Try Out, Latihan Soal dll... "
                             class="w-full bg-white border border-gray-200 rounded-full py-4 pl-12 pr-4 shadow-md focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm">
                     </div>
-                window.location.href = '{{ route('beranda') }}?search=' + this.keyword;
-            }
-        }"
-        class="flex flex-col md:flex-row items-center gap-4 w-full max-w-3xl"
-    >
-        <div class="relative w-full">
-            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
-            </div>
 
                     <button @click="goToPage()"
                         class="w-full md:w-auto bg-blue-400 hover:bg-blue-500 text-white px-10 py-4 rounded-full font-semibold text-sm shadow-md transition-all active:scale-95 shrink-0">
@@ -326,7 +322,8 @@
                     </p>
 
                     <a href="{{ route('kuis.index') }}">
-                        <button class="mt-7 bg-[#4375D1] hover:bg-blue-700 text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-100">
+                        <button
+                            class="mt-7 bg-[#4375D1] hover:bg-blue-700 text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-100">
                             Mulai Kuis
                             <span class="bg-white/30 w-8 h-8 flex items-center justify-center rounded-full text-white">
                                 ➜
@@ -344,59 +341,56 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div
-                        class="bg-blue-50 rounded-[2rem] p-6 flex flex-col items-center relative hover:shadow-lg transition-all border border-blue-100 group">
-                        <div class="w-full flex justify-between items-start mb-2">
-                            <span class="text-blue-400 font-bold pt-1 text-lg uppercase tracking-tighter">Try
-                                Out</span>
-                            <span class="bg-blue-600 text-white text-lg px-4 py-1 rounded-full font-bold">UTBK</span>
-                        </div>
+                    @foreach ($tos as $to)
                         <div
-                            class="text-[100px] font-black text-blue-500 leading-none my-6 group-hover:scale-110 transition-transform">
-                            1</div>
-                        <div
-                            class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium text-blue-500 shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="2" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
+                            class="bg-blue-50 rounded-[2rem] p-6 flex flex-col items-center relative hover:shadow-lg transition-all border border-blue-100 group">
 
-                                {{-- Label TO --}}
-                                <div class="w-full flex justify-between items-start mb-2">
-                                    <span
-                                        class="{{ $to->is_open ? 'text-blue-400' : ($to->sudah_dikerjakan ? 'text-emerald-400' : 'text-gray-400') }} font-bold pt-1 text-lg uppercase tracking-tighter">Try
-                                        Out</span>
-                                    <span
-                                        class="{{ $to->is_open ? 'bg-blue-600' : ($to->sudah_dikerjakan ? 'bg-emerald-600' : 'bg-gray-400') }} text-white text-lg px-4 py-1 rounded-full font-bold">UTBK</span>
-                                </div>
+                            {{-- Header --}}
+                            <div class="w-full flex justify-between items-start mb-2">
+                                <span
+                                    class="{{ $to->is_open ? 'text-blue-400' : ($to->sudah_dikerjakan ? 'text-emerald-400' : 'text-gray-400') }} font-bold text-lg uppercase tracking-tighter">
+                                    Try Out
+                                </span>
+                                <span
+                                    class="{{ $to->is_open ? 'bg-blue-600' : ($to->sudah_dikerjakan ? 'bg-emerald-600' : 'bg-gray-400') }} text-white text-lg px-4 py-1 rounded-full font-bold">
+                                    UTBK
+                                </span>
+                            </div>
 
-                                {{-- Nomor TO --}}
+                            {{-- Nomor --}}
+                            <div
+                                class="{{ $to->is_open ? 'text-blue-500 group-hover:scale-110' : ($to->sudah_dikerjakan ? 'text-emerald-500' : 'text-gray-300') }} text-[100px] font-black leading-none mt-6 mb-1 transition-transform">
+                                {{ $loop->iteration }}
+                            </div>
+
+                            {{-- Nama --}}
+                            <div class="w-full mb-6 text-center">
                                 <div
-                                    class="{{ $to->is_open ? 'text-blue-500 group-hover:scale-110' : ($to->sudah_dikerjakan ? 'text-emerald-500' : 'text-gray-300') }} text-[100px] font-black leading-none mt-6 mb-1 transition-transform">
-                                    {{ $loop->iteration }}
-                                </div>
-
-                                {{-- Nama TO --}}
-                                <div class="w-full mb-6 text-center">
-                                    <div
-                                        class="{{ $to->is_open || $to->sudah_dikerjakan ? 'text-[#2E3B66]' : 'text-gray-400' }} text-sm font-black uppercase tracking-[0.15em] line-clamp-2 px-2">
-                                        {{ $to->nama_tryout }}
-                                    </div>
-                                </div>
-
-                                {{-- Status / tanggal --}}
-                                <div
-                                    class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium shadow-sm w-full justify-center mt-auto
-                                {{ $to->is_open ? 'text-blue-500' : ($to->sudah_dikerjakan ? 'text-emerald-500' : 'text-gray-400') }}">
-                                    <i
-                                        class="fa-solid {{ $to->is_open ? 'fa-clock' : ($to->sudah_dikerjakan ? 'fa-circle-check' : 'fa-lock') }} text-[10px]"></i>
-                                    <span class="text-[11px] font-bold">
-                                        {{ $to->sudah_dikerjakan ? 'Lihat Hasil' : ($to->is_open ? $to->tanggal->format('d M') . ' - ' . $to->tanggal_akhir->format('d M') : ($to->is_locked ? 'Pilih Jurusan' : 'Belum Tersedia')) }}
-                                    </span>
+                                    class="{{ $to->is_open || $to->sudah_dikerjakan ? 'text-[#2E3B66]' : 'text-gray-400' }} text-sm font-black uppercase tracking-[0.15em] line-clamp-2 px-2">
+                                    {{ $to->nama_tryout }}
                                 </div>
                             </div>
-                        </a>
+
+                            {{-- Status --}}
+                            <div
+                                class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium shadow-sm w-full justify-center mt-auto
+        {{ $to->is_open ? 'text-blue-500' : ($to->sudah_dikerjakan ? 'text-emerald-500' : 'text-gray-400') }}">
+
+                                <i
+                                    class="fa-solid {{ $to->is_open ? 'fa-clock' : ($to->sudah_dikerjakan ? 'fa-circle-check' : 'fa-lock') }} text-[10px]"></i>
+
+                                <span class="text-[11px] font-bold">
+                                    {{ $to->sudah_dikerjakan
+                                        ? 'Lihat Hasil'
+                                        : ($to->is_open
+                                            ? $to->tanggal->format('d M') . ' - ' . $to->tanggal_akhir->format('d M')
+                                            : ($to->is_locked
+                                                ? 'Pilih Jurusan'
+                                                : 'Belum Tersedia')) }}
+                                </span>
+                            </div>
+
+                        </div>
                     @endforeach
 
                     {{-- Tombol Lainnya --}}
