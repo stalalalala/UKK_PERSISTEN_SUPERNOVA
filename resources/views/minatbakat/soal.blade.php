@@ -147,7 +147,7 @@
                         <div class="flex flex-col items-center">
                             <button type="button" @click="selected = 5"
                                 class="w-full h-24 md:h-48 bg-blue-500 clip-slant rounded-md md:rounded-2xl flex items-end justify-center pb-3 md:pb-6 px-0.5 transition-all outline-none"
-                                :class="selected === 5 ? 'ring-2 md:ring-4 ring-blue-200 shadow-lg scale-105' : 'opacity-60 hover:opacity-100'">
+                              :class="selected === 5 ? 'ring-2 md:ring-4 ring-blue-200 shadow-lg scale-105' : 'opacity-60 hover:opacity-100'">
                                 <span class="text-white btn-text font-bold uppercase text-center">Sangat<br>Setuju</span>
                             </button>
                             <div class="py-2 md:py-4">
@@ -212,7 +212,7 @@
 
                 <button type="button" @click="nextStep()" :disabled="selected === null"
                     class="px-6 md:px-12 py-3 bg-blue-500 text-white rounded-xl md:rounded-2xl font-bold shadow-lg hover:bg-blue-600 disabled:bg-slate-300 disabled:shadow-none active:scale-95 transition-all text-xs md:text-base">
-                    <span x-text="step === totalSteps ? 'Lihat Hasil' : 'Lanjut'"></span>
+                    <span x-text="step === totalSteps ? 'Lihat Hasil' : 'Selanjutnya'"></span>
                 </button>
             </div>
         </div>

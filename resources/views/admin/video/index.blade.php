@@ -147,114 +147,100 @@ class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-
 </aside>
 
     <main class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
-          <header class="flex flex-col md:flex-row items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0">
-                <div class="flex items-center w-full gap-4">
-                    <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
-                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+          <header class="flex flex-col lg:flex-row lg:items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0 w-full">
+    <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
+        <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
 
-                  <div 
-                    x-data="{
-                        keyword: '',
-                        routes: {
-                            'dashboard': '{{ route('admin.dashboard.index') }}',
-                            'user': '{{ route('admin.user.index') }}',
-                            'streak': '{{ route('admin.streak.index') }}',
-                            'monitoring': '{{ route('admin.laporan.index') }}',
-                            'video': '{{ route('admin.videoPembelajaran.index') }}',
-                            'peluang': '{{ route('admin.peluang.index') }}',
-                            'tryout': '{{ route('admin.tryout.index') }}',
-                            'minat bakat': '{{ route('admin.minatBakat.index') }}',
-                            'kuis': '{{ route('admin.kuis.index') }}',
-                            'latihan': '{{ route('admin.latihan.index') }}'
-                        },
-                        goToPage(){
-                            let search = this.keyword.toLowerCase()
+        @php
+            use Illuminate\Support\Facades\Auth;
+            $user = Auth::user();
+        @endphp
 
-                            for (let key in this.routes) {
-                                if (key.includes(search)) {
-                                    window.location.href = this.routes[key]
-                                    return
-                                }
-                            }
-
-                            alert('Halaman tidak ditemukan')
-                        }
-                    }"
-                    class="relative w-full group flex items-center gap-2"
-                    >
-
-                        <div class="relative w-full">
-                            
-                            <!-- ICON -->
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" 
-                                    class="w-5 h-5 text-gray-500" 
-                                    fill="none"
-                                    viewBox="0 0 24 24" 
-                                    stroke="currentColor" 
-                                    stroke-width="2">
-                                    <path stroke-linecap="round" 
-                                        stroke-linejoin="round"
-                                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                                </svg>
-                            </div>
-
-                            <input 
-                                type="text"
-                                x-model="keyword"
-                                placeholder="Cari halaman..."
-                                @keydown.enter="goToPage()"
-                                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
-                        </div>
-
-                        <button 
-                            @click="goToPage()"
-                            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
-                            Cari
-                        </button>
-
+        <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
+            <div @click="open = !open" 
+                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
+                
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
+                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" 
+                             alt="Admin" class="w-full h-full object-cover">
                     </div>
+                    <span class="font-bold text-sm text-gray-700 truncate">Admin</span>
                 </div>
+                
+                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+            </div>
 
-                 @php
-                use Illuminate\Support\Facades\Auth;
-                $user = Auth::user();
-            @endphp
-                    <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
-    
-                    <div @click="open = !open" 
-                        class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
-                                ml-auto md:ml-0 cursor-pointer">
-                        
-                        <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" alt="Admin">
-                        </div>
-                        
-                        <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-                        
-                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-                    </div>
-
-                    <div x-show="open" @click.away="open = false"
-                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
-                        x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform scale-95"
-                        x-transition:enter-end="opacity-100 transform scale-100"
-                        x-transition:leave="transition ease-in duration-150"
-                        x-transition:leave-start="opacity-100 transform scale-100"
-                        x-transition:leave-end="opacity-0 transform scale-95">
-                        <div class="p-4">
-                            <p class="font-semibold text-gray-700">{{ $user->name }}</p>
-                            <p class="text-sm text-gray-500">{{ $user->email }}</p>
-                            <p class="text-sm text-gray-500">{{ $user->no_hp ?? '-' }}</p>
-                        </div>
-                    </div>
+            <div x-show="open" @click.away="open = false"
+                class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform scale-95"
+                x-transition:enter-end="opacity-100 transform scale-100">
+                <div class="p-4 bg-gray-50/50 border-b border-gray-100">
+                    <p class="font-bold text-gray-800">{{ $user->name }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
                 </div>
-            </header>
+                <div class="p-4 text-xs text-gray-500 bg-white">
+                    {{ $user->no_hp ?? '-' }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div x-data="{
+            keyword: '',
+            routes: {
+                'dashboard': '{{ route('admin.dashboard.index') }}',
+                'user': '{{ route('admin.user.index') }}',
+                'streak': '{{ route('admin.streak.index') }}',
+                'monitoring': '{{ route('admin.laporan.index') }}',
+                'video': '{{ route('admin.videoPembelajaran.index') }}',
+                'peluang': '{{ route('admin.peluang.index') }}',
+                'tryout': '{{ route('admin.tryout.index') }}',
+                'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                'kuis': '{{ route('admin.kuis.index') }}',
+                'latihan': '{{ route('admin.latihan.index') }}'
+            },
+            goToPage(){
+                let search = this.keyword.toLowerCase()
+                for (let key in this.routes) {
+                    if (key.includes(search)) {
+                        window.location.href = this.routes[key]
+                        return
+                    }
+                }
+                alert('Halaman tidak ditemukan')
+            }
+        }"
+        class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1"
+    >
+        <div class="relative w-full">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+            </div>
+            <input 
+                type="text" 
+                x-model="keyword" 
+                placeholder="Cari halaman..." 
+                @keydown.enter="goToPage()"
+                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm"
+            >
+        </div>
+
+        <button 
+            @click="goToPage()" 
+            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0"
+        >
+            Cari
+        </button>
+    </div>
+</header>
 
 
  <section class="flex-1 p-4 lg:p-6 xl:p-8 overflow-y-auto">

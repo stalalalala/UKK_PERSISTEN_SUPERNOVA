@@ -226,31 +226,26 @@
             </section>
 
             <section class="mt-6 flex justify-center px-4">
-                <div x-data="{
-                    keyword: '',
-                    routes: {
-                        'tryout': '{{ route('tryout.index') }}',
-                        'latihan': '{{ route('latihan.index') }}',
-                        'kuis': '{{ route('kuis.index') }}',
-                        'video': '{{ route('video.index') }}',
-                        'streak': '{{ route('streak.index') }}',
-                        'profil': '{{ route('profile.index') }}',
-                        'minat bakat': '{{ route('minatbakat.soal') }}'
-                    },
-                    goToPage() {
-                        let search = this.keyword.toLowerCase().trim();
-                        if (search === '') return;
-                
-                        // Cari kunci yang mengandung kata kunci pencarian
-                        for (let key in this.routes) {
-                            if (key.includes(search)) {
-                                window.location.href = this.routes[key];
-                                return;
-                            }
-                        }
-                
-                        // Jika tidak ketemu di navigasi, arahkan ke pencarian global di controller (opsional)
-                        window.location.href = '{{ route('beranda') }}?search=' + this.keyword;
+    <div 
+        x-data="{
+            keyword: '',
+            routes: {
+                'tryout': '{{ route('tryout.index') }}',
+                'latihan': '{{ route('latihan.index') }}',
+                'kuis': '{{ route('kuis.index') }}',
+                'video': '{{ route('video.index') }}',
+                'streak': '{{ route('streak.index') }}',
+                'profil': '{{ route('profile.index') }}',
+                'minat bakat': '{{ route('minatbakat.soal') }}'
+            },
+            goToPage(){
+                let search = this.keyword.toLowerCase().trim();
+                if (search === '') return;
+
+                for (let key in this.routes) {
+                    if (key.includes(search)) {
+                        window.location.href = this.routes[key];
+                        return;
                     }
                 }" class="flex flex-col md:flex-row items-center gap-4 w-full max-w-3xl">
                     <div class="relative w-full">
@@ -262,6 +257,15 @@
                             placeholder="Cari Halaman Try Out, Latihan Soal dll... "
                             class="w-full bg-white border border-gray-200 rounded-full py-4 pl-12 pr-4 shadow-md focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm">
                     </div>
+                window.location.href = '{{ route('beranda') }}?search=' + this.keyword;
+            }
+        }"
+        class="flex flex-col md:flex-row items-center gap-4 w-full max-w-3xl"
+    >
+        <div class="relative w-full">
+            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
+            </div>
 
                     <button @click="goToPage()"
                         class="w-full md:w-auto bg-blue-400 hover:bg-blue-500 text-white px-10 py-4 rounded-full font-semibold text-sm shadow-md transition-all active:scale-95 shrink-0">
@@ -283,10 +287,9 @@
                     ];
                 @endphp
 
-                <a href="{{ route('latihan.index') }}">
-                    <div
-                        class="grid justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-5">
-                        @foreach ($subs as $s)
+                <div class="grid justify-items-center grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-5">
+                    @foreach ($subs as $s)
+                        <a href="{{ route('latihan.index') }}" class="w-full">
                             <div
                                 class="{{ $s[1] }} rounded-[30px] w-full h-full text-white shadow-lg hover:shadow-2xl hover:-translate-y-3 transition duration-300 cursor-pointer text-center">
                                 <div class="px-2 py-3">
@@ -298,9 +301,9 @@
                                     <p class="font-medium text-md">Latihan!</p>
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                </a>
+                        </a>
+                    @endforeach
+                </div>
             </section>
         </div>
     </div>
@@ -319,17 +322,12 @@
                     <h1 class="text-3xl md:text-5xl font-extrabold text-[#2E3B66]">Belajar dari Nol?</h1>
                     <p class="mt-3 text-base md:text-lg text-[#2E3B66]">
                         Kuasai fundamental dulu sebelum masuk <br> latihan tingkat lanjut.
-                        <br><span class="font-bold">Yuk latihan pemahaman dasarmu!</span>
+                        <br><span class="font-bold">Yuk kerjakan kuis pemahaman!</span>
                     </p>
-                    @php
-                        // Cek apakah user sudah pernah mengerjakan tes
-                        $hasilTes = \App\Models\HasilMinatBakat::where('user_id', Auth::id())->exists();
-                    @endphp
 
                     <a href="{{ route('kuis.index') }}">
-                        <button
-                            class="mt-7 bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-100">
-                            {{ $hasilTes ? 'Lihat Hasil Tes' : 'Mulai Tes' }}
+                        <button class="mt-7 bg-[#4375D1] hover:bg-blue-700 text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-100">
+                            Mulai Kuis
                             <span class="bg-white/30 w-8 h-8 flex items-center justify-center rounded-full text-white">
                                 ➜
                             </span>
@@ -346,12 +344,23 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    @foreach ($latestTryouts as $to)
-                        <a href="{{ $to->sudah_dikerjakan ? route('tryout.hasil', $to->id) : ($to->is_open ? route('tryout.intruksi', $to->id) : '#') }}"
-                            @if (!$to->is_open && $to->is_locked) onclick="alert('Silakan pilih Universitas & Jurusan terlebih dahulu!')" @endif>
-                            <div
-                                class="rounded-[2rem] p-6 flex flex-col items-center relative transition-all group
-                            {{ $to->sudah_dikerjakan ? 'bg-emerald-50 border-emerald-100 hover:shadow-lg' : ($to->is_open ? 'bg-blue-50 border-blue-100 hover:shadow-lg' : 'bg-gray-100 opacity-60 border-gray-200 cursor-not-allowed grayscale') }}">
+                    <div
+                        class="bg-blue-50 rounded-[2rem] p-6 flex flex-col items-center relative hover:shadow-lg transition-all border border-blue-100 group">
+                        <div class="w-full flex justify-between items-start mb-2">
+                            <span class="text-blue-400 font-bold pt-1 text-lg uppercase tracking-tighter">Try
+                                Out</span>
+                            <span class="bg-blue-600 text-white text-lg px-4 py-1 rounded-full font-bold">UTBK</span>
+                        </div>
+                        <div
+                            class="text-[100px] font-black text-blue-500 leading-none my-6 group-hover:scale-110 transition-transform">
+                            1</div>
+                        <div
+                            class="bg-white px-4 py-1.5 rounded-full flex items-center gap-2 text-sm font-medium text-blue-500 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="2" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
 
                                 {{-- Label TO --}}
                                 <div class="w-full flex justify-between items-start mb-2">
@@ -422,11 +431,13 @@
                     dan karir yang sesuai dengan minat dan bakatmu!
                 </p>
                 <div class="mt-28 md:mt-8">
-
+                    @php
+                        $hasilTes = \App\Models\HasilMinatBakat::where('user_id', Auth::id())->exists();
+                    @endphp
                     <a href="{{ route('minatbakat.intruksi') }}">
                         <button
                             class="bg-[#FCAE4B] hover:bg-[#f39c12] text-white font-bold px-10 py-3 rounded-full text-xl shadow-lg flex items-center gap-4 transition-transform hover:scale-105">
-                            Mulai Tes
+                            {{ $hasilTes ? 'Lihat Hasil Tes' : 'Mulai Tes' }}
                             <div class="bg-white w-6 h-6 rounded-full flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="#FCAE4B"
                                     class="w-4 h-4">
@@ -443,7 +454,6 @@
     </div>
 
     @include('layouts.footer')
-
 
 </body>
 

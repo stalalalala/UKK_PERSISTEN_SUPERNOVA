@@ -22,21 +22,17 @@ class LoginController extends Controller
 
     public function register(Request $request)
 {
-
     $request->validate([
         'name'     => 'required|string|max:255',
-        'no_hp' => 'required|numeric|digits_between:11,100',
+        'no_hp'    => 'required|numeric|digits_between:11,100',
         'email'    => 'required|email|unique:users,email',
         'password' => [
             'required',
             'min:6', 
             'confirmed',
             'regex:/[0-9]/',      
-            'regex:/[@$!%*#?&]/', 
+            'regex:/[^A-Za-z0-9]/', 
         ],
-    ], [
-        'password.regex' => 'Password harus mengandung minimal satu angka dan satu simbol.',
-        'no_hp.min' => 'Nomor HP minimal harus 11 karakter.',
     ]);
 
     $user = User::create([
@@ -49,10 +45,15 @@ class LoginController extends Controller
 
     Auth::login($user); 
 
-    // Kirim Email
-    $user->sendEmailVerificationNotification();
-
-    return redirect()->route('verification.notice'); 
+    try {
+        // Mencoba kirim ke Gmail
+        $user->sendEmailVerificationNotification();
+        return redirect()->route('verification.notice');
+    } catch (\Exception $e) {
+        // Jika internet memblokir koneksi ke Google SMTP
+        // User tetap masuk, tapi kita beri notifikasi
+        return redirect('/')->with('warning', 'Pendaftaran berhasil! Namun kami gagal mengirim email verifikasi ke Gmail Anda karena kendala koneksi server.');
+    }
 }
 
       // ==============================

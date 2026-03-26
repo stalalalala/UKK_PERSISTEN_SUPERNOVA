@@ -50,16 +50,18 @@
     </nav>
 
     <main class="relative z-20 flex-grow flex items-center py-10">
-        <div class="container mx-auto px-4 md:px-10">
+        <div class="max-w-7xl mx-auto w-full px-4 md:px-10">
             <div class="grid lg:grid-cols-12 gap-4 items-center">
+                
                 <div class="lg:col-span-6 xl:col-span-5 flex justify-center lg:justify-start">
-                    <div class="bg-white/10 lg:bg-[#E8F1FF]/90 backdrop-blur-[2px] lg:backdrop-blur-xl w-full max-w-[450px] md:max-w-[480px] rounded-[40px] md:rounded-[50px] p-8 md:p-12 shadow-2xl border-4 border-white/40 lg:border-white/60 transition-all">
+                    <div class="bg-white/10 lg:bg-[#E8F1FF]/90 backdrop-blur-[4px] lg:backdrop-blur-xl w-full max-w-[450px] md:max-w-[480px] rounded-[40px] md:rounded-[50px] p-8 md:p-12 shadow-2xl border-4 border-white/40 lg:border-white/60 transition-all">
 
-                        <div class="flex justify-between items-center mb-8">
+                        <div class="flex justify-between items-center mb-8 gap-4">
                             <h1 class="text-3xl md:text-4xl font-black text-white lg:text-[#2E3B66] drop-shadow-md lg:drop-shadow-none">Masuk</h1>
-                            <a href="{{ route('login.google') }}" class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl shadow-sm">
-                                <span class="text-[8px] md:text-[9px] font-bold text-gray-400 uppercase">Masuk dengan</span>
-                                <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" alt="Google" class="w-4 h-4 md:w-5 md:h-5">
+                            
+                            <a href="{{ route('login.google') }}" class="flex items-center gap-2 bg-white px-3 py-2 rounded-xl shadow-sm hover:scale-105 transition-transform">
+                                <span class="hidden md:block text-[10px] font-bold text-gray-400 uppercase">Masuk dengan</span>
+                                <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" alt="Google" class="w-5 h-5 md:w-6 md:h-6">
                             </a>
                         </div>
 
@@ -76,42 +78,40 @@
                             </div>
 
                             <div x-data="{ showPassword: false }" class="space-y-2">
-    
-                                    <div class="flex justify-between px-1">
-                                        <label class="text-white lg:text-gray-500 font-bold text-sm">Kata sandi</label>
-                                        <a href="{{ route('password.request') }}" class="text-white lg:text-[#4A9FFF] font-bold text-xs hover:underline">Lupa sandi?</a>
-                                    </div>
-
-                                    
-                                    <div class="relative">
-                                        <input :type="showPassword ? 'text' : 'password'" 
-                                            name="password" 
-                                            placeholder="xxxxxxxx" 
-                                            required
-                                            class="w-full px-5 py-3.5 rounded-2xl border-2 border-white lg:border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all text-gray-800 bg-white/90 tracking-widest pr-12">
-
-                                    
-                                        <button type="button" @click="showPassword = !showPassword"
-                                            class="absolute right-4 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition-colors">
-                                            <i class="fa-solid text-lg" :class="showPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
-                                        </button>
-                                    </div>
+                                <div class="flex justify-between px-1">
+                                    <label class="text-white lg:text-gray-500 font-bold text-sm">Kata sandi</label>
+                                    <a href="{{ route('password.request') }}" class="text-white lg:text-[#4A9FFF] font-bold text-xs hover:underline">Lupa sandi?</a>
                                 </div>
+                                
+                                <div class="relative">
+                                    <input :type="showPassword ? 'text' : 'password'" 
+                                        name="password" 
+                                        placeholder="xxxxxxxx" 
+                                        required
+                                        class="w-full px-5 py-3.5 rounded-2xl border-2 border-white lg:border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all text-gray-800 bg-white/90 tracking-widest pr-12">
 
-                            <div class="flex flex-col md:flex-row justify-center gap-4 pt-6">
+                                    <button type="button" @click="showPassword = !showPassword"
+                                        class="absolute right-4 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition-colors">
+                                        <i class="fa-solid text-lg" :class="showPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row justify-center gap-4 pt-6">
                                 <a href="{{ route('register') }}"
-                                    class="w-full bg-[#FFB81C] text-white font-black py-4 rounded-3xl text-xl shadow-[0_6px_0_0_#d99c16] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center">
+                                    class="w-full bg-[#FFB81C] text-white font-black py-4 rounded-3xl text-lg md:text-xl shadow-[0_6px_0_0_#d99c16] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center">
                                     Daftar
                                 </a>
 
                                 <button type="submit"
-                                    class="w-full bg-[#4A9FFF] text-white font-black py-4 rounded-3xl text-xl shadow-[0_6px_0_0_#3a86db] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center">
+                                    class="w-full bg-[#4A9FFF] text-white font-black py-4 rounded-3xl text-lg md:text-xl shadow-[0_6px_0_0_#3a86db] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center">
                                     Masuk
                                 </button>
                             </div>
                         </form>
-                        </div>
+                    </div>
                 </div>
+
                 <div class="lg:col-span-6 xl:col-span-7 hidden lg:block"></div>
             </div>
         </div>
