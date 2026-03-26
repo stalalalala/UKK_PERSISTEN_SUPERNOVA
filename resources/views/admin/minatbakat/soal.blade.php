@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -93,9 +94,45 @@
                     <div class="flex-1">
                         <p class="text-slate-700 font-medium leading-relaxed text-xs md:text-lg" x-text="soal.text"></p>
                     </div>
-                    <button @click="prepareAction(soal, 'delete')" class="w-10 h-10 md:w-14 md:h-14 bg-red-50 text-red-400 rounded-xl md:rounded-2xl hover:bg-red-500 hover:text-white transition-all flex items-center justify-center md:opacity-0 group-hover:opacity-100 shadow-sm shrink-0">
-                        <i class="fa-solid fa-trash-can text-xs md:text-lg"></i>
-                    </button>
+                    <button 
+                            @click="
+                            Swal.fire({
+                            title: 'Hapus Soal?',
+                            text: 'Soal akan dipindahkan ke History',
+                            icon: 'warning',
+                            width: '340px',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            confirmButtonText: 'Ya, Hapus!',
+                            customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                }).then(async (result) => {
+                                    if(result.isConfirmed){
+                                        try {
+                                            const response = await fetch(`{{ url('admin/minat-bakat/soal') }}/${soal.id}`, {
+                                                method: 'DELETE',
+                                                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+                                            });
+
+                                            if(response.ok){
+                                                const now = new Date();
+                                                const deletedAt = now.toLocaleString('id-ID');
+
+                                                history.unshift({ ...soal, deletedAt, id_history: Date.now() });
+                                                localStorage.setItem('recycle_bin_soal', JSON.stringify(history));
+
+                                                questions = questions.filter(q => q.id !== soal.id);
+                                            }
+                                        } catch(e){
+                                            Swal.fire('Error', 'Gagal menghapus', 'error')
+                                        }
+                                    }
+                                })
+                                "
+                                class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+                                </button>
                 </div>
             </template>
             <template x-if="filteredQuestions.length === 0">
@@ -191,8 +228,73 @@
                             <div class="flex justify-between items-center border-t border-dashed pt-3">
                                 <span class="text-[8px] md:text-[9px] font-bold text-blue-300 uppercase" x-text="h.deletedAt"></span>
                                 <div class="flex gap-1 md:gap-2">
-                                    <button @click="prepareAction(h, 'restore')" class="px-3 md:px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg font-bold text-[8px] md:text-[9px] hover:bg-emerald-500 hover:text-white transition-all uppercase">PULIHKAN</button>
-                                    <button @click="prepareAction(h, 'forceDelete')" class="w-7 h-7 md:w-8 md:h-8 bg-red-50 text-red-400 rounded-lg flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"><i class="fa-solid fa-trash-can text-[10px] md:text-xs"></i></button>
+                                    <button 
+                                    @click="
+                                    Swal.fire({
+                                        title: 'Pulihkan Soal?',
+                                        text: 'Data akan dikembalikan ke daftar Soal',
+                                        icon: 'question',
+                                        width: '340px',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#22c55e',
+                                        confirmButtonText: 'Ya, Pulihkan!',
+                                        cancelButtonText: 'Batal',
+                                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                        }).then(async (result) => {
+                                            if(result.isConfirmed){
+                                                try {
+                                                    const response = await fetch('{{ route('admin.minatBakat.soal.restore') }}', {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/json',
+                                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                            'Accept': 'application/json'
+                                                        },
+                                                        body: JSON.stringify({ text: h.text, category: categoryName })
+                                                    });
+
+                                                    if(response.ok){
+                                                        const restored = await response.json();
+                                                        questions.unshift(restored);
+
+                                                        history = history.filter(item => item.id_history !== h.id_history);
+                                                        localStorage.setItem('recycle_bin_soal', JSON.stringify(history));
+                                                    }
+                                                } catch(e){
+                                                    Swal.fire('Error', 'Gagal restore', 'error')
+                                                }
+                                            }
+                                        })
+                                        "
+                                        class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> 
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                                        </svg>
+                                        </button>
+                                   <button 
+                                    @click="
+                                    Swal.fire({
+                                        title: 'Hapus Permanen?',
+                                        text: 'Data tidak bisa dikembalikan!',
+                                        width: '340px',
+                                        icon: 'error',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#ef4444',
+                                        confirmButtonText: 'Ya, Hapus!',
+                                        cancelButtonText: 'Batal',
+                                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                            }).then((result) => {
+                                                if(result.isConfirmed){
+                                                    history = history.filter(item => item.id_history !== h.id_history);
+                                                    localStorage.setItem('recycle_bin_soal', JSON.stringify(history));
+                                                }
+                                            })
+                                            "
+                                            class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                            </svg>
+                                            </button>
                                 </div>
                             </div>
                         </div>
@@ -201,55 +303,7 @@
             </div>
         </div>
 
-        {{-- MODAL KONFIRMASI (Arsip) --}}
-        <div x-show="showDeleteConfirmModal" x-cloak class="fixed inset-0 z-[999] flex items-center justify-center p-4">
-            <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showDeleteConfirmModal = false"></div>
-            <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 max-w-md w-full relative z-[1000] text-center shadow-2xl" x-show="showDeleteConfirmModal" x-transition>
-                <div class="w-16 h-16 md:w-20 md:h-20 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 text-2xl md:text-3xl">
-                    <i class="fa-solid fa-box-archive"></i>
-                </div>
-                <h3 class="text-lg md:text-xl font-black text-[#2E3B66] mb-2 uppercase tracking-tight">Arsipkan Soal?</h3>
-                <p class="text-gray-500 text-[9px] md:text-[11px] font-bold uppercase tracking-widest mb-6 md:mb-8 px-4 leading-relaxed">
-                    Soal: <span class="text-amber-600 italic" x-text="actionText.substring(0, 30) + '...'"></span> akan dipindahkan ke History.
-                </p>
-                <div class="flex gap-3">
-                    <button @click="showDeleteConfirmModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400 text-[9px] md:text-[10px] uppercase transition-all">Batal</button>
-                    <button @click="confirmDelete()" class="flex-1 py-3 rounded-xl font-bold bg-amber-500 text-white shadow-lg text-[9px] md:text-[10px] uppercase transition-all active:scale-95">Arsipkan</button>
-                </div>
-            </div>
-        </div>
-
-        {{-- MODAL KONFIRMASI (Pulihkan) --}}
-        <div x-show="showRestoreModal" x-cloak class="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-            <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showRestoreModal = false"></div>
-            <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 max-w-md w-full relative z-[1001] text-center shadow-2xl" x-show="showRestoreModal" x-transition>
-                <div class="w-16 h-16 md:w-20 md:h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 text-2xl md:text-3xl">
-                    <i class="fa-solid fa-rotate-left"></i>
-                </div>
-                <h3 class="text-lg md:text-xl font-black text-[#2E3B66] mb-2 uppercase tracking-tight">Pulihkan?</h3>
-                <p class="text-gray-500 text-[9px] md:text-[11px] font-bold uppercase tracking-widest mb-6 md:mb-8 px-4">Kembalikan soal ini ke daftar utama?</p>
-                <div class="flex gap-3">
-                    <button @click="showRestoreModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400 text-[9px] md:text-[10px] uppercase transition-all">Batal</button>
-                    <button @click="confirmRestore()" class="flex-1 py-3 rounded-xl font-bold bg-emerald-500 text-white shadow-lg text-[9px] md:text-[10px] uppercase transition-all active:scale-95">Pulihkan</button>
-                </div>
-            </div>
-        </div>
-
-        {{-- MODAL KONFIRMASI (Hapus Permanen) --}}
-        <div x-show="showForceDeleteModal" x-cloak class="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-            <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showForceDeleteModal = false"></div>
-            <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] p-6 md:p-8 max-w-md w-full relative z-[1001] text-center shadow-2xl" x-show="showForceDeleteModal" x-transition>
-                <div class="w-16 h-16 md:w-20 md:h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 text-2xl md:text-3xl">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-                <h3 class="text-lg md:text-xl font-black text-[#2E3B66] mb-2 uppercase tracking-tight text-red-600">Hapus Permanen?</h3>
-                <p class="text-gray-500 text-[9px] md:text-[11px] font-bold uppercase tracking-widest mb-6 md:mb-8 px-4">Tindakan ini tidak dapat dibatalkan!</p>
-                <div class="flex gap-3">
-                    <button @click="showForceDeleteModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-400 text-[9px] md:text-[10px] uppercase transition-all">Batal</button>
-                    <button @click="confirmForceDelete()" class="flex-1 py-3 rounded-xl font-bold bg-red-600 text-white shadow-lg text-[9px] md:text-[10px] uppercase transition-all active:scale-95">Hapus</button>
-                </div>
-            </div>
-        </div>
+       
 
     </div>
 
@@ -259,9 +313,6 @@
                 showFormAdd: false,
                 showHistory: false,
                 showImportModal: false,
-                showDeleteConfirmModal: false,
-                showRestoreModal: false,
-                showForceDeleteModal: false,
                 importMode: 'single', 
                 searchQuery: '',
                 newText: '',
@@ -285,15 +336,6 @@
                     return this.filteredQuestions.slice(start, start + this.itemsPerPage);
                 },
                 get totalPages() { return Math.ceil(this.filteredQuestions.length / this.itemsPerPage) || 1; },
-
-                prepareAction(item, type) {
-                    this.selectedItem = item;
-                    this.actionId = item.id;
-                    this.actionText = item.text || '';
-                    if(type === 'delete') this.showDeleteConfirmModal = true;
-                    if(type === 'restore') this.showRestoreModal = true;
-                    if(type === 'forceDelete') this.showForceDeleteModal = true;
-                },
 
                 unduhTemplate() {
                     const wb = XLSX.utils.book_new();
@@ -361,45 +403,6 @@
                     } catch (e) { console.error(e); }
                 },
 
-                async confirmDelete() {
-                    try {
-                        const response = await fetch(`{{ url('admin/minat-bakat/soal') }}/${this.actionId}`, {
-                            method: 'DELETE',
-                            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
-                        });
-                        if(response.ok) {
-                            const now = new Date();
-                            const deletedAt = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID');
-                            this.history.unshift({ ...this.selectedItem, deletedAt: deletedAt, id_history: Date.now() });
-                            this.saveHistory();
-                            this.questions = this.questions.filter(q => q.id !== this.actionId);
-                            this.showDeleteConfirmModal = false;
-                        }
-                    } catch (e) { alert('Gagal menghapus'); }
-                },
-
-                async confirmRestore() {
-                    try {
-                        const response = await fetch('{{ route("admin.minatBakat.soal.restore") }}', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
-                            body: JSON.stringify({ text: this.selectedItem.text, category: this.categoryName })
-                        });
-                        if(response.ok) {
-                            const restored = await response.json();
-                            this.questions.unshift(restored);
-                            this.history = this.history.filter(item => item.id_history !== this.selectedItem.id_history);
-                            this.saveHistory();
-                            this.showRestoreModal = false;
-                        }
-                    } catch (e) { alert('Gagal memulihkan'); }
-                },
-
-                confirmForceDelete() {
-                    this.history = this.history.filter(h => h.id_history !== this.selectedItem.id_history);
-                    this.saveHistory();
-                    this.showForceDeleteModal = false;
-                }
             }
         }
     </script>
