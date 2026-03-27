@@ -22,9 +22,15 @@
         {{-- Navbar --}}
         <nav class="flex justify-between items-center bg-gray-100 rounded-full mx-4 md:mx-10 mt-4 relative z-10">
             <div class="w-20 md:w-28 h-12 bg-blue-400 rounded-full flex-shrink-0"></div>
+
             <ul class="hidden lg:flex gap-12 text-gray-800 font-medium text-sm">
-                <li><a href="/" class="font-bold hover:text-blue-500">Kuis Fundamental</a></li>
+                <li><a href="/" class="hover:text-blue-500">Beranda</a></li>
+                <li><a href="{{ route('streak.index') }}" class="hover:text-blue-500">Pet Streak</a></li>
+                <li><a href="{{ route('tryout.index') }}" class="hover:text-blue-500">Try Out</a></li>
+                <li><a href="{{ route('latihan.index') }}" class="hover:text-blue-500">Latihan Soal</a></li>
+                <li><a href="{{ route('video.index') }}" class="hover:text-blue-500">Video Pembelajaran</a></li>
             </ul>
+
             <div class="flex items-center gap-2">
                 <div class="flex items-center gap-2 bg-[#FBBA16] rounded-full">
                     <a href="{{ route('profile.index') }}"
@@ -48,7 +54,8 @@
                     </form>
                 </div>
 
-                <button @click="open = true" class="lg:hidden p-2 text-gray-600 hover:bg-gray-200 rounded-full">
+                <button @click="open = true"
+                    class="lg:hidden p-2 text-gray-600 hover:bg-gray-200 rounded-full transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -57,14 +64,75 @@
                 </button>
             </div>
         </nav>
+
+        <div x-show="open" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
+            <div x-show="open" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="open = false"
+                class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+            <div x-show="open" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-90"
+                x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90"
+                class="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Menu Utama</h2>
+                    <button @click="open = false" class="text-gray-400 hover:text-gray-600">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <ul class="space-y-3">
+                    <li><a href="/"
+                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Beranda</a>
+                    </li>
+                    <li><a href="{{ route('streak.index') }}"
+                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Pet
+                            Streak</a></li>
+                    <li><a href="{{ route('tryout.index') }}"
+                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Try
+                            Out</a></li>
+                    <li><a href="{{ route('latihan.index') }}"
+                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Latihan
+                            Soal</a></li>
+                    <li><a href="{{ route('video.index') }}"
+                            class="block text-center py-3 px-4 bg-gray-50 rounded-xl font-semibold text-gray-700 hover:bg-blue-500 hover:text-white transition">Video
+                            Pembelajaran</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
     </div>
 
     <main class="max-w-[1440px] mx-auto py-10">
 
-        <section class="px-4 md:px-10 mb-10">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-[#2E3B66]">Kuis Fundamental</h1>
-            <p class="text-gray-500 mt-2">Tentukan materi fundamental yang ingin kamu latih dan mulai kerjakan kuis
-                sekarang!</p>
+        <section class="px-4 md:px-10 mb-10 flex items-center justify-between">
+
+            <!-- Kiri -->
+            <div>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-[#2E3B66]">
+                    Kuis Fundamental
+                </h1>
+                <p class="text-gray-500 mt-2">
+                    Tentukan materi fundamental yang ingin kamu latih dan mulai kerjakan kuis sekarang!
+                </p>
+            </div>
+
+            <!-- Kanan: Icon Button -->
+            <a href="/"
+                class="flex items-center justify-center w-10 h-10 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition shadow-sm">
+
+                <!-- Heroicon Arrow Left -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                    stroke="currentColor" class="w-5 h-5 text-gray-700">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+
+            </a>
+
         </section>
 
         <div class="px-4 md:px-10">
@@ -136,7 +204,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                                 </svg>
-                                <span class="font-semibold text-slate-600">{{ $k->questions_count ?? '20' }} Soal</span>
+                                <span class="font-semibold text-slate-600">{{ $k->questions_count ?? '20' }}
+                                    Soal</span>
                             </div>
 
                             {{-- Baris Durasi --}}

@@ -37,6 +37,7 @@
     function latihanForm() {
         return {
             activeMenu: 'Manajemen Latihan', // Sesuaikan nama menu
+            showPublishModal: false,
             mobileMenuOpen: false,
             showImportModal: false,
             currentSet: @json($nextSet ?? 1),
@@ -66,6 +67,29 @@
                 };
 
                 localStorage.setItem('latihan_draft', JSON.stringify(data));
+            },
+
+            openPublishModal() {
+
+                let totalTerisi = this.questions.filter(q => q).length;
+
+                if (totalTerisi < 20) {
+                    alert("Wajib isi 20 soal sebelum publish!");
+                    return;
+                }
+
+                this.showPublishModal = true;
+            },
+
+            confirmPublikasikan() {
+
+                this.showPublishModal = false;
+
+                // lanjut submit
+                document.getElementById("questions_json").value =
+                    JSON.stringify(this.questions);
+
+                document.getElementById("latihanForm").submit();
             },
 
             loadFromLocal() {
@@ -104,7 +128,7 @@
                 reader.readAsDataURL(file);
             },
 
-            
+
             importExcel(event) {
                 const file = event.target.files[0];
                 if (!file) return;
@@ -114,7 +138,9 @@
                 reader.onload = (e) => {
                     try {
                         const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: "array" });
+                        const workbook = XLSX.read(data, {
+                            type: "array"
+                        });
 
                         const sheet = workbook.Sheets[workbook.SheetNames[0]];
                         const jsonData = XLSX.utils.sheet_to_json(sheet);
@@ -240,8 +266,8 @@
                             materi: row["Materi"] || "",
                             pertanyaan: row["Pertanyaan"] || "",
 
-                            gambar: (row["URL Gambar"] || "").startsWith("http")
-                                ? row["URL Gambar"] : null,
+                            gambar: (row["URL Gambar"] || "").startsWith("http") ?
+                                row["URL Gambar"] : null,
 
                             opsi_a: row["Opsi A"] || "",
                             opsi_b: row["Opsi B"] || "",
@@ -485,6 +511,10 @@
 
                 });
 
+                window.addEventListener('beforeunload', () => {
+                    localStorage.removeItem('latihan_draft');
+                });
+
 
 
             },
@@ -662,15 +692,18 @@ loadFromLocal()"
 
             </nav>
 
-            <button
-                class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
-                <svg xmlns="http://www.w3.org/2000/xml" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" class="size-5 md:size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-                </svg>
-                <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
-            </button>
+            <form action="{{ route('logout') }}" method="POST" class="w-full inline">
+                @csrf
+                <button type="submit"
+                    class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-5 md:size-6 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                    </svg>
+                    <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
+                </button>
+            </form>
         </aside>
 
         <div x-show="mobileMenuOpen" x-transition:enter="transition opacity-ease-out duration-300"
@@ -1096,7 +1129,7 @@ saveToLocal();
                                     </div>
                                 </div>
 
-                                <button type="button" @click="submitFinal()" :disabled="questions.length < 20"
+                                <button type="button" @click="openPublishModal()" :disabled="questions.length < 20"
                                     class="w-full mt-6 bg-emerald-500 text-white py-3 rounded-xl font-bold disabled:opacity-40 disabled:cursor-not-allowed">
                                     Publikasikan Latihan
                                 </button>
@@ -1169,6 +1202,36 @@ saveToLocal();
 
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    {{-- MODAL KONFIRM PUBLIKASI --}}
+    <div x-show="showPublishModal" x-cloak class="fixed inset-0 z-[180] flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showPublishModal = false"></div>
+
+        <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[181] text-center shadow-2xl border border-blue-50"
+            x-show="showPublishModal" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+
+            <div
+                class="w-20 h-20 bg-blue-100 text-[#4A72D4] rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+
+            <h3 class="text-xl font-black text-[#2E3B66] mb-2">Publikasikan Latihan?</h3>
+            <p class="text-gray-500 text-sm mb-8">Pastikan semua data sudah benar. Latihan yang dipublikasikan akan
+                langsung dapat diakses.</p>
+
+            <div class="flex gap-3">
+                <button type="button" @click="showPublishModal = false"
+                    class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all">
+                    Batal
+                </button>
+                <button type="button" @click="confirmPublikasikan()"
+                    class="flex-1 py-3 rounded-xl font-bold bg-[#4A72D4] text-white shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all">
+                    Ya, Terbitkan
+                </button>
             </div>
         </div>
     </div>

@@ -17,7 +17,8 @@
         /* Menghapus scroll di desktop, mengizinkan di mobile jika sangat kecil */
         @media (min-width: 1024px) {
             body {
-                overflow: hidden;
+                overflow: auto;
+                /* ✅ jangan hidden */
             }
         }
 
@@ -50,10 +51,12 @@
     @vite('resources/css/app.css')
 </head>
 
+
+
 <body class="min-h-screen flex font-po relative overflow-x-hidden">
 
     <div
-        class="w-full max-w-[1440px] mx-auto p-4 md:p-6 min-h-screen flex flex-col relative shadow-inner overflow-y-auto lg:overflow-hidden">
+        class="w-full max-w-[1440px] mx-auto p-4 md:p-6 min-h-screen flex flex-col relative shadow-inner overflow-y-auto">
 
         <div class="relative w-full flex flex-col items-center flex-1 min-h-0">
 
@@ -143,6 +146,38 @@
         </div>
     </div>
 
+    <div id="exitModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[99] p-4">
+
+        <div class="absolute inset-0" onclick="closeModal()"></div>
+        <div
+            class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-10 text-center shadow-2xl animate-[zoomIn_0.2s_ease]">
+
+            <div
+                class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                ⚠️
+            </div>
+
+            <h3 class="text-xl font-black text-[#2E3B66] mb-2">
+                Keluar Halaman?
+            </h3>
+
+            <p class="text-gray-500 text-sm mb-8">
+                Kamu akan kembali ke halaman utama kuis.
+            </p>
+
+            <div class="flex gap-4">
+                <button onclick="closeModal()" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500">
+                    Batal
+                </button>
+
+                <a href="{{ route('kuis.index') }}"
+                    class="flex-1 py-3 rounded-xl font-bold bg-red-500 text-white text-center">
+                    Ya, Keluar
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
         // Sound Effects
@@ -173,8 +208,38 @@
             window.requestAnimationFrame(step);
         }
 
+        function showModal() {
+            const modal = document.getElementById('exitModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // 🔥 disable scroll saat modal kebuka
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('exitModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            document.body.style.overflow = 'auto';
+        }
+
+        function lockBack() {
+            for (let i = 0; i < 5; i++) {
+                history.pushState(null, null, location.href);
+            }
+
+            window.onpopstate = function() {
+                showModal();
+                history.pushState(null, null, location.href);
+            };
+        }
+
         // Update window.onload kamu
         window.onload = function() {
+
+            lockBack();
             // Beri delay sedikit biar user nggak kaget
             setTimeout(() => {
                 const scoreDisplay = document.getElementById('counter-score');
