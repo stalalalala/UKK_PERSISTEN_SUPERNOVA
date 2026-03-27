@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Karakter Streak</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -15,7 +16,17 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: #F4F7FF;
+            letter-spacing: -0.01em;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4A72D4;
+            border-radius: 10px;
         }
 
         .main-content {
@@ -23,27 +34,8 @@
             overflow-y: auto;
         }
 
-        /* ===== ANIMATION ===== */
 
-        .animate-bounce {
-            animation: bounce 1.2s infinite;
-        }
 
-        .animate-float {
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .animate-wiggle {
-            animation: wiggle 1s ease-in-out infinite;
-        }
-
-        .animate-spin {
-            animation: spin 3s linear infinite;
-        }
-
-        .animate-pulse {
-            animation: pulse 2s ease-in-out infinite;
-        }
 
         @keyframes float {
 
@@ -91,16 +83,6 @@
 
                         history.pushState(null, null, location.href)
 
-                    }
-
-                })
-
-                // refresh / close tab
-                window.addEventListener('beforeunload', (e) => {
-
-                    if (!this.allowLeave) {
-                        e.preventDefault()
-                        e.returnValue = ''
                     }
 
                 })
@@ -429,7 +411,7 @@
                 </div>
 
                 <form action="{{ route('admin.streak.store') }}" @submit="allowLeave = true" method="POST"
-                    enctype="multipart/form-data" x-data="streakForm()">
+                    enctype="multipart/form-data" x-data="streakForm()" x-init="init()">
                     @csrf
 
                     <div class="space-y-8">
@@ -460,7 +442,7 @@
                                         <label
                                             class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-[#4A72D4] transition-colors">Nama
                                             Karakter</label>
-                                        <input type="text" name="nama" required
+                                        <input type="text" name="nama" x-model="form.nama" required
                                             class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-5 py-4 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-[#4A72D4] transition-all outline-none text-gray-700 font-medium"
                                             placeholder="John Doe">
                                     </div>
@@ -470,7 +452,8 @@
                                             class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-[#4A72D4] transition-colors">Minimum
                                             Level</label>
                                         <div class="relative">
-                                            <input type="number" name="min_level" required min="1"
+                                            <input type="number" name="min_level" x-model="form.min_level" required
+                                                min="1"
                                                 class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-5 pr-14 py-4 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-[#4A72D4] transition-all outline-none text-gray-700 font-medium"
                                                 placeholder="1">
                                             <div
@@ -720,47 +703,70 @@
     </div>
     <script>
         function streakForm() {
-
             return {
-
                 svgPreview: null,
                 svgPreviewAnimasi: null,
                 animation: '',
+                form: {
+                    nama: '',
+                    min_level: ''
+                },
 
-                previewSvg(event, type) {
-
-                    const file = event.target.files[0
-
-                    ]
-
-                    if (file) {
-
-                        const url = URL.createObjectURL(file)
-
-                        if (type === 'normal') {
-                            if (this.svgPreview) URL.revokeObjectURL(this.svgPreview)
-                            this.svgPreview = url
-                        }
-
-                        if (type === 'animasi') {
-                            if (this.svgPreviewAnimasi) URL.revokeObjectURL(this.svgPreviewAnimasi)
-                            this.svgPreviewAnimasi = url
-                        }
-
+                init() {
+                    // restore form
+                    const saved = localStorage.getItem('streakForm')
+                    if (saved) {
+                        this.form = JSON.parse(saved)
                     }
 
+                    // restore preview SVG
+                    const svg = localStorage.getItem('svgPreview')
+                    if (svg) {
+                        this.svgPreview = svg
+                    }
+
+                    const svgAnim = localStorage.getItem('svgPreviewAnimasi')
+                    if (svgAnim) {
+                        this.svgPreviewAnimasi = svgAnim
+                    }
+
+                    // auto save form
+                    this.$watch('form', (value) => {
+                        localStorage.setItem('streakForm', JSON.stringify(value))
+                    }, {
+                        deep: true
+                    })
+                },
+
+                previewSvg(event, type) {
+                    const file = event.target.files[0]
+
+                    if (file) {
+                        const reader = new FileReader()
+
+                        reader.onload = (e) => {
+                            const base64 = e.target.result
+
+                            if (type === 'normal') {
+                                this.svgPreview = base64
+                                localStorage.setItem('svgPreview', base64)
+                            }
+
+                            if (type === 'animasi') {
+                                this.svgPreviewAnimasi = base64
+                                localStorage.setItem('svgPreviewAnimasi', base64)
+                            }
+                        }
+
+                        reader.readAsDataURL(file)
+                    }
                 },
 
                 get animationClass() {
-
                     if (!this.animation) return ''
-
                     return 'animate-' + this.animation
-
                 }
-
             }
-
         }
     </script>
 

@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Karakter Streak</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -15,7 +15,17 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: #F4F7FF;
+            letter-spacing: -0.01em;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4A72D4;
+            border-radius: 10px;
         }
 
         .main-content {
@@ -23,27 +33,6 @@
             overflow-y: auto;
         }
 
-        /* ===== ANIMATION ===== */
-
-        .animate-bounce {
-            animation: bounce 1.2s infinite;
-        }
-
-        .animate-float {
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .animate-wiggle {
-            animation: wiggle 1s ease-in-out infinite;
-        }
-
-        .animate-spin {
-            animation: spin 3s linear infinite;
-        }
-
-        .animate-pulse {
-            animation: pulse 2s ease-in-out infinite;
-        }
 
         @keyframes float {
 
@@ -95,15 +84,6 @@
 
                 })
 
-                // refresh / close tab
-                window.addEventListener('beforeunload', (e) => {
-
-                    if (!this.allowLeave) {
-                        e.preventDefault()
-                        e.returnValue = ''
-                    }
-
-                })
 
             },
 
