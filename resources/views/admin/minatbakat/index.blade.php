@@ -400,23 +400,24 @@
         </main>
     </div>
 
-   <div x-show="showModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-    <div @click="showModal = false" class="absolute inset-0 bg-[#2D3B61]/40 backdrop-blur-sm"></div>
+  <div x-show="showModal" x-cloak 
+     class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+     x-transition>
 
-    <div class="bg-white rounded-[28px] w-full max-w-md p-8 relative shadow-2xl"
-         x-transition:enter="transition ease-out duration-300" 
-         x-transition:enter-start="opacity-0 scale-90">
+    <div @click.away="showModal = false" 
+         class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl">
 
+        <!-- HEADER -->
         <div class="flex justify-between items-center mb-6">
-            <h3 class="text-lg font-bold text-gray-800 uppercase tracking-widest" 
-                x-text="isEdit ? 'Edit Kategori' : 'Tambah Kategori'"></h3>
+            <h3 class="text-xl font-extrabold text-slate-800"
+                x-text="isEdit ? 'Ubah Kategori' : 'Tambah Kategori'"></h3>
 
-            <button @click="showModal = false" class="text-gray-400 hover:text-gray-600">
-                <i class="fa-solid fa-xmark text-xl"></i>
+            <button @click="showModal = false" class="text-gray-300 hover:text-red-500">
+                <i class="fa-solid fa-circle-xmark text-2xl"></i>
             </button>
         </div>
 
-
+        <!-- FORM -->
         <form 
             method="POST"
             @submit.prevent="
@@ -435,65 +436,75 @@
                 ? `/admin/minatBakat/${formData.id}` 
                 : '{{ route('admin.minatBakat.kategori.store') }}'">
 
-                    @csrf
-                    <template x-if="isEdit">
-                        <input type="hidden" name="_method" value="PUT">
-                    </template>
+            @csrf
+            <template x-if="isEdit">
+                <input type="hidden" name="_method" value="PUT">
+            </template>
 
-                    <div class="space-y-5">
+            <div class="space-y-3">
 
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2 tracking-widest">
-                                Nama Kategori
-                            </label>
-                            <input 
-                                type="text" 
-                                name="name"
-                                x-model="formData.name"
-                                required
-                                class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#4A72D4] outline-none">
-                        </div>
+                <!-- Nama -->
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">
+                        Nama Kategori
+                    </label>
+                    <input 
+                        type="text" 
+                        name="name"
+                        x-model="formData.name"
+                        class="w-full bg-[#F3F6FF] rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                        placeholder="Masukkan nama kategori...">
+                </div>
 
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2 tracking-widest">
-                                Deskripsi Minat Bakat
-                            </label>
-                            <textarea 
-                                name="description"
-                                x-model="formData.description"
-                                rows="3"
-                                class="w-full px-5 py-3 bg-gray-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-[#4A72D4] outline-none resize-none"></textarea>
-                        </div>
+                <!-- Deskripsi -->
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">
+                        Deskripsi
+                    </label>
+                    <textarea 
+                        name="description"
+                        x-model="formData.description"
+                        rows="3"
+                        class="w-full bg-[#F3F6FF] rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none resize-none"
+                        placeholder="Masukkan deskripsi..."></textarea>
+                </div>
 
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase block mb-2 tracking-widest">
-                                Warna Identitas
-                            </label>
-                            <div class="flex gap-3">
-                                <input 
-                                    type="color" 
-                                    name="color"
-                                    x-model="formData.color"
-                                    class="h-12 w-20 rounded-xl border-none cursor-pointer bg-transparent">
+                <!-- Warna -->
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">
+                        Warna Identitas
+                    </label>
 
-                                <div class="flex-1 px-5 py-3 bg-gray-50 rounded-2xl text-[10px] font-bold uppercase text-gray-400 flex items-center" 
-                                    x-text="formData.color"></div>
-                            </div>
-                        </div>
+                    <div class="flex gap-3 items-center">
+                        <input 
+                            type="color" 
+                            name="color"
+                            x-model="formData.color"
+                            class="h-12 w-16 rounded-xl border-none cursor-pointer bg-transparent">
 
-                        <!-- 🔥 BUTTON SUBMIT -->
-                        <button 
-                            type="submit"
-                            class="w-full py-4 bg-[#4A72D4] text-white rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg active:scale-95">
-                            
-                            <span x-text="isEdit ? 'Simpan Perubahan' : 'Buat Kategori Baru'"></span>
-                        </button>
-
+                        <div class="flex-1 bg-[#F3F6FF] rounded-2xl p-3 text-[10px] font-bold text-slate-400 uppercase flex items-center"
+                             x-text="formData.color"></div>
                     </div>
-                </form>
-                <!-- 🔥 FORM END -->
+                </div>
+
+                <!-- BUTTON -->
+                <div class="flex gap-3 pt-2">
+                    <button type="button"
+                        @click="showModal = false"
+                        class="flex-1 bg-slate-50 text-slate-400 font-bold py-3.5 rounded-2xl hover:bg-slate-100">
+                        Batal
+                    </button>
+
+                    <button type="submit"
+                        class="flex-1 bg-[#4A72D4] text-white font-bold py-3.5 rounded-2xl hover:bg-blue-600 shadow-lg shadow-blue-100 active:scale-95">
+                        <span x-text="isEdit ? 'Simpan' : 'Tambah'"></span>
+                    </button>
+                </div>
+
             </div>
-        </div>
+        </form>
+    </div>
+</div>
 
     <div x-show="showAllParticipants" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center lg:p-10">
         <div @click="showAllParticipants = false" class="absolute inset-0 bg-[#2D3B61]/60 backdrop-blur-md"></div>

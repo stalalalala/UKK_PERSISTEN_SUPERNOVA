@@ -717,102 +717,217 @@ laporan</span>
         </main>
     </div>
 
-    <div x-show="showImportModal" x-transition x-cloak class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">
-            <div class="bg-emerald-500 p-6 text-white text-center"><h4 class="text-lg font-black italic uppercase">Import PTN & Prodi</h4></div>
-            <div class="p-8 space-y-4">
-                <button @click="unduhTemplate('utama')" class="w-full bg-gray-50 border-2 border-dashed border-gray-200 p-4 rounded-xl flex flex-col items-center gap-2">
-                    <span class="text-[9px] font-black uppercase text-gray-500">Unduh Template Lengkap</span>
-                </button>
-                <div class="relative">
-                    <input type="file" @change="importExcel($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                    <div class="w-full bg-[#4A72D4] text-white py-3 rounded-xl font-black text-center uppercase text-[9px] tracking-widest">Pilih File Excel</div>
-                </div>
-                <button @click="showImportModal = false" class="w-full font-black text-gray-400 uppercase text-[9px] tracking-widest mt-2">Batal</button>
-            </div>
-        </div>
-    </div>
+    <div x-show="showImportModal" x-cloak class="fixed inset-0 z-[100] overflow-y-auto">
 
-    <div x-show="showModalProdi" x-transition x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-    <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">
-        <div class="bg-[#4A72D4] p-6 text-white text-center">
-            <h4 class="text-lg font-black italic uppercase">Tambah Prodi</h4>
-            <p class="text-[9px] opacity-70 font-bold uppercase tracking-widest mt-1" x-text="selectedUnivName"></p>
-        </div>
-        <div class="flex border-b">
-            <button @click="prodiMode = 'manual'" :class="prodiMode === 'manual' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-400'" class="flex-1 py-3 font-black text-[9px] uppercase">Manual</button>
-            <button @click="prodiMode = 'excel'" :class="prodiMode === 'excel' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-400'" class="flex-1 py-3 font-black text-[9px] uppercase">Excel</button>
-        </div>
-        <div class="p-6">
-            <div x-show="prodiMode === 'manual'" class="space-y-3">
-                <input x-model="newProdiName" type="text" placeholder="Nama Prodi" 
-                    class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-bold text-sm focus:ring-2 focus:ring-[#4A72D4]"
-                    :class="{'ring-2 ring-red-500': !newProdiName && showProdiError}">
-                
-                <div class="grid grid-cols-2 gap-3">
-                    <input x-model="newProdiKuota" type="number" placeholder="Kuota" 
-                        class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-black text-center text-blue-600 focus:ring-2 focus:ring-[#4A72D4]"
-                        :class="{'ring-2 ring-red-500': (!newProdiKuota || newProdiKuota <= 0) && showProdiError}">
-                    
-                    <input x-model="newProdiPeminat" type="number" placeholder="Peminat" 
-                        class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-black text-center text-indigo-500 focus:ring-2 focus:ring-[#4A72D4]"
-                        :class="{'ring-2 ring-red-500': (!newProdiPeminat || newProdiPeminat <= 0) && showProdiError}">
-                </div>
+    <!-- BACKDROP -->
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" 
+         @click="showImportModal = false"></div>
 
-                <template x-if="showProdiError && (!newProdiName || !newProdiKuota || !newProdiPeminat)">
-                    <p class="text-[10px] text-red-500 font-bold text-center uppercase tracking-tighter">* Semua data manual wajib diisi!</p>
-                </template>
+    <!-- CONTENT -->
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+        <div class="relative bg-white w-full max-w-lg rounded-[35px] shadow-2xl p-8"
+             x-show="showImportModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0">
 
-                <button @click="if(newProdiName && newProdiKuota > 0 && newProdiPeminat > 0) { saveProdi(); showProdiError = false; } else { showProdiError = true; }" 
-                    class="w-full bg-[#4A72D4] text-white py-3 rounded-xl font-black uppercase text-[9px] tracking-widest shadow-lg mt-2">
-                    Simpan Prodi
+            <!-- HEADER -->
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fa-solid fa-file-excel text-emerald-500"></i> 
+                    Import PTN & Prodi
+                </h3>
+
+                <button @click="showImportModal = false" 
+                        class="text-gray-400 hover:text-red-500">
+                    <i class="fa-solid fa-circle-xmark text-2xl"></i>
                 </button>
             </div>
 
-            <div x-show="prodiMode === 'excel'" class="space-y-4 text-center">
-                <button @click="unduhTemplate('prodi')" class="w-full bg-emerald-50 border border-dashed border-emerald-200 py-3 rounded-xl text-emerald-600 font-bold text-[9px] uppercase">Unduh Template Prodi</button>
-                <div class="relative">
-                    <input type="file" @change="importExcel($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                    <div class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black text-center uppercase text-[9px] tracking-widest">Upload Excel Prodi</div>
+            <!-- UPLOAD AREA -->
+            <div class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-300 transition-all bg-gray-50/50">
+
+                <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
                 </div>
+
+                <p class="text-sm font-bold text-gray-600">Klik untuk upload</p>
+                <p class="text-[10px] text-gray-400 mt-2">
+                    Maksimal 100MB (.xlsx, .xls)
+                </p>
+
+                <!-- INPUT -->
+                <input type="file" 
+                       class="hidden"
+                       x-ref="excelInput"
+                       @change="importExcel($event)"
+                       accept=".xlsx,.xls">
+
+                <button @click="$refs.excelInput.click()"
+                        class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">
+                    Pilih File
+                </button>
             </div>
 
-            <button @click="showModalProdi = false; showProdiError = false;" class="w-full font-black text-gray-400 uppercase text-[9px] tracking-widest mt-4">Batal</button>
+            <!-- TEMPLATE -->
+            <div class="mt-8 p-4 bg-emerald-50 rounded-2xl flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-circle-info text-emerald-500"></i>
+                    <span class="text-[11px] font-bold text-emerald-700 uppercase">
+                        Butuh template?
+                    </span>
+                </div>
+
+                <button @click="unduhTemplate('utama')" 
+                        class="text-[11px] font-black text-emerald-600 hover:underline uppercase">
+                    Unduh
+                </button>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="grid grid-cols-2 gap-4 mt-8">
+                <button @click="showImportModal = false"
+                        class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                    Batalkan
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
 
-    <div x-show="showModalUniv" x-transition x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-    <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">
-        <div class="bg-[#4A72D4] p-6 text-white text-center">
-            <h4 class="text-lg font-black italic uppercase" x-text="isEditModeUniv ? 'Edit PTN' : 'Tambah PTN'"></h4>
-        </div>
-        <div class="p-6 space-y-3">
-            <input x-model="newUnivName" 
-                   type="text" 
-                   placeholder="Nama Universitas" 
-                   class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-bold text-sm focus:ring-2 focus:ring-[#4A72D4]"
-                   :class="{'ring-2 ring-red-500': !newUnivName && showValidationErrors}">
-            
-            <input x-model="newUnivLocation" 
-                   type="text" 
-                   placeholder="Lokasi" 
-                   class="w-full bg-gray-50 border-none rounded-xl py-3 px-4 font-bold text-sm focus:ring-2 focus:ring-[#4A72D4]"
-                   :class="{'ring-2 ring-red-500': !newUnivLocation && showValidationErrors}">
+   <div x-show="showModalProdi" x-cloak class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div @click.away="showModalProdi = false" class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl">
 
-            <template x-if="showValidationErrors && (!newUnivName || !newUnivLocation)">
-                <p class="text-[10px] text-red-500 font-bold text-center uppercase tracking-tighter">* Semua field wajib diisi!</p>
+        <!-- HEADER -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h3 class="text-xl font-extrabold text-slate-800">Tambah Prodi</h3>
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest mt-1" x-text="selectedUnivName"></p>
+            </div>
+
+            <button @click="showModalProdi = false" class="text-gray-300 hover:text-red-500">
+                <i class="fa-solid fa-circle-xmark text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- FORM -->
+        <div class="space-y-3">
+
+            <!-- Nama Prodi -->
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">
+                    Nama Prodi
+                </label>
+                <input x-model="newProdiName" type="text"
+                    class="w-full bg-[#F3F6FF] rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+            </div>
+
+            <!-- Kuota & Peminat -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">
+                        Kuota
+                    </label>
+                    <input x-model="newProdiKuota" type="number"
+                        class="w-full bg-[#F3F6FF] rounded-2xl p-3 text-sm text-center text-blue-600 focus:ring-2 focus:ring-blue-400">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">
+                        Peminat
+                    </label>
+                    <input x-model="newProdiPeminat" type="number"
+                        class="w-full bg-[#F3F6FF] rounded-2xl p-3 text-sm text-center text-indigo-500 focus:ring-2 focus:ring-blue-400">
+                </div>
+            </div>
+
+            <!-- ERROR -->
+            <template x-if="showProdiError && (!newProdiName || !newProdiKuota || !newProdiPeminat)">
+                <p class="text-[10px] text-red-500 mt-1">
+                    Semua field wajib diisi.
+                </p>
             </template>
 
-            <button @click="if(newUnivName && newUnivLocation) { saveUniv(); showValidationErrors = false; } else { showValidationErrors = true; }" 
-                    class="w-full bg-[#4A72D4] py-3 rounded-xl font-black text-white uppercase text-[9px] tracking-widest shadow-lg mt-2">
-                Simpan
+            <!-- BUTTON -->
+            <div class="flex gap-3 pt-2">
+                <button type="button"
+                    @click="showModalProdi = false"
+                    class="flex-1 bg-slate-50 text-slate-400 font-bold py-3.5 rounded-2xl hover:bg-slate-100">
+                    Batal
+                </button>
+
+                <button
+                    @click="if(newProdiName && newProdiKuota && newProdiPeminat){ saveProdi(); showProdiError=false } else { showProdiError=true }"
+                    class="flex-1 bg-[#4A72D4] text-white font-bold py-3.5 rounded-2xl hover:bg-blue-600 shadow-lg shadow-blue-100 active:scale-95">
+                    Simpan
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+    <div x-show="showModalUniv" x-cloak class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div @click.away="showModalUniv = false" class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl">
+
+        <!-- HEADER -->
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-extrabold text-slate-800" 
+                x-text="isEditModeUniv ? 'Ubah Universitas' : 'Tambah Universitas'"></h3>
+
+            <button @click="showModalUniv = false" class="text-gray-300 hover:text-red-500">
+                <i class="fa-solid fa-circle-xmark text-2xl"></i>
             </button>
-            
-            <button @click="showModalUniv = false; showValidationErrors = false;" 
-                    class="w-full font-black text-gray-400 uppercase text-[9px] tracking-widest">
-                Batal
-            </button>
+        </div>
+
+        <!-- FORM -->
+        <div class="space-y-3">
+
+            <!-- Nama Univ -->
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">
+                    Nama Universitas
+                </label>
+                <input x-model="newUnivName" type="text"
+                    class="w-full bg-[#F3F6FF] rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                    placeholder="Masukkan nama universitas..."
+                    :class="{'ring-2 ring-red-500': !newUnivName && showValidationErrors}">
+            </div>
+
+            <!-- Lokasi -->
+            <div class="space-y-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">
+                    Lokasi
+                </label>
+                <input x-model="newUnivLocation" type="text"
+                    class="w-full bg-[#F3F6FF] rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+                    placeholder="Masukkan lokasi..."
+                    :class="{'ring-2 ring-red-500': !newUnivLocation && showValidationErrors}">
+            </div>
+
+            <!-- ERROR -->
+            <template x-if="showValidationErrors && (!newUnivName || !newUnivLocation)">
+                <p class="text-[10px] text-red-500 mt-1">
+                    Semua field wajib diisi.
+                </p>
+            </template>
+
+            <!-- BUTTON -->
+            <div class="flex gap-3 pt-2">
+                <button type="button"
+                    @click="showModalUniv = false"
+                    class="flex-1 bg-slate-50 text-slate-400 font-bold py-3.5 rounded-2xl hover:bg-slate-100">
+                    Batal
+                </button>
+
+                <button
+                    @click="if(newUnivName && newUnivLocation){ saveUniv(); showValidationErrors=false } else { showValidationErrors=true }"
+                    class="flex-1 bg-[#4A72D4] text-white font-bold py-3.5 rounded-2xl hover:bg-blue-600 shadow-lg shadow-blue-100 active:scale-95">
+                    Simpan
+                </button>
+            </div>
+
         </div>
     </div>
 </div>

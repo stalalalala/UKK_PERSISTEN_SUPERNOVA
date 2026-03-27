@@ -354,34 +354,65 @@
                 },
 
                 async importExcel(event) {
-                    const file = event.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = async (e) => {
-                        try {
-                            const data = new Uint8Array(e.target.result);
-                            const workbook = XLSX.read(data, { type: 'array' });
-                            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                            
-                            const response = await fetch('{{ route("admin.minatBakat.soal.importBulk") }}', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
-                                body: JSON.stringify({ 
-                                    data: jsonData, 
-                                    mode: this.importMode,
-                                    current_category: this.categoryName 
-                                })
-                            });
-                            const result = await response.json();
-                            if (result.success) {
-                                alert('Berhasil mengimport data.');
-                                window.location.reload(); 
-                            } else { alert('Gagal: ' + result.message); }
-                        } catch (err) { alert('Terjadi kesalahan saat membaca file.'); }
-                    };
-                    reader.readAsArrayBuffer(file);
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = async (e) => {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            const response = await fetch('{{ route("admin.minatBakat.soal.importBulk") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
                 },
+                body: JSON.stringify({ 
+                    data: jsonData, 
+                    mode: this.importMode,
+                    current_category: this.categoryName 
+                })
+            });
+
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Data berhasil diimport',
+                    width: '340px',
+                    padding: '1.8rem',
+                    confirmButtonColor: '#4A72D4',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-xl',
+                        title: 'text-lg font-bold',
+                        confirmButton: 'rounded-xl px-6 py-2'
+                    }
+                }).then(() => location.reload());
+            } else {
+                throw new Error();
+            }
+
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Data Gagal Tersimpan!',
+                width: '340px',
+                confirmButtonColor: '#ef4444',
+                customClass: {
+                    popup: 'rounded-3xl shadow-xl',
+                    title: 'text-lg font-bold'
+                }
+            });
+        }
+    };
+
+    reader.readAsArrayBuffer(file);
+},
 
                 async saveNew() {
                     if(!this.newText.trim()) return;
