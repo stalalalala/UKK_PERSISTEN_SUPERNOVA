@@ -119,23 +119,31 @@
                 reader.readAsDataURL(file);
             },
 
-            importExcel(event) {
-                const file = event.target.files[0];
-                if (!file) return;
+           importExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-                const reader = new FileReader();
+            const reader = new FileReader();
 
-                reader.onload = (e) => {
+            reader.onload = (e) => {
+                try {
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {
-                        type: "array"
-                    });
+                    const workbook = XLSX.read(data, { type: "array" });
 
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const jsonData = XLSX.utils.sheet_to_json(sheet);
 
                     if (jsonData.length === 0) {
-                        alert("File Excel kosong!");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'File Excel kosong!',
+                            width: '340px',
+                            confirmButtonColor: '#ef4444',
+                            customClass: {
+                                popup: 'rounded-3xl shadow-xl',
+                                title: 'text-lg font-bold'
+                            }
+                        });
                         return;
                     }
 
@@ -156,13 +164,20 @@
                     const globalSubtes = (jsonData[0]["Kategori Subtes"] || "").trim();
                     const globalWaktu = (jsonData[0]["Waktu"] || "").toString().trim();
 
-                    // ✅ Validasi Subtes
                     if (!allowedSubtes.includes(globalSubtes)) {
-                        alert("Subtes tidak valid! Harus sesuai format lengkap.");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Subtes tidak valid!',
+                            width: '340px',
+                            confirmButtonColor: '#ef4444',
+                            customClass: {
+                                popup: 'rounded-3xl shadow-xl',
+                                title: 'text-lg font-bold'
+                            }
+                        });
                         return;
                     }
 
-                    // ✅ Validasi Waktu (20–60 menit kelipatan 5)
                     const allowedWaktu = [
                         "20 Menit", "25 Menit", "30 Menit",
                         "35 Menit", "40 Menit", "45 Menit",
@@ -170,11 +185,19 @@
                     ];
 
                     if (!allowedWaktu.includes(globalWaktu)) {
-                        alert("Waktu harus 20 - 60 Menit (kelipatan 5)");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Waktu harus 20 - 60 menit!',
+                            width: '340px',
+                            confirmButtonColor: '#ef4444',
+                            customClass: {
+                                popup: 'rounded-3xl shadow-xl',
+                                title: 'text-lg font-bold'
+                            }
+                        });
                         return;
                     }
 
-                    // 🔥 KONVERSI "45 Menit" → 45
                     const waktuAngka = parseInt(globalWaktu.replace(" Menit", ""));
 
                     // =========================
@@ -182,16 +205,35 @@
                     // =========================
                     for (let i = 0; i < jsonData.length; i++) {
                         let row = jsonData[i];
-
                         let jawaban = (row["Jawaban Benar"] || "").toString().trim();
 
-                        if (!['a', 'b', 'c', 'd', 'e'].includes(jawaban)) {
-                            alert(`Error di baris ${i + 2}: Jawaban harus huruf kecil (a/b/c/d/e)`);
+                        if (!['a','b','c','d','e'].includes(jawaban)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: `Error di baris ${i + 2}`,
+                                text: 'Jawaban harus a/b/c/d/e',
+                                width: '340px',
+                                confirmButtonColor: '#ef4444',
+                                customClass: {
+                                    popup: 'rounded-3xl shadow-xl',
+                                    title: 'text-lg font-bold'
+                                }
+                            });
                             return;
                         }
 
                         if (jawaban !== jawaban.toLowerCase()) {
-                            alert(`Error di baris ${i + 2}: Jangan pakai huruf besar!`);
+                            Swal.fire({
+                                icon: 'error',
+                                title: `Error di baris ${i + 2}`,
+                                text: 'Gunakan huruf kecil!',
+                                width: '340px',
+                                confirmButtonColor: '#ef4444',
+                                customClass: {
+                                    popup: 'rounded-3xl shadow-xl',
+                                    title: 'text-lg font-bold'
+                                }
+                            });
                             return;
                         }
                     }
@@ -199,7 +241,6 @@
                     // =========================
                     // ✅ MAPPING DATA
                     // =========================
-
                     this.selectedSubtes = globalSubtes;
                     this.selectedWaktu = waktuAngka;
 
@@ -210,8 +251,8 @@
                         materi: row["Materi"] || "",
                         pertanyaan: row["Pertanyaan"] || "",
 
-                        gambar: (row["URL Gambar"] || "").startsWith("http") ?
-                            row["URL Gambar"] : null,
+                        gambar: (row["URL Gambar"] || "").startsWith("http")
+                            ? row["URL Gambar"] : null,
 
                         opsi_a: row["Opsi A"] || "",
                         opsi_b: row["Opsi B"] || "",
@@ -228,11 +269,36 @@
 
                     this.showImportModal = false;
 
-                    alert("Import berhasil & valid!");
-                };
+                    // ✅ SUCCESS
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Data berhasil diimport',
+                        width: '340px',
+                        padding: '1.8rem',
+                        confirmButtonColor: '#4A72D4',
+                        customClass: {
+                            popup: 'rounded-3xl shadow-xl',
+                            title: 'text-lg font-bold',
+                            confirmButton: 'rounded-xl px-6 py-2'
+                        }
+                    });
 
-                reader.readAsArrayBuffer(file);
-            },
+                } catch (err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data Gagal Tersimpan!',
+                        width: '340px',
+                        confirmButtonColor: '#ef4444',
+                        customClass: {
+                            popup: 'rounded-3xl shadow-xl',
+                            title: 'text-lg font-bold'
+                        }
+                    });
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        },
 
             unduhTemplate() {
                 const wb = XLSX.utils.book_new();

@@ -726,24 +726,6 @@
     "
 ></div>
 @endif
-
-
-@if (session('success'))
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
-            text: "{{ session('success') }}",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            customClass: {
-                popup: 'rounded-[2rem]', 
-            }
-        });
-    </script>
-    
-@endif
 </body>
 
 </html>

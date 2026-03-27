@@ -328,12 +328,13 @@
                 <div class="flex gap-2">
 
                     <button 
-                        @click="editData({
-                            id: user.id,
-                            nama: user.name,
-                            no_hp: user.no_hp,
-                            email: user.email
-                        })"
+                      @click="editData({
+                        id: user.id,
+                        nama: user.name,
+                        no_hp: user.no_hp,
+                        email: user.email,
+                        photo: user.photo 
+                    })"
                         class="text-blue-500 px-2 py-1.5 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"><svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                     </button>
 
@@ -530,15 +531,50 @@
                 </template>
 
                 {{-- FOTO --}}
-                <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-100 rounded-3xl py-6 bg-slate-50 hover:bg-blue-50 transition-all cursor-pointer relative group">
-                    <input type="file" name="photo"
-                           class="absolute inset-0 opacity-0 cursor-pointer">
-                    <div class="bg-white p-3 rounded-full shadow-sm text-[#4A72D4] mb-2">
-                        <i class="fa-solid fa-camera text-xl"></i>
+               <div class="flex flex-col items-center gap-3">
+
+                   
+                    <div class="relative group w-32 h-32">
+
+                        
+                        <input type="file" name="photo"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            accept="image/*"
+                            @change="
+                                const file = $event.target.files[0];
+                                if(file){
+                                    const reader = new FileReader();
+                                    reader.onload = e => photoPreview = e.target.result;
+                                    reader.readAsDataURL(file);
+                                }
+                            "
+                        >
+
+                        <!-- PREVIEW -->
+                        <template x-if="photoPreview">
+                            <img :src="photoPreview"
+                                class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
+                        </template>
+
+                        <!-- DEFAULT (BELUM ADA FOTO) -->
+                        <div x-show="!photoPreview"
+                            class="w-32 h-32 rounded-full bg-slate-100 flex items-center justify-center shadow-inner border border-slate-200">
+                            
+                            <i class="fa-solid fa-user text-3xl text-slate-400"></i>
+                        </div>
+
+                        <!-- OVERLAY HOVER -->
+                        <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition">
+                            Ganti
+                        </div>
+
                     </div>
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                        Unggah Foto Profil
+
+                    <!-- TEXT -->
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        Upload Foto Profil
                     </p>
+
                 </div>
 
                 {{-- NAMA & WA --}}
@@ -747,14 +783,17 @@ function userApp() {
         openModal: false,
         isEdit: false,
 
+       
+        photoPreview: null,
+
         form: {
             id: '',
             nama: '',
-            wa: '',
+            no_hp: '',
             email: ''
         },
 
-        //  FILTER ADMIN
+        
         get filteredAdmins() {
             return this.admins.filter(u =>
                 u.name.toLowerCase().includes(this.search.toLowerCase()) ||
@@ -763,7 +802,6 @@ function userApp() {
             );
         },
 
-        //  FILTER PESERTA
         get filteredPesertas() {
             return this.pesertas.filter(u =>
                 u.name.toLowerCase().includes(this.search.toLowerCase()) ||
@@ -772,32 +810,44 @@ function userApp() {
             );
         },
 
-        //  FILTER HISTORY
-       get filteredHistory() {
-        return this.history.filter(u =>
-            u.name.toLowerCase().includes(this.search.toLowerCase()) ||
-            u.id.toString().includes(this.search) ||
-            (u.role && u.role.toLowerCase().includes(this.search.toLowerCase()))
-        );
-    },
+        get filteredHistory() {
+            return this.history.filter(u =>
+                u.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                u.id.toString().includes(this.search) ||
+                (u.role && u.role.toLowerCase().includes(this.search.toLowerCase()))
+            );
+        },
 
         editData(data) {
             this.isEdit = true;
+
             this.form.id = data.id;
-            this.form.nama = data.nama;
+            this.form.nama = data.nama ?? data.name;
             this.form.no_hp = data.no_hp;
             this.form.email = data.email;
+
+           
+            if (data.photo) {
+                this.photoPreview = data.photo.startsWith('http')
+                    ? data.photo
+                    : '/storage/' + data.photo;
+            } else {
+                this.photoPreview = null;
+            }
+
             this.openModal = true;
         },
 
-        
-
+      
         resetForm() {
             this.isEdit = false;
+
             this.form.id = '';
             this.form.nama = '';
-            this.form.wa = '';
+            this.form.no_hp = '';
             this.form.email = '';
+
+            this.photoPreview = null;
         }
     }
 }

@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -103,59 +104,108 @@
     },
 
     importSheet(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                let totalImported = 0;
-                let foundSheet = false;
+    const file = event.target.files[0];
+    if (!file) return;
 
-                workbook.SheetNames.forEach(sheetName => {
-                    const sIdx = this.subtesList.findIndex(s => s.name.toLowerCase() === sheetName.toLowerCase());
-                    if (sIdx !== -1) {
-                        foundSheet = true;
-                        const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-                        if (jsonData.length > 0) {
-                            let current = this.subtesList[sIdx];
-                            jsonData.forEach((row, i) => {
-                                if(i < this.targetSoal) {
-                                    current.questions[i] = {
-                                        pertanyaan: row['Pertanyaan'] || '',
-                                        opsi_a: row['Opsi A'] || '', opsi_b: row['Opsi B'] || '',
-                                        opsi_c: row['Opsi C'] || '', opsi_d: row['Opsi D'] || '',
-                                        opsi_e: row['Opsi E'] || '',
-                                        jawaban_benar: row['Jawaban Benar']?.toString().toUpperCase() || '',
-                                        pembahasan: row['Pembahasan'] || '',
-                                        materi_teks: row['Materi Teks'] || '',
-                                        image_url: row['Link Gambar'] || null
-                                    };
-                                }
-                            });
-                            current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
-                            current.completed = (current.soalTerisi >= this.targetSoal);
-                            totalImported += current.soalTerisi;
-                        }
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+
+            let totalImported = 0;
+            let foundSheet = false;
+
+            workbook.SheetNames.forEach(sheetName => {
+                const sIdx = this.subtesList.findIndex(s => s.name.toLowerCase() === sheetName.toLowerCase());
+
+                if (sIdx !== -1) {
+                    foundSheet = true;
+
+                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+                    if (jsonData.length > 0) {
+                        let current = this.subtesList[sIdx];
+
+                        jsonData.forEach((row, i) => {
+                            if (i < this.targetSoal) {
+                                current.questions[i] = {
+                                    pertanyaan: row['Pertanyaan'] || '',
+                                    opsi_a: row['Opsi A'] || '',
+                                    opsi_b: row['Opsi B'] || '',
+                                    opsi_c: row['Opsi C'] || '',
+                                    opsi_d: row['Opsi D'] || '',
+                                    opsi_e: row['Opsi E'] || '',
+                                    jawaban_benar: row['Jawaban Benar']?.toString().toUpperCase() || '',
+                                    pembahasan: row['Pembahasan'] || '',
+                                    materi_teks: row['Materi Teks'] || '',
+                                    image_url: row['Link Gambar'] || null
+                                };
+                            }
+                        });
+
+                        current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
+                        current.completed = (current.soalTerisi >= this.targetSoal);
+
+                        totalImported += current.soalTerisi;
+                    }
+                }
+            });
+
+            //  kalau sheet gak cocok
+            if (!foundSheet) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Nama sheet tidak sesuai subtes!',
+                    width: '340px',
+                    confirmButtonColor: '#ef4444',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-xl',
+                        title: 'text-lg font-bold'
                     }
                 });
-
-                if (!foundSheet) throw new Error('Nama sheet tidak sesuai subtes.');
-                
-                this.saveLocal();
-                this.successMessage = 'Berhasil mengimport ' + totalImported + ' soal.';
-                this.showSuccessModal = true;
-                this.showImportModal = false;
-                if (this.activeSubtesIndex !== null) this.loadQuestion();
-            } catch (error) {
-                this.errorMessage = error.message;
-                this.showErrorModal = true;
+                return;
             }
-            event.target.value = '';
-        };
-        reader.readAsArrayBuffer(file);
-    },
+
+            this.saveLocal();
+            this.showImportModal = false;
+
+            //  SUCCESS
+            Swal.fire({
+                icon: 'success',
+                title: `Berhasil mengimport ${totalImported} soal`,
+                width: '340px',
+                padding: '1.8rem',
+                confirmButtonColor: '#4A72D4',
+                customClass: {
+                    popup: 'rounded-3xl shadow-xl',
+                    title: 'text-lg font-bold',
+                    confirmButton: 'rounded-xl px-6 py-2'
+                }
+            });
+
+            if (this.activeSubtesIndex !== null) this.loadQuestion();
+
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Data Gagal Tersimpan!',
+                text: error.message,
+                width: '340px',
+                confirmButtonColor: '#ef4444',
+                customClass: {
+                    popup: 'rounded-3xl shadow-xl',
+                    title: 'text-lg font-bold'
+                }
+            });
+        }
+
+        event.target.value = '';
+    };
+
+    reader.readAsArrayBuffer(file);
+},
 
     selectSubtes(index) {
         this.activeSubtesIndex = index;

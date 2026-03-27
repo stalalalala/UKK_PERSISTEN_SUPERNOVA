@@ -20,7 +20,9 @@ class UserController extends Controller
     public function index()
     {
        return view('admin.user.index', [
-            'admins'   => User::where('role', 'admin')->latest()->get(),
+            'admins'   => User::where('role', 'admin')
+                            ->orderBy('updated_at', 'desc') 
+                            ->get(),
             'pesertas' => User::where('role', 'peserta')->latest()->get(),
             'history'  => User::onlyTrashed()->latest()->get()
         ]);

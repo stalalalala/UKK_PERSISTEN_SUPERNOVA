@@ -247,7 +247,7 @@
                 <div class="flex items-center gap-2">
                     <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
                         <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" alt="Admin" class="w-full h-full object-cover">
->>>>>>> perubahan2
+
                     </div>
                     <span class="font-bold text-sm text-gray-700 truncate lg:max-w-none">Admin</span>
                 </div>

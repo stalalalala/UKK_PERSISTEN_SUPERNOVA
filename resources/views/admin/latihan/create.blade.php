@@ -69,7 +69,7 @@
                 reader.readAsDataURL(file);
             },
 
-            // Pastikan format import sesuai dengan kolom di Controller
+            
             importExcel(event) {
                 const file = event.target.files[0];
                 if (!file) return;
@@ -77,110 +77,179 @@
                 const reader = new FileReader();
 
                 reader.onload = (e) => {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {
-                        type: "array"
-                    });
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: "array" });
 
-                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(sheet);
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-                    if (jsonData.length === 0) {
-                        alert("File Excel kosong!");
-                        return;
-                    }
-
-                    // =========================
-                    // 🔥 VALIDASI GLOBAL
-                    // =========================
-
-                    const allowedSubtes = [
-                        "Penalaran Umum",
-                        "Penalaran & Pemahaman Umum",
-                        "Pemahaman Bacaan & Menulis",
-                        "Pengetahuan Kuantitatif",
-                        "Penalaran Matematika",
-                        "Literasi Bahasa Indonesia",
-                        "Literasi Bahasa Inggris"
-                    ];
-
-                    const globalSubtes = (jsonData[0]["Kategori Subtes"] || "").trim();
-                    const globalWaktu = (jsonData[0]["Waktu"] || "").toString().trim();
-
-                    // ✅ Validasi Subtes
-                    if (!allowedSubtes.includes(globalSubtes)) {
-                        alert("Subtes tidak valid! Harus sesuai format lengkap.");
-                        return;
-                    }
-
-                    // ✅ Validasi Waktu (20–60 menit kelipatan 5)
-                    const allowedWaktu = [
-                        "20 Menit", "25 Menit", "30 Menit",
-                        "35 Menit", "40 Menit", "45 Menit",
-                        "50 Menit", "55 Menit", "60 Menit"
-                    ];
-
-                    if (!allowedWaktu.includes(globalWaktu)) {
-                        alert("Waktu harus 20 - 60 Menit (kelipatan 5)");
-                        return;
-                    }
-
-                    // 🔥 KONVERSI "45 Menit" → 45
-                    const waktuAngka = parseInt(globalWaktu.replace(" Menit", ""));
-
-                    // =========================
-                    // 🔥 VALIDASI PER BARIS
-                    // =========================
-                    for (let i = 0; i < jsonData.length; i++) {
-                        let row = jsonData[i];
-
-                        let jawaban = (row["Jawaban Benar"] || "").toString().trim();
-
-                        if (!['a', 'b', 'c', 'd', 'e'].includes(jawaban)) {
-                            alert(`Error di baris ${i + 2}: Jawaban harus huruf kecil (a/b/c/d/e)`);
+                        // ❌ FILE KOSONG
+                        if (jsonData.length === 0) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'File Excel kosong!',
+                                width: '340px',
+                                confirmButtonColor: '#ef4444',
+                                customClass: {
+                                    popup: 'rounded-3xl shadow-xl',
+                                    title: 'text-lg font-bold'
+                                }
+                            });
                             return;
                         }
 
-                        if (jawaban !== jawaban.toLowerCase()) {
-                            alert(`Error di baris ${i + 2}: Jangan pakai huruf besar!`);
+                        // =========================
+                        // 🔥 VALIDASI GLOBAL
+                        // =========================
+
+                        const allowedSubtes = [
+                            "Penalaran Umum",
+                            "Penalaran & Pemahaman Umum",
+                            "Pemahaman Bacaan & Menulis",
+                            "Pengetahuan Kuantitatif",
+                            "Penalaran Matematika",
+                            "Literasi Bahasa Indonesia",
+                            "Literasi Bahasa Inggris"
+                        ];
+
+                        const globalSubtes = (jsonData[0]["Kategori Subtes"] || "").trim();
+                        const globalWaktu = (jsonData[0]["Waktu"] || "").toString().trim();
+
+                        // ❌ Subtes tidak valid
+                        if (!allowedSubtes.includes(globalSubtes)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Subtes tidak valid!',
+                                width: '340px',
+                                confirmButtonColor: '#ef4444',
+                                customClass: {
+                                    popup: 'rounded-3xl shadow-xl',
+                                    title: 'text-lg font-bold'
+                                }
+                            });
                             return;
                         }
+
+                        // ❌ Waktu tidak valid
+                        const allowedWaktu = [
+                            "20 Menit", "25 Menit", "30 Menit",
+                            "35 Menit", "40 Menit", "45 Menit",
+                            "50 Menit", "55 Menit", "60 Menit"
+                        ];
+
+                        if (!allowedWaktu.includes(globalWaktu)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Waktu harus 20 - 60 Menit',
+                                width: '340px',
+                                confirmButtonColor: '#ef4444',
+                                customClass: {
+                                    popup: 'rounded-3xl shadow-xl',
+                                    title: 'text-lg font-bold'
+                                }
+                            });
+                            return;
+                        }
+
+                        const waktuAngka = parseInt(globalWaktu.replace(" Menit", ""));
+
+                        // =========================
+                        // 🔥 VALIDASI PER BARIS
+                        // =========================
+                        for (let i = 0; i < jsonData.length; i++) {
+                            let row = jsonData[i];
+                            let jawaban = (row["Jawaban Benar"] || "").toString().trim();
+
+                            if (!['a', 'b', 'c', 'd', 'e'].includes(jawaban)) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: `Error di baris ${i + 2}`,
+                                    text: 'Jawaban harus a/b/c/d/e',
+                                    width: '340px',
+                                    confirmButtonColor: '#ef4444',
+                                    customClass: {
+                                        popup: 'rounded-3xl shadow-xl',
+                                        title: 'text-lg font-bold'
+                                    }
+                                });
+                                return;
+                            }
+
+                            if (jawaban !== jawaban.toLowerCase()) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: `Error di baris ${i + 2}`,
+                                    text: 'Gunakan huruf kecil!',
+                                    width: '340px',
+                                    confirmButtonColor: '#ef4444',
+                                    customClass: {
+                                        popup: 'rounded-3xl shadow-xl',
+                                        title: 'text-lg font-bold'
+                                    }
+                                });
+                                return;
+                            }
+                        }
+
+                        // =========================
+                        // ✅ MAPPING DATA
+                        // =========================
+                        this.selectedSubtes = globalSubtes;
+                        this.selectedWaktu = waktuAngka;
+
+                        this.questions = jsonData.slice(0, 20).map((row) => ({
+                            subtes: globalSubtes,
+                            waktu: waktuAngka,
+
+                            materi: row["Materi"] || "",
+                            pertanyaan: row["Pertanyaan"] || "",
+
+                            gambar: (row["URL Gambar"] || "").startsWith("http")
+                                ? row["URL Gambar"] : null,
+
+                            opsi_a: row["Opsi A"] || "",
+                            opsi_b: row["Opsi B"] || "",
+                            opsi_c: row["Opsi C"] || "",
+                            opsi_d: row["Opsi D"] || "",
+                            opsi_e: row["Opsi E"] || "",
+
+                            jawaban_benar: (row["Jawaban Benar"] || "").toLowerCase().trim(),
+                            pembahasan: row["Pembahasan"] || "",
+                        }));
+
+                        this.soalTersimpan = this.questions.length;
+                        this.activeQuestion = 1;
+                        this.loadQuestion();
+
+                        this.showImportModal = false;
+
+                        // ✅ SUCCESS
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Data berhasil diimport',
+                            width: '340px',
+                            padding: '1.8rem',
+                            confirmButtonColor: '#4A72D4',
+                            customClass: {
+                                popup: 'rounded-3xl shadow-xl',
+                                title: 'text-lg font-bold',
+                                confirmButton: 'rounded-xl px-6 py-2'
+                            }
+                        });
+
+                    } catch (err) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Tersimpan!',
+                            width: '340px',
+                            confirmButtonColor: '#ef4444',
+                            customClass: {
+                                popup: 'rounded-3xl shadow-xl',
+                                title: 'text-lg font-bold'
+                            }
+                        });
                     }
-
-                    // =========================
-                    // ✅ MAPPING DATA
-                    // =========================
-
-                    this.selectedSubtes = globalSubtes;
-                    this.selectedWaktu = waktuAngka;
-
-                    this.questions = jsonData.slice(0, 20).map((row) => ({
-                        subtes: globalSubtes,
-                        waktu: waktuAngka,
-
-                        materi: row["Materi"] || "",
-                        pertanyaan: row["Pertanyaan"] || "",
-
-                        gambar: (row["URL Gambar"] || "").startsWith("http") ?
-                            row["URL Gambar"] : null,
-
-                        opsi_a: row["Opsi A"] || "",
-                        opsi_b: row["Opsi B"] || "",
-                        opsi_c: row["Opsi C"] || "",
-                        opsi_d: row["Opsi D"] || "",
-                        opsi_e: row["Opsi E"] || "",
-
-                        jawaban_benar: (row["Jawaban Benar"] || "").toLowerCase().trim(),
-                        pembahasan: row["Pembahasan"] || "",
-                    }));
-
-                    this.soalTersimpan = this.questions.length;
-                    this.activeQuestion = 1;
-                    this.loadQuestion();
-
-                    this.showImportModal = false;
-
-                    alert("Import berhasil & valid!");
                 };
 
                 reader.readAsArrayBuffer(file);
