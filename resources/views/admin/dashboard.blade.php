@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persisten Dashboard - Admin</title>
+    <title>Dashboard - Admin | PERSISTEN</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -174,359 +174,374 @@
 
         <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
 
-            <header class="flex flex-col lg:flex-row lg:items-center justify-between lg:pt-4 pb-4 gap-4 flex-shrink-0 w-full">
-    <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
-        <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
-            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-        </button>
-
-        @php
-            use Illuminate\Support\Facades\Auth;
-            $user = Auth::user();
-        @endphp
-
-        <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
-            <div @click="open = !open" 
-                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
-                
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
-                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" 
-                             alt="Admin" class="w-full h-full object-cover">
-                    </div>
-                    <span class="font-bold text-sm text-gray-700 truncate">Admin</span>
-                </div>
-                
-                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-            </div>
-
-            <div x-show="open" @click.away="open = false"
-                class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
-                x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 transform scale-95"
-                x-transition:enter-end="opacity-100 transform scale-100"
-                x-transition:leave="transition ease-in duration-150"
-                x-transition:leave-start="opacity-100 transform scale-100"
-                x-transition:leave-end="opacity-0 transform scale-95"
-                style="display: none;">
-                <div class="p-4 bg-gray-50/50 border-b border-gray-100">
-                    <p class="font-bold text-gray-800">{{ $user->name }}</p>
-                    <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
-                </div>
-                <div class="p-4 text-xs text-gray-500 bg-white">
-                    {{ $user->no_hp ?? '-' }}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div x-data="{
-            keyword: '',
-            routes: {
-                'dashboard': '{{ route('admin.dashboard.index') }}',
-                'user': '{{ route('admin.user.index') }}',
-                'streak': '{{ route('admin.streak.index') }}',
-                'monitoring': '{{ route('admin.laporan.index') }}',
-                'video': '{{ route('admin.videoPembelajaran.index') }}',
-                'peluang': '{{ route('admin.peluang.index') }}',
-                'tryout': '{{ route('admin.tryout.index') }}',
-                'minat bakat': '{{ route('admin.minatBakat.index') }}',
-                'kuis': '{{ route('admin.kuis.index') }}',
-                'latihan': '{{ route('admin.latihan.index') }}'
-            },
-            goToPage(){
-                let search = this.keyword.toLowerCase()
-                for (let key in this.routes) {
-                    if (key.includes(search)) {
-                        window.location.href = this.routes[key]
-                        return
-                    }
-                }
-                alert('Halaman tidak ditemukan')
-            }
-        }"
-        class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1"
-    >
-        <div class="relative w-full">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                </svg>
-            </div>
-            <input 
-                type="text" 
-                x-model="keyword" 
-                placeholder="Cari halaman..." 
-                @keydown.enter="goToPage()"
-                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm"
-            >
-        </div>
-
-        <button 
-            @click="goToPage()" 
-            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0"
-        >
-            Cari
-        </button>
-    </div>
-</header>
-
-          <div class="grid grid-cols-12 gap-6 pb-8">
-    <div class="col-span-12 bg-white rounded-[20px] p-6 lg:p-8 lg:pb-12 shadow-sm border border-blue-50 relative overflow-hidden">
-        <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
-            <h2 class="text-xl font-bold text-[#4A72D4]">
-                Perbandingan Pendaftar akun
-                <span class="text-[#3B455E] font-medium text-lg">dalam setahun</span>
-            </h2>
-        </div>
-
-        @php
-            $barWidth = 33;   
-            $spacing = 40;  
-            $offset = 50;    
-            $chartHeight = 165;
-            $totalData = count($months);
-            $chartWidth = ($totalData * ($barWidth + $spacing)) + $offset;
-            $maxValue = max($months);
-            $steps = 5;
-            $stepValue = $maxValue > 0 ? ceil($maxValue / ($steps - 1)) : 1;
-            $chartMax = $stepValue * ($steps - 1);
-        @endphp
-
-        <div class="w-full mt-4 relative">
-            <div class="overflow-x-auto pb-4 scrollbar-hide lg:overflow-visible">
-                <div style="min-width: {{ $chartWidth }}px;" class="h-64 px-6">
-                    <svg viewBox="0 0 {{ $chartWidth }} 240" class="w-full h-full" preserveAspectRatio="xMinYMid meet">
-                        <g stroke="#F1F5F9" stroke-width="1">
-                            <line x1="0" y1="180" x2="{{ $chartWidth }}" y2="180" />
-                            <line x1="0" y1="140" x2="{{ $chartWidth }}" y2="140" />
-                            <line x1="0" y1="100" x2="{{ $chartWidth }}" y2="100" />
-                            <line x1="0" y1="60" x2="{{ $chartWidth }}" y2="60" />
-                            <line x1="0" y1="20" x2="{{ $chartWidth }}" y2="20" />
-                        </g>
-
-                        @php $i = 0; @endphp
-                        @foreach($months as $index => $value)
-                            @php
-                                $x = $i * ($barWidth + $spacing) + $offset;
-                                $height = $chartMax > 0 ? ($value / $chartMax) * $chartHeight : 0;
-                                $y = 180 - $height;
-                                $i++;
-                            @endphp
-
-                            <rect x="{{ $x }}" y="{{ $y }}" width="{{ $barWidth }}" height="{{ $height }}" rx="8" fill="#4A72D4" class="hover:opacity-80 transition" />
-                            <text x="{{ $x + ($barWidth/2) }}" y="230" text-anchor="middle" class="text-[10px] font-bold fill-gray-400 uppercase tracking-widest">
-                                {{ \Carbon\Carbon::create()->month($index)->format('M') }}
-                            </text>
-                        @endforeach
-                    </svg>
-                </div>
-            </div>
-
-            <div class="absolute inset-y-0 left-0 flex flex-col justify-between text-[10px] text-gray-400 font-bold py-2 pointer-events-none bg-white/80 pr-2" style="height: 180px; top: 16px;">
-                @php
-                    $ySteps = 4;
-                    $yStepValue = $maxValue > 0 ? ceil($maxValue / $ySteps) : 1;
-                @endphp
-                @for ($i = $ySteps; $i >= 0; $i--)
-                    <span>{{ $i * $yStepValue }}</span>
-                @endfor
-            </div>
-        </div>
-
-        <div class="mt-10 flex items-center justify-between bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
-            <div class="flex items-center gap-3">
-                <div class="w-4 h-4 bg-[#4A72D4] rounded-full"></div>
-                <span class="text-sm font-medium text-gray-600">Total pendaftar tahun ini</span>
-            </div>
-            <span class="text-lg font-bold text-[#4A72D4]">{{ array_sum($months) }}</span>
-        </div>
-    </div>
-</div>
-
-<div class="grid grid-cols-12 gap-6">
-    <div class="col-span-12 lg:col-span-7 space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white rounded-[20px] p-6 lg:p-2 shadow-sm flex items-center gap-6 border border-blue-50">
-                <div class="w-14 h-14 bg-[#A6C1FF] rounded-full shrink-0 flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#4A72D4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9.003 9.003 0 0112 15c2.21 0 4.21.896 5.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </div>
-                <div>
-                    <p class="text-[#4A72D4] text-xl font-bold">Total Peserta</p>
-                    <h3 class="text-2xl font-bold text-gray-700"> {{ number_format($totalUsers) }}</h3>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-[20px] p-6 lg:p-2 shadow-sm border border-blue-50">
-                <div class="flex items-center gap-6">
-                    <div class="w-14 h-14 bg-[#5BB58D] rounded-full shrink-0 flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l7 4v6c0 5.25-3.75 10-7 10s-7-4.75-7-10V6l7-4z" />
+            <header
+                class="flex flex-col lg:flex-row lg:items-center justify-between lg:pt-4 pb-4 gap-4 flex-shrink-0 w-full">
+                <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
+                    <button @click="mobileMenuOpen = true"
+                        class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
+                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
+                    </button>
+
+                    @php
+                        use Illuminate\Support\Facades\Auth;
+                        $user = Auth::user();
+                    @endphp
+
+                    <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
+                        <div @click="open = !open"
+                            class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
+
+                            <div class="flex items-center gap-2">
+                                <div
+                                    class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
+                                    <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
+                                        alt="Admin" class="w-full h-full object-cover">
+                                </div>
+                                <span class="font-bold text-sm text-gray-700 truncate">Admin</span>
+                            </div>
+
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                        </div>
+
+                        <div x-show="open" @click.away="open = false"
+                            class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 transform scale-95"
+                            x-transition:enter-end="opacity-100 transform scale-100"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 transform scale-100"
+                            x-transition:leave-end="opacity-0 transform scale-95" style="display: none;">
+                            <div class="p-4 bg-gray-50/50 border-b border-gray-100">
+                                <p class="font-bold text-gray-800">{{ $user->name }}</p>
+                                <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
+                            </div>
+                            <div class="p-4 text-xs text-gray-500 bg-white">
+                                {{ $user->no_hp ?? '-' }}
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-[#5BB58D] text-xl font-bold">Total Admin</p>
-                        <h3 class="text-2xl font-bold text-gray-700">{{ number_format($totalAdmins) }}</h3>
+                </div>
+
+                <div x-data="{
+                    keyword: '',
+                    routes: {
+                        'dashboard': '{{ route('admin.dashboard.index') }}',
+                        'user': '{{ route('admin.user.index') }}',
+                        'streak': '{{ route('admin.streak.index') }}',
+                        'monitoring': '{{ route('admin.laporan.index') }}',
+                        'video': '{{ route('admin.videoPembelajaran.index') }}',
+                        'peluang': '{{ route('admin.peluang.index') }}',
+                        'tryout': '{{ route('admin.tryout.index') }}',
+                        'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                        'kuis': '{{ route('admin.kuis.index') }}',
+                        'latihan': '{{ route('admin.latihan.index') }}'
+                    },
+                    goToPage() {
+                        let search = this.keyword.toLowerCase()
+                        for (let key in this.routes) {
+                            if (key.includes(search)) {
+                                window.location.href = this.routes[key]
+                                return
+                            }
+                        }
+                        alert('Halaman tidak ditemukan')
+                    }
+                }" class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1">
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                            </svg>
+                        </div>
+                        <input type="text" x-model="keyword" placeholder="Cari halaman..."
+                            @keydown.enter="goToPage()"
+                            class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm">
+                    </div>
+
+                    <button @click="goToPage()"
+                        class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0">
+                        Cari
+                    </button>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-12 gap-6 pb-8">
+                <div
+                    class="col-span-12 bg-white rounded-[20px] p-6 lg:p-8 lg:pb-12 shadow-sm border border-blue-50 relative overflow-hidden">
+                    <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+                        <h2 class="text-xl font-bold text-[#4A72D4]">
+                            Perbandingan Pendaftar akun
+                            <span class="text-[#3B455E] font-medium text-lg">dalam setahun</span>
+                        </h2>
+                    </div>
+
+                    @php
+                        $barWidth = 33;
+                        $spacing = 40;
+                        $offset = 50;
+                        $chartHeight = 165;
+                        $totalData = count($months);
+                        $chartWidth = $totalData * ($barWidth + $spacing) + $offset;
+                        $maxValue = max($months);
+                        $steps = 5;
+                        $stepValue = $maxValue > 0 ? ceil($maxValue / ($steps - 1)) : 1;
+                        $chartMax = $stepValue * ($steps - 1);
+                    @endphp
+
+                    <div class="w-full mt-4 relative">
+                        <div class="overflow-x-auto pb-4 scrollbar-hide lg:overflow-visible">
+                            <div style="min-width: {{ $chartWidth }}px;" class="h-64 px-6">
+                                <svg viewBox="0 0 {{ $chartWidth }} 240" class="w-full h-full"
+                                    preserveAspectRatio="xMinYMid meet">
+                                    <g stroke="#F1F5F9" stroke-width="1">
+                                        <line x1="0" y1="180" x2="{{ $chartWidth }}"
+                                            y2="180" />
+                                        <line x1="0" y1="140" x2="{{ $chartWidth }}"
+                                            y2="140" />
+                                        <line x1="0" y1="100" x2="{{ $chartWidth }}"
+                                            y2="100" />
+                                        <line x1="0" y1="60" x2="{{ $chartWidth }}"
+                                            y2="60" />
+                                        <line x1="0" y1="20" x2="{{ $chartWidth }}"
+                                            y2="20" />
+                                    </g>
+
+                                    @php $i = 0; @endphp
+                                    @foreach ($months as $index => $value)
+                                        @php
+                                            $x = $i * ($barWidth + $spacing) + $offset;
+                                            $height = $chartMax > 0 ? ($value / $chartMax) * $chartHeight : 0;
+                                            $y = 180 - $height;
+                                            $i++;
+                                        @endphp
+
+                                        <rect x="{{ $x }}" y="{{ $y }}"
+                                            width="{{ $barWidth }}" height="{{ $height }}" rx="8"
+                                            fill="#4A72D4" class="hover:opacity-80 transition" />
+                                        <text x="{{ $x + $barWidth / 2 }}" y="230" text-anchor="middle"
+                                            class="text-[10px] font-bold fill-gray-400 uppercase tracking-widest">
+                                            {{ \Carbon\Carbon::create()->month($index)->format('M') }}
+                                        </text>
+                                    @endforeach
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="absolute inset-y-0 left-0 flex flex-col justify-between text-[10px] text-gray-400 font-bold py-2 pointer-events-none bg-white/80 pr-2"
+                            style="height: 180px; top: 16px;">
+                            @php
+                                $ySteps = 4;
+                                $yStepValue = $maxValue > 0 ? ceil($maxValue / $ySteps) : 1;
+                            @endphp
+                            @for ($i = $ySteps; $i >= 0; $i--)
+                                <span>{{ $i * $yStepValue }}</span>
+                            @endfor
+                        </div>
+                    </div>
+
+                    <div
+                        class="mt-10 flex items-center justify-between bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-4 h-4 bg-[#4A72D4] rounded-full"></div>
+                            <span class="text-sm font-medium text-gray-600">Total pendaftar tahun ini</span>
+                        </div>
+                        <span class="text-lg font-bold text-[#4A72D4]">{{ array_sum($months) }}</span>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="bg-white rounded-[20px] p-8 shadow-sm border border-blue-50">
-            <h2 class="text-xl font-bold mb-8 text-[#4A72D4]">
-                Total Konten <span class="text-gray-400 font-normal">dalam sistem</span>
-            </h2>
-
-            <div class="space-y-5">
-                <div class="flex items-center justify-between border-b border-gray-150 pb-3">
-                    <div class="flex items-center gap-4">
-                        <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
-                            <i class="fas fa-file-alt text-white text-xs"></i>
+            <div class="grid grid-cols-12 gap-6">
+                <div class="col-span-12 lg:col-span-7 space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div
+                            class="bg-white rounded-[20px] p-6 lg:p-2 shadow-sm flex items-center gap-6 border border-blue-50">
+                            <div class="w-14 h-14 bg-[#A6C1FF] rounded-full shrink-0 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#4A72D4]" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5.121 17.804A9.003 9.003 0 0112 15c2.21 0 4.21.896 5.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-[#4A72D4] text-xl font-bold">Total Peserta</p>
+                                <h3 class="text-2xl font-bold text-gray-700"> {{ number_format($totalUsers) }}</h3>
+                            </div>
                         </div>
-                        <span class="font-bold text-gray-500">Tryout</span>
+
+                        <div class="bg-white rounded-[20px] p-6 lg:p-2 shadow-sm border border-blue-50">
+                            <div class="flex items-center gap-6">
+                                <div
+                                    class="w-14 h-14 bg-[#5BB58D] rounded-full shrink-0 flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 2l7 4v6c0 5.25-3.75 10-7 10s-7-4.75-7-10V6l7-4z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-[#5BB58D] text-xl font-bold">Total Admin</p>
+                                    <h3 class="text-2xl font-bold text-gray-700">{{ number_format($totalAdmins) }}
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <span class="font-black text-gray-700">{{ number_format($totalTryout) }}</span>
+
+                    <div class="bg-white rounded-[20px] p-8 shadow-sm border border-blue-50">
+                        <h2 class="text-xl font-bold mb-8 text-[#4A72D4]">
+                            Total Konten <span class="text-gray-400 font-normal">dalam sistem</span>
+                        </h2>
+
+                        <div class="space-y-5">
+                            <div class="flex items-center justify-between border-b border-gray-150 pb-3">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
+                                        <i class="fas fa-file-alt text-white text-xs"></i>
+                                    </div>
+                                    <span class="font-bold text-gray-500">Tryout</span>
+                                </div>
+                                <span class="font-black text-gray-700">{{ number_format($totalTryout) }}</span>
+                            </div>
+
+                            <div class="flex items-center justify-between border-b border-gray-150 pb-3">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
+                                        <i class="fas fa-pencil-alt text-white text-xs"></i>
+                                    </div>
+                                    <span class="font-bold text-gray-500">Latihan Soal</span>
+                                </div>
+                                <span class="font-black text-gray-700">{{ number_format($totalLatihan) }}</span>
+                            </div>
+
+                            <div class="flex items-center justify-between border-b border-gray-150 pb-3">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
+                                        <i class="fas fa-video text-white text-xs"></i>
+                                    </div>
+                                    <span class="font-bold text-gray-500">Video</span>
+                                </div>
+                                <span class="font-black text-gray-700">{{ number_format($totalVideo) }}</span>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
+                                        <i class="fas fa-question text-white text-xs"></i>
+                                    </div>
+                                    <span class="font-bold text-gray-500">Kuis</span>
+                                </div>
+                                <span class="font-black text-gray-700">{{ number_format($totalKuis) }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <div class="col-span-12 lg:col-span-5 space-y-4.5">
 
-                <div class="flex items-center justify-between border-b border-gray-150 pb-3">
-                    <div class="flex items-center gap-4">
-                        <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
-                            <i class="fas fa-pencil-alt text-white text-xs"></i>
-                        </div>
-                        <span class="font-bold text-gray-500">Latihan Soal</span>
+                    <div class="bg-white rounded-[20px] shadow-sm border border-blue-50 p-6">
+                        <h2 class="text-lg font-bold text-[#4A72D4] mb-2">Pengaturan SNBT</h2>
+                        <form action="{{ route('admin.setsnbt') }}" method="POST" class="space-y-1">
+                            @csrf
+                            <div>
+                                <input type="datetime-local" name="snbt_date"
+                                    value="{{ isset($setting) ? \Carbon\Carbon::parse($setting->snbt_date)->format('Y-m-d\TH:i') : '' }}"
+                                    class="w-full bg-blue-50/50 border border-blue-100 rounded-xl px-4 py-2  text-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
+                            </div>
+                            <button type="submit"
+                                class="w-full bg-[#4A72D4] text-white font-bold py-2 rounded-xl hover:bg-blue-600 transition-all active:scale-95 shadow-sm text-xs">
+                                Simpan Jadwal
+                            </button>
+                        </form>
                     </div>
-                    <span class="font-black text-gray-700">{{ number_format($totalLatihan) }}</span>
-                </div>
 
-                <div class="flex items-center justify-between border-b border-gray-150 pb-3">
-                    <div class="flex items-center gap-4">
-                        <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
-                            <i class="fas fa-video text-white text-xs"></i>
-                        </div>
-                        <span class="font-bold text-gray-500">Video</span>
-                    </div>
-                    <span class="font-black text-gray-700">{{ number_format($totalVideo) }}</span>
-                </div>
+                    <div class="bg-white rounded-[20px] p-6 shadow-sm border border-blue-50 flex flex-col h-fit">
+                        <h2 class="text-xl font-bold mb-3 text-[#4A72D4]">Aktivitas Admin</h2>
 
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="w-6 h-6 bg-[#A6C1FF] rounded-full flex items-center justify-center">
-                            <i class="fas fa-question text-white text-xs"></i>
+                        <div class="max-h-[100px] overflow-y-auto pr-2 custom-scrollbar">
+                            <div class="space-y-2 relative">
+                                <div class="absolute left-6 top-2 bottom-10 w-0.5 bg-blue-50"></div>
+
+                                @forelse($recentLogs as $log)
+                                    <div class="relative flex items-start gap-4 mb-6 group">
+                                        <div
+                                            class="w-12 h-12 bg-blue-100 text-[#4A72D4] rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm border border-white group-hover:bg-[#4A72D4] group-hover:text-white transition-colors">
+                                            @if (str_contains(strtoupper($log->category), 'TAMBAH'))
+                                                <i class="fa-solid fa-plus text-xs"></i>
+                                            @elseif(str_contains(strtoupper($log->category), 'HAPUS'))
+                                                <i class="fa-solid fa-trash-can text-xs"></i>
+                                            @elseif(str_contains(strtoupper($log->category), 'UPDATE') || str_contains(strtoupper($log->category), 'EDIT'))
+                                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                            @else
+                                                <i class="fa-solid fa-bolt text-xs"></i>
+                                            @endif
+                                        </div>
+
+                                        <div class="pt-1 overflow-hidden">
+                                            <p class="text-sm font-bold text-gray-600 leading-tight">
+                                                {{ $log->user->name ?? 'Admin' }}
+                                                <span class="text-[#4A72D4] lowercase font-medium">
+                                                    {{ str_replace('TRYOUT', '', $log->category) }}
+                                                </span>
+                                                <span class="block text-gray-400 font-medium truncate italic mt-0.5">
+                                                    {{ $log->title }}
+                                                </span>
+                                            </p>
+                                            <span class="text-[11px] font-medium text-gray-400">
+                                                {{ $log->created_at->diffForHumans() }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="py-10 text-center opacity-30">
+                                        <p class="text-[10px] font-bold uppercase tracking-widest">Belum Ada Riwayat
+                                        </p>
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
-                        <span class="font-bold text-gray-500">Kuis</span>
+
+                        <a href="{{ route('admin.laporan.index') }}"
+                            class="w-full py-3 mt-4 bg-blue-50/50 hover:bg-[#4A72D4] hover:text-white text-[#4A72D4] text-[10px] font-black rounded-xl transition-all border border-blue-100/50 text-center uppercase tracking-[0.2em]">
+                            Semua Aktivitas
+                        </a>
                     </div>
-                    <span class="font-black text-gray-700">{{ number_format($totalKuis) }}</span>
+
                 </div>
             </div>
-        </div>
-    </div>
-  <div class="col-span-12 lg:col-span-5 space-y-4.5">
-
-    <div class="bg-white rounded-[20px] shadow-sm border border-blue-50 p-6">
-        <h2 class="text-lg font-bold text-[#4A72D4] mb-2">Pengaturan SNBT</h2>
-        <form action="{{ route('admin.setsnbt') }}" method="POST" class="space-y-1">
-            @csrf
-            <div>
-                <input type="datetime-local" name="snbt_date" value="{{ isset($setting) ? \Carbon\Carbon::parse($setting->snbt_date)->format('Y-m-d\TH:i') : '' }}" 
-                    class="w-full bg-blue-50/50 border border-blue-100 rounded-xl px-4 py-2  text-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
-            </div>
-            <button type="submit" class="w-full bg-[#4A72D4] text-white font-bold py-2 rounded-xl hover:bg-blue-600 transition-all active:scale-95 shadow-sm text-xs">
-                Simpan Jadwal
-            </button>
-        </form>
-    </div>
-
-    <div class="bg-white rounded-[20px] p-6 shadow-sm border border-blue-50 flex flex-col h-fit">
-        <h2 class="text-xl font-bold mb-3 text-[#4A72D4]">Aktivitas Admin</h2>
-        
-        <div class="max-h-[100px] overflow-y-auto pr-2 custom-scrollbar">
-            <div class="space-y-2 relative">
-                <div class="absolute left-6 top-2 bottom-10 w-0.5 bg-blue-50"></div>
-                
-                @forelse($recentLogs as $log)
-                <div class="relative flex items-start gap-4 mb-6 group">
-                    <div class="w-12 h-12 bg-blue-100 text-[#4A72D4] rounded-full shrink-0 flex items-center justify-center relative z-10 shadow-sm border border-white group-hover:bg-[#4A72D4] group-hover:text-white transition-colors">
-                        @if(str_contains(strtoupper($log->category), 'TAMBAH'))
-                            <i class="fa-solid fa-plus text-xs"></i>
-                        @elseif(str_contains(strtoupper($log->category), 'HAPUS'))
-                            <i class="fa-solid fa-trash-can text-xs"></i>
-                        @elseif(str_contains(strtoupper($log->category), 'UPDATE') || str_contains(strtoupper($log->category), 'EDIT'))
-                            <i class="fa-solid fa-pen-to-square text-xs"></i>
-                        @else
-                            <i class="fa-solid fa-bolt text-xs"></i>
-                        @endif
-                    </div>
-
-                    <div class="pt-1 overflow-hidden">
-                        <p class="text-sm font-bold text-gray-600 leading-tight">
-                            {{ $log->user->name ?? 'Admin' }} 
-                            <span class="text-[#4A72D4] lowercase font-medium">
-                                {{ str_replace('TRYOUT', '', $log->category) }}
-                            </span> 
-                            <span class="block text-gray-400 font-medium truncate italic mt-0.5">
-                                {{ $log->title }}
-                            </span>
-                        </p>
-                        <span class="text-[11px] font-medium text-gray-400">
-                            {{ $log->created_at->diffForHumans() }}
-                        </span>
-                    </div>
-                </div>
-                @empty
-                <div class="py-10 text-center opacity-30">
-                    <p class="text-[10px] font-bold uppercase tracking-widest">Belum Ada Riwayat</p>
-                </div>
-                @endforelse
-            </div>
-        </div>
-
-        <a href="{{ route('admin.laporan.index') }}" 
-           class="w-full py-3 mt-4 bg-blue-50/50 hover:bg-[#4A72D4] hover:text-white text-[#4A72D4] text-[10px] font-black rounded-xl transition-all border border-blue-100/50 text-center uppercase tracking-[0.2em]">
-            Semua Aktivitas
-        </a>
-    </div>
-
-</div>
-    </div>
         </main>
     </div>
-    @if(session('success'))
-<div 
-    x-data
-    x-init="
-        Swal.fire({
+    @if (session('success'))
+        <div x-data x-init="Swal.fire({
             icon: 'success',
             title: '{{ session('success') }}',
-
+        
             width: '340px',
             padding: '1.8rem',
-
+        
             background: '#ffffff',
             color: '#334155',
-
+        
             confirmButtonText: 'Oke',
             confirmButtonColor: '#4A72D4',
-
+        
             customClass: {
                 popup: 'rounded-3xl shadow-xl',
                 title: 'text-lg font-bold',
                 confirmButton: 'rounded-xl px-6 py-2'
             },
-
+        
             showClass: {
                 popup: 'animate__animated animate__fadeInDown'
             },
             hideClass: {
                 popup: 'animate__animated animate__fadeOutUp'
             }
-        })
-    "
-></div>
-@endif
+        })"></div>
+    @endif
 
     <style>
         .custom-scrollbar::-webkit-scrollbar {

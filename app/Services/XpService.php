@@ -76,27 +76,26 @@ class XpService
 {
     if (!$user->last_xp_date) return;
 
-    $days = Carbon::parse($user->last_xp_date)
-            ->diffInDays(now());
+    // Gunakan diffInDays untuk mengecek selisih hari kalender
+    $days = Carbon::parse($user->last_xp_date)->startOfDay()
+    ->diffInDays(Carbon::today());
 
-    if ($days >= 1 && !$user->character_locked) {
+    if ($days >= 5 && !$user->character_locked) { // GANTI KE 5 HARI
+        // Backup data
+        $user->backup_xp = $user->total_xp;
+        $user->backup_streak_days = $user->streak_days;
+        $user->backup_level = $user->level;
 
-    // 💾 SIMPAN DATA LAMA
-    $user->backup_xp = $user->total_xp;
-    $user->backup_streak_days = $user->streak_days;
-    $user->backup_level = $user->level;
+        // Reset
+        $user->streak_days = 1;
+        $user->streak_active = false;
+        $user->total_xp = 0;
+        $user->level = 1;
+        $user->character_locked = true;
 
-    // 🔥 RESET
-    $user->streak_days = 1;
-    $user->streak_active = false;
-
-    $user->total_xp = 0;
-    $user->level = 1;
-
-    $user->character_locked = true;
-
-    $user->save();
-}
+        $user->save();
+        $user->refresh(); // Penting agar instance user di memori terupdate
+    }
 }
 
     public function restoreStreak($user)

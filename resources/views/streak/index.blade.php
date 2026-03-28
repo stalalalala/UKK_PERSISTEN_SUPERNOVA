@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pet Streak - PERSISTEN</title>
+    <title>Streak | PERSISTEN</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -64,6 +64,8 @@
                 </button>
             </div>
         </nav>
+
+
 
         <div x-show="open" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="display: none;">
             <div x-show="open" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
@@ -131,6 +133,7 @@
 
         // Cek next evolution
         $userHasNextEvolution = $nextEvolution && !$isLocked;
+
     @endphp
 
     <main class="max-w-[1300px] mx-auto mt-10 px-4 md:px-6 pb-20" x-data="{

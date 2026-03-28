@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persisten Dashboard - Manajemen Tryout</title>
+    <title>Manajemen Tryout - Admin | PERSISTEN</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -44,15 +44,14 @@
     </style>
 </head>
 
-<body class="bg-[#E9EFFF] h-screen flex overflow-hidden text-[#2D3B61]" 
-    x-data="{
-        activeMenu: 'Manajemen Tryout',
-        mobileMenuOpen: false,
-        activeTab: 'list',
-        currentPage: 1,
-        itemsPerPage: 5,
-        
-        allTryout: {{ $tryouts->map(function($t) {
+<body class="bg-[#E9EFFF] h-screen flex overflow-hidden text-[#2D3B61]" x-data="{
+    activeMenu: 'Manajemen Tryout',
+    mobileMenuOpen: false,
+    activeTab: 'list',
+    currentPage: 1,
+    itemsPerPage: 5,
+
+    allTryout: {{ $tryouts->map(function ($t) {
             return [
                 'id' => $t->id,
                 'judul' => $t->nama_tryout,
@@ -61,11 +60,11 @@
                 'durasi' => $t->categories->sum('durasi'),
                 'is_active' => (bool) $t->is_active,
                 'tgl' => $t->tanggal->format('d M Y'),
-                'toggle_url' => route('admin.tryout.toggle', $t->id)
+                'toggle_url' => route('admin.tryout.toggle', $t->id),
             ];
         })->toJson() }},
 
-        historyTryout: {{ $trashed->map(function($t) {
+    historyTryout: {{ $trashed->map(function ($t) {
             return [
                 'id' => $t->id,
                 'judul' => $t->nama_tryout,
@@ -73,38 +72,38 @@
                 'total_soal' => $t->soals_count,
                 'durasi' => $t->categories->sum('durasi'),
                 'is_active' => (bool) $t->is_active,
-                'tgl' => $t->deleted_at ? $t->deleted_at->format('d M Y') : '-'
+                'tgl' => $t->deleted_at ? $t->deleted_at->format('d M Y') : '-',
             ];
         })->toJson() }},
 
-        deleteToHistory(id) {
-            const form = document.createElement('form');
-            form.action = '/admin/tryout/' + id;
-            form.method = 'POST';
-            form.innerHTML = `
+    deleteToHistory(id) {
+        const form = document.createElement('form');
+        form.action = '/admin/tryout/' + id;
+        form.method = 'POST';
+        form.innerHTML = `
                 <input type='hidden' name='_token' value='{{ csrf_token() }}'>
                 <input type='hidden' name='_method' value='DELETE'>
             `;
-            document.body.appendChild(form);
-            form.submit();
-        },
+        document.body.appendChild(form);
+        form.submit();
+    },
 
 
-        get totalPages() {
-            let data = this.activeTab === 'list' ? this.allTryout : this.historyTryout;
-            return Math.ceil(data.length / this.itemsPerPage) || 1;
-        },
+    get totalPages() {
+        let data = this.activeTab === 'list' ? this.allTryout : this.historyTryout;
+        return Math.ceil(data.length / this.itemsPerPage) || 1;
+    },
 
-        get pagedTryout() {
-            let start = (this.currentPage - 1) * this.itemsPerPage;
-            return this.allTryout.slice(start, start + this.itemsPerPage);
-        },
+    get pagedTryout() {
+        let start = (this.currentPage - 1) * this.itemsPerPage;
+        return this.allTryout.slice(start, start + this.itemsPerPage);
+    },
 
-        get pagedHistory() {
-            let start = (this.currentPage - 1) * this.itemsPerPage;
-            return this.historyTryout.slice(start, start + this.itemsPerPage);
-        }
-    }">
+    get pagedHistory() {
+        let start = (this.currentPage - 1) * this.itemsPerPage;
+        return this.historyTryout.slice(start, start + this.itemsPerPage);
+    }
+}">
 
     <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
         class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-screen overflow-y-auto">
@@ -256,100 +255,97 @@
 
     <main class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
 
-        <header class="flex flex-col lg:flex-row lg:items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0 w-full">
-    <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
-        <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
-            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-        </button>
+        <header
+            class="flex flex-col lg:flex-row lg:items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0 w-full">
+            <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
+                <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
 
-        @php
-            use Illuminate\Support\Facades\Auth;
-            $user = Auth::user();
-        @endphp
+                @php
+                    use Illuminate\Support\Facades\Auth;
+                    $user = Auth::user();
+                @endphp
 
-        <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
-            <div @click="open = !open" 
-                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
-                
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
-                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" 
-                             alt="Admin" class="w-full h-full object-cover">
+                <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
+                    <div @click="open = !open"
+                        class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
+
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
+                                <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
+                                    alt="Admin" class="w-full h-full object-cover">
+                            </div>
+                            <span class="font-bold text-sm text-gray-700 truncate lg:max-w-none">Admin</span>
+                        </div>
+
+                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
                     </div>
-                    <span class="font-bold text-sm text-gray-700 truncate lg:max-w-none">Admin</span>
+
+                    <div x-show="open" @click.away="open = false"
+                        class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100">
+                        <div class="p-4 bg-gray-50/50 border-b border-gray-100">
+                            <p class="font-bold text-gray-800">{{ $user->name }}</p>
+                            <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
+                        </div>
+                        <div class="p-4 text-xs text-gray-500 bg-white">
+                            {{ $user->no_hp ?? '-' }}
+                        </div>
+                    </div>
                 </div>
-                
-                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
             </div>
 
-            <div x-show="open" @click.away="open = false"
-                class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
-                x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 transform scale-95"
-                x-transition:enter-end="opacity-100 transform scale-100">
-                <div class="p-4 bg-gray-50/50 border-b border-gray-100">
-                    <p class="font-bold text-gray-800">{{ $user->name }}</p>
-                    <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
-                </div>
-                <div class="p-4 text-xs text-gray-500 bg-white">
-                    {{ $user->no_hp ?? '-' }}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div x-data="{
-            keyword: '',
-            routes: {
-                'dashboard': '{{ route('admin.dashboard.index') }}',
-                'user': '{{ route('admin.user.index') }}',
-                'streak': '{{ route('admin.streak.index') }}',
-                'monitoring': '{{ route('admin.laporan.index') }}',
-                'video': '{{ route('admin.videoPembelajaran.index') }}',
-                'peluang': '{{ route('admin.peluang.index') }}',
-                'tryout': '{{ route('admin.tryout.index') }}',
-                'minat bakat': '{{ route('admin.minatBakat.index') }}',
-                'kuis': '{{ route('admin.kuis.index') }}',
-                'latihan': '{{ route('admin.latihan.index') }}'
-            },
-            goToPage(){
-                let search = this.keyword.toLowerCase()
-                for (let key in this.routes) {
-                    if (key.includes(search)) {
-                        window.location.href = this.routes[key]
-                        return
+            <div x-data="{
+                keyword: '',
+                routes: {
+                    'dashboard': '{{ route('admin.dashboard.index') }}',
+                    'user': '{{ route('admin.user.index') }}',
+                    'streak': '{{ route('admin.streak.index') }}',
+                    'monitoring': '{{ route('admin.laporan.index') }}',
+                    'video': '{{ route('admin.videoPembelajaran.index') }}',
+                    'peluang': '{{ route('admin.peluang.index') }}',
+                    'tryout': '{{ route('admin.tryout.index') }}',
+                    'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                    'kuis': '{{ route('admin.kuis.index') }}',
+                    'latihan': '{{ route('admin.latihan.index') }}'
+                },
+                goToPage() {
+                    let search = this.keyword.toLowerCase()
+                    for (let key in this.routes) {
+                        if (key.includes(search)) {
+                            window.location.href = this.routes[key]
+                            return
+                        }
                     }
+                    alert('Halaman tidak ditemukan')
                 }
-                alert('Halaman tidak ditemukan')
-            }
-        }"
-        class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1"
-    >
-        <div class="relative w-full">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                </svg>
-            </div>
-            <input 
-                type="text" 
-                x-model="keyword" 
-                placeholder="Cari halaman..." 
-                @keydown.enter="goToPage()"
-                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm"
-            >
-        </div>
+            }" class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1">
+                <div class="relative w-full">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                    </div>
+                    <input type="text" x-model="keyword" placeholder="Cari halaman..."
+                        @keydown.enter="goToPage()"
+                        class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm">
+                </div>
 
-        <button 
-            @click="goToPage()" 
-            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0"
-        >
-            Cari
-        </button>
-    </div>
-</header>
+                <button @click="goToPage()"
+                    class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0">
+                    Cari
+                </button>
+            </div>
+        </header>
 
         <div class="flex-1 overflow-y-auto custom-scrollbar p-4 lg:px-8 lg:pb-8">
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
@@ -437,49 +433,59 @@
                         </thead>
                         <tbody class="divide-y divide-gray-50">
 
-                        <template x-for="(to, index) in pagedTryout" :key="to.id">
-                            <tr class="hover:bg-blue-50/30 transition-colors group">
-                                <td class="px-8 py-5">
-                                    <div class="flex flex-col">
-                                        <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]" x-text="to.judul"></span>
-                                        <span class="text-[10px] text-gray-400 font-medium uppercase" x-text="'ID: #TO-' + to.id + ' • ' + to.tgl"></span>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-5 text-center">
-                                    <span class="inline-block whitespace-nowrap bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-indigo-100" x-text="to.subtes + ' Subtes'"></span>
-                                </td>
-                                <td class="px-8 py-5 text-center text-sm font-bold text-gray-600" x-text="to.total_soal + ' Soal'"></td>
-                                <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <i class="fa-regular fa-clock text-gray-400"></i>
-                                        <span x-text="to.durasi + ' Menit'"></span>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-5 text-center">
-                                    <span :class="to.is_active ? 'bg-emerald-100 text-emerald-600 border-emerald-200' : 'bg-red-50 text-red-500 border-red-100'"
-                                        class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase border">
-                                        <span x-text="to.is_active ? 'Aktif' : 'Nonaktif'"></span>
-                                    </span>
-                                </td>
-                                <td class="px-8 py-5 text-center">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <form :action="to.toggle_url" method="POST" class="inline">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" 
-                                                :class="to.is_active ? 'text-emerald-500 hover:bg-emerald-50' : 'text-gray-400 hover:bg-gray-50'"
-                                                class="p-2 rounded-lg transition-all" 
-                                                :title="to.is_active ? 'Nonaktifkan' : 'Aktifkan'">
-                                                <i class="fa-solid" :class="to.is_active ? 'fa-eye' : 'fa-eye-slash'"></i>
-                                            </button>
-                                        </form>
+                            <template x-for="(to, index) in pagedTryout" :key="to.id">
+                                <tr class="hover:bg-blue-50/30 transition-colors group">
+                                    <td class="px-8 py-5">
+                                        <div class="flex flex-col">
+                                            <span class="font-bold text-gray-800 group-hover:text-[#4A72D4]"
+                                                x-text="to.judul"></span>
+                                            <span class="text-[10px] text-gray-400 font-medium uppercase"
+                                                x-text="'ID: #TO-' + to.id + ' • ' + to.tgl"></span>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5 text-center">
+                                        <span
+                                            class="inline-block whitespace-nowrap bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-indigo-100"
+                                            x-text="to.subtes + ' Subtes'"></span>
+                                    </td>
+                                    <td class="px-8 py-5 text-center text-sm font-bold text-gray-600"
+                                        x-text="to.total_soal + ' Soal'"></td>
+                                    <td class="px-8 py-5 text-center text-sm font-semibold text-gray-700">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <i class="fa-regular fa-clock text-gray-400"></i>
+                                            <span x-text="to.durasi + ' Menit'"></span>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-5 text-center">
+                                        <span
+                                            :class="to.is_active ? 'bg-emerald-100 text-emerald-600 border-emerald-200' :
+                                                'bg-red-50 text-red-500 border-red-100'"
+                                            class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase border">
+                                            <span x-text="to.is_active ? 'Aktif' : 'Nonaktif'"></span>
+                                        </span>
+                                    </td>
+                                    <td class="px-8 py-5 text-center">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <form :action="to.toggle_url" method="POST" class="inline">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit"
+                                                    :class="to.is_active ? 'text-emerald-500 hover:bg-emerald-50' :
+                                                        'text-gray-400 hover:bg-gray-50'"
+                                                    class="p-2 rounded-lg transition-all"
+                                                    :title="to.is_active ? 'Nonaktifkan' : 'Aktifkan'">
+                                                    <i class="fa-solid"
+                                                        :class="to.is_active ? 'fa-eye' : 'fa-eye-slash'"></i>
+                                                </button>
+                                            </form>
 
-                                        <a :href="'/admin/tryout/' + to.id + '/edit'"
-                                            class="p-2 text-blue-400 hover:bg-blue-50 rounded-lg transition-all" title="Edit">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </a>
-                                       <button type="button" 
-                                        @click="
+                                            <a :href="'/admin/tryout/' + to.id + '/edit'"
+                                                class="p-2 text-blue-400 hover:bg-blue-50 rounded-lg transition-all"
+                                                title="Edit">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                            <button type="button"
+                                                @click="
                                             Swal.fire({
                                                     title: 'Hapus TryOut?',
                                                     text: 'TryOut akan dipindahkan ke History',
@@ -495,24 +501,24 @@
                                                 }
                                             })
                                         "
-                                       class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                        </svg>
-                                        </button>
+                                                class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                    class="size-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
 
-                                        <form 
-                                            :action="`/admin/tryout/${to.id}`" 
-                                            method="POST" 
-                                            class="hidden">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
+                                            <form :action="`/admin/tryout/${to.id}`" method="POST" class="hidden">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
                     </table>
 
                     <table x-show="activeTab === 'history'"
@@ -543,7 +549,9 @@
                                         </div>
                                     </td>
                                     <td class="px-8 py-5 text-center">
-                                        <span class="inline-block whitespace-nowrap bg-gray-50 text-gray-600 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-gray-100" x-text="hist.subtes + ' Subtes'"></span>
+                                        <span
+                                            class="inline-block whitespace-nowrap bg-gray-50 text-gray-600 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-gray-100"
+                                            x-text="hist.subtes + ' Subtes'"></span>
 
                                     </td>
                                     <td class="px-8 py-5 text-center">
@@ -553,8 +561,8 @@
                                     </td>
                                     <td class="px-8 py-5 text-center">
                                         <div class="flex items-center justify-center gap-3">
-                                            <button 
-                                            @click="
+                                            <button
+                                                @click="
                                             Swal.fire({
                                                         title: 'Pulihkan TryOut?',
                                                         text: 'Data akan dikembalikan ke daftar TryOut',
@@ -571,20 +579,21 @@
                                                     }
                                                 })
                                             "
-                                            class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> 
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
-                                            </svg>
+                                                class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                                </svg>
                                             </button>
 
-                                            <form 
-                                                :action="`/admin/tryout/${hist.id}/restore`" 
-                                                method="POST" 
+                                            <form :action="`/admin/tryout/${hist.id}/restore`" method="POST"
                                                 class="hidden">
                                                 @csrf
                                             </form>
-                                                                                    <button 
-                                            @click="
+                                            <button
+                                                @click="
                                                 Swal.fire({
                                                         title: 'Hapus Permanen?',
                                                         text: 'Data tidak bisa dikembalikan!',
@@ -601,15 +610,16 @@
                                                     }
                                                 })
                                             "
-                                             class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                            </svg>
+                                                class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                    class="size-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
                                             </button>
 
-                                            <form 
-                                                :action="`/admin/tryout/${hist.id}/force-delete`" 
-                                                method="POST" 
+                                            <form :action="`/admin/tryout/${hist.id}/force-delete`" method="POST"
                                                 class="hidden">
                                                 @csrf
                                                 @method('DELETE')
@@ -659,73 +669,63 @@
         </div>
     </main>
 
-    @if(session('success'))
-<div 
-    x-data
-    x-init="
-        Swal.fire({
+    @if (session('success'))
+        <div x-data x-init="Swal.fire({
             icon: 'success',
             title: '{{ session('success') }}',
-
+        
             width: '340px',
             padding: '1.8rem',
-
+        
             background: '#ffffff',
             color: '#334155',
-
+        
             confirmButtonText: 'Oke',
             confirmButtonColor: '#4A72D4',
-
+        
             customClass: {
                 popup: 'rounded-3xl shadow-xl',
                 title: 'text-lg font-bold',
                 confirmButton: 'rounded-xl px-6 py-2'
             },
-
+        
             showClass: {
                 popup: 'animate__animated animate__fadeInDown'
             },
             hideClass: {
                 popup: 'animate__animated animate__fadeOutUp'
             }
-        })
-    "
-></div>
-@endif
+        })"></div>
+    @endif
 
-@if(session('error'))
-<div 
-    x-data
-    x-init="
-        Swal.fire({
+    @if (session('error'))
+        <div x-data x-init="Swal.fire({
             icon: 'error',
             title: '{{ session('error') }}',
-
+        
             width: '340px',
             padding: '1.8rem',
-
+        
             background: '#ffffff',
             color: '#334155',
-
+        
             confirmButtonText: 'Coba Lagi',
             confirmButtonColor: '#ef4444',
-
+        
             customClass: {
                 popup: 'rounded-3xl shadow-xl',
                 title: 'text-lg font-bold',
                 confirmButton: 'rounded-xl px-6 py-2'
             },
-
+        
             showClass: {
                 popup: 'animate__animated animate__fadeInDown'
             },
             hideClass: {
                 popup: 'animate__animated animate__fadeOutUp'
             }
-        })
-    "
-></div>
-@endif
+        })"></div>
+    @endif
 </body>
 
 </html>

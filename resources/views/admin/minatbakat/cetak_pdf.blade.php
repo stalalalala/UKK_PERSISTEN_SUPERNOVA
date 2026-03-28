@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Laporan Hasil Analisis - {{ $nama }}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Laporan Hasil Analisis - {{ $nama }} | PERSISTEN</title>
     <style>
-        @page { margin: 0cm; }
-        body { 
-            font-family: 'Helvetica', 'Arial', sans-serif; 
-            color: #2D3B61; 
+        @page {
+            margin: 0cm;
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #2D3B61;
             line-height: 1.5;
             margin: 0;
             padding: 0;
         }
+
         .sidebar-accent {
             position: absolute;
             left: 0;
@@ -20,48 +25,68 @@
             width: 15px;
             background-color: #4A72D4;
         }
-        .container { padding: 50px 60px; }
-        
+
+        .container {
+            padding: 50px 60px;
+        }
+
         /* Header */
-        .header { 
-            border-bottom: 2px solid #E9EFFF; 
-            padding-bottom: 20px; 
+        .header {
+            border-bottom: 2px solid #E9EFFF;
+            padding-bottom: 20px;
             margin-bottom: 30px;
         }
-        .header h1 { 
-            color: #4A72D4; 
-            margin: 0; 
-            font-size: 24px; 
+
+        .header h1 {
+            color: #4A72D4;
+            margin: 0;
+            font-size: 24px;
             letter-spacing: 2px;
             text-transform: uppercase;
         }
-        .header p { margin: 5px 0 0; color: #8898AA; font-size: 12px; }
+
+        .header p {
+            margin: 5px 0 0;
+            color: #8898AA;
+            font-size: 12px;
+        }
 
         /* Info Peserta */
-        .user-info { margin-bottom: 40px; }
-        .user-info table { width: 100%; }
-        .user-info td { font-size: 14px; padding: 3px 0; }
+        .user-info {
+            margin-bottom: 40px;
+        }
+
+        .user-info table {
+            width: 100%;
+        }
+
+        .user-info td {
+            font-size: 14px;
+            padding: 3px 0;
+        }
 
         /* Hasil Utama */
-        .main-result { 
-            background: #F8FAFF; 
+        .main-result {
+            background: #F8FAFF;
             border: 1px solid #E9EFFF;
-            padding: 30px; 
-            border-radius: 20px; 
+            padding: 30px;
+            border-radius: 20px;
             text-align: center;
             margin-bottom: 40px;
         }
-        .main-result .label { 
-            font-size: 12px; 
-            font-weight: bold; 
-            color: #4A72D4; 
-            text-transform: uppercase; 
+
+        .main-result .label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #4A72D4;
+            text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .main-result h2 { 
-            font-size: 32px; 
-            margin: 10px 0; 
-            color: #2D3B61; 
+
+        .main-result h2 {
+            font-size: 32px;
+            margin: 10px 0;
+            color: #2D3B61;
             text-transform: uppercase;
         }
 
@@ -73,19 +98,21 @@
             padding-left: 10px;
             margin-bottom: 20px;
         }
-        
+
         .category-card {
             margin-bottom: 20px;
             padding: 15px;
             border: 1px solid #F0F2F5;
             border-radius: 10px;
         }
+
         .category-name {
             font-weight: bold;
             color: #4A72D4;
             font-size: 15px;
             margin-bottom: 5px;
         }
+
         .category-desc {
             font-size: 13px;
             color: #525F7F;
@@ -105,9 +132,10 @@
         }
     </style>
 </head>
+
 <body>
     <div class="sidebar-accent"></div>
-    
+
     <div class="container">
         <div class="header">
             <h1>Laporan Analisis Minat Bakat</h1>
@@ -136,16 +164,16 @@
 
         <div class="section-title">Detail Potensi Teratas</div>
 
-        @if(count($top_categories) > 0)
-    @foreach($top_categories as $cat)
-        <div class="category-card">
-            <div class="category-name">{{ $loop->iteration }}. {{ $cat->name }}</div>
-            <div class="category-desc">{{ $cat->description }}</div>
-        </div>
-    @endforeach
-@else
-    <p>Data kategori tidak ditemukan di database.</p>
-@endif
+        @if (count($top_categories) > 0)
+            @foreach ($top_categories as $cat)
+                <div class="category-card">
+                    <div class="category-name">{{ $loop->iteration }}. {{ $cat->name }}</div>
+                    <div class="category-desc">{{ $cat->description }}</div>
+                </div>
+            @endforeach
+        @else
+            <p>Data kategori tidak ditemukan di database.</p>
+        @endif
 
         <div class="footer">
             Laporan ini bersifat rahasia dan dihasilkan secara digital oleh Persisten System.<br>
@@ -153,4 +181,5 @@
         </div>
     </div>
 </body>
+
 </html>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hasil - Latihan Soal {{ $latihan->subtes }} - Set {{ $latihan->set_ke }}</title>
+    <title>Hasil Latihan Soal {{ $latihan->subtes }} - Set {{ $latihan->set_ke }} | PERSISTEN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
