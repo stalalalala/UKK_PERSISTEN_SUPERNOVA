@@ -165,43 +165,63 @@ $tryoutTerbesar = $tryoutStats->sortByDesc('skor')->first();
      */
     public function update(Request $request)
 {
-    /** @var \App\Models\User $user */
-    $user = Auth::user();
+    try {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
-    $request->validate([
-        'name'     => 'required|string|max:255',
-        'no_hp'    => 'required|numeric|digits_between:11,100', 
-        'photo'    => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        $request->validate([
+        'name'  => 'required|string|max:255',
+        'no_hp' => 'required|numeric|digits_between:11,100',
+        'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
         'password' => [
             'nullable',
-            'min:6', 
-            'confirmed',
-            'regex:/[0-9]/',      
-            'regex:/[@$!%*#?&]/', 
+            'required_with:password_confirmation', 
+            'min:6',
+            'regex:/[0-9]/',
+            'regex:/[@$!%*#?&]/',
         ],
+
+        'password_confirmation' => [
+            'nullable',
+            'required_with:password', 
+            'same:password'
+        ],
+
     ], [
-        'password.regex' => 'Password baru harus mengandung minimal satu angka dan satu simbol.',
-        'no_hp.digits_between' => 'Nomor HP minimal harus 11 karakter.',
+        'password.required_with' => 'Password wajib diisi jika konfirmasi diisi.',
+        'password_confirmation.required_with' => 'Konfirmasi password wajib diisi jika password diisi.',
+        'password_confirmation.same' => 'Konfirmasi password tidak cocok.',
+        'password.regex' => 'Password harus mengandung angka dan simbol.',
     ]);
 
-    $user->name = $request->name;
-    $user->no_hp = $request->no_hp;
+        // Update data
+        $user->name = $request->name;
+        $user->no_hp = $request->no_hp;
 
-    if ($request->password) {
-        $user->password = Hash::make($request->password);
-    }
-
-    if ($request->hasFile('photo')) {
-        if ($user->photo && file_exists(public_path('storage/'.$user->photo))) {
-            unlink(public_path('storage/'.$user->photo));
+        // Update password (optional)
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
         }
-        $path = $request->file('photo')->store('profile', 'public');
-        $user->photo = $path;
+
+        // Update photo
+        if ($request->hasFile('photo')) {
+            if ($user->photo && file_exists(public_path('storage/' . $user->photo))) {
+                unlink(public_path('storage/' . $user->photo));
+            }
+
+            $path = $request->file('photo')->store('profile', 'public');
+            $user->photo = $path;
+        }
+
+        $user->save();
+
+        return back()->with('success', 'Profil berhasil diperbarui');
+
+    } catch (\Exception $e) {
+       
+        return back()->with('error', 'Terjadi kesalahan, coba lagi!');
     }
-
-    $user->save();
-
-    return back()->with('success', 'Profil berhasil diperbarui');
 }
 
 public function log()

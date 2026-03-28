@@ -520,22 +520,22 @@
                                             <!-- Delete -->
                                             <button type="button"
                                                 @click="
-        Swal.fire({
-                            title: 'Hapus Kuis?',
-                            text: 'Kuis akan dipindahkan ke History',
-                            icon: 'warning',
-                            width: '340px',
-                            showCancelButton: true,
-                            confirmButtonColor: '#ef4444',
-                            confirmButtonText: 'Ya, Hapus!',
-                            cancelButtonText: 'Batal',
-                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
-        }).then((result) => {
-            if(result.isConfirmed){
-                $el.nextElementSibling.submit()
-            }
-        })
-    "
+                                                    Swal.fire({
+                                                                        title: 'Hapus Kuis?',
+                                                                        text: 'Kuis akan dipindahkan ke History',
+                                                                        icon: 'warning',
+                                                                        width: '340px',
+                                                                        showCancelButton: true,
+                                                                        confirmButtonColor: '#ef4444',
+                                                                        confirmButtonText: 'Ya, Hapus!',
+                                                                        cancelButtonText: 'Batal',
+                                                                    customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                                    }).then((result) => {
+                                                        if(result.isConfirmed){
+                                                            $el.nextElementSibling.submit()
+                                                        }
+                                                    })
+                                                "
                                                 class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
@@ -625,23 +625,23 @@
                                         <div class="flex flex-col md:flex-row gap-2 justify-center">
 
                                             <button type="button"
-                                                @click="
-                                Swal.fire({
-                            title: 'Pulihkan Kuis?',
-                            text: 'Data akan dikembalikan ke daftar Kuis',
-                            icon: 'question',
-                            width: '340px',
-                            showCancelButton: true,
-                            confirmButtonColor: '#22c55e',
-                            confirmButtonText: 'Ya, Pulihkan!',
-                            cancelButtonText: 'Batal',
-                            customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
-                            }).then((result) => {
-                                if(result.isConfirmed){
-                                    $el.nextElementSibling.submit()
-                                }
-                            })
-                        "
+                                              @click="
+                                                    Swal.fire({
+                                                title: 'Pulihkan Kuis?',
+                                                text: 'Data akan dikembalikan ke daftar Kuis',
+                                                icon: 'question',
+                                                width: '340px',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#22c55e',
+                                                confirmButtonText: 'Ya, Pulihkan!',
+                                                cancelButtonText: 'Batal',
+                                                customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                                }).then((result) => {
+                                                    if(result.isConfirmed){
+                                                        $el.nextElementSibling.submit()
+                                                    }
+                                                })
+                                            "
                                                 class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -659,22 +659,22 @@
                                             <!-- FORCE DELETE -->
                                             <button type="button"
                                                 @click="
-                                Swal.fire({
-                            title: 'Hapus Permanen?',
-                            text: 'Data tidak bisa dikembalikan!',
-                            width: '340px',
-                            icon: 'error',
-                            showCancelButton: true,
-                            confirmButtonColor: '#ef4444',
-                            confirmButtonText: 'Ya, Hapus!',
-                            cancelButtonText: 'Batal',
-                                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
-                    }).then((result) => {
-                        if(result.isConfirmed){
-                            $el.nextElementSibling.submit()
-                        }
-                    })
-                "
+                                                    Swal.fire({
+                                                title: 'Hapus Permanen?',
+                                                text: 'Data tidak bisa dikembalikan!',
+                                                width: '340px',
+                                                icon: 'error',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#ef4444',
+                                                confirmButtonText: 'Ya, Hapus!',
+                                                cancelButtonText: 'Batal',
+                                                            customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                        }).then((result) => {
+                                            if(result.isConfirmed){
+                                                $el.nextElementSibling.submit()
+                                            }
+                                        })
+                                    "
                                                 class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"

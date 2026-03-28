@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -131,12 +131,7 @@
 
             {{-- Bagian Form --}}
             <div class="bg-white rounded-[20px] md:rounded-[35px] p-5 md:p-10 shadow-sm w-full border border-white">
-                @if (session('success'))
-                    <div
-                        class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 text-sm">
-                        {{ session('success') }}
-                    </div>
-                @endif
+                
 
                 <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data"
                     class="space-y-4 md:space-y-6">
@@ -190,11 +185,51 @@
 
                     {{-- Password --}}
                     <div class="space-y-2" x-data="{
-                        password: '',
-                        passwordError: '',
-                        showPassword: false,
-                        showConfirm: false
-                    }">
+                                password: '',
+                                confirm: '',
+                                passwordError: '',
+                                showPassword: false,
+                                showConfirm: false,
+
+                                validate() {
+                                    // kalau dua-duanya kosong → aman
+                                    if (!this.password && !this.confirm) {
+                                        this.passwordError = '';
+                                        return;
+                                    }
+
+                                    // kalau salah satu doang
+                                    if (!this.password || !this.confirm) {
+                                        this.passwordError = 'Password dan konfirmasi harus diisi keduanya';
+                                        return;
+                                    }
+
+                                    // validasi isi password
+                                    if (this.password.length < 6) {
+                                        this.passwordError = 'Minimal 6 karakter';
+                                        return;
+                                    }
+
+                                    if (!/[0-9]/.test(this.password)) {
+                                        this.passwordError = 'Wajib ada angka';
+                                        return;
+                                    }
+
+                                    if (!/[^A-Za-z0-9]/.test(this.password)) {
+                                        this.passwordError = 'Wajib ada simbol (@$!%*#?&)';
+                                        return;
+                                    }
+
+                                    // cek sama atau tidak
+                                    if (this.password !== this.confirm) {
+                                        this.passwordError = 'Konfirmasi password tidak sama';
+                                        return;
+                                    }
+
+                                    // lolos semua
+                                    this.passwordError = '';
+                                }
+                            }">
                         <label class="block text-[#4A5578] font-semibold text-sm ml-1">Kata Sandi (Kosongkan jika tidak
                             diubah)</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
@@ -207,17 +242,13 @@
                                         :class="passwordError ? 'bg-red-500' : ''">
                                         <i class="fa-solid fa-lock text-lg"></i>
                                     </div>
-                                    <input :type="showPassword ? 'text' : 'password'" name="password"
-                                        x-model="password"
-                                        @input="
-                                        if(password.length > 0) {
-                                            passwordError = (password.length < 6) ? 'Minimal 6 karakter' : 
-                                                            (!/[0-9]/.test(password)) ? 'Wajib ada angka' : 
-                                                            (!/[^A-Za-z0-9]/.test(password)) ? 'Wajib ada simbol(@$!%*#?&)' : '';
-                                        } else { passwordError = ''; }
-                                    "
-                                        placeholder="kata sandi baru"
-                                        class="w-full px-2 md:px-4 py-1 md:py-3 pr-10 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
+                                    <input 
+                                    :type="showPassword ? 'text' : 'password'" 
+                                    name="password"
+                                    x-model="password"
+                                    @input="validate()"
+                                    placeholder="kata sandi baru"
+                                    class="w-full px-2 md:px-4 py-1 md:py-3 pr-10 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
 
                                     <button type="button" @click="showPassword = !showPassword"
                                         class="absolute right-3 text-gray-400 hover:text-[#6EB4FF] transition-colors">
@@ -235,9 +266,13 @@
                                     class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
                                     <i class="fa-solid fa-lock text-lg"></i>
                                 </div>
-                                <input :type="showConfirm ? 'text' : 'password'" name="password_confirmation"
-                                    placeholder="konfirmasi kata sandi baru"
-                                    class="w-full px-2 md:px-4 py-1 md:py-3 pr-10 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
+                                <input 
+                                :type="showConfirm ? 'text' : 'password'" 
+                                name="password_confirmation"
+                                x-model="confirm"
+                                @input="validate()"
+                                placeholder="konfirmasi kata sandi baru"
+                                class="w-full px-2 md:px-4 py-1 md:py-3 pr-10 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
 
                                 <button type="button" @click="showConfirm = !showConfirm"
                                     class="absolute right-3 text-gray-400 hover:text-[#6EB4FF] transition-colors">
@@ -254,15 +289,75 @@
                                 Batal
                             </button>
                         </a>
-                        <button type="submit"
-                            class="w-full sm:w-auto bg-[#6EB4FF] hover:bg-blue-500 text-white px-8 py-3 rounded-full font-medium shadow-lg text-xs md:text-sm transition-all active:scale-95">
-                            Simpan Perubahan
-                        </button>
+                        <button 
+                        type="submit"
+                        :disabled="passwordError"
+                        class="w-full sm:w-auto bg-[#6EB4FF] hover:bg-blue-500 text-white px-8 py-3 rounded-full font-medium shadow-lg text-xs md:text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Simpan Perubahan
+                    </button>
                     </div>
                 </form>
             </div>
         </main>
     </div>
+
+    @if (session('success'))
+        <div x-data x-init="Swal.fire({
+            icon: 'success',
+            title: '{{ session('success') }}',
+        
+            width: '340px',
+            padding: '1.8rem',
+        
+            background: '#ffffff',
+            color: '#334155',
+        
+            confirmButtonText: 'Oke',
+            confirmButtonColor: '#4A72D4',
+        
+            customClass: {
+                popup: 'rounded-3xl shadow-xl',
+                title: 'text-lg font-bold',
+                confirmButton: 'rounded-xl px-6 py-2'
+            },
+        
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        })"></div>
+    @endif
+
+    @if (session('error'))
+        <div x-data x-init="Swal.fire({
+            icon: 'error',
+            title: '{{ session('error') }}',
+        
+            width: '340px',
+            padding: '1.8rem',
+        
+            background: '#ffffff',
+            color: '#334155',
+        
+            confirmButtonText: 'Coba Lagi',
+            confirmButtonColor: '#ef4444',
+        
+            customClass: {
+                popup: 'rounded-3xl shadow-xl',
+                title: 'text-lg font-bold',
+                confirmButton: 'rounded-xl px-6 py-2'
+            },
+        
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        })"></div>
+    @endif
 
     <script>
         const photoInput = document.getElementById('photoInput');
