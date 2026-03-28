@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hasil - Latihan Soal {{ $latihan->subtes }} - Set {{ $latihan->set_ke }}</title>
+    <title>Hasil Latihan Soal {{ $latihan->subtes }} - Set {{ $latihan->set_ke }} | PERSISTEN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -235,6 +235,38 @@
         </div>
     </div>
 
+    <div id="exitModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[99] p-4">
+
+        <div class="absolute inset-0" onclick="closeModal()"></div>
+
+        <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-10 text-center shadow-2xl">
+
+            <div
+                class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                ⚠️
+            </div>
+
+            <h3 class="text-xl font-black text-[#2E3B66] mb-2">
+                Keluar Halaman?
+            </h3>
+
+            <p class="text-gray-500 text-sm mb-8">
+                Kamu akan kembali ke halaman utama latihan.
+            </p>
+
+            <div class="flex gap-4">
+                <button onclick="closeModal()" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500">
+                    Batal
+                </button>
+
+                <a href="{{ route('latihan.index') }}"
+                    class="flex-1 py-3 rounded-xl font-bold bg-red-500 text-white text-center">
+                    Ya, Keluar
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
         // Sound Effects
@@ -265,8 +297,38 @@
             window.requestAnimationFrame(step);
         }
 
+        function showModal() {
+            const modal = document.getElementById('exitModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('exitModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            document.body.style.overflow = 'auto';
+        }
+
+        function lockBack() {
+            // Push beberapa kali biar kuat (kayak di kuis kamu)
+            for (let i = 0; i < 5; i++) {
+                history.pushState(null, null, location.href);
+            }
+
+            window.onpopstate = function() {
+                showModal();
+                history.pushState(null, null, location.href);
+            };
+        }
+
         // Update window.onload kamu
         window.onload = function() {
+
+            lockBack();
             // Beri delay sedikit biar user nggak kaget
             setTimeout(() => {
                 const scoreDisplay = document.getElementById('counter-score');

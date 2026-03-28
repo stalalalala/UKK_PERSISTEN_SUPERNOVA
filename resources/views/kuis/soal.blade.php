@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PERSISTEN - Kuis Fundamental - Set {{ $kuis->set_ke }}</title>
+    <title>Kuis Fundamental - Set {{ $kuis->set_ke }} | PERSISTEN</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @vite('resources/css/app.css')
     <style>
         [x-cloak] {
             display: none !important;
@@ -44,7 +46,8 @@
 
 <body class="p-4 md:p-6 pt-0 desktop-fixed">
 
-    <div x-data="kuisApp()" @keydown.window.enter="nextSoal()" x-init="startTimer()" x-cloak
+    <div x-data="kuisApp()" @keydown.window.enter="nextSoal()" x-init="startTimer();
+    lockHistory()" x-cloak
         class="h-full flex flex-col max-w-[1440px] mx-auto">
 
         <div class="flex flex-row items-center justify-between mb-4 shrink-0">
@@ -198,10 +201,51 @@
             </div>
         </div>
 
-        <form id="formKuis" action="{{ route('kuis.submit', $kuis->id) }}" method="POST" class="hidden">
-            @csrf
-            <input type="hidden" name="jawaban" :value="JSON.stringify(jawabanTerpilih)">
-        </form>
+
+        <div x-show="showExitModal" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-transition
+            x-cloak>
+            <div class="fixed inset-0 bg-black/50" @click="showExitModal = false"></div>
+            <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-10 text-center shadow-2xl">
+                <div
+                    class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+                <h3 class="text-xl font-black text-[#2E3B66] mb-2">Keluar Ujian?</h3>
+                <p class="text-gray-500 text-sm mb-8">Data pengerjaan subtes ini akan terhapus. Yakin ingin keluar?
+                </p>
+                <div class="flex gap-4">
+                    <button @click="showExitModal = false"
+                        class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500">Batal</button>
+                    <a href="{{ route('kuis.index') }}" @click="clearStorage()"
+                        class="flex-1 py-3 rounded-xl font-bold bg-red-500 text-white text-center">Ya, Keluar</a>
+                </div>
+            </div>
+        </div>
+        <div x-show="showConfirmModal" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-transition
+            x-cloak>
+            <div class="fixed inset-0 bg-black/50" @click="showConfirmModal = false"></div>
+            <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-10 text-center shadow-2xl">
+                <div
+                    class="w-20 h-20 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h3 class="text-xl font-black text-[#2E3B66] mb-2">Soal Belum Lengkap</h3>
+                <p class="text-gray-500 text-sm mb-8">Masih ada soal yang belum dijawab. Yakin ingin selesai?</p>
+                <div class="flex flex-col gap-3">
+                    <button @click="submitKuis()" class="w-full py-3 rounded-xl font-bold bg-[#3B82F6] text-white">Ya,
+                        Lanjutkan</button>
+                    <button @click="showConfirmModal = false"
+                        class="w-full py-3 rounded-xl font-bold bg-gray-100 text-gray-500">Batal, Cek Lagi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <form id="formKuis" action="{{ route('kuis.submit', $kuis->id) }}" method="POST" class="hidden">
+        @csrf
+        <input type="hidden" name="jawaban" :value="JSON.stringify(jawabanTerpilih)">
+    </form>
     </div>
 
     <script>
@@ -212,6 +256,8 @@
 
             return {
                 soalAktifIdx: 0,
+                showExitModal: false,
+                showConfirmModal: false,
                 questions: @json($kuis->questions),
 
                 // Ambil jawaban dari localStorage jika ada, kalau tidak ada set object kosong
@@ -234,6 +280,15 @@
                     }, 1000);
                 },
 
+                lockHistory() {
+                    history.pushState(null, null, window.location.href);
+
+                    window.onpopstate = () => {
+                        this.showExitModal = true;
+                        history.pushState(null, null, window.location.href);
+                    };
+                },
+
                 formatTime(seconds) {
                     let min = Math.floor(seconds / 60);
                     let sec = seconds % 60;
@@ -249,15 +304,20 @@
                 nextSoal() {
                     if (this.soalAktifIdx < this.questions.length - 1) {
                         this.soalAktifIdx++;
-                        if (window.innerWidth < 1024) window.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
-                    } else {
-                        if (confirm('Yakin ingin menyelesaikan kuis?')) {
-                            this.submitKuis();
+                        if (window.innerWidth < 1024) {
+                            window.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            });
                         }
+                    } else {
+                        this.showConfirmModal = true; // 🔥 bukan confirm() lagi
                     }
+                },
+
+                clearStorage() {
+                    localStorage.removeItem(storageTimerKey);
+                    localStorage.removeItem(storageJawabanKey);
                 },
 
                 prevSoal() {
@@ -265,21 +325,16 @@
                 },
 
                 submitKuis() {
-                    // Hapus semua jejak storage saat kuis disubmit
-                    localStorage.removeItem(storageTimerKey);
-                    localStorage.removeItem(storageJawabanKey);
+                    this.clearStorage();
+
+                    document.querySelector('input[name="jawaban"]').value =
+                        JSON.stringify(this.jawabanTerpilih);
 
                     document.getElementById('formKuis').submit();
                 },
 
                 confirmExit() {
-                    if (confirm('Progres akan hilang. Yakin ingin keluar?')) {
-                        // Hapus storage jika user sengaja keluar/batal
-                        localStorage.removeItem(storageTimerKey);
-                        localStorage.removeItem(storageJawabanKey);
-
-                        window.location.href = "{{ route('kuis.index') }}";
-                    }
+                    this.showExitModal = true;
                 }
             }
         }

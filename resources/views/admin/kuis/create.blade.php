@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persisten Dashboard - Manajemen Kuis</title>
+    <title>Tambah Kuis Fundamental - Admin | PERSISTEN</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -37,6 +37,7 @@
     function kuisForm() {
         return {
             activeMenu: 'Manajemen Kuis',
+            showPublishModal: false,
             mobileMenuOpen: false,
             showImportModal: false,
             currentSet: @json($nextSet),
@@ -122,6 +123,29 @@
                 }
             },
 
+            openPublishModal() {
+
+                let totalTerisi = this.questions.filter(q => q).length;
+
+                if (totalTerisi < 20) {
+                    alert("Wajib isi 20 soal sebelum publish!");
+                    return;
+                }
+
+                this.showPublishModal = true;
+            },
+
+            confirmPublikasikan() {
+
+                this.showPublishModal = false;
+
+                // lanjut submit
+                document.getElementById("questions_json").value =
+                    JSON.stringify(this.questions);
+
+                document.getElementById("kuisForm").submit();
+            },
+
             uploadGambar(e) {
 
                 const file = e.target.files[0];
@@ -156,99 +180,26 @@
                 reader.readAsDataURL(file);
             },
 
-           importExcel(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+            importExcel(event) {
+                const file = event.target.files[0];
+                if (!file) return;
 
-            const reader = new FileReader();
+                const reader = new FileReader();
 
-            reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: "array" });
-
-                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(sheet);
-
-                    if (jsonData.length === 0) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'File Excel kosong!',
-                            width: '340px',
-                            confirmButtonColor: '#ef4444',
-                            customClass: {
-                                popup: 'rounded-3xl shadow-xl',
-                                title: 'text-lg font-bold'
-                            }
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {
+                            type: "array"
                         });
-                        return;
-                    }
 
-                    // =========================
-                    // 🔥 VALIDASI GLOBAL
-                    // =========================
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-                    const allowedSubtes = [
-                        "Penalaran Umum",
-                        "Penalaran & Pemahaman Umum",
-                        "Pemahaman Bacaan & Menulis",
-                        "Pengetahuan Kuantitatif",
-                        "Penalaran Matematika",
-                        "Literasi Bahasa Indonesia",
-                        "Literasi Bahasa Inggris"
-                    ];
-
-                    const globalSubtes = (jsonData[0]["Kategori Subtes"] || "").trim();
-                    const globalWaktu = (jsonData[0]["Waktu"] || "").toString().trim();
-
-                    if (!allowedSubtes.includes(globalSubtes)) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Subtes tidak valid!',
-                            width: '340px',
-                            confirmButtonColor: '#ef4444',
-                            customClass: {
-                                popup: 'rounded-3xl shadow-xl',
-                                title: 'text-lg font-bold'
-                            }
-                        });
-                        return;
-                    }
-
-                    const allowedWaktu = [
-                        "20 Menit", "25 Menit", "30 Menit",
-                        "35 Menit", "40 Menit", "45 Menit",
-                        "50 Menit", "55 Menit", "60 Menit"
-                    ];
-
-                    if (!allowedWaktu.includes(globalWaktu)) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Waktu harus 20 - 60 menit!',
-                            width: '340px',
-                            confirmButtonColor: '#ef4444',
-                            customClass: {
-                                popup: 'rounded-3xl shadow-xl',
-                                title: 'text-lg font-bold'
-                            }
-                        });
-                        return;
-                    }
-
-                    const waktuAngka = parseInt(globalWaktu.replace(" Menit", ""));
-
-                    // =========================
-                    // 🔥 VALIDASI PER BARIS
-                    // =========================
-                    for (let i = 0; i < jsonData.length; i++) {
-                        let row = jsonData[i];
-                        let jawaban = (row["Jawaban Benar"] || "").toString().trim();
-
-                        if (!['a','b','c','d','e'].includes(jawaban)) {
+                        if (jsonData.length === 0) {
                             Swal.fire({
                                 icon: 'error',
-                                title: `Error di baris ${i + 2}`,
-                                text: 'Jawaban harus a/b/c/d/e',
+                                title: 'File Excel kosong!',
                                 width: '340px',
                                 confirmButtonColor: '#ef4444',
                                 customClass: {
@@ -259,11 +210,27 @@
                             return;
                         }
 
-                        if (jawaban !== jawaban.toLowerCase()) {
+                        // =========================
+                        // 🔥 VALIDASI GLOBAL
+                        // =========================
+
+                        const allowedSubtes = [
+                            "Penalaran Umum",
+                            "Penalaran & Pemahaman Umum",
+                            "Pemahaman Bacaan & Menulis",
+                            "Pengetahuan Kuantitatif",
+                            "Penalaran Matematika",
+                            "Literasi Bahasa Indonesia",
+                            "Literasi Bahasa Inggris"
+                        ];
+
+                        const globalSubtes = (jsonData[0]["Kategori Subtes"] || "").trim();
+                        const globalWaktu = (jsonData[0]["Waktu"] || "").toString().trim();
+
+                        if (!allowedSubtes.includes(globalSubtes)) {
                             Swal.fire({
                                 icon: 'error',
-                                title: `Error di baris ${i + 2}`,
-                                text: 'Gunakan huruf kecil!',
+                                title: 'Subtes tidak valid!',
                                 width: '340px',
                                 confirmButtonColor: '#ef4444',
                                 customClass: {
@@ -273,69 +240,128 @@
                             });
                             return;
                         }
+
+                        const allowedWaktu = [
+                            "20 Menit", "25 Menit", "30 Menit",
+                            "35 Menit", "40 Menit", "45 Menit",
+                            "50 Menit", "55 Menit", "60 Menit"
+                        ];
+
+                        if (!allowedWaktu.includes(globalWaktu)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Waktu harus 20 - 60 menit!',
+                                width: '340px',
+                                confirmButtonColor: '#ef4444',
+                                customClass: {
+                                    popup: 'rounded-3xl shadow-xl',
+                                    title: 'text-lg font-bold'
+                                }
+                            });
+                            return;
+                        }
+
+                        const waktuAngka = parseInt(globalWaktu.replace(" Menit", ""));
+
+                        // =========================
+                        // 🔥 VALIDASI PER BARIS
+                        // =========================
+                        for (let i = 0; i < jsonData.length; i++) {
+                            let row = jsonData[i];
+                            let jawaban = (row["Jawaban Benar"] || "").toString().trim();
+
+                            if (!['a', 'b', 'c', 'd', 'e'].includes(jawaban)) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: `Error di baris ${i + 2}`,
+                                    text: 'Jawaban harus a/b/c/d/e',
+                                    width: '340px',
+                                    confirmButtonColor: '#ef4444',
+                                    customClass: {
+                                        popup: 'rounded-3xl shadow-xl',
+                                        title: 'text-lg font-bold'
+                                    }
+                                });
+                                return;
+                            }
+
+                            if (jawaban !== jawaban.toLowerCase()) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: `Error di baris ${i + 2}`,
+                                    text: 'Gunakan huruf kecil!',
+                                    width: '340px',
+                                    confirmButtonColor: '#ef4444',
+                                    customClass: {
+                                        popup: 'rounded-3xl shadow-xl',
+                                        title: 'text-lg font-bold'
+                                    }
+                                });
+                                return;
+                            }
+                        }
+
+                        // =========================
+                        // ✅ MAPPING DATA
+                        // =========================
+                        this.selectedSubtes = globalSubtes;
+                        this.selectedWaktu = waktuAngka;
+
+                        this.questions = jsonData.slice(0, 20).map((row) => ({
+                            subtes: globalSubtes,
+                            waktu: waktuAngka,
+
+                            materi: row["Materi"] || "",
+                            pertanyaan: row["Pertanyaan"] || "",
+
+                            gambar: (row["URL Gambar"] || "").startsWith("http") ?
+                                row["URL Gambar"] : null,
+
+                            opsi_a: row["Opsi A"] || "",
+                            opsi_b: row["Opsi B"] || "",
+                            opsi_c: row["Opsi C"] || "",
+                            opsi_d: row["Opsi D"] || "",
+                            opsi_e: row["Opsi E"] || "",
+
+                            jawaban_benar: (row["Jawaban Benar"] || "").toLowerCase().trim(),
+                        }));
+
+                        this.soalTersimpan = this.questions.length;
+                        this.activeQuestion = 1;
+                        this.loadQuestion();
+
+                        this.showImportModal = false;
+
+                        // ✅ SUCCESS
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Data berhasil diimport',
+                            width: '340px',
+                            padding: '1.8rem',
+                            confirmButtonColor: '#4A72D4',
+                            customClass: {
+                                popup: 'rounded-3xl shadow-xl',
+                                title: 'text-lg font-bold',
+                                confirmButton: 'rounded-xl px-6 py-2'
+                            }
+                        });
+
+                    } catch (err) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Tersimpan!',
+                            width: '340px',
+                            confirmButtonColor: '#ef4444',
+                            customClass: {
+                                popup: 'rounded-3xl shadow-xl',
+                                title: 'text-lg font-bold'
+                            }
+                        });
                     }
+                };
 
-                    // =========================
-                    // ✅ MAPPING DATA
-                    // =========================
-                    this.selectedSubtes = globalSubtes;
-                    this.selectedWaktu = waktuAngka;
-
-                    this.questions = jsonData.slice(0, 20).map((row) => ({
-                        subtes: globalSubtes,
-                        waktu: waktuAngka,
-
-                        materi: row["Materi"] || "",
-                        pertanyaan: row["Pertanyaan"] || "",
-
-                        gambar: (row["URL Gambar"] || "").startsWith("http")
-                            ? row["URL Gambar"] : null,
-
-                        opsi_a: row["Opsi A"] || "",
-                        opsi_b: row["Opsi B"] || "",
-                        opsi_c: row["Opsi C"] || "",
-                        opsi_d: row["Opsi D"] || "",
-                        opsi_e: row["Opsi E"] || "",
-
-                        jawaban_benar: (row["Jawaban Benar"] || "").toLowerCase().trim(),
-                    }));
-
-                    this.soalTersimpan = this.questions.length;
-                    this.activeQuestion = 1;
-                    this.loadQuestion();
-
-                    this.showImportModal = false;
-
-                    // ✅ SUCCESS
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Data berhasil diimport',
-                        width: '340px',
-                        padding: '1.8rem',
-                        confirmButtonColor: '#4A72D4',
-                        customClass: {
-                            popup: 'rounded-3xl shadow-xl',
-                            title: 'text-lg font-bold',
-                            confirmButton: 'rounded-xl px-6 py-2'
-                        }
-                    });
-
-                } catch (err) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Data Gagal Tersimpan!',
-                        width: '340px',
-                        confirmButtonColor: '#ef4444',
-                        customClass: {
-                            popup: 'rounded-3xl shadow-xl',
-                            title: 'text-lg font-bold'
-                        }
-                    });
-                }
-            };
-
-            reader.readAsArrayBuffer(file);
-        },
+                reader.readAsArrayBuffer(file);
+            },
 
             unduhTemplate() {
                 const wb = XLSX.utils.book_new();
@@ -533,6 +559,10 @@
                         }, "", location.href);
                     }
 
+                });
+
+                window.addEventListener('beforeunload', () => {
+                    localStorage.removeItem('kuis_draft');
                 });
 
 
@@ -1194,7 +1224,7 @@ window.scrollTo({top:0,behavior:'smooth'})"
                                     </div>
                                 </div>
 
-                                <button type="button" @click="submitFinal()"
+                                <button type="button" @click="openPublishModal()"
                                     :disabled="questions.filter(q => q?.pertanyaan).length < 20"
                                     class="w-full mt-6 bg-emerald-500 text-white py-3 rounded-xl font-bold disabled:opacity-40 disabled:cursor-not-allowed">
                                     Publikasikan Kuis
@@ -1268,6 +1298,36 @@ window.scrollTo({top:0,behavior:'smooth'})"
 
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    {{-- MODAL KONFIRM PUBLIKASI --}}
+    <div x-show="showPublishModal" x-cloak class="fixed inset-0 z-[180] flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showPublishModal = false"></div>
+
+        <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[181] text-center shadow-2xl border border-blue-50"
+            x-show="showPublishModal" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+
+            <div
+                class="w-20 h-20 bg-blue-100 text-[#4A72D4] rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+
+            <h3 class="text-xl font-black text-[#2E3B66] mb-2">Publikasikan Kuis?</h3>
+            <p class="text-gray-500 text-sm mb-8">Pastikan semua data sudah benar. Kuis yang dipublikasikan akan
+                langsung dapat diakses.</p>
+
+            <div class="flex gap-3">
+                <button type="button" @click="showPublishModal = false"
+                    class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all">
+                    Batal
+                </button>
+                <button type="button" @click="confirmPublikasikan()"
+                    class="flex-1 py-3 rounded-xl font-bold bg-[#4A72D4] text-white shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all">
+                    Ya, Terbitkan
+                </button>
             </div>
         </div>
     </div>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instruksi Minat dan Bakat</title>
+    <title>Instruksi Minat dan Bakat | PERSISTEN</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -70,7 +70,8 @@
                                 <h3 class="text-2xl md:text-2xl font-black text-[#2E3B66] leading-tight mb-2">
                                     Tes Minat dan Bakat
                                 </h3>
-                                <p class="text-xs text-gray-400 font-medium">Kenali potensi dan kepribadianmu untuk masa depan yang tepat.</p>
+                                <p class="text-xs text-gray-400 font-medium">Kenali potensi dan kepribadianmu untuk masa
+                                    depan yang tepat.</p>
                             </div>
 
                             <div class="space-y-3">
@@ -85,7 +86,8 @@
                                             Pernyataan</p>
                                         <p class="text-xl font-extrabold text-[#2E3B66]">
                                             {{ $totalSoal ?? '100' }} <span
-                                                class="text-xs font-medium text-gray-400 block tracking-normal">Butir Soal</span>
+                                                class="text-xs font-medium text-gray-400 block tracking-normal">Butir
+                                                Soal</span>
                                         </p>
                                     </div>
                                 </div>
@@ -100,7 +102,8 @@
                                         <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Tipe
                                             Jawaban</p>
                                         <p class="text-lg font-extrabold text-[#2E3B66]">Pilihan Skala <span
-                                                class="text-xs font-medium text-gray-400 block tracking-normal">Kejujuran Diri</span></p>
+                                                class="text-xs font-medium text-gray-400 block tracking-normal">Kejujuran
+                                                Diri</span></p>
                                     </div>
                                 </div>
                             </div>
@@ -126,8 +129,10 @@
                                 <div>
                                     <h4 class="font-bold text-[#2E3B66]">Kejujuran adalah Kunci</h4>
                                     <p class="text-sm text-gray-500 leading-relaxed font-medium">
-                                        Pilihlah jawaban yang paling menggambarkan dirimu yang sebenarnya, bukan apa yang kamu anggap "baik". 
-                                        Tidak ada jawaban benar atau salah dalam tes ini. Hasil yang akurat sangat bergantung pada seberapa jujur kamu menilai dirimu sendiri.
+                                        Pilihlah jawaban yang paling menggambarkan dirimu yang sebenarnya, bukan apa
+                                        yang kamu anggap "baik".
+                                        Tidak ada jawaban benar atau salah dalam tes ini. Hasil yang akurat sangat
+                                        bergantung pada seberapa jujur kamu menilai dirimu sendiri.
                                     </p>
                                 </div>
                             </div>
@@ -139,7 +144,9 @@
                                 <div>
                                     <h4 class="font-bold text-[#2E3B66]">Menentukan Tingkat Kesesuaian</h4>
                                     <p class="text-sm text-gray-500 leading-relaxed font-medium">
-                                        Klik pada kotak pilihan warna yang tersedia. Semakin ke arah kiri (warna biru), berarti kamu semakin <strong>Setuju</strong> atau merasa sangat sesuai dengan pernyataan tersebut. Sebaliknya, semakin ke kanan berarti semakin tidak sesuai.
+                                        Klik pada kotak pilihan warna yang tersedia. Semakin ke arah kiri (warna biru),
+                                        berarti kamu semakin <strong>Setuju</strong> atau merasa sangat sesuai dengan
+                                        pernyataan tersebut. Sebaliknya, semakin ke kanan berarti semakin tidak sesuai.
                                     </p>
                                 </div>
                             </div>
@@ -151,7 +158,9 @@
                                 <div>
                                     <h4 class="font-bold text-[#2E3B66]">Waktu dan Spontanitas</h4>
                                     <p class="text-sm text-gray-500 leading-relaxed font-medium">
-                                        Jawablah setiap pernyataan secara spontan. Biasanya, jawaban pertama yang muncul di pikiranmu adalah yang paling mendekati kenyataan. Jangan menghabiskan terlalu banyak waktu untuk merenungkan satu pernyataan.
+                                        Jawablah setiap pernyataan secara spontan. Biasanya, jawaban pertama yang muncul
+                                        di pikiranmu adalah yang paling mendekati kenyataan. Jangan menghabiskan terlalu
+                                        banyak waktu untuk merenungkan satu pernyataan.
                                     </p>
                                 </div>
                             </div>
@@ -163,7 +172,9 @@
                                 <div>
                                     <h4 class="font-bold text-[#2E3B66]">Pantau Progress Pengerjaan</h4>
                                     <p class="text-sm text-gray-500 leading-relaxed font-medium">
-                                        Gunakan bar progres di bagian atas untuk melihat seberapa jauh kamu telah mengerjakan tes. Pastikan seluruh pernyataan telah terisi sebelum kamu mencapai akhir halaman untuk mendapatkan hasil analisa yang lengkap.
+                                        Gunakan bar progres di bagian atas untuk melihat seberapa jauh kamu telah
+                                        mengerjakan tes. Pastikan seluruh pernyataan telah terisi sebelum kamu mencapai
+                                        akhir halaman untuk mendapatkan hasil analisa yang lengkap.
                                     </p>
                                 </div>
                             </div>
@@ -175,7 +186,9 @@
                                 <div>
                                     <h4 class="font-bold text-[#2E3B66]">Penyimpanan Hasil Otomatis</h4>
                                     <p class="text-sm text-gray-500 leading-relaxed font-medium">
-                                        Pastikan koneksi internetmu tetap aktif. Setelah menyelesaikan semua pernyataan, tekan tombol 'Selesai'. Sistem akan langsung memproses profil minat dan bakatmu untuk ditampilkan dalam bentuk grafik dan deskripsi karir yang cocok.
+                                        Pastikan koneksi internetmu tetap aktif. Setelah menyelesaikan semua pernyataan,
+                                        tekan tombol 'Selesai'. Sistem akan langsung memproses profil minat dan bakatmu
+                                        untuk ditampilkan dalam bentuk grafik dan deskripsi karir yang cocok.
                                     </p>
                                 </div>
                             </div>

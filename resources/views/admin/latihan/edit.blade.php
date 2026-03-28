@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persisten Dashboard - Manajemen Kuis</title>
+    <title>Edit Latihan Soal - Admin | PERSISTEN</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -179,7 +179,7 @@
 <body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="{ ...PageGuard(), ...editLatihanData() }" x-init="init()">
 
     <div class="flex h-screen w-full relative">
-        <aside x-init="if (currentPage === 'kuis') { $el.scrollIntoView({ block: 'center' }) }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+        <aside x-data="{ currentPage: 'kuis' }" :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
             class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
 
             <div class="flex items-center justify-between mb-10 px-2">
@@ -200,13 +200,7 @@
                 </button>
             </div>
 
-            <nav
-                class="flex-1 space-y-1 overflow-y-auto pr-2 
-                [&::-webkit-scrollbar]:w-1 
-                [&::-webkit-scrollbar-track]:bg-transparent 
-                [&::-webkit-scrollbar-thumb]:bg-white/20 
-                [&::-webkit-scrollbar-thumb]:rounded-full">
-
+            <nav class="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
                 <a href="{{ route('admin.dashboard.index') }}"
                     class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -310,20 +304,20 @@
                     </svg>
                     <span class="text-md font-regular">Monitoring dan laporan</span>
                 </a>
-
-
-
             </nav>
 
-            <button
-                class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
-                <svg xmlns="http://www.w3.org/2000/xml" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" class="size-5 md:size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-                </svg>
-                <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
-            </button>
+            <form action="{{ route('logout') }}" method="POST" class="w-full inline">
+                @csrf
+                <button type="submit"
+                    class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-5 md:size-6 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                    </svg>
+                    <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
+                </button>
+            </form>
         </aside>
 
         <div x-show="mobileMenuOpen" x-transition:enter="transition opacity-ease-out duration-300"
@@ -335,13 +329,15 @@
 
         <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
 
-           <header class="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4 w-full">
-    <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
-        <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
-            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-        </button>
+            <header class="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4 w-full">
+                <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
+                    <button @click="mobileMenuOpen = true"
+                        class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
+                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
 
                     <div x-data="{
                         keyword: '',
@@ -391,93 +387,94 @@
                             class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
                             Cari
                         </button>
-        @php
-            use Illuminate\Support\Facades\Auth;
-            $user = Auth::user();
-        @endphp
+                        @php
+                            use Illuminate\Support\Facades\Auth;
+                            $user = Auth::user();
+                        @endphp
 
-        <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
-            <div @click="open = !open" 
-                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
-                
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
-                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" 
-                             alt="Admin" class="w-full h-full object-cover">
+                        <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
+                            <div @click="open = !open"
+                                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
+
+                                <div class="flex items-center gap-2">
+                                    <div
+                                        class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
+                                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
+                                            alt="Admin" class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="font-bold text-sm text-gray-700 truncate lg:max-w-none">Admin</span>
+                                </div>
+
+                                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                            </div>
+
+                            <div x-show="open" @click.away="open = false"
+                                class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 transform scale-95"
+                                x-transition:enter-end="opacity-100 transform scale-100">
+                                <div class="p-4 bg-gray-50/50 border-b border-gray-100">
+                                    <p class="font-bold text-gray-800">{{ $user->name }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
+                                </div>
+                                <div class="p-4 text-xs text-gray-500 bg-white">
+                                    {{ $user->no_hp ?? '-' }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <span class="font-bold text-sm text-gray-700 truncate lg:max-w-none">Admin</span>
-                </div>
-                
-                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-            </div>
 
-            <div x-show="open" @click.away="open = false"
-                class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
-                x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 transform scale-95"
-                x-transition:enter-end="opacity-100 transform scale-100">
-                <div class="p-4 bg-gray-50/50 border-b border-gray-100">
-                    <p class="font-bold text-gray-800">{{ $user->name }}</p>
-                    <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
-                </div>
-                <div class="p-4 text-xs text-gray-500 bg-white">
-                    {{ $user->no_hp ?? '-' }}
-                </div>
-            </div>
-        </div>
-    </div>
+                    <div x-data="{
+                        keyword: '',
+                        routes: {
+                            'dashboard': '{{ route('admin.dashboard.index') }}',
+                            'user': '{{ route('admin.user.index') }}',
+                            'streak': '{{ route('admin.streak.index') }}',
+                            'monitoring': '{{ route('admin.laporan.index') }}',
+                            'video': '{{ route('admin.videoPembelajaran.index') }}',
+                            'peluang': '{{ route('admin.peluang.index') }}',
+                            'tryout': '{{ route('admin.tryout.index') }}',
+                            'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                            'kuis': '{{ route('admin.kuis.index') }}',
+                            'latihan': '{{ route('admin.latihan.index') }}'
+                        },
+                        goToPage() {
+                            let search = this.keyword.toLowerCase()
+                            for (let key in this.routes) {
+                                if (key.includes(search)) {
+                                    window.location.href = this.routes[key]
+                                    return
+                                }
+                            }
+                            alert('Halaman tidak ditemukan')
+                        }
+                    }"
+                        class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1">
 
-    <div x-data="{
-            keyword: '',
-            routes: {
-                'dashboard': '{{ route('admin.dashboard.index') }}',
-                'user': '{{ route('admin.user.index') }}',
-                'streak': '{{ route('admin.streak.index') }}',
-                'monitoring': '{{ route('admin.laporan.index') }}',
-                'video': '{{ route('admin.videoPembelajaran.index') }}',
-                'peluang': '{{ route('admin.peluang.index') }}',
-                'tryout': '{{ route('admin.tryout.index') }}',
-                'minat bakat': '{{ route('admin.minatBakat.index') }}',
-                'kuis': '{{ route('admin.kuis.index') }}',
-                'latihan': '{{ route('admin.latihan.index') }}'
-            },
-            goToPage(){
-                let search = this.keyword.toLowerCase()
-                for (let key in this.routes) {
-                    if (key.includes(search)) {
-                        window.location.href = this.routes[key]
-                        return
-                    }
-                }
-                alert('Halaman tidak ditemukan')
-            }
-        }"
-        class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1">
-        
-        <div class="relative w-full">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                </svg>
-            </div>
-            <input 
-                type="text" 
-                x-model="keyword" 
-                placeholder="Cari halaman..." 
-                @keydown.enter="goToPage()"
-                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm">
-        </div>
+                        <div class="relative w-full">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                </svg>
+                            </div>
+                            <input type="text" x-model="keyword" placeholder="Cari halaman..."
+                                @keydown.enter="goToPage()"
+                                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm">
+                        </div>
 
-        <button @click="goToPage()" class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0">
-            Cari
-        </button>
-    </div>
-</header>
+                        <button @click="goToPage()"
+                            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0">
+                            Cari
+                        </button>
+                    </div>
+            </header>
 
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
                 <div>
                     <h2 class="text-2xl font-extrabold text-[#4A72D4]">
-                        Kuis Fundamental - Set <span x-text="currentSet">1</span>
+                        Latihan Soal - Set <span x-text="currentSet">1</span>
                     </h2>
                     <p class="text-gray-400 text-sm">Persisten Admin Panel / Kuis</p>
                 </div>
@@ -485,15 +482,12 @@
                 <div class="flex flex-wrap gap-3 w-full lg:w-auto">
 
                     <a href="{{ route('latihan.index') }}" @click.prevent="confirmLeave()"
-                        class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-white hover:bg-white-600 text-emerald-600 px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95">
-                        Kembali ke Daftar
+                        class="px-5 py-3.5 rounded-xl border items-center justify-center  border-gray-200 text-gray-600 bg-white font-bold text-sm hover:bg-gray-50 transition-all">
+                        Batal
                     </a>
 
 
-                    <button @click="showImportModal = true"
-                        class="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-md active:scale-95">
-                        <i class="fa-solid fa-file-excel text-lg"></i> Import via Excel
-                    </button>
+
                 </div>
             </div>
 
