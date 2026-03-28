@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -287,7 +288,9 @@ laporan</span>
                 <div x-show="activeSubtesIndex === null" x-transition>
                     <div class="mb-8 flex items-center justify-between">
                         <div class="flex items-center gap-4">
-                            <button type="button" @click="showConfirmBackModal = true" 
+                            <button 
+                                type="button" 
+                                @click="backToDaftarTryout()" 
                                 class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all">
                                 <i class="fa-solid fa-arrow-left"></i>
                             </button>
@@ -441,205 +444,226 @@ laporan</span>
         </main>
     </div>
 
-    <script>
-        function editTryoutForm() {
-            return {
-                mobileMenuOpen: false,
-                activeSubtesIndex: null,
-                activeQuestion: 1,
-                imageUrl: null,
-                showImageModal: false,
-                tempImageUrl: '',
-                showPublishModal: false,
-                showConfirmBackModal: false,
-                isDirty: false,
-                namaTryout: {!! json_encode($tryout->nama_tryout) !!},
-                tglMulai: {!! json_encode($tryout->tanggal->format('Y-m-d')) !!},
-                tglSelesai: {!! json_encode($tryout->tanggal_akhir ? $tryout->tanggal_akhir->format('Y-m-d') : '') !!},
-                subtesList: {!! json_encode($tryout->categories->map(function($cat) {
+   <script>
+function editTryoutForm() {
+    return {
+        mobileMenuOpen: false,
+        activeSubtesIndex: null,
+        activeQuestion: 1,
+        imageUrl: null,
+        showImageModal: false,
+        tempImageUrl: '',
+        showPublishModal: false,
+        isDirty: false,
+
+        namaTryout: {!! json_encode($tryout->nama_tryout) !!},
+        tglMulai: {!! json_encode($tryout->tanggal->format('Y-m-d')) !!},
+        tglSelesai: {!! json_encode($tryout->tanggal_akhir ? $tryout->tanggal_akhir->format('Y-m-d') : '') !!},
+
+        subtesList: {!! json_encode($tryout->categories->map(function($cat) {
+            return [
+                'name' => $cat->nama_kategori,
+                'waktu' => (int) $cat->durasi,
+                'soalTerisi' => $cat->soals->count(),
+                'questions' => $cat->soals->map(function($s) {
                     return [
-                        'name' => $cat->nama_kategori,
-                        'waktu' => (int) $cat->durasi,
-                        'soalTerisi' => $cat->soals->count(),
-                        'questions' => $cat->soals->map(function($s) {
-                            return [
-                                'pertanyaan' => $s->pertanyaan ?? '',
-                                'opsi_a' => $s->opsi_a ?? '',
-                                'opsi_b' => $s->opsi_b ?? '',
-                                'opsi_c' => $s->opsi_c ?? '',
-                                'opsi_d' => $s->opsi_d ?? '',
-                                'opsi_e' => $s->opsi_e ?? '',
-                                'jawaban_benar' => $s->jawaban_benar ?? '',
-                                'pembahasan' => $s->pembahasan ?? '',
-                                'materi_teks' => $s->materi_teks ?? '',
-                                'image_url' => $s->image_url ?? null
-                            ];
-                        })->toArray()
+                        'pertanyaan' => $s->pertanyaan ?? '',
+                        'opsi_a' => $s->opsi_a ?? '',
+                        'opsi_b' => $s->opsi_b ?? '',
+                        'opsi_c' => $s->opsi_c ?? '',
+                        'opsi_d' => $s->opsi_d ?? '',
+                        'opsi_e' => $s->opsi_e ?? '',
+                        'jawaban_benar' => $s->jawaban_benar ?? '',
+                        'pembahasan' => $s->pembahasan ?? '',
+                        'materi_teks' => $s->materi_teks ?? '',
+                        'image_url' => $s->image_url ?? null
                     ];
-                })) !!},
+                })->toArray()
+            ];
+        })) !!},
 
-                selectSubtes(index) {
-                    this.activeSubtesIndex = index;
-                    this.activeQuestion = 1;
-                    this.imageUrl = null;
-                    this.$nextTick(() => { this.loadQuestion(); });
-                },
-
-                handleImageFile(event) {
-                    const file = event.target.files[0];
-                    if (file) { 
-                        const reader = new FileReader();
-                        reader.onload = (e) => { this.imageUrl = e.target.result; this.showImageModal = false; };
-                        reader.readAsDataURL(file);
-                    }
-                },
-
-                applyImageUrl() {
-                    if (this.tempImageUrl.trim() !== '') {
-                        this.imageUrl = this.tempImageUrl; this.showImageModal = false; this.tempImageUrl = '';
-                    }
-                },
-
-                simpanSoal() {
-                    let current = this.subtesList[this.activeSubtesIndex];
-                    const jaw = document.querySelector('input[name="correct_option"]:checked');
-                    
-                    current.questions[this.activeQuestion - 1] = {
-                        materi_teks: document.getElementById('materi_teks').value,
-                        pertanyaan: document.getElementById('pertanyaan_teks').value,
-                        opsi_a: document.getElementById('opt_a').value,
-                        opsi_b: document.getElementById('opt_b').value,
-                        opsi_c: document.getElementById('opt_c').value,
-                        opsi_d: document.getElementById('opt_d').value,
-                        opsi_e: document.getElementById('opt_e').value,
-                        jawaban_benar: jaw ? jaw.value : '',
-                        pembahasan: document.getElementById('pembahasan_teks').value,
-                        image_url: this.imageUrl
-                    };
-                    current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
-                    alert('Soal nomor ' + this.activeQuestion + ' tersimpan sementara.');
-                },
-
-                loadQuestion() {
-                    let current = this.subtesList[this.activeSubtesIndex];
-                    let data = current.questions[this.activeQuestion - 1];
-                    if (data) {
-                        document.getElementById('materi_teks').value = data.materi_teks || '';
-                        document.getElementById('pertanyaan_teks').value = data.pertanyaan || '';
-                        document.getElementById('opt_a').value = data.opsi_a || '';
-                        document.getElementById('opt_b').value = data.opsi_b || '';
-                        document.getElementById('opt_c').value = data.opsi_c || '';
-                        document.getElementById('opt_d').value = data.opsi_d || '';
-                        document.getElementById('opt_e').value = data.opsi_e || '';
-                        document.getElementById('pembahasan_teks').value = data.pembahasan || '';
-                        this.imageUrl = data.image_url || null;
-                        document.getElementsByName('correct_option').forEach(r => r.checked = (r.value === data.jawaban_benar));
-                    } else {
-                        this.resetInputForm();
-                    }
-                },
-
-                resetInputForm() {
-                    ['materi_teks','pertanyaan_teks','opt_a','opt_b','opt_c','opt_d','opt_e','pembahasan_teks'].forEach(id => {
-                        const el = document.getElementById(id); if(el) el.value = '';
-                    });
-                    this.imageUrl = null;
-                    document.getElementsByName('correct_option').forEach(r => r.checked = false);
-                },
-
-                submitForm() {
-                    this.isDirty = false;
-                    localStorage.removeItem('persisten_tryout_edit_backup');
-                    document.getElementById('payload_full_data').value = JSON.stringify(this.subtesList);
-                    document.getElementById('formTryout').submit();
-                },
-
-                saveToLocal() {
-                    const dataToSave = {
-                        subtesList: this.subtesList,
-                        namaTryout: this.namaTryout,
-                        tglMulai: this.tglMulai,
-                        tglSelesai: this.tglSelesai
-                    };
-                    localStorage.setItem('persisten_tryout_edit_backup', JSON.stringify(dataToSave));
-                },
-
-                publikasikan() {
-                    this.showPublishModal = true;
-                },
-
-                // Fungsi eksekusi final saat tombol "Ya, Terbitkan" diklik
-                confirmPublikasikan() {
-                    // 1. Matikan proteksi isDirty agar tidak dicegat browser/history
-                    this.isDirty = false;
-                    
-                    // 2. Hapus backup di LocalStorage karena data sudah akan disimpan permanen
-                    localStorage.removeItem('persisten_tryout_edit_backup');
-                    
-                    // 3. Masukkan data subtes ke input hidden
-                    document.getElementById('payload_full_data').value = JSON.stringify(this.subtesList);
-                    
-                    // 4. Submit form asli
-                    document.getElementById('formTryout').submit();
-                },
-
-                init() {
-                    // 1. Cek apakah ada data cadangan di LocalStorage
-                    const saved = localStorage.getItem('persisten_tryout_edit_backup');
-                    if (saved) {
-                        const data = JSON.parse(saved);
-                        // Gunakan data dari localstorage jika ada
-                        this.subtesList = data.subtesList;
-                        this.namaTryout = data.namaTryout;
-                        this.tglMulai = data.tglMulai;
-                        this.tglSelesai = data.tglSelesai;
-                        this.isDirty = true; 
-                    }
-
-                    // 2. Setup Watcher untuk simpan otomatis setiap ada perubahan
-                    this.$watch('subtesList', () => { this.isDirty = true; this.saveToLocal(); });
-                    this.$watch('namaTryout', () => { this.isDirty = true; this.saveToLocal(); });
-                    this.$watch('tglMulai', () => { this.isDirty = true; this.saveToLocal(); });
-                    this.$watch('tglSelesai', () => { this.isDirty = true; this.saveToLocal(); });
-
-                    // 3. Teknik History API (Tetap dipertahankan untuk tombol Back)
-                    history.pushState(null, null, window.location.href);
-                    window.onpopstate = () => {
-                        if (this.isDirty) {
-                            this.showConfirmBackModal = true;
-                            history.pushState(null, null, window.location.href);
-                        } else {
-                            window.location.href = '{{ route("admin.tryout.index") }}';
-                        }
-                    };
+        // 🔥 SWEET ALERT BACK
+        confirmLeave() {
+             Swal.fire({
+                title: 'Yakin ingin keluar?',
+                text: 'Data tryout yang belum dipublikasikan akan hilang.',
+                icon: 'warning',
+                width: '340px',
+                padding: '1.8rem',
+                showCancelButton: true,
+                confirmButtonColor: '#4A72D4',
+                cancelButtonColor: '#E5E7EB',
+                cancelButtonText: 'Batal',
+                confirmButtonText: 'Ya, keluar',    
+                customClass: {
+                    popup: 'rounded-3xl shadow-xl',
+                    title: 'text-lg font-bold text-gray-800',
+                    htmlContainer: 'text-sm text-gray-500',
+                    confirmButton: 'rounded-xl px-5 py-2',
+                    cancelButton: 'rounded-xl px-5 py-2'
                 }
-            }
-        }
-    </script>
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.isDirty = false;
+                    localStorage.removeItem('persisten_tryout_edit_backup');
+                    window.location.href = '/admin/tryout';
+                }
+            });
+        },
 
-    {{-- MODAL KEMBALI --}}
-<div x-show="showConfirmBackModal" x-cloak class="fixed inset-0 z-[150] flex items-center justify-center p-4">
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showConfirmBackModal = false"></div>
-    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[151] text-center shadow-2xl border border-blue-50"
-         x-show="showConfirmBackModal"
-         x-transition>
-        <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-        </div>
-        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Konfirmasi Keluar</h3>
-        <p class="text-gray-500 text-sm mb-8">Perubahan belum disimpan. Jika keluar sekarang, perubahan akan hilang.</p>
-        <div class="flex gap-3">
-            <button type="button" @click="showConfirmBackModal = false" 
-                class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200">Batal</button>
-            
-            <button type="button" 
-                @click="isDirty = false; localStorage.removeItem('persisten_tryout_edit_backup'); window.location.href = '{{ route('admin.tryout.index') }}'" 
-                class="flex-1 py-3 rounded-xl font-bold bg-red-500 text-white shadow-lg shadow-red-200">
-                Ya, Keluar
-            </button>
-        </div>
-    </div>
-</div>
+        backToDaftarTryout() {
+            if (this.isDirty) {
+                this.confirmLeave();
+            } else {
+                window.location.href = '/admin/tryout';
+            }
+        },
+
+        selectSubtes(index) {
+            this.activeSubtesIndex = index;
+            this.activeQuestion = 1;
+            this.imageUrl = null;
+            this.$nextTick(() => { this.loadQuestion(); });
+        },
+
+        handleImageFile(event) {
+            const file = event.target.files[0];
+            if (file) { 
+                const reader = new FileReader();
+                reader.onload = (e) => { 
+                    this.imageUrl = e.target.result; 
+                    this.showImageModal = false; 
+                };
+                reader.readAsDataURL(file);
+            }
+        },
+
+        applyImageUrl() {
+            if (this.tempImageUrl.trim() !== '') {
+                this.imageUrl = this.tempImageUrl; 
+                this.showImageModal = false; 
+                this.tempImageUrl = '';
+            }
+        },
+
+        simpanSoal() {
+            let current = this.subtesList[this.activeSubtesIndex];
+            const jaw = document.querySelector("input[name='correct_option']:checked");
+
+            current.questions[this.activeQuestion - 1] = {
+                materi_teks: document.getElementById('materi_teks').value,
+                pertanyaan: document.getElementById('pertanyaan_teks').value,
+                opsi_a: document.getElementById('opt_a').value,
+                opsi_b: document.getElementById('opt_b').value,
+                opsi_c: document.getElementById('opt_c').value,
+                opsi_d: document.getElementById('opt_d').value,
+                opsi_e: document.getElementById('opt_e').value,
+                jawaban_benar: jaw ? jaw.value : '',
+                pembahasan: document.getElementById('pembahasan_teks').value,
+                image_url: this.imageUrl
+            };
+
+            current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Tersimpan',
+                text: 'Soal nomor ' + this.activeQuestion
+            });
+        },
+
+        loadQuestion() {
+            let current = this.subtesList[this.activeSubtesIndex];
+            let data = current.questions[this.activeQuestion - 1];
+
+            if (data) {
+                document.getElementById('materi_teks').value = data.materi_teks || '';
+                document.getElementById('pertanyaan_teks').value = data.pertanyaan || '';
+                document.getElementById('opt_a').value = data.opsi_a || '';
+                document.getElementById('opt_b').value = data.opsi_b || '';
+                document.getElementById('opt_c').value = data.opsi_c || '';
+                document.getElementById('opt_d').value = data.opsi_d || '';
+                document.getElementById('opt_e').value = data.opsi_e || '';
+                document.getElementById('pembahasan_teks').value = data.pembahasan || '';
+                this.imageUrl = data.image_url || null;
+
+                document.getElementsByName('correct_option')
+                    .forEach(r => r.checked = (r.value === data.jawaban_benar));
+            } else {
+                this.resetInputForm();
+            }
+        },
+
+        resetInputForm() {
+            ['materi_teks','pertanyaan_teks','opt_a','opt_b','opt_c','opt_d','opt_e','pembahasan_teks']
+            .forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.value = '';
+            });
+
+            this.imageUrl = null;
+            document.getElementsByName('correct_option')
+                .forEach(r => r.checked = false);
+        },
+
+        submitForm() {
+            this.isDirty = false;
+            localStorage.removeItem('persisten_tryout_edit_backup');
+            document.getElementById('payload_full_data').value = JSON.stringify(this.subtesList);
+            document.getElementById('formTryout').submit();
+        },
+
+        saveToLocal() {
+            const dataToSave = {
+                subtesList: this.subtesList,
+                namaTryout: this.namaTryout,
+                tglMulai: this.tglMulai,
+                tglSelesai: this.tglSelesai
+            };
+            localStorage.setItem('persisten_tryout_edit_backup', JSON.stringify(dataToSave));
+        },
+
+        publikasikan() {
+            this.showPublishModal = true;
+        },
+
+        confirmPublikasikan() {
+            this.isDirty = false;
+            localStorage.removeItem('persisten_tryout_edit_backup');
+            document.getElementById('payload_full_data').value = JSON.stringify(this.subtesList);
+            document.getElementById('formTryout').submit();
+        },
+
+        init() {
+            const saved = localStorage.getItem('persisten_tryout_edit_backup');
+            if (saved) {
+                const data = JSON.parse(saved);
+                this.subtesList = data.subtesList;
+                this.namaTryout = data.namaTryout;
+                this.tglMulai = data.tglMulai;
+                this.tglSelesai = data.tglSelesai;
+                this.isDirty = true; 
+            }
+
+            this.$watch('subtesList', () => { this.isDirty = true; this.saveToLocal(); });
+            this.$watch('namaTryout', () => { this.isDirty = true; this.saveToLocal(); });
+            this.$watch('tglMulai', () => { this.isDirty = true; this.saveToLocal(); });
+            this.$watch('tglSelesai', () => { this.isDirty = true; this.saveToLocal(); });
+
+            history.pushState(null, null, window.location.href);
+
+            window.onpopstate = () => {
+                if (this.isDirty) {
+                    history.pushState(null, null, window.location.href);
+                    this.confirmLeave();
+                } else {
+                    window.location.href = '/admin/tryout';
+                }
+            };
+        }
+    }
+}
+</script>
 
 {{-- MODAL PUBLIKASI --}}
 <div x-show="showPublishModal" x-cloak class="fixed inset-0 z-[180] flex items-center justify-center p-4">

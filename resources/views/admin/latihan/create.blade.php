@@ -492,15 +492,23 @@
             confirmLeave() {
 
                 Swal.fire({
-                    title: "Kembali ke halaman daftar?",
-                    text: "Data latihan yang belum dipublikasikan akan hilang.",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#4A72D4",
-                    cancelButtonColor: "#9CA3AF",
-                    confirmButtonText: "Ya, kembali",
-                    cancelButtonText: "Tetap di sini",
-                    scrollbarPadding: false
+                title: 'Yakin ingin keluar?',
+                text: 'Perubahan latihan yang belum disimpan akan hilang.',
+                icon: 'warning',
+                width: '340px',
+                padding: '1.8rem',
+                showCancelButton: true,
+                confirmButtonColor: '#4A72D4',
+                cancelButtonColor: '#E5E7EB',
+                cancelButtonText: 'Batal',
+                confirmButtonText: 'Ya, keluar',    
+                customClass: {
+                    popup: 'rounded-3xl shadow-xl',
+                    title: 'text-lg font-bold text-gray-800',
+                    htmlContainer: 'text-sm text-gray-500',
+                    confirmButton: 'rounded-xl px-5 py-2',
+                    cancelButton: 'rounded-xl px-5 py-2'
+                }
                 }).then((result) => {
 
                     if (result.isConfirmed) {

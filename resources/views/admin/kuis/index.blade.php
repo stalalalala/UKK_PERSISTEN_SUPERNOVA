@@ -528,6 +528,7 @@
                             showCancelButton: true,
                             confirmButtonColor: '#ef4444',
                             confirmButtonText: 'Ya, Hapus!',
+                            cancelButtonText: 'Batal',
                         customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
         }).then((result) => {
             if(result.isConfirmed){

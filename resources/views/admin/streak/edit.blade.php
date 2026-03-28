@@ -89,27 +89,34 @@
 
             confirmLeave() {
 
-                Swal.fire({
-                    title: "Kembali ke halaman daftar?",
-                    text: "Karakter streak yang sedang dibuat akan hilang.",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#4A72D4",
-                    cancelButtonColor: "#9CA3AF",
-                    confirmButtonText: "Ya, kembali",
-                    cancelButtonText: "Tetap di sini"
-                }).then((result) => {
+    Swal.fire({
+        title: 'Yakin ingin keluar?',
+        text: 'Karakter streak yang sedang dibuat akan hilang.',
+        icon: 'warning',
+        width: '340px',
+        padding: '1.8rem',
+        showCancelButton: true,
+        confirmButtonColor: '#4A72D4',
+        cancelButtonColor: '#E5E7EB',
+        cancelButtonText: 'Batal',
+        confirmButtonText: 'Ya, keluar',    
+        customClass: {
+            popup: 'rounded-3xl shadow-xl',
+            title: 'text-lg font-bold text-gray-800',
+            htmlContainer: 'text-sm text-gray-500',
+            confirmButton: 'rounded-xl px-5 py-2',
+            cancelButton: 'rounded-xl px-5 py-2'
+        }
+    }).then((result) => {
 
-                    if (result.isConfirmed) {
+        if (result.isConfirmed) {
+            this.allowLeave = true
+            window.location.href = "{{ route('admin.streak.index') }}"
+        }
 
-                        this.allowLeave = true
-                        window.location.href = "{{ route('admin.streak.index') }}"
+    })
 
-                    }
-
-                })
-
-            }
+}
 
         }
 

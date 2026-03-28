@@ -55,8 +55,9 @@ class UserController extends Controller
             'password' => [
                 'required',
                 'min:6',
-                'regex:/^(?=.*[0-9])(?=.*[\W]).+$/',
-                'confirmed'
+                'confirmed',
+                'regex:/[0-9]/',      
+            'regex:/[^A-Za-z0-9]/',
             ],
             'no_hp' => 'nullable|digits_between:11,100',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
