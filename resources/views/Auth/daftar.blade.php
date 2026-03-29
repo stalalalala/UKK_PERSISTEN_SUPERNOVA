@@ -51,7 +51,7 @@
                                 autocomplete="off" 
                                 class="w-full px-5 py-3.5 md:px-6 md:py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white text-sm md:text-base">
                             @error('name')
-                                <p class="text-red-500 text-xs mt-1 ml-2 font-medium">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1 ml-2 font-semibold">Nama wajib diisi.</p>
                             @enderror
                         </div>
 
@@ -77,7 +77,7 @@
                             <p x-show="hpError" x-text="hpError" class="text-red-500 text-xs mt-1 ml-2 font-semibold italic"></p>
                             
                             @error('no_hp')
-                                <p class="text-red-500 text-xs mt-1 ml-2 font-semibold italic">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1 ml-2 font-semibold">Nomor HP wajib diisi.</p>
                             @enderror
                         </div>
                     </div>
@@ -92,15 +92,25 @@
                                 autocomplete="off" 
                                 class="w-full px-5 py-3.5 md:px-6 md:py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white text-sm md:text-base">
                             @error('email')
-                                <p class="text-red-500 text-xs mt-1 ml-2 font-medium">{{ $message }}</p>
+                                <p class="text-red-500 text-xs mt-1 ml-2 font-semibold">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div x-data="{ showPassword: false, showConfirm: false }" class="space-y-5 md:space-y-6">
+                        <div x-data="{
+                            showPassword: false,
+                            showConfirm: false,
+                            password: '',
+                            confirmPassword: '',
+                            passwordError: '',
+                            confirmError: ''
+                        }" class="space-y-5 md:space-y-6">
+
                             {{-- Password --}}
-                            <div x-data="{ password: '', passwordError: '' }" class="space-y-2">
-                                <label class="block text-gray-500 font-bold ml-1 text-sm md:text-base">Buat sandi</label>
-                                
+                            <div class="space-y-2">
+                                <label class="block text-gray-500 font-bold ml-1 text-sm md:text-base">
+                                    Buat sandi
+                                </label>
+
                                 <div class="relative">
                                     <input :type="showPassword ? 'text' : 'password'" 
                                         name="password"
@@ -108,36 +118,53 @@
                                         autocomplete="new-password"
                                         x-model="password"
                                         @input="
-                                            passwordError = (password.length < 6) ? 'Minimal 6 karakter' : 
+                                            passwordError = (password === '') ? 'Wajib diisi' :
+                                                            (password.length < 6) ? 'Minimal 6 karakter' : 
                                                             (!/[0-9]/.test(password)) ? 'Wajib ada angka' : 
                                                             (!/[^A-Za-z0-9]/.test(password)) ? 'Wajib ada simbol(@$!%*#?&)' : '';
+                                            
+                                            confirmError = (confirmPassword !== '' && confirmPassword !== password) 
+                                                            ? 'Password tidak sama' : '';
                                         "
                                         class="w-full px-5 py-3.5 md:px-6 md:py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white pr-12 text-sm md:text-base">
-                                    
+
                                     <button type="button" @click="showPassword = !showPassword"
-                                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 focus:outline-none hover:text-[#4A9FFF] transition-colors">
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#4A9FFF]">
                                         <i class="fa-solid text-lg" :class="showPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
                                     </button>
                                 </div>
-                                <p x-show="passwordError" x-text="passwordError" class="text-red-500 text-[10px] md:text-xs mt-1 font-semibold italic ml-2"></p>
+
+                                <p x-show="passwordError" x-text="passwordError"
+                                class="text-red-500 text-[10px] md:text-xs mt-1 font-semibold ml-2"></p>
                             </div>
 
                             {{-- Confirm Password --}}
                             <div class="space-y-2">
-                                <label class="block text-gray-500 font-bold ml-1 text-sm md:text-base">Konfirmasi sandi</label>
-                                
+                                <label class="block text-gray-500 font-bold ml-1 text-sm md:text-base">
+                                    Konfirmasi sandi
+                                </label>
+
                                 <div class="relative">
                                     <input :type="showConfirm ? 'text' : 'password'" 
                                         name="password_confirmation"
                                         placeholder="xxxxxxxx"
+                                        x-model="confirmPassword"
+                                        @input="
+                                            confirmError = (confirmPassword === '') ? 'Wajib diisi' :
+                                                        (confirmPassword !== password) ? 'Password tidak sama' : '';
+                                        "
                                         class="w-full px-5 py-3.5 md:px-6 md:py-4 rounded-2xl border-2 border-[#4A9FFF] focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all bg-white pr-12 text-sm md:text-base">
-                                    
+
                                     <button type="button" @click="showConfirm = !showConfirm"
-                                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 focus:outline-none hover:text-[#4A9FFF] transition-colors">
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#4A9FFF]">
                                         <i class="fa-solid text-lg" :class="showConfirm ? 'fa-eye' : 'fa-eye-slash'"></i>
                                     </button>
                                 </div>
+
+                                <p x-show="confirmError" x-text="confirmError"
+                                class="text-red-500 text-[10px] md:text-xs mt-1 font-semibold ml-2"></p>
                             </div>
+
                         </div>
                     </div>
 

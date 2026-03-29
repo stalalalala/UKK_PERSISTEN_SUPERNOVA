@@ -23,17 +23,21 @@ class LoginController extends Controller
     public function register(Request $request)
 {
     $request->validate([
-        'name'     => 'required|string|max:255',
-        'no_hp'    => 'required|numeric|digits_between:11,100',
-        'email'    => 'required|email|unique:users,email',
-        'password' => [
-            'required',
-            'min:6', 
-            'confirmed',
-            'regex:/[0-9]/',      
-            'regex:/[^A-Za-z0-9]/', 
-        ],
-    ]);
+    'name'     => 'required|string|max:255',
+    'no_hp'    => 'required|numeric|digits_between:11,13',
+    'email'    => 'required|email|unique:users,email',
+    'password' => [
+        'required',
+        'min:6', 
+        'confirmed',
+        'regex:/[0-9]/',      
+        'regex:/[^A-Za-z0-9]/', 
+    ],
+], [
+    'email.required' => 'Email wajib diisi.',
+    'email.email'    => 'Format email tidak valid.',
+    'email.unique'   => 'Email sudah terdaftar, gunakan email lain.',
+]);
 
     $user = User::create([
         'name' => $request->name,
