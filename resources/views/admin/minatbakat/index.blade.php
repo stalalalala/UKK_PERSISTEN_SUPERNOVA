@@ -56,7 +56,7 @@
                 [&::-webkit-scrollbar-thumb]:bg-white/20 
                 [&::-webkit-scrollbar-thumb]:rounded-full" >
 
-                <a href="{{ route('admin.dashboard.index') }}" 
+        <a href="{{ route('admin.dashboard.index') }}" 
             class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
@@ -121,8 +121,6 @@
             <span class="text-md font-regular">Manajemen minat bakat</span>
         </a>
 
-        
-
          <a href="{{ route('admin.peluang.index') }}" 
             class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
@@ -148,10 +146,11 @@
         <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
     </button>
     </form>
+    </nav>
         </aside>
 
         <main class="flex-1 flex flex-col min-w-0 bg-[#F8FAFF] overflow-hidden p-4 lg:p-8">
-            <header class="flex flex-col lg:flex-row lg:items-center justify-between lg:pt-4 lg:pb-4 gap-4 flex-shrink-0 w-full">
+            <header class="flex flex-col lg:flex-row lg:items-center justify-between pb-4 gap-4 flex-shrink-0 w-full">
     <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
         <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
             <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,37 +161,42 @@
         @php
             use Illuminate\Support\Facades\Auth;
             $user = Auth::user();
+            $firstName = explode(' ', trim($user->name))[0];
         @endphp
 
         <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
             <div @click="open = !open" 
-                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
+                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto ml-auto">
                 
                 <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
-                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" 
-                             alt="Admin" class="w-full h-full object-cover">
+                    <div class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden border-2 border-white shrink-0">
+                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=4A72D4&color=fff' }}" 
+                             alt="{{ $user->name }}" class="w-full h-full object-cover">
                     </div>
-                    <span class="font-bold text-sm text-gray-700 truncate">Admin</span>
+                    <span class="font-bold text-sm text-gray-700 truncate">{{ $firstName }}</span>
                 </div>
                 
-                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                <i class="fa-solid fa-chevron-down text-gray-400 text-[10px]"></i>
             </div>
 
-            <div x-show="open" @click.away="open = false"
-                class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+            <div x-show="open" 
+                x-cloak
+                @click.away="open = false"
                 x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 transform scale-95"
-                x-transition:enter-end="opacity-100 transform scale-100"
-                x-transition:leave="transition ease-in duration-150"
-                x-transition:leave-start="opacity-100 transform scale-100"
-                x-transition:leave-end="opacity-0 transform scale-95">
-                <div class="p-4 bg-gray-50/50 border-b border-gray-100">
-                    <p class="font-bold text-gray-800">{{ $user->name }}</p>
-                    <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
+                x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
+                x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                class="absolute right-0 mt-3 w-64 bg-white rounded-[20px] shadow-2xl border border-gray-100 z-[100] overflow-hidden">
+                
+                <div class="p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                    <p class="font-extrabold text-gray-800 leading-tight">{{ $user->name }}</p>
+                    <p class="text-[11px] text-gray-400 mt-1 truncate">{{ $user->email }}</p>
                 </div>
-                <div class="p-4 text-xs text-gray-500 bg-white">
-                    {{ $user->no_hp ?? '-' }}
+                
+                <div class="p-4 flex flex-col gap-2 bg-white">
+                    <div class="flex items-center gap-3 text-xs text-gray-500 p-2 bg-gray-50 rounded-xl border border-gray-100">
+                        <i class="fa-solid fa-phone text-blue-400"></i>
+                        <span>{{ $user->no_hp ?? 'No HP belum diatur' }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -213,21 +217,22 @@
                 'latihan': '{{ route('admin.latihan.index') }}'
             },
             goToPage(){
-                let search = this.keyword.toLowerCase()
+                let search = this.keyword.toLowerCase().trim();
+                if(!search) return;
                 for (let key in this.routes) {
                     if (key.includes(search)) {
-                        window.location.href = this.routes[key]
-                        return
+                        window.location.href = this.routes[key];
+                        return;
                     }
                 }
-                alert('Halaman tidak ditemukan')
+                alert('Halaman tidak ditemukan');
             }
         }"
         class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1"
     >
-        <div class="relative w-full">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="relative w-full group">
+            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 group-focus-within:text-[#4A72D4] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                 </svg>
             </div>
@@ -236,13 +241,13 @@
                 x-model="keyword" 
                 placeholder="Cari halaman..." 
                 @keydown.enter="goToPage()"
-                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm"
+                class="w-full bg-white border-none rounded-full py-3.5 pl-14 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm placeholder:text-gray-400 font-medium"
             >
         </div>
 
         <button 
             @click="goToPage()" 
-            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0"
+            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-7 py-3.5 rounded-full text-sm font-extrabold shadow-lg shadow-blue-100 transition-all active:scale-95 shrink-0"
         >
             Cari
         </button>
@@ -313,34 +318,31 @@
                                 </button>
 
                                <button 
-                            type="button"
-                            @click.stop="
-                            Swal.fire({
-                            title: 'Hapus Kategori?',
-                            text: 'Kategori akan dipindahkan ke History',
-                            icon: 'warning',
-                            width: '340px',
-                            showCancelButton: true,
-                            confirmButtonColor: '#ef4444',
-                            confirmButtonText: 'Ya, Hapus!',
-                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
-                        }).then((result) => {
-                            if(result.isConfirmed) $el.nextElementSibling.submit()
-                        })
-                        "
-                        class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                    </svg>
-                </button>
+                                    type="button"
+                                    @click.stop="
+                                    Swal.fire({
+                                    title: 'Hapus Kategori?',
+                                    text: 'Kategori akan dipindahkan ke History',
+                                    icon: 'warning',
+                                    width: '340px',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#ef4444',
+                                    confirmButtonText: 'Ya, Hapus!',
+                                    customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                    }).then((result) => {
+                                        if(result.isConfirmed) $el.nextElementSibling.submit()
+                                    })
+                                    "
+                                    class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                    </svg>
+                                </button>
 
-                <form 
-                :action="`/admin/minatBakat/${cat.id}`" 
-                method="POST" 
-                class="hidden">
-                    @csrf
-                    @method('DELETE')
-                </form>
+                                <form :action="`/admin/minatBakat/${cat.id}`" method="POST" class="hidden">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
                             </div>
 
                             <div class="flex flex-col gap-3 relative z-0">
@@ -400,7 +402,7 @@
         </main>
     </div>
 
-   <div x-show="showModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div x-show="showModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4">
     <div @click="showModal = false" class="absolute inset-0 bg-[#2D3B61]/40 backdrop-blur-sm"></div>
 
     <div class="bg-white rounded-[28px] w-full max-w-md p-8 relative shadow-2xl"
@@ -474,24 +476,29 @@
                                     type="color" 
                                     name="color"
                                     x-model="formData.color"
-                                    class="h-12 w-20 rounded-xl border-none cursor-pointer bg-transparent">
+                                    class="h-12 w-12 rounded-xl border-none cursor-pointer bg-transparent shrink-0">
 
-                                <div class="flex-1 px-5 py-3 bg-gray-50 rounded-2xl text-[10px] font-bold uppercase text-gray-400 flex items-center" 
-                                    x-text="formData.color"></div>
+                                <div class="flex-1 relative">
+                                    <input 
+                                        type="text" 
+                                        x-model="formData.color"
+                                        @input="if (!$el.value.startsWith('#')) $el.value = '#' + $el.value"
+                                        maxlength="7"
+                                        class="w-full h-12 px-5 bg-gray-50 border-none rounded-2xl text-[10px] font-black uppercase text-gray-600 focus:ring-2 focus:ring-[#4A72D4] outline-none"
+                                        placeholder="#4A72D4">
+                                    <div class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded shadow-sm border border-gray-200" :style="`background-color: ${formData.color}`"></div>
+                                </div>
                             </div>
+                            <p class="text-[9px] text-gray-400 mt-2 italic font-medium">*Klik kotak warna atau ketik kode HEX secara manual.</p>
                         </div>
 
-                        <!-- 🔥 BUTTON SUBMIT -->
                         <button 
                             type="submit"
                             class="w-full py-4 bg-[#4A72D4] text-white rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg active:scale-95">
-                            
                             <span x-text="isEdit ? 'Simpan Perubahan' : 'Buat Kategori Baru'"></span>
                         </button>
-
                     </div>
                 </form>
-                <!-- 🔥 FORM END -->
             </div>
         </div>
 
@@ -596,7 +603,7 @@
             actionId: null,
             actionName: '',
             pagiCurrentPage: 1,
-            pagiItemsPerPage: 5,
+            pagiItemsPerPage: 10,
             showDeleteConfirmModal: false,
 
             // Data Initialization
@@ -672,7 +679,6 @@
                 this.showModal = true;
             },
 
-           
             goToSoal(name) {
                 const baseUrl = '{{ route("admin.minatBakat.manajemen") }}';
                 window.location.href = `${baseUrl}?category=${encodeURIComponent(name)}`;
@@ -681,7 +687,7 @@
     });
 </script>
 
-{{-- HISTORY --}}
+{{-- HISTORY MODAL --}}
 <div x-show="showHistoryModal" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-6">
     <div @click="showHistoryModal = false" 
          x-transition:enter="ease-out duration-300" 
@@ -728,138 +734,76 @@
                         
                         <div class="flex items-center gap-2 w-full sm:w-auto">
                             <button 
-                            type="button"
-                            @click.stop="
-                            Swal.fire({
-                            title: 'Pulihkan Kategori?',
-                            text: 'Data akan dikembalikan ke daftar Kategori',
-                            icon: 'question',
-                            width: '340px',
-                            showCancelButton: true,
-                            confirmButtonColor: '#22c55e',
-                            confirmButtonText: 'Ya, Pulihkan!',
-                            cancelButtonText: 'Batal',
-                            customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
-                            }).then((result) => {
-                                if(result.isConfirmed) $el.nextElementSibling.submit()
-                            })
-                            "
-                            class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> 
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
-                                            </svg>
+                                type="button"
+                                @click.stop="
+                                Swal.fire({
+                                title: 'Pulihkan Kategori?',
+                                text: 'Data akan dikembalikan ke daftar Kategori',
+                                icon: 'question',
+                                width: '340px',
+                                showCancelButton: true,
+                                confirmButtonColor: '#22c55e',
+                                confirmButtonText: 'Ya, Pulihkan!',
+                                cancelButtonText: 'Batal',
+                                customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                }).then((result) => {
+                                    if(result.isConfirmed) $el.nextElementSibling.submit()
+                                })
+                                "
+                                class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> 
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                </svg>
                             </button>
 
-                            <form 
-                            :action="`/admin/minat-bakat/${item.id}/restore`" 
-                            method="POST" 
-                            class="hidden">
+                            <form :action="`/admin/minat-bakat/${item.id}/restore`" method="POST" class="hidden">
                                 @csrf
                             </form>
-                                                    <button 
-                            type="button"
-                            @click.stop="
-                            Swal.fire({
-                            title: 'Hapus Permanen?',
-                            text: 'Data tidak bisa dikembalikan!',
-                            width: '340px',
-                            icon: 'error',
-                            showCancelButton: true,
-                            confirmButtonColor: '#ef4444',
-                            confirmButtonText: 'Ya, Hapus!',
-                            cancelButtonText: 'Batal',
-                            customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
-                        }).then((result) => {
-                            if(result.isConfirmed) $el.nextElementSibling.submit()
-                        })
-                        "
-                        class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                        </svg>
-                        </button>
 
-                        <form 
-                        :action="`/admin/minat-bakat/${item.id}/force-delete`" 
-                        method="POST" 
-                        class="hidden">
-                            @csrf
-                            @method('DELETE')
-                        </form>
+                            <button 
+                                type="button"
+                                @click.stop="
+                                Swal.fire({
+                                title: 'Hapus Permanen?',
+                                text: 'Data tidak bisa dikembalikan!',
+                                width: '340px',
+                                icon: 'error',
+                                showCancelButton: true,
+                                confirmButtonColor: '#ef4444',
+                                confirmButtonText: 'Ya, Hapus!',
+                                cancelButtonText: 'Batal',
+                                customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                }).then((result) => {
+                                    if(result.isConfirmed) $el.nextElementSibling.submit()
+                                })
+                                "
+                                class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+                            </button>
+
+                            <form :action="`/admin/minat-bakat/${item.id}/force-delete`" method="POST" class="hidden">
+                                @csrf
+                                @method('DELETE')
+                            </form>
                         </div>
                     </div>
                 </template>
             </div>
         </div>
-
     </div>
 </div>
+
+{{-- Success Alert --}}
 @if(session('success'))
-<div 
-    x-data
-    x-init="
-        Swal.fire({
-            icon: 'success',
-            title: '{{ session('success') }}',
-
-            width: '340px',
-            padding: '1.8rem',
-
-            background: '#ffffff',
-            color: '#334155',
-
-            confirmButtonText: 'Oke',
-            confirmButtonColor: '#4A72D4',
-
-            customClass: {
-                popup: 'rounded-3xl shadow-xl',
-                title: 'text-lg font-bold',
-                confirmButton: 'rounded-xl px-6 py-2'
-            },
-
-            showClass: {
-                popup: 'animate__animated animate__fadeInDown'
-            },
-            hideClass: {
-                popup: 'animate__animated animate__fadeOutUp'
-            }
-        })
-    "
-></div>
+<div x-data x-init="Swal.fire({ icon: 'success', title: '{{ session('success') }}', width: '340px', confirmButtonText: 'Oke', confirmButtonColor: '#4A72D4', customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'rounded-xl px-6 py-2' }})"></div>
 @endif
 
+{{-- Error Alert --}}
 @if(session('error'))
-<div 
-    x-data
-    x-init="
-        Swal.fire({
-            icon: 'error',
-            title: '{{ session('error') }}',
-
-            width: '340px',
-            padding: '1.8rem',
-
-            background: '#ffffff',
-            color: '#334155',
-
-            confirmButtonText: 'Coba Lagi',
-            confirmButtonColor: '#ef4444',
-
-            customClass: {
-                popup: 'rounded-3xl shadow-xl',
-                title: 'text-lg font-bold',
-                confirmButton: 'rounded-xl px-6 py-2'
-            },
-
-            showClass: {
-                popup: 'animate__animated animate__fadeInDown'
-            },
-            hideClass: {
-                popup: 'animate__animated animate__fadeOutUp'
-            }
-        })
-    "
-></div>
+<div x-data x-init="Swal.fire({ icon: 'error', title: '{{ session('error') }}', width: '340px', confirmButtonText: 'Coba Lagi', confirmButtonColor: '#ef4444', customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'rounded-xl px-6 py-2' }})"></div>
 @endif
+
 </body>
 </html>

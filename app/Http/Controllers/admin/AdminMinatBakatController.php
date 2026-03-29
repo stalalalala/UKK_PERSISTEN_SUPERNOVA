@@ -128,7 +128,11 @@ class AdminMinatBakatController extends Controller
     {
         $categoryName = $request->query('category', 'Umum');
         $questions = MinatBakatSoal::where('kategori_name', $categoryName)->latest()->get();
-        return view('admin.minatBakat.soal', compact('questions', 'categoryName'));
+
+        $allCategories = MinatBakatKategori::select('name')->pluck('name');
+
+
+        return view('admin.minatBakat.soal', compact('questions', 'categoryName', 'allCategories'));
     }
 
     public function storeSoal(Request $request)
@@ -215,26 +219,54 @@ class AdminMinatBakatController extends Controller
     }
 
     public function importSoalBulk(Request $request)
-    {
-        try {
-            $rows = $request->data;
-            if (!$rows || count($rows) <= 1) return response()->json(['success' => false, 'message' => 'File kosong'], 400);
-            $count = 0;
-            DB::beginTransaction();
-            foreach ($rows as $index => $row) {
-                if ($index === 0) continue;
-                $pertanyaan = $row[1] ?? null;
-                $kategori   = $row[2] ?? null;
-                if (!empty($pertanyaan) && !empty($kategori)) {
-                    MinatBakatSoal::create(['text' => trim($pertanyaan), 'kategori_name' => trim($kategori)]);
-                    $count++;
-                }
-            }
-            DB::commit();
-            return response()->json(['success' => true, 'message' => "Berhasil mengimpor $count soal!"]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+{
+    try {
+        $rows = $request->data;
+        $mode = $request->mode; // Ambil mode dari request (single/all)
+        $currentCategory = $request->current_category; // Ambil kategori saat ini
+
+        if (!$rows || count($rows) <= 1) {
+            return response()->json(['success' => false, 'message' => 'File kosong atau hanya berisi header'], 400);
         }
+
+        $count = 0;
+        DB::beginTransaction();
+
+        foreach ($rows as $index => $row) {
+            // Lewati baris pertama (Header)
+            if ($index === 0) continue;
+
+            $pertanyaan = null;
+            $kategori = null;
+
+            if ($mode === 'single') {
+                // Template Single: ['Pertanyaan'] -> Kolom 0
+                $pertanyaan = $row[0] ?? null;
+                $kategori = $currentCategory; 
+            } else {
+                // Template All: ['Kategori', 'Pertanyaan'] -> Kolom 0 dan 1
+                $kategori = $row[0] ?? null;
+                $pertanyaan = $row[1] ?? null;
+            }
+
+            if (!empty($pertanyaan) && !empty($kategori)) {
+                MinatBakatSoal::create([
+                    'text' => trim($pertanyaan),
+                    'kategori_name' => trim($kategori)
+                ]);
+                $count++;
+            }
+        }
+
+        DB::commit();
+        return response()->json([
+            'success' => true, 
+            'message' => "Berhasil mengimpor $count soal ke kategori " . ($mode === 'single' ? $currentCategory : 'masing-masing') . "!"
+        ]);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['success' => false, 'message' => 'Gagal: ' . $e->getMessage()], 500);
     }
+}
 }

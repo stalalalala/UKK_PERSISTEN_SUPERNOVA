@@ -78,6 +78,20 @@ Route::post('/reset-password', [PasswordResetController::class, 'reset'])
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('verification.verify');
+
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])
+        ->name('verification.notice');
+
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
+    ->middleware(['throttle:6,1'])
+    ->name('verification.send');
+
+    Route::post('/logout', [LoginController::class,'logout'])
+        ->name('logout');
+
     // ADMIN
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
 
@@ -207,11 +221,11 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:peserta','verified'])->group(function () {
 
         Route::get('/', [BerandaController::class, 'index'])->name('beranda');
-        Route::get('/profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile.index');
+        Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
         
 
-       Route::get('/profile/edit', [ProfileController::class, 'edit'])->middleware('auth')->name('profile.edit');
-       Route::post('/profile/update', [ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
+       Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+       Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
        Route::get('/log', [ProfileController::class, 'log'])->name('log.index');
 
 
@@ -278,25 +292,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/slime', function () { return view('slime'); });
         Route::get('/slime_login', function () { return view('slime_login'); });
     });
-});
 
-// ==============================
-// EMAIL VERIFICATION
-// ==============================
-// 1. PINDAHKAN VERIFY KE LUAR (Agar bisa diklik di HP tanpa login)
-Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
-    ->middleware(['signed', 'throttle:6,1'])
-    ->name('verification.verify');
+ }); //AUTH
 
-// 2. SISANYA TETAP DI DALAM AUTH (Karena butuh login untuk akses halaman/tombolnya)
-Route::middleware('auth')->group(function () {
-    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])
-        ->name('verification.notice');
 
-    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
-    ->middleware(['auth', 'throttle:6,1'])
-    ->name('verification.send');
-
-    Route::post('/logout', [LoginController::class,'logout'])
-        ->name('logout');
-});

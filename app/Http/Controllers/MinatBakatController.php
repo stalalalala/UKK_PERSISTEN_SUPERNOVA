@@ -22,7 +22,9 @@ class MinatBakatController extends Controller
             return redirect()->route('minatbakat.hasil');
         }
 
-        return view('minatbakat.intruksi');
+        $totalSoal = MinatBakatSoal::count();
+
+        return view('minatbakat.intruksi', compact('totalSoal'));
     }
 
     public function index() 

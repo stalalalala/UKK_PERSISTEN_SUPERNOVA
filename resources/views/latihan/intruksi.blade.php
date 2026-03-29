@@ -121,9 +121,7 @@
                                             <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
                                                 Metode
                                                 Ujian</p>
-                                            <p class="text-lg font-extrabold text-[#2E3B66]">Pilihan Ganda <span
-                                                    class="text-xs font-medium text-gray-400 block tracking-normal">Single
-                                                    Answer Selection</span></p>
+                                            <p class="text-lg font-extrabold text-[#2E3B66]">Pilihan Ganda</p>
                                         </div>
                                     </div>
                                 </div>

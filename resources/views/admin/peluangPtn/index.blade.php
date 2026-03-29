@@ -340,34 +340,43 @@ laporan</span>
         @php
             use Illuminate\Support\Facades\Auth;
             $user = Auth::user();
+            // Mengambil nama depan saja untuk tampilan ringkas di bar
+            $firstName = explode(' ', trim($user->name))[0];
         @endphp
 
         <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
             <div @click="open = !open" 
-                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
+                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto ml-auto">
                 
                 <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
-                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" 
-                             alt="Admin" class="w-full h-full object-cover">
+                    <div class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden border-2 border-white shrink-0">
+                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=4A72D4&color=fff' }}" 
+                             alt="{{ $user->name }}" class="w-full h-full object-cover">
                     </div>
-                    <span class="font-bold text-sm text-gray-700 truncate lg:max-w-none">Admin</span>
+                    <span class="font-bold text-sm text-gray-700 truncate">{{ $firstName }}</span>
                 </div>
                 
-                <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                <i class="fa-solid fa-chevron-down text-gray-400 text-[10px]"></i>
             </div>
 
-            <div x-show="open" @click.away="open = false"
-                class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+            <div x-show="open" 
+                x-cloak
+                @click.away="open = false"
                 x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 transform scale-95"
-                x-transition:enter-end="opacity-100 transform scale-100">
-                <div class="p-4 bg-gray-50/50 border-b border-gray-100">
-                    <p class="font-bold text-gray-800">{{ $user->name }}</p>
-                    <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
+                x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
+                x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                class="absolute right-0 mt-3 w-64 bg-white rounded-[20px] shadow-2xl border border-gray-100 z-[100] overflow-hidden">
+                
+                <div class="p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                    <p class="font-extrabold text-gray-800 leading-tight">{{ $user->name }}</p>
+                    <p class="text-[11px] text-gray-400 mt-1 truncate">{{ $user->email }}</p>
                 </div>
-                <div class="p-4 text-xs text-gray-500 bg-white">
-                    {{ $user->no_hp ?? '-' }}
+                
+                <div class="p-4 flex flex-col gap-2 bg-white">
+                    <div class="flex items-center gap-3 text-xs text-gray-500 p-2 bg-gray-50 rounded-xl border border-gray-100">
+                        <i class="fa-solid fa-phone text-blue-400"></i>
+                        <span>{{ $user->no_hp ?? 'No HP belum diatur' }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -388,21 +397,22 @@ laporan</span>
                 'latihan': '{{ route('admin.latihan.index') }}'
             },
             goToPage(){
-                let search = this.keyword.toLowerCase()
+                let search = this.keyword.toLowerCase().trim();
+                if(!search) return;
                 for (let key in this.routes) {
                     if (key.includes(search)) {
-                        window.location.href = this.routes[key]
-                        return
+                        window.location.href = this.routes[key];
+                        return;
                     }
                 }
-                alert('Halaman tidak ditemukan')
+                alert('Halaman tidak ditemukan');
             }
         }"
         class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1"
     >
-        <div class="relative w-full">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="relative w-full group">
+            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 group-focus-within:text-[#4A72D4] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                 </svg>
             </div>
@@ -411,13 +421,13 @@ laporan</span>
                 x-model="keyword" 
                 placeholder="Cari halaman..." 
                 @keydown.enter="goToPage()"
-                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm"
+                class="w-full bg-white border-none rounded-full py-3.5 pl-14 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm placeholder:text-gray-400 font-medium"
             >
         </div>
 
         <button 
             @click="goToPage()" 
-            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0"
+            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-7 py-3.5 rounded-full text-sm font-extrabold shadow-lg shadow-blue-100 transition-all active:scale-95 shrink-0"
         >
             Cari
         </button>
@@ -717,21 +727,55 @@ laporan</span>
         </main>
     </div>
 
-    <div x-show="showImportModal" x-transition x-cloak class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">
-            <div class="bg-emerald-500 p-6 text-white text-center"><h4 class="text-lg font-black italic uppercase">Import PTN & Prodi</h4></div>
-            <div class="p-8 space-y-4">
-                <button @click="unduhTemplate('utama')" class="w-full bg-gray-50 border-2 border-dashed border-gray-200 p-4 rounded-xl flex flex-col items-center gap-2">
-                    <span class="text-[9px] font-black uppercase text-gray-500">Unduh Template Lengkap</span>
-                </button>
-                <div class="relative">
-                    <input type="file" @change="importExcel($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                    <div class="w-full bg-[#4A72D4] text-white py-3 rounded-xl font-black text-center uppercase text-[9px] tracking-widest">Pilih File Excel</div>
-                </div>
-                <button @click="showImportModal = false" class="w-full font-black text-gray-400 uppercase text-[9px] tracking-widest mt-2">Batal</button>
+    <div x-show="showImportModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         @click="showImportModal = false"></div>
+    
+    <div class="relative bg-white w-[95%] max-w-lg rounded-[2.5rem] shadow-2xl p-6 md:p-10 transform transition-all overflow-y-auto max-h-[90vh] no-scrollbar"
+         x-show="showImportModal" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0">
+
+        <div class="flex justify-between items-center mb-6 md:mb-8">
+            <h3 class="text-lg md:text-xl font-bold text-gray-800 flex items-center gap-3">
+                <i class="fa-solid fa-file-excel text-emerald-500"></i> 
+                Import Data Excel
+            </h3>
+            <button @click="showImportModal = false" class="text-gray-400 hover:text-red-500 transition-colors">
+                <i class="fa-solid fa-circle-xmark text-2xl"></i>
+            </button>
+        </div>
+
+        <div class="border-4 border-dashed border-gray-100 rounded-[30px] p-8 md:p-12 flex flex-col items-center justify-center group hover:border-emerald-100 transition-all bg-gray-50/30">
+            <div class="w-20 h-20 md:w-24 md:h-24 bg-emerald-50 rounded-full flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl md:text-4xl text-emerald-500"></i>
             </div>
+            <p class="text-xs md:text-sm font-bold text-gray-600 text-center">Klik tombol di bawah untuk memilih file</p>
+            <p class="text-[9px] md:text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 50MB (.xlsx)</p>
+            
+            <input type="file" class="hidden" x-ref="excelInput" @change="importExcel($event)" accept=".xlsx,.xls">
+            
+            <button @click="$refs.excelInput.click()"
+                    class="mt-6 md:mt-8 w-full md:w-auto px-10 py-4 bg-emerald-500 text-white rounded-2xl text-xs font-bold hover:bg-emerald-600 shadow-lg shadow-emerald-100 transition-all">
+                Pilih File Excel
+            </button>
+        </div>
+
+        <div class="mt-6 md:mt-8 p-4 md:p-5 bg-emerald-50 rounded-[25px] flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-circle-info text-emerald-500"></i>
+                <span class="text-[10px] md:text-[11px] font-bold text-emerald-700 uppercase tracking-tight">Butuh Format?</span>
+            </div>
+            <button @click="unduhTemplate('utama')" class="text-[10px] md:text-[11px] font-black text-emerald-600 hover:underline">
+                DOWNLOAD TEMPLATE
+            </button>
         </div>
     </div>
+</div>
 
     <div x-show="showModalProdi" x-transition x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
     <div class="bg-white rounded-[2rem] w-full max-w-[320px] lg:max-w-sm overflow-hidden shadow-2xl">

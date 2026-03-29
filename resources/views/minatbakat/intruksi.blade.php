@@ -22,7 +22,6 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* Smooth Custom Scrollbar */
         .custom-scroll::-webkit-scrollbar {
             width: 6px;
         }
@@ -40,7 +39,6 @@
             transform: scale(1.1);
         }
 
-        /* Glassmorphism subtle effect */
         .glass-subtest {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(4px);
@@ -81,10 +79,9 @@
                                         <i class="fa-solid fa-list-check text-orange-400 text-xl"></i>
                                     </div>
                                     <div>
-                                        <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Jumlah
-                                            Pernyataan</p>
+                                        <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Jumlah Pernyataan</p>
                                         <p class="text-xl font-extrabold text-[#2E3B66]">
-                                            {{ $totalSoal ?? '100' }} <span
+                                            {{ $totalSoal ?? '0' }} <span
                                                 class="text-xs font-medium text-gray-400 block tracking-normal">Butir Soal</span>
                                         </p>
                                     </div>
@@ -97,8 +94,7 @@
                                         <i class="fa-solid fa-face-smile text-green-500 text-xl"></i>
                                     </div>
                                     <div>
-                                        <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Tipe
-                                            Jawaban</p>
+                                        <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Tipe Jawaban</p>
                                         <p class="text-lg font-extrabold text-[#2E3B66]">Pilihan Skala <span
                                                 class="text-xs font-medium text-gray-400 block tracking-normal">Kejujuran Diri</span></p>
                                     </div>
@@ -121,7 +117,7 @@
                         <div class="flex-1 overflow-y-auto custom-scroll p-2 space-y-6">
                             <div class="flex items-start gap-5 instruction-card transition">
                                 <div
-                                    class="icon-number w-6 sm:w-12 w-6 sm:h-12 shrink-0 rounded-md sm:rounded-2xl bg-[#FEA33A] shadow-lg shadow-orange-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300">
+                                    class="icon-number w-6 sm:w-12 shrink-0 rounded-md sm:rounded-2xl bg-[#FEA33A] shadow-lg shadow-orange-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300 sm:h-12 h-6">
                                     1</div>
                                 <div>
                                     <h4 class="font-bold text-[#2E3B66]">Kejujuran adalah Kunci</h4>
@@ -134,7 +130,7 @@
 
                             <div class="flex items-start gap-5 instruction-card transition">
                                 <div
-                                    class="icon-number w-6 sm:w-12 w-6 sm:h-12 shrink-0 rounded-md sm:rounded-2xl bg-[#9885FB] shadow-lg shadow-purple-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300">
+                                    class="icon-number w-6 sm:w-12 shrink-0 rounded-md sm:rounded-2xl bg-[#9885FB] shadow-lg shadow-purple-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300 sm:h-12 h-6">
                                     2</div>
                                 <div>
                                     <h4 class="font-bold text-[#2E3B66]">Menentukan Tingkat Kesesuaian</h4>
@@ -146,7 +142,7 @@
 
                             <div class="flex items-start gap-5 instruction-card transition">
                                 <div
-                                    class="icon-number w-6 sm:w-12 w-6 sm:h-12 shrink-0 rounded-md sm:rounded-2xl bg-[#FF908E] shadow-lg shadow-red-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300">
+                                    class="icon-number w-6 sm:w-12 shrink-0 rounded-md sm:rounded-2xl bg-[#FF908E] shadow-lg shadow-red-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300 sm:h-12 h-6">
                                     3</div>
                                 <div>
                                     <h4 class="font-bold text-[#2E3B66]">Waktu dan Spontanitas</h4>
@@ -158,7 +154,7 @@
 
                             <div class="flex items-start gap-5 instruction-card transition">
                                 <div
-                                    class="icon-number w-6 sm:w-12 w-6 sm:h-12 shrink-0 rounded-md sm:rounded-2xl bg-[#4B8A81] shadow-lg shadow-teal-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300">
+                                    class="icon-number w-6 sm:w-12 shrink-0 rounded-md sm:rounded-2xl bg-[#4B8A81] shadow-lg shadow-teal-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300 sm:h-12 h-6">
                                     4</div>
                                 <div>
                                     <h4 class="font-bold text-[#2E3B66]">Pantau Progress Pengerjaan</h4>
@@ -170,7 +166,7 @@
 
                             <div class="flex items-start gap-5 instruction-card transition">
                                 <div
-                                    class="icon-number w-6 sm:w-12 w-6 sm:h-12 shrink-0 rounded-md sm:rounded-2xl bg-[#3171CD] shadow-lg shadow-blue-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300">
+                                    class="icon-number w-6 sm:w-12 shrink-0 rounded-md sm:rounded-2xl bg-[#3171CD] shadow-lg shadow-blue-100 flex items-center justify-center text-white font-bold text-sm sm:text-xl transition duration-300 sm:h-12 h-6">
                                     5</div>
                                 <div>
                                     <h4 class="font-bold text-[#2E3B66]">Penyimpanan Hasil Otomatis</h4>

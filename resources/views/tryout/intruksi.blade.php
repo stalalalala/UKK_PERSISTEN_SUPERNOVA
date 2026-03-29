@@ -78,7 +78,7 @@
                                     <div>
                                         <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Jumlah Pertanyaan</p>
                                         <p class="text-xl font-extrabold text-[#2E3B66]">
-                                            {{ \App\Models\SoalTryout::whereIn('category_id', $tryout->categories->pluck('id'))->count() }} 
+                                            {{ $totalSoal }} 
                                             <span class="text-xs font-medium text-gray-400 block tracking-normal">Soal</span>
                                         </p>
                                     </div>
@@ -91,7 +91,7 @@
                                     <div>
                                         <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Alokasi Waktu</p>
                                         <p class="text-xl font-extrabold text-[#2E3B66]">
-                                            {{ $tryout->categories->sum('durasi') }} 
+                                            {{ $totalDurasi }} 
                                             <span class="text-xs font-medium text-gray-400 block tracking-normal">Menit Pengerjaan</span>
                                         </p>
                                     </div>
@@ -104,7 +104,6 @@
                                     <div>
                                         <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Metode Ujian</p>
                                         <p class="text-lg font-extrabold text-[#2E3B66]">Pilihan Ganda 
-                                            <span class="text-xs font-medium text-gray-400 block tracking-normal">Single Answer Selection</span>
                                         </p>
                                     </div>
                                 </div>
