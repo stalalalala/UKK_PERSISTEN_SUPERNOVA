@@ -26,7 +26,7 @@ class PasswordResetController extends Controller
             'min:6', 
             'confirmed',
             'regex:/[0-9]/',      
-            'regex:/[@$!%*#?&]/', 
+            'regex:/[^A-Za-z0-9]/', 
         ],
     ], [
         'password.regex' => 'Password baru harus mengandung minimal satu angka dan satu simbol.',

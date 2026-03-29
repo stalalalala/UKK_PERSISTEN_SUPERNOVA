@@ -37,20 +37,33 @@
             <input type="email" name="email" required placeholder="Email"
                 class="w-full px-4 py-2 sm:py-3 border-2 border-blue-400 rounded-xl mb-4 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-100">
 
-            <div x-data="{ password: '', passwordError: '', showPassword: false, showConfirm: false }" class="space-y-4">
+            <div x-data="{
+    password: '',
+    confirmPassword: '',
+    passwordError: '',
+    confirmError: '',
+    showPassword: false,
+    showConfirm: false
+}" class="space-y-4">
 
                 {{-- Input Password Baru --}}
                 <div class="space-y-1">
                     <div class="relative">
-                        <input :type="showPassword ? 'text' : 'password'" name="password" x-model="password"
-                            @input="
-                        passwordError = (password.length < 6) ? 'Minimal 6 karakter' : 
-                                        (!/[0-9]/.test(password)) ? 'Wajib ada angka' : 
-                                        (!/[^A-Za-z0-9]/.test(password)) ? 'Wajib ada simbol(@$!%*#?&)' : '';
-                    "
-                            required placeholder="Password Baru"
-                            class="w-full px-4 py-2 sm:py-3 border-2 rounded-xl pr-12 text-sm sm:text-base focus:outline-none transition-all"
-                            :class="passwordError ? 'border-red-500' : 'border-blue-400 focus:ring-2 focus:ring-blue-100'">
+                        <input :type="showPassword ? 'text' : 'password'" 
+    name="password" 
+    x-model="password"
+    @input="
+        passwordError = (password.length < 6) ? 'Minimal 6 karakter' : 
+                        (!/[0-9]/.test(password)) ? 'Wajib ada angka' : 
+                        (!/[^A-Za-z0-9]/.test(password)) ? 'Wajib ada simbol(@$!%*#?&)' : '';
+
+        confirmError = (confirmPassword && password !== confirmPassword) 
+                        ? 'Password tidak sama' : '';
+    "
+    required 
+    placeholder="Password Baru"
+    class="w-full px-4 py-2 border-2 rounded-xl pr-12"
+    :class="passwordError ? 'border-red-500' : 'border-blue-400'">
 
                         <button type="button" @click="showPassword = !showPassword"
                             class="absolute right-4 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition">
@@ -63,22 +76,36 @@
 
                 {{-- Konfirmasi Password --}}
                 <div class="relative">
-                    <input :type="showConfirm ? 'text' : 'password'" name="password_confirmation" required
-                        placeholder="Konfirmasi Password"
-                        class="w-full px-4 py-2 sm:py-3 border-2 border-blue-400 rounded-xl pr-12 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-100 transition">
+                    <input :type="showConfirm ? 'text' : 'password'" 
+    name="password_confirmation"
+    x-model="confirmPassword"
+    @input="
+        confirmError = (password !== confirmPassword) 
+                        ? 'Password tidak sama' : '';
+    "
+    required 
+    placeholder="Konfirmasi Password"
+    class="w-full px-4 py-2 border-2 rounded-xl pr-12"
+    :class="confirmError ? 'border-red-500' : 'border-blue-400'">
 
                     <button type="button" @click="showConfirm = !showConfirm"
                         class="absolute right-4 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition">
                         <i class="fa-solid" :class="showConfirm ? 'fa-eye' : 'fa-eye-slash'"></i>
                     </button>
                 </div>
+                <p x-show="confirmError" 
+   x-text="confirmError"
+   class="text-red-500 text-xs italic">
+</p>
 
-                <div class="pt-4">
-                    <button type="submit"
-                        class="w-full bg-blue-500 text-white py-2 sm:py-3 text-sm sm:text-base rounded-xl hover:bg-blue-600 transition font-bold shadow-lg shadow-blue-100">
-                        Reset Password
-                    </button>
-                </div>
+                <button type="submit"
+    :disabled="passwordError || confirmError || !password || !confirmPassword"
+    :class="(passwordError || confirmError || !password || !confirmPassword) 
+        ? 'bg-gray-400 cursor-not-allowed' 
+        : 'bg-blue-500 hover:bg-blue-600'"
+    class="w-full text-white py-2 rounded-xl">
+    Reset Password
+</button>
             </div>
         </form>
     </div>
