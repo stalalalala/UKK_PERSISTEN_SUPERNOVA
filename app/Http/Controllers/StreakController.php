@@ -40,10 +40,14 @@ class StreakController extends Controller
     $todayXp = UserXpLog::where('user_id',$user->id)->whereDate('xp_date', now())->sum('xp');
 
     // cek aktivitas
+   $loginDone = false;
+
+if (!$user->skip_login_xp_until || now()->gte($user->skip_login_xp_until)) {
     $loginDone = UserXpLog::where('user_id',$user->id)
         ->where('source','login')
         ->whereDate('xp_date', today())
         ->exists();
+}
 
     $kuisDone = UserXpLog::where('user_id',$user->id)
         ->where('source','kuis')

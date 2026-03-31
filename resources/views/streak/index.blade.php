@@ -150,7 +150,7 @@
         <div class="flex flex-col items-center mb-12">
             <div
                 class="bg-blue-600 text-white px-8 py-1.5 rounded-full font-bold shadow-lg -mb-10 z-20 tracking-widest text-sm">
-                • Level {{ $level }} •
+                Level {{ $level }}
             </div>
 
             <div class="slime relative z-10 w-full max-w-[320px] md:max-w-[500px] lg:max-w-[600px] cursor-pointer"
