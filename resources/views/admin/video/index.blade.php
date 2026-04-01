@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manajemen Video - Admin | PERSISTEN</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -35,7 +34,12 @@
 
             <div class="flex items-center justify-between mb-10 px-2">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('img/logo.svg') }}" alt="Logo" class="w-14 h-14">
+                    <div class="bg-white p-2 rounded-xl">
+                        <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
                     <h1 class="text-2xl font-bold tracking-tight">P E R S I S T E N</h1>
                 </div>
                 <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">
@@ -147,123 +151,15 @@
                     <span class="text-md font-regular">Manajemen peluang PTN</span>
                 </a>
 
-                <<<<<<< HEAD <main class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
-                    <header
-                        class="flex flex-col lg:flex-row lg:items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0 w-full">
-                        <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
-                            <button @click="mobileMenuOpen = true"
-                                class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
-                                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                            </button>
-
-                            @php
-                                use Illuminate\Support\Facades\Auth;
-                                $user = Auth::user();
-                                // Mengambil nama depan saja untuk tampilan ringkas di bar
-                                $firstName = explode(' ', trim($user->name))[0];
-                            @endphp
-
-                            <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
-                                <div @click="open = !open"
-                                    class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto ml-auto">
-
-                                    <div class="flex items-center gap-2">
-                                        <div
-                                            class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden border-2 border-white shrink-0">
-                                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=4A72D4&color=fff' }}"
-                                                alt="{{ $user->name }}" class="w-full h-full object-cover">
-                                        </div>
-                                        <span
-                                            class="font-bold text-sm text-gray-700 truncate">{{ $firstName }}</span>
-                                    </div>
-
-                                    <i class="fa-solid fa-chevron-down text-gray-400 text-[10px]"></i>
-                                </div>
-
-                                <div x-show="open" x-cloak @click.away="open = false"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
-                                    x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
-                                    class="absolute right-0 mt-3 w-64 bg-white rounded-[20px] shadow-2xl border border-gray-100 z-[100] overflow-hidden">
-
-                                    <div class="p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
-                                        <p class="font-extrabold text-gray-800 leading-tight">{{ $user->name }}</p>
-                                        <p class="text-[11px] text-gray-400 mt-1 truncate">{{ $user->email }}</p>
-                                    </div>
-
-                                    <div class="p-4 flex flex-col gap-2 bg-white">
-                                        <div
-                                            class="flex items-center gap-3 text-xs text-gray-500 p-2 bg-gray-50 rounded-xl border border-gray-100">
-                                            <i class="fa-solid fa-phone text-blue-400"></i>
-                                            <span>{{ $user->no_hp ?? 'No HP belum diatur' }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div x-data="{
-                            keyword: '',
-                            routes: {
-                                'dashboard': '{{ route('admin.dashboard.index') }}',
-                                'user': '{{ route('admin.user.index') }}',
-                                'streak': '{{ route('admin.streak.index') }}',
-                                'monitoring': '{{ route('admin.laporan.index') }}',
-                                'video': '{{ route('admin.videoPembelajaran.index') }}',
-                                'peluang': '{{ route('admin.peluang.index') }}',
-                                'tryout': '{{ route('admin.tryout.index') }}',
-                                'minat bakat': '{{ route('admin.minatBakat.index') }}',
-                                'kuis': '{{ route('admin.kuis.index') }}',
-                                'latihan': '{{ route('admin.latihan.index') }}'
-                            },
-                            goToPage() {
-                                let search = this.keyword.toLowerCase().trim();
-                                if (!search) return;
-                                for (let key in this.routes) {
-                                    if (key.includes(search)) {
-                                        window.location.href = this.routes[key];
-                                        return;
-                                    }
-                                }
-                                alert('Halaman tidak ditemukan');
-                            }
-                        }"
-                            class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1">
-                            <div class="relative w-full group">
-                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="w-5 h-5 text-gray-400 group-focus-within:text-[#4A72D4] transition-colors"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                                    </svg>
-                                </div>
-                                <input type="text" x-model="keyword" placeholder="Cari halaman..."
-                                    @keydown.enter="goToPage()"
-                                    class="w-full bg-white border-none rounded-full py-3.5 pl-14 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm placeholder:text-gray-400 font-medium">
-                            </div>
-
-                            <button @click="goToPage()"
-                                class="bg-[#4A72D4] hover:bg-blue-600 text-white px-7 py-3.5 rounded-full text-sm font-extrabold shadow-lg shadow-blue-100 transition-all active:scale-95 shrink-0">
-                                Cari
-                            </button>
-                        </div>
-                    </header>
-                    =======
-                    <a href="{{ route('admin.laporan.index') }}"
-                        class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                            stroke="currentColor" class="size-7">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
-                        </svg>
-                        <span class="text-md font-regular">Monitoring dan laporan</span>
-                    </a>
-                    >>>>>>> dandan-2
+                <a href="{{ route('admin.laporan.index') }}"
+                    class="w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 group text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-7">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.25 7.5V6.108c0-1.135.845-2.098 1.976-2.192.373-.03.748-.057 1.123-.08M15.75 18H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M15.75 18.75v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5A3.375 3.375 0 0 0 6.375 7.5H5.25m11.9-3.664A2.251 2.251 0 0 0 15 2.25h-1.5a2.251 2.251 0 0 0-2.15 1.586m5.8 0c.065.21.1.433.1.664v.75h-6V4.5c0-.231.035-.454.1-.664M6.75 7.5H4.875c-.621 0-1.125.504-1.125 1.125v12c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V16.5a9 9 0 0 0-9-9Z" />
+                    </svg>
+                    <span class="text-md font-regular">Monitoring dan laporan</span>
+                </a>
 
 
             </nav>
@@ -297,35 +193,43 @@
                     @php
                         use Illuminate\Support\Facades\Auth;
                         $user = Auth::user();
+                        // Mengambil nama depan saja untuk tampilan ringkas di bar
+                        $firstName = explode(' ', trim($user->name))[0];
                     @endphp
 
                     <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
                         <div @click="open = !open"
-                            class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
+                            class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto ml-auto">
 
                             <div class="flex items-center gap-2">
                                 <div
-                                    class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
-                                    <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
-                                        alt="Admin" class="w-full h-full object-cover">
+                                    class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden border-2 border-white shrink-0">
+                                    <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=4A72D4&color=fff' }}"
+                                        alt="{{ $user->name }}" class="w-full h-full object-cover">
                                 </div>
-                                <span class="font-bold text-sm text-gray-700 truncate">Admin</span>
+                                <span class="font-bold text-sm text-gray-700 truncate">{{ $firstName }}</span>
                             </div>
 
-                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-[10px]"></i>
                         </div>
 
-                        <div x-show="open" @click.away="open = false"
-                            class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+                        <div x-show="open" x-cloak @click.away="open = false"
                             x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100">
-                            <div class="p-4 bg-gray-50/50 border-b border-gray-100">
-                                <p class="font-bold text-gray-800">{{ $user->name }}</p>
-                                <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
+                            x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
+                            x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                            class="absolute right-0 mt-3 w-64 bg-white rounded-[20px] shadow-2xl border border-gray-100 z-[100] overflow-hidden">
+
+                            <div class="p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                                <p class="font-extrabold text-gray-800 leading-tight">{{ $user->name }}</p>
+                                <p class="text-[11px] text-gray-400 mt-1 truncate">{{ $user->email }}</p>
                             </div>
-                            <div class="p-4 text-xs text-gray-500 bg-white">
-                                {{ $user->no_hp ?? '-' }}
+
+                            <div class="p-4 flex flex-col gap-2 bg-white">
+                                <div
+                                    class="flex items-center gap-3 text-xs text-gray-500 p-2 bg-gray-50 rounded-xl border border-gray-100">
+                                    <i class="fa-solid fa-phone text-blue-400"></i>
+                                    <span>{{ $user->no_hp ?? 'No HP belum diatur' }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -346,31 +250,33 @@
                         'latihan': '{{ route('admin.latihan.index') }}'
                     },
                     goToPage() {
-                        let search = this.keyword.toLowerCase()
+                        let search = this.keyword.toLowerCase().trim();
+                        if (!search) return;
                         for (let key in this.routes) {
                             if (key.includes(search)) {
-                                window.location.href = this.routes[key]
-                                return
+                                window.location.href = this.routes[key];
+                                return;
                             }
                         }
-                        alert('Halaman tidak ditemukan')
+                        alert('Halaman tidak ditemukan');
                     }
                 }" class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1">
-                    <div class="relative w-full">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <div class="relative w-full group">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5 text-gray-400 group-focus-within:text-[#4A72D4] transition-colors"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                             </svg>
                         </div>
                         <input type="text" x-model="keyword" placeholder="Cari halaman..."
                             @keydown.enter="goToPage()"
-                            class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm">
+                            class="w-full bg-white border-none rounded-full py-3.5 pl-14 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm placeholder:text-gray-400 font-medium">
                     </div>
 
                     <button @click="goToPage()"
-                        class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0">
+                        class="bg-[#4A72D4] hover:bg-blue-600 text-white px-7 py-3.5 rounded-full text-sm font-extrabold shadow-lg shadow-blue-100 transition-all active:scale-95 shrink-0">
                         Cari
                     </button>
                 </div>
@@ -877,87 +783,55 @@
                 },
 
                 async sendImportData(jsonData) {
-                        try {
-                            const response = await fetch("{{ route('admin.videoPembelajaran.import') }}", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                                },
-                                body: JSON.stringify({
-                                    data: jsonData
-                                })
-                            });
+                    try {
+                        const response = await fetch("{{ route('admin.videoPembelajaran.import') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({
+                                data: jsonData
+                            })
+                        });
 
-                            <<
-                            << << < HEAD
-                            if (response.ok) {
-                                const result = await response.json(); // Mengambil respon message dari controller
+                        if (response.ok) {
+                            const result = await response.json(); // Mengambil respon message dari controller
 
-                                Swal.fire({
-                                    icon: result.success ? 'success' : 'warning',
-                                    title: 'Hasil Import',
-                                    text: result.message, // Menampilkan pesan "Berhasil: X, Dilewati: Y"
-                                    width: '340px',
-                                    confirmButtonColor: '#4A72D4',
-                                    customClass: {
-                                        popup: 'rounded-3xl shadow-xl',
-                                        title: 'text-lg font-bold',
-                                        confirmButton: 'rounded-xl px-6 py-2'
-                                    }
-                                }).then(() => {
-                                    // Hanya reload jika ada data yang berhasil masuk
-                                    if (result.success) location.reload();
-                                });
-                            } else {
-                                const errorData = await response.json();
-                                throw new Error(errorData.message || 'Gagal tersimpan');
-                            }
-                        } catch (error) {
                             Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Tersimpan!',
+                                icon: result.success ? 'success' : 'warning',
+                                title: 'Hasil Import',
+                                text: result.message, // Menampilkan pesan "Berhasil: X, Dilewati: Y"
                                 width: '340px',
-                                confirmButtonColor: '#ef4444',
+                                confirmButtonColor: '#4A72D4',
                                 customClass: {
                                     popup: 'rounded-3xl shadow-xl',
-                                    title: 'text-lg font-bold'
+                                    title: 'text-lg font-bold',
+                                    confirmButton: 'rounded-xl px-6 py-2'
                                 }
-                            }); ===
-                            === =
-                            if (response.ok) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Data berhasil diimport',
-                                    width: '340px',
-                                    padding: '1.8rem',
-                                    confirmButtonColor: '#4A72D4',
-                                    customClass: {
-                                        popup: 'rounded-3xl shadow-xl',
-                                        title: 'text-lg font-bold',
-                                        confirmButton: 'rounded-xl px-6 py-2'
-                                    }
-                                }).then(() => location.reload());
-                            } else {
-                                throw new Error();
-                            }
-                        } catch (error) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Tersimpan!',
-                                width: '340px',
-                                confirmButtonColor: '#ef4444',
-                                customClass: {
-                                    popup: 'rounded-3xl shadow-xl',
-                                    title: 'text-lg font-bold'
-                                }
+                            }).then(() => {
+                                // Hanya reload jika ada data yang berhasil masuk
+                                if (result.success) location.reload();
                             });
+                        } else {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || 'Gagal tersimpan');
                         }
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Data Gagal Tersimpan!',
+                            width: '340px',
+                            confirmButtonColor: '#ef4444',
+                            customClass: {
+                                popup: 'rounded-3xl shadow-xl',
+                                title: 'text-lg font-bold'
+                            }
+                        });
                     }
+                }
 
 
-                    >>>
-                    >>> > dandan - 2
             }
         }
 

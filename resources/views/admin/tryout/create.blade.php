@@ -7,7 +7,6 @@
     <title>Tambah Soal Tryout - Admin | PERSISTEN</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -350,116 +349,49 @@
                 x-transition:enter-start="opacity-0 scale-95 translate-y-8"
                 x-transition:enter-end="opacity-100 scale-100 translate-y-0">
 
-
-                <div class="relative min-h-screen flex items-center justify-center p-4">
-                    <div class="relative bg-white w-full max-w-lg rounded-[35px] shadow-2xl p-8 transform transition-all"
-                        x-show="showImportModal" x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 scale-95 translate-y-8"
-                        x-transition:enter-end="opacity-100 scale-100 translate-y-0">
-
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
-                                <i class="fa-solid fa-file-excel text-emerald-500"></i> Import Soal dari Excel
-                            </h3>
-                            <button @click="showImportModal = false"
-                                class="text-gray-400 hover:text-red-500 transition-colors">
-                                <i class="fa-solid fa-circle-xmark text-2xl"></i>
-                            </button>
-                        </div>
-
-                        <div
-                            class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-300 transition-all bg-gray-50/50">
-                            <div
-                                class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
-                            </div>
-                            <p class="text-sm font-bold text-gray-600">Klik di sini</p>
-                            <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 100MB (.xlsx, .xls)</p>
-
-                            <input type="file" class="hidden" x-ref="soalExcelInput" @change="importSheet($event)"
-                                accept=".xlsx,.xls">
-                            <button @click="$refs.soalExcelInput.click()"
-                                class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">
-                                Pilih File
-                            </button>
-                        </div>
-
-                        <div class="mt-8 p-4 bg-emerald-50 rounded-2xl flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <i class="fa-solid fa-circle-info text-emerald-500"></i>
-                                <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-tight">Belum
-                                    punya
-                                    formatnya?</span>
-                            </div>
-                            <button @click="unduhTemplate()"
-                                class="text-[11px] font-black text-emerald-600 hover:underline">
-                                DOWNLOAD TEMPLATE
-                            </button>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4 mt-8">
-                            <button @click="showImportModal = false"
-                                class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                                Batalkan
-                            </button>
-                        </div>
-                    </div>
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center gap-3">
+                        <i class="fa-solid fa-file-excel text-emerald-500"></i> Import Soal dari Excel
+                    </h3>
+                    <button @click="showImportModal = false" class="text-gray-400 hover:text-red-500 transition-colors">
+                        <i class="fa-solid fa-circle-xmark text-2xl"></i>
+                    </button>
                 </div>
-            </div>
 
-            <div class="flex h-full w-full">
-                <aside x-data="{ currentPage: 'tryout' }"
-                    :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-                    class="fixed inset-y-0 left-0 z-50 w-72 bg-[#4A72D4] text-white flex flex-col p-6 shadow-xl transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 shrink-0 h-full">
-
-                    <div class="flex items-center justify-between mb-10 px-2">
-                        <div class="flex items-center gap-3">
-                            <img src="{{ asset('img/logo.svg') }}" alt="Logo" class="w-14 h-14">
-                            <h1 class="text-2xl font-bold tracking-tight">P E R S I S T E N</h1>
-                        </div>
-                        <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
+                <div
+                    class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-300 transition-all bg-gray-50/50">
                     <div
-                        class="border-4 border-dashed border-gray-100 rounded-[25px] p-10 flex flex-col items-center justify-center group hover:border-emerald-300 transition-all bg-gray-50/50">
-                        <div
-                            class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
-                        </div>
-                        <p class="text-sm font-bold text-gray-600">Klik di sini</p>
-                        <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 100MB (.xlsx, .xls)</p>
-
-                        <input type="file" class="hidden" x-ref="soalExcelInput" @change="importSheet($event)"
-                            accept=".xlsx,.xls">
-                        <button @click="$refs.soalExcelInput.click()"
-                            class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">
-                            Pilih File
-                        </button>
+                        class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-500"></i>
                     </div>
+                    <p class="text-sm font-bold text-gray-600">Klik di sini</p>
+                    <p class="text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 100MB (.xlsx, .xls)</p>
 
-                    <div class="mt-8 p-4 bg-emerald-50 rounded-2xl flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-solid fa-circle-info text-emerald-500"></i>
-                            <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-tight">Belum punya
-                                formatnya?</span>
-                        </div>
-                        <button @click="unduhTemplate()"
-                            class="text-[11px] font-black text-emerald-600 hover:underline">
-                            DOWNLOAD TEMPLATE
-                        </button>
-                    </div>
+                    <input type="file" class="hidden" x-ref="soalExcelInput" @change="importSheet($event)"
+                        accept=".xlsx,.xls">
+                    <button @click="$refs.soalExcelInput.click()"
+                        class="mt-6 px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all">
+                        Pilih File
+                    </button>
+                </div>
 
-                    <div class="grid grid-cols-2 gap-4 mt-8">
-                        <button @click="showImportModal = false"
-                            class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                            Batalkan
-                        </button>
+                <div class="mt-8 p-4 bg-emerald-50 rounded-2xl flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-circle-info text-emerald-500"></i>
+                        <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-tight">Belum punya
+                            formatnya?</span>
                     </div>
+                    <button @click="unduhTemplate()" class="text-[11px] font-black text-emerald-600 hover:underline">
+                        DOWNLOAD TEMPLATE
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mt-8">
+                    <button @click="showImportModal = false"
+                        class="py-4 rounded-2xl text-sm font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                        Batalkan
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -471,8 +403,7 @@
             <div class="flex items-center justify-between mb-10 px-2">
                 <div class="flex items-center gap-3">
                     <div class="bg-white p-2 rounded-xl">
-                        <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                 d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>

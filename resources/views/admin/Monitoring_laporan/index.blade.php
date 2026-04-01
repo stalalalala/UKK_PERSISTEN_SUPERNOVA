@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Laporan - Admin | PERSISTEN</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -49,7 +48,6 @@
             border-radius: 10px;
         }
 
-
         /* Custom Scrollbar untuk Navigasi */
         .nav-scroll::-webkit-scrollbar {
             width: 4px;
@@ -89,7 +87,13 @@
             <div class="p-6 pb-1">
                 <div class="flex items-center justify-between mb-10 px-2">
                     <div class="flex items-center gap-3">
-                        <img src="{{ asset('img/logo.svg') }}" alt="Logo" class="w-14 h-14">
+                        <div class="bg-white p-2 rounded-xl">
+                            <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
                         <h1 class="text-2xl font-bold tracking-tight">P E R S I S T E N</h1>
                     </div>
                     <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">
@@ -329,7 +333,6 @@
                     </button>
                 </div>
             </header>
-
 
             <div class="flex-1 overflow-y-auto space-y-8 pr-2 log-scroll">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -656,7 +659,6 @@
                         <span class="hidden xs:inline">Cetak Draf Ke PDF</span>
                         <span class="xs:hidden">Cetak PDF</span>
                     </button>
-
                 </div>
 
                 <button @click="showDraftDetail = false"

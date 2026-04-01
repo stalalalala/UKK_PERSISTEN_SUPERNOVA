@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manajemen User - Admin | PERSISTEN</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -29,7 +28,12 @@
 
             <div class="flex items-center justify-between mb-10 px-2">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('img/logo.svg') }}" alt="Logo" class="w-14 h-14">
+                    <div class="bg-white p-2 rounded-xl">
+                        <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
                     <h1 class="text-2xl font-bold tracking-tight">P E R S I S T E N</h1>
                 </div>
                 <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">
@@ -152,252 +156,227 @@
                 </a>
 
 
-                <main class="flex-1 p-4 md:p-8 overflow-y-auto h-screen">
-                    <header
-                        class="flex flex-col lg:flex-row lg:items-center justify-between pb-4 gap-4 flex-shrink-0 w-full">
-                        <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
-                            <button @click="mobileMenuOpen = true"
-                                class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
-                                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                            </button>
 
-                            @php
-                                use Illuminate\Support\Facades\Auth;
-                                $user = Auth::user();
-                                // Mengambil nama depan saja untuk tampilan ringkas di bar
-                                $firstName = explode(' ', trim($user->name))[0];
-                            @endphp
+            </nav>
 
-                            <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
-                                <div @click="open = !open"
-                                    class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto ml-auto">
+            <form action="{{ route('logout') }}" method="POST" class="w-full inline">
+                @csrf
+                <button type="submit"
+                    class="mt-4 w-full flex items-center bg-white/10 hover:bg-white/20 px-6 py-3 rounded-2xl transition-all group border border-white/20 backdrop-blur-sm shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor" class="size-5 md:size-6 text-white">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                    </svg>
+                    <span class="text-white text-md font-medium tracking-wide ml-4">Logout</span>
+                </button>
+            </form>
+        </aside>
 
-                                    <div class="flex items-center gap-2">
-                                        <div
-                                            class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden border-2 border-white shrink-0">
-                                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=4A72D4&color=fff' }}"
-                                                alt="{{ $user->name }}" class="w-full h-full object-cover">
-                                        </div>
-                                        <span
-                                            class="font-bold text-sm text-gray-700 truncate">{{ $firstName }}</span>
-                                    </div>
+        <main class="flex-1 p-4 md:p-8 overflow-y-auto h-screen">
+            <header class="flex flex-col lg:flex-row lg:items-center justify-between pb-4 gap-4 flex-shrink-0 w-full">
+                <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
+                    <button @click="mobileMenuOpen = true"
+                        class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
+                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
 
-                                    <i class="fa-solid fa-chevron-down text-gray-400 text-[10px]"></i>
-                                </div>
+                    @php
+                        use Illuminate\Support\Facades\Auth;
+                        $user = Auth::user();
+                        // Mengambil nama depan saja untuk tampilan ringkas di bar
+                        $firstName = explode(' ', trim($user->name))[0];
+                    @endphp
 
-
-                                <div x-show="open" x-cloak @click.away="open = false"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
-                                    x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
-                                    class="absolute right-0 mt-3 w-64 bg-white rounded-[20px] shadow-2xl border border-gray-100 z-[100] overflow-hidden">
-
-                                    <div class="p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
-                                        <p class="font-extrabold text-gray-800 leading-tight">{{ $user->name }}</p>
-                                        <p class="text-[11px] text-gray-400 mt-1 truncate">{{ $user->email }}</p>
-                                    </div>
-
-                                    <div class="p-4 flex flex-col gap-2 bg-white">
-                                        <div
-                                            class="flex items-center gap-3 text-xs text-gray-500 p-2 bg-gray-50 rounded-xl border border-gray-100">
-                                            <i class="fa-solid fa-phone text-blue-400"></i>
-                                            <span>{{ $user->no_hp ?? 'No HP belum diatur' }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div x-data="{
-                            keyword: '',
-                            routes: {
-                                'dashboard': '{{ route('admin.dashboard.index') }}',
-                                'user': '{{ route('admin.user.index') }}',
-                                'streak': '{{ route('admin.streak.index') }}',
-                                'monitoring': '{{ route('admin.laporan.index') }}',
-                                'video': '{{ route('admin.videoPembelajaran.index') }}',
-                                'peluang': '{{ route('admin.peluang.index') }}',
-                                'tryout': '{{ route('admin.tryout.index') }}',
-                                'minat bakat': '{{ route('admin.minatBakat.index') }}',
-                                'kuis': '{{ route('admin.kuis.index') }}',
-                                'latihan': '{{ route('admin.latihan.index') }}'
-                            },
-                            goToPage() {
-                                let search = this.keyword.toLowerCase().trim();
-                                if (!search) return;
-                                for (let key in this.routes) {
-                                    if (key.includes(search)) {
-                                        window.location.href = this.routes[key];
-                                        return;
-                                    }
-                                }
-                                alert('Halaman tidak ditemukan');
-                            }
-                        }"
-                            class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1">
-                            <div class="relative w-full group">
-                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        class="w-5 h-5 text-gray-400 group-focus-within:text-[#4A72D4] transition-colors"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                                    </svg>
-                                </div>
-                                <input type="text" x-model="keyword" placeholder="Cari halaman..."
-                                    @keydown.enter="goToPage()"
-                                    class="w-full bg-white border-none rounded-full py-3.5 pl-14 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm placeholder:text-gray-400 font-medium">
-                            </div>
-
-                            <button @click="goToPage()"
-                                class="bg-[#4A72D4] hover:bg-blue-600 text-white px-7 py-3.5 rounded-full text-sm font-extrabold shadow-lg shadow-blue-100 transition-all active:scale-95 shrink-0">
-                                Cari
-                            </button>
-                        </div>
-                    </header>
-                    <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
-
+                    <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
                         <div @click="open = !open"
-                            class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
-                                ml-auto md:ml-0 cursor-pointer">
+                            class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto ml-auto">
 
-                            <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                                <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=random' }}"
-                                    alt="User Photo">
+                            <div class="flex items-center gap-2">
+                                <div
+                                    class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden border-2 border-white shrink-0">
+                                    <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=4A72D4&color=fff' }}"
+                                        alt="{{ $user->name }}" class="w-full h-full object-cover">
+                                </div>
+                                <span class="font-bold text-sm text-gray-700 truncate">{{ $firstName }}</span>
                             </div>
 
-                            <span class="font-bold text-sm hidden sm:block text-gray-700">{{ $firstName }}</span>
-
-                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
+                            <i class="fa-solid fa-chevron-down text-gray-400 text-[10px]"></i>
                         </div>
 
-                        <div x-show="open" @click.away="open = false"
-                            class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+                        <div x-show="open" x-cloak @click.away="open = false"
                             x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100"
-                            x-transition:leave="transition ease-in duration-150"
-                            x-transition:leave-start="opacity-100 transform scale-100"
-                            x-transition:leave-end="opacity-0 transform scale-95">
-                            <div class="p-4">
-                                <p class="font-semibold text-gray-700">{{ $user->name }}</p>
-                                <p class="text-sm text-gray-500">{{ $user->email }}</p>
-                                <p class="text-sm text-gray-500">{{ $user->no_hp ?? '-' }}</p>
+                            x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
+                            x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                            class="absolute right-0 mt-3 w-64 bg-white rounded-[20px] shadow-2xl border border-gray-100 z-[100] overflow-hidden">
+
+                            <div class="p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                                <p class="font-extrabold text-gray-800 leading-tight">{{ $user->name }}</p>
+                                <p class="text-[11px] text-gray-400 mt-1 truncate">{{ $user->email }}</p>
+                            </div>
+
+                            <div class="p-4 flex flex-col gap-2 bg-white">
+                                <div
+                                    class="flex items-center gap-3 text-xs text-gray-500 p-2 bg-gray-50 rounded-xl border border-gray-100">
+                                    <i class="fa-solid fa-phone text-blue-400"></i>
+                                    <span>{{ $user->no_hp ?? 'No HP belum diatur' }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    </header>
+                </div>
 
-                    <h2 class="text-2xl font-semibold text-slate-700 mb-6">Manajemen User</h2>
-
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden">
-
-                        <div class="flex gap-6 mb-6 border-b border-gray-100">
-                            <button @click="tab='admin'"
-                                :class="tab === 'admin' ? 'text-blue-600 border-b-2 border-blue-600' :
-                                    'text-gray-400 hover:text-gray-600'"
-                                class="pb-3 text-sm font-bold transition-all">Admin</button>
-                            <button @click="tab='peserta'"
-                                :class="tab === 'peserta' ? 'text-blue-600 border-b-2 border-blue-600' :
-                                    'text-gray-400 hover:text-gray-600'"
-                                class="pb-3 text-sm font-bold transition-all">Peserta</button>
-                            <button @click="tab='history'"
-                                :class="tab === 'history' ? 'text-blue-600 border-b-2 border-blue-600' :
-                                    'text-gray-400 hover:text-gray-600'"
-                                class="pb-3 text-sm font-bold transition-all">History</button>
+                <div x-data="{
+                    keyword: '',
+                    routes: {
+                        'dashboard': '{{ route('admin.dashboard.index') }}',
+                        'user': '{{ route('admin.user.index') }}',
+                        'streak': '{{ route('admin.streak.index') }}',
+                        'monitoring': '{{ route('admin.laporan.index') }}',
+                        'video': '{{ route('admin.videoPembelajaran.index') }}',
+                        'peluang': '{{ route('admin.peluang.index') }}',
+                        'tryout': '{{ route('admin.tryout.index') }}',
+                        'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                        'kuis': '{{ route('admin.kuis.index') }}',
+                        'latihan': '{{ route('admin.latihan.index') }}'
+                    },
+                    goToPage() {
+                        let search = this.keyword.toLowerCase().trim();
+                        if (!search) return;
+                        for (let key in this.routes) {
+                            if (key.includes(search)) {
+                                window.location.href = this.routes[key];
+                                return;
+                            }
+                        }
+                        alert('Halaman tidak ditemukan');
+                    }
+                }" class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1">
+                    <div class="relative w-full group">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5 text-gray-400 group-focus-within:text-[#4A72D4] transition-colors"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                            </svg>
                         </div>
+                        <input type="text" x-model="keyword" placeholder="Cari halaman..."
+                            @keydown.enter="goToPage()"
+                            class="w-full bg-white border-none rounded-full py-3.5 pl-14 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm placeholder:text-gray-400 font-medium">
+                    </div>
 
-                        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-                            <div class="relative w-full md:w-80">
-                                <div class="absolute left-4 inset-y-0 flex items-center">
-                                    <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
-                                </div>
-                                <input type="text" x-model="search"
-                                    :placeholder="tab === 'admin' ? 'Search Admin....' : (tab === 'peserta' ?
-                                        'Search Peserta....' :
-                                        'Search History....')"
-                                    class="w-full bg-[#F3F6FF] border border-transparent rounded-full py-2.5 pl-11 pr-4 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
-                            </div>
+                    <button @click="goToPage()"
+                        class="bg-[#4A72D4] hover:bg-blue-600 text-white px-7 py-3.5 rounded-full text-sm font-extrabold shadow-lg shadow-blue-100 transition-all active:scale-95 shrink-0">
+                        Cari
+                    </button>
+                </div>
+            </header>
 
-                            <button x-show="tab==='admin'" @click="openModal=true; isEdit=false; resetForm()"
-                                class="w-full md:w-auto bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm">
-                                <i class="fa-solid fa-plus text-xs"></i> Tambah Admin
-                            </button>
+            <h2 class="text-2xl font-semibold text-slate-700 mb-6">Manajemen User</h2>
+
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 md:p-6 overflow-hidden">
+
+                <div class="flex gap-6 mb-6 border-b border-gray-100">
+                    <button @click="tab='admin'"
+                        :class="tab === 'admin' ? 'text-blue-600 border-b-2 border-blue-600' :
+                            'text-gray-400 hover:text-gray-600'"
+                        class="pb-3 text-sm font-bold transition-all">Admin</button>
+                    <button @click="tab='peserta'"
+                        :class="tab === 'peserta' ? 'text-blue-600 border-b-2 border-blue-600' :
+                            'text-gray-400 hover:text-gray-600'"
+                        class="pb-3 text-sm font-bold transition-all">Peserta</button>
+                    <button @click="tab='history'"
+                        :class="tab === 'history' ? 'text-blue-600 border-b-2 border-blue-600' :
+                            'text-gray-400 hover:text-gray-600'"
+                        class="pb-3 text-sm font-bold transition-all">History</button>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                    <div class="relative w-full md:w-80">
+                        <div class="absolute left-4 inset-y-0 flex items-center">
+                            <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
                         </div>
+                        <input type="text" x-model="search"
+                            :placeholder="tab === 'admin' ? 'Search Admin....' : (tab === 'peserta' ? 'Search Peserta....' :
+                                'Search History....')"
+                            class="w-full bg-[#F3F6FF] border border-transparent rounded-full py-2.5 pl-11 pr-4 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                    </div>
 
-                        <div class="overflow-x-auto rounded-2xl border border-gray-50">
-                            <table class="w-full text-sm min-w-[600px]">
-                                <thead class="bg-[#F8FAFF] text-[#4A72D4]">
-                                    <tr>
-                                        <th class="p-4 text-left font-bold">ID</th>
-                                        <th class="p-4 text-left font-bold">Nama</th>
-                                        <th class="p-4 text-left font-bold">Email</th>
-                                        <th class="p-4 text-left font-bold"
-                                            x-text="tab === 'history' ? 'Modul' : 'No HP'">No
-                                            HP</th>
-                                        <th class="p-4 text-left font-bold"
-                                            x-text="tab === 'history' ? 'Waktu Hapus' : 'Bergabung'">Bergabung</th>
-                                        <th class="p-4 text-left font-bold" x-show="tab !== 'peserta'">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-50">
+                    <button x-show="tab==='admin'" @click="openModal=true; isEdit=false; resetForm()"
+                        class="w-full md:w-auto bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm">
+                        <i class="fa-solid fa-plus text-xs"></i> Tambah Admin
+                    </button>
+                </div>
 
-                                    {{-- ================= ADMIN ================= --}}
-                                <tbody x-show="tab==='admin'">
-                                    <template x-for="user in filteredAdmins" :key="user.id">
-                                        <tr class="hover:bg-slate-50 transition-colors">
+                <div class="overflow-x-auto rounded-2xl border border-gray-50">
+                    <table class="w-full text-sm min-w-[600px]">
+                        <thead class="bg-[#F8FAFF] text-[#4A72D4]">
+                            <tr>
+                                <th class="p-4 text-left font-bold">ID</th>
+                                <th class="p-4 text-left font-bold">Nama</th>
+                                <th class="p-4 text-left font-bold">Email</th>
+                                <th class="p-4 text-left font-bold" x-text="tab === 'history' ? 'Modul' : 'No HP'">No
+                                    HP</th>
+                                <th class="p-4 text-left font-bold"
+                                    x-text="tab === 'history' ? 'Waktu Hapus' : 'Bergabung'">Bergabung</th>
+                                <th class="p-4 text-left font-bold" x-show="tab !== 'peserta'">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
 
-                                            <td class="p-4 font-semibold text-blue-600">
-                                                <span x-text="user.kode"></span>
-                                            </td>
+                            {{-- ================= ADMIN ================= --}}
+                        <tbody x-show="tab==='admin'">
+                            <template x-for="user in filteredAdmins" :key="user.id">
+                                <tr class="hover:bg-slate-50 transition-colors">
 
-                                            <td class="p-4">
-                                                <div class="flex items-center gap-3">
-                                                    <img :src="user.photo ?
-                                                        '/storage/' + user.photo :
-                                                        'https://ui-avatars.com/api/?name=' + user.name + ' &
-                                                        background =
-                                                        random '"
-                                                        :alt="user.name"
-                                                        class="w-10 h-10 rounded-full object-cover">
-                                                    <span class="font-semibold text-slate-700"
-                                                        x-text="user.name"></span>
-                                                </div>
-                                            </td>
+                                    <td class="p-4 font-semibold text-blue-600">
+                                        <span x-text="user.kode"></span>
+                                    </td>
 
-                                            <td class="p-4 font-semibold text-slate-700" x-text="user.email"></td>
+                                    <td class="p-4">
+                                        <div class="flex items-center gap-3">
+                                            <img :src="user.photo ?
+                                                '/storage/' + user.photo :
+                                                'https://ui-avatars.com/api/?name=' + user.name + ' & background =
+                                                random '"
+                                                :alt="user.name" class="w-10 h-10 rounded-full object-cover">
+                                            <span class="font-semibold text-slate-700" x-text="user.name"></span>
+                                        </div>
+                                    </td>
 
-                                            <td class="p-4 text-gray-500" x-text="user.no_hp"></td>
+                                    <td class="p-4 font-semibold text-slate-700" x-text="user.email"></td>
 
-                                            <td class="p-4 text-gray-500"
-                                                x-text="new Date(user.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })">
-                                            </td>
+                                    <td class="p-4 text-gray-500" x-text="user.no_hp"></td>
 
-                                            <td class="p-4">
-                                                <div class="flex gap-2">
+                                    <td class="p-4 text-gray-500"
+                                        x-text="new Date(user.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })">
+                                    </td>
 
-                                                    <button
-                                                        @click="editData({
+                                    <td class="p-4">
+                                        <div class="flex gap-2">
+
+                                            <button
+                                                @click="editData({
                         id: user.id,
                         nama: user.name,
                         no_hp: user.no_hp,
                         email: user.email,
                         photo: user.photo 
                     })"
-                                                        class="text-blue-500 px-2 py-1.5 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"><svg
-                                                            class="w-4 h-4 lg:w-5 lg:h-5" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-width="2"
-                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                        </svg>
-                                                    </button>
+                                                class="text-blue-500 px-2 py-1.5 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"><svg
+                                                    class="w-4 h-4 lg:w-5 lg:h-5" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </button>
 
-                                                    <button
-                                                        @click="
+                                            <button
+                                                @click="
                         Swal.fire({
                             title: 'Hapus User?',
                             text: 'User akan dipindahkan ke History',
@@ -414,82 +393,80 @@
                             }
                         })
                     "
-                                                        class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            viewBox="0 0 24 24" stroke-width="2"
-                                                            stroke="currentColor" class="size-5">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                        </svg>
-                                                    </button>
+                                                class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                    class="size-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
 
-                                                    <form :action="`/admin/user/${user.id}`" method="POST"
-                                                        class="hidden">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
+                                            <form :action="`/admin/user/${user.id}`" method="POST" class="hidden">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
 
-                                                </div>
-                                            </td>
+                                        </div>
+                                    </td>
 
-                                        </tr>
-                                    </template>
-                                </tbody>
-
-
-                                {{-- ================= PESERTA ================= --}}
-                                <tbody x-show="tab==='peserta'">
-                                    <template x-for="user in filteredPesertas" :key="user.id">
-                                        <tr class="hover:bg-slate-50 transition-colors">
+                                </tr>
+                            </template>
+                        </tbody>
 
 
-                                            <td class="p-4 font-semibold text-blue-600">
-                                                <span x-text="user.kode"></span>
-                                            </td>
-
-                                            <td class="p-4 font-semibold text-slate-700" x-text="user.name"></td>
-
-                                            <td class="p-4 font-semibold text-slate-700" x-text="user.email"></td>
-
-                                            <td class="p-4 text-gray-500" x-text="user.no_hp"></td>
-
-                                            <td class="p-4 text-gray-500"
-                                                x-text="new Date(user.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })">
-                                            </td>
+                        {{-- ================= PESERTA ================= --}}
+                        <tbody x-show="tab==='peserta'">
+                            <template x-for="user in filteredPesertas" :key="user.id">
+                                <tr class="hover:bg-slate-50 transition-colors">
 
 
-                                        </tr>
-                                    </template>
-                                </tbody>
+                                    <td class="p-4 font-semibold text-blue-600">
+                                        <span x-text="user.kode"></span>
+                                    </td>
+
+                                    <td class="p-4 font-semibold text-slate-700" x-text="user.name"></td>
+
+                                    <td class="p-4 font-semibold text-slate-700" x-text="user.email"></td>
+
+                                    <td class="p-4 text-gray-500" x-text="user.no_hp"></td>
+
+                                    <td class="p-4 text-gray-500"
+                                        x-text="new Date(user.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })">
+                                    </td>
 
 
-                                {{-- ================= HISTORY ================= --}}
-                                <tbody x-show="tab==='history'">
-                                    <template x-for="user in filteredHistory" :key="user.id">
-                                        <tr class="hover:bg-slate-50 transition-colors">
+                                </tr>
+                            </template>
+                        </tbody>
 
 
-                                            <td class="p-4 font-semibold text-blue-600">
-                                                <span x-text="user.kode"></span>
-                                            </td>
+                        {{-- ================= HISTORY ================= --}}
+                        <tbody x-show="tab==='history'">
+                            <template x-for="user in filteredHistory" :key="user.id">
+                                <tr class="hover:bg-slate-50 transition-colors">
 
-                                            <td class="p-4 font-semibold text-slate-700" x-text="user.name"></td>
 
-                                            <td class="p-4 font-semibold text-slate-700" x-text="user.email"></td>
+                                    <td class="p-4 font-semibold text-blue-600">
+                                        <span x-text="user.kode"></span>
+                                    </td>
 
-                                            <td class="p-4 text-gray-500 font-medium"
-                                                x-text="user.role.toUpperCase()">
-                                            </td>
+                                    <td class="p-4 font-semibold text-slate-700" x-text="user.name"></td>
 
-                                            <td class="p-4 text-gray-400"
-                                                x-text="new Date(user.deleted_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })">
-                                            </td>
+                                    <td class="p-4 font-semibold text-slate-700" x-text="user.email"></td>
 
-                                            <td class="p-4">
-                                                <div class="flex gap-2">
+                                    <td class="p-4 text-gray-500 font-medium" x-text="user.role.toUpperCase()">
+                                    </td>
 
-                                                    <button
-                                                        @click="
+                                    <td class="p-4 text-gray-400"
+                                        x-text="new Date(user.deleted_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })">
+                                    </td>
+
+                                    <td class="p-4">
+                                        <div class="flex gap-2">
+
+                                            <button
+                                                @click="
                         Swal.fire({
                             title: 'Pulihkan User?',
                             text: 'Data akan dikembalikan ke daftar User',
@@ -506,21 +483,21 @@
                             }
                         })
                     "
-                                                        class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                                            stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
-                                                        </svg>
-                                                    </button>
+                                                class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                    stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                                </svg>
+                                            </button>
 
-                                                    <form :action="`/admin/user/${user.id}/restore`" method="POST"
-                                                        class="hidden">
-                                                        @csrf
-                                                    </form>
-                                                    <button
-                                                        @click="
+                                            <form :action="`/admin/user/${user.id}/restore`" method="POST"
+                                                class="hidden">
+                                                @csrf
+                                            </form>
+                                            <button
+                                                @click="
                         Swal.fire({
                             title: 'Hapus Permanen?',
                             text: 'Data tidak bisa dikembalikan!',
@@ -537,72 +514,71 @@
                             }
                         })
                     "
-                                                        class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            viewBox="0 0 24 24" stroke-width="2"
-                                                            stroke="currentColor" class="size-5">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                        </svg>
-                                                    </button>
+                                                class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                    class="size-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
 
-                                                    <form :action="`/admin/user/${user.id}/force-delete`"
-                                                        method="POST" class="hidden">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                    </form>
+                                            <form :action="`/admin/user/${user.id}/force-delete`" method="POST"
+                                                class="hidden">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
 
-                                                </div>
-                                            </td>
+                                        </div>
+                                    </td>
 
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+                <div x-show="openModal" x-cloak
+                    class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+                    x-transition>
+
+                    <div @click.away="openModal=false"
+                        class="bg-white w-full max-w-lg rounded-[32px] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all">
+
+                        <div class="p-8 pb-4 flex justify-between items-center border-b border-gray-50 shrink-0">
+                            <h3 class="text-xl font-extrabold text-slate-800"
+                                x-text="isEdit ? 'Ubah Data Admin' : 'Tambah Admin Baru'"></h3>
+                            <button @click="openModal=false"
+                                class="text-gray-300 hover:text-red-500 transition-colors">
+                                <i class="fa-solid fa-circle-xmark text-2xl"></i>
+                            </button>
                         </div>
-                        <div x-show="openModal" x-cloak
-                            class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-                            x-transition>
 
-                            <div @click.away="openModal=false"
-                                class="bg-white w-full max-w-lg rounded-[32px] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all">
-
-                                <div
-                                    class="p-8 pb-4 flex justify-between items-center border-b border-gray-50 shrink-0">
-                                    <h3 class="text-xl font-extrabold text-slate-800"
-                                        x-text="isEdit ? 'Ubah Data Admin' : 'Tambah Admin Baru'"></h3>
-                                    <button @click="openModal=false"
-                                        class="text-gray-300 hover:text-red-500 transition-colors">
-                                        <i class="fa-solid fa-circle-xmark text-2xl"></i>
-                                    </button>
-                                </div>
-
-                                <div class="p-8 overflow-y-auto flex-1">
+                        <div class="p-8 overflow-y-auto flex-1">
 
 
-                                    <form class="space-y-4 pr-1" method="POST" enctype="multipart/form-data"
-                                        autocomplete="off"
-                                        :action="isEdit
-                                            ?
-                                            '/admin/user/' + form.id :
-                                            '{{ route('admin.user.store') }}'">
+                            <form class="space-y-4 pr-1" method="POST" enctype="multipart/form-data"
+                                autocomplete="off"
+                                :action="isEdit
+                                    ?
+                                    '/admin/user/' + form.id :
+                                    '{{ route('admin.user.store') }}'">
 
-                                        @csrf
-                                        <template x-if="isEdit">
-                                            <input type="hidden" name="_method" value="PUT">
-                                        </template>
+                                @csrf
+                                <template x-if="isEdit">
+                                    <input type="hidden" name="_method" value="PUT">
+                                </template>
 
-                                        {{-- FOTO --}}
-                                        <div class="flex flex-col items-center gap-3">
-
-
-                                            <div class="relative group w-32 h-32">
+                                {{-- FOTO --}}
+                                <div class="flex flex-col items-center gap-3">
 
 
-                                                <input type="file" name="photo"
-                                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                    accept="image/*"
-                                                    @change="
+                                    <div class="relative group w-32 h-32">
+
+
+                                        <input type="file" name="photo"
+                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                            accept="image/*"
+                                            @change="
                                 const file = $event.target.files[0];
                                 if(file){
                                     const reader = new FileReader();
@@ -611,82 +587,81 @@
                                 }
                             ">
 
-                                                <!-- PREVIEW -->
-                                                <template x-if="photoPreview">
-                                                    <img :src="photoPreview"
-                                                        class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
-                                                </template>
+                                        <!-- PREVIEW -->
+                                        <template x-if="photoPreview">
+                                            <img :src="photoPreview"
+                                                class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg">
+                                        </template>
 
-                                                <!-- DEFAULT (BELUM ADA FOTO) -->
-                                                <div x-show="!photoPreview"
-                                                    class="w-32 h-32 rounded-full bg-slate-100 flex items-center justify-center shadow-inner border border-slate-200">
+                                        <!-- DEFAULT (BELUM ADA FOTO) -->
+                                        <div x-show="!photoPreview"
+                                            class="w-32 h-32 rounded-full bg-slate-100 flex items-center justify-center shadow-inner border border-slate-200">
 
-                                                    <i class="fa-solid fa-user text-3xl text-slate-400"></i>
-                                                </div>
-
-                                                <!-- OVERLAY HOVER -->
-                                                <div
-                                                    class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition">
-                                                    Ganti
-                                                </div>
-
-                                            </div>
-
-                                            <!-- TEXT -->
-                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                                Upload Foto Profil
-                                            </p>
-
+                                            <i class="fa-solid fa-user text-3xl text-slate-400"></i>
                                         </div>
 
-                                        {{-- NAMA & WA --}}
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div class="space-y-1">
-                                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">
-                                                    Nama Lengkap
-                                                </label>
-                                                <input type="text" name="name" x-model="form.nama"
-                                                    class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
-                                            </div>
+                                        <!-- OVERLAY HOVER -->
+                                        <div
+                                            class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition">
+                                            Ganti
+                                        </div>
 
-                                            <div x-data="{ hpError: '' }" class="space-y-1">
-                                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">
-                                                    No HP
-                                                </label>
+                                    </div>
 
-                                                <input type="text" name="no_hp" x-model="form.no_hp"
-                                                    @input="
+                                    <!-- TEXT -->
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                        Upload Foto Profil
+                                    </p>
+
+                                </div>
+
+                                {{-- NAMA & WA --}}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">
+                                            Nama Lengkap
+                                        </label>
+                                        <input type="text" name="name" x-model="form.nama"
+                                            class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                                    </div>
+
+                                    <div x-data="{ hpError: '' }" class="space-y-1">
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">
+                                            No HP
+                                        </label>
+
+                                        <input type="text" name="no_hp" x-model="form.no_hp"
+                                            @input="
                                 form.no_hp = form.no_hp.replace(/[^0-9]/g,'');
                                 hpError = (form.no_hp.length > 0 && form.no_hp.length < 11) 
                                     ? 'Minimal 11 digit' 
                                     : '';
                                 "
-                                                    class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                                            class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
 
-                                                <p x-text="hpError" class="text-red-500 text-[11px]"></p>
-                                            </div>
-                                        </div>
+                                        <p x-text="hpError" class="text-red-500 text-[11px]"></p>
+                                    </div>
+                                </div>
 
-                                        {{-- EMAIL --}}
-                                        <div class="space-y-1">
-                                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">
-                                                Alamat Email
-                                            </label>
-                                            <input type="email" name="email" x-model="form.email"
-                                                autocomplete="off"
-                                                class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
-                                        </div>
+                                {{-- EMAIL --}}
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">
+                                        Alamat Email
+                                    </label>
+                                    <input type="email" name="email" x-model="form.email" autocomplete="off"
+                                        class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                                </div>
 
-                                        {{-- PASSWORD --}}
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div x-data="{ password: '', passwordError: '', show: false }" class="space-y-1">
-                                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Kata
-                                                    Sandi</label>
+                                {{-- PASSWORD --}}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div x-data="{ password: '', passwordError: '', show: false }" class="space-y-1">
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Kata
+                                            Sandi</label>
 
-                                                <div class="relative">
-                                                    <input :type="show ? 'text' : 'password'" name="password"
-                                                        autocomplete="new-password" x-model="password"
-                                                        @input="
+                                        <div class="relative">
+                                            <input :type="show ? 'text' : 'password'" name="password"
+                                                autocomplete="new-password" x-model="password"
+                                                @input="
                                     const hasNumber = /[0-9]/.test(password);
                                     const hasSymbol = /[^A-Za-z0-9]/.test(password);
 
@@ -706,60 +681,57 @@
                                         passwordError = '';
                                     }
                                 "
-                                                        class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none pr-10">
+                                                class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none pr-10">
 
-                                                    <button type="button" @click="show = !show"
-                                                        class="absolute right-3 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition-colors">
-                                                        <i class="fa-solid"
-                                                            :class="show ? 'fa-eye' : 'fa-eye-slash'"></i>
-                                                    </button>
-                                                </div>
-
-                                                <p x-text="passwordError" class="text-red-600 text-[11px] mt-1 ml-1">
-                                                </p>
-                                            </div>
-
-                                            <div x-data="{ showConfirm: false }" class="space-y-1">
-                                                <label
-                                                    class="text-[10px] font-bold text-slate-400 uppercase ml-1">Konfirmasi
-                                                    Sandi</label>
-
-                                                <div class="relative">
-                                                    <input :type="showConfirm ? 'text' : 'password'"
-                                                        name="password_confirmation"
-                                                        class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none pr-10">
-
-                                                    <button type="button" @click="showConfirm = !showConfirm"
-                                                        class="absolute right-3 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition-colors">
-                                                        <i class="fa-solid"
-                                                            :class="showConfirm ? 'fa-eye' : 'fa-eye-slash'"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{-- FOOTER BUTTON --}}
-                                        <div class="pt-6 flex gap-3 border-t border-gray-50">
-                                            <button type="button" @click="openModal=false"
-                                                class="flex-1 bg-slate-50 text-slate-400 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition-all">
-                                                Batal
-                                            </button>
-
-                                            <button type="submit"
-                                                class="flex-1 bg-[#4A72D4] text-white font-bold py-3.5 rounded-2xl hover:bg-blue-600 shadow-lg shadow-blue-100 transition-all">
-                                                Simpan Data
+                                            <button type="button" @click="show = !show"
+                                                class="absolute right-3 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition-colors">
+                                                <i class="fa-solid" :class="show ? 'fa-eye' : 'fa-eye-slash'"></i>
                                             </button>
                                         </div>
 
-                                    </form>
+                                        <p x-text="passwordError" class="text-red-600 text-[11px] mt-1 ml-1"></p>
+                                    </div>
+
+                                    <div x-data="{ showConfirm: false }" class="space-y-1">
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Konfirmasi
+                                            Sandi</label>
+
+                                        <div class="relative">
+                                            <input :type="showConfirm ? 'text' : 'password'"
+                                                name="password_confirmation"
+                                                class="w-full bg-slate-100 border-none rounded-2xl p-3 text-sm focus:ring-2 focus:ring-blue-400 outline-none pr-10">
+
+                                            <button type="button" @click="showConfirm = !showConfirm"
+                                                class="absolute right-3 top-0 h-full flex items-center text-gray-400 hover:text-blue-500 transition-colors">
+                                                <i class="fa-solid"
+                                                    :class="showConfirm ? 'fa-eye' : 'fa-eye-slash'"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+
+                                {{-- FOOTER BUTTON --}}
+                                <div class="pt-6 flex gap-3 border-t border-gray-50">
+                                    <button type="button" @click="openModal=false"
+                                        class="flex-1 bg-slate-50 text-slate-400 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition-all">
+                                        Batal
+                                    </button>
+
+                                    <button type="submit"
+                                        class="flex-1 bg-[#4A72D4] text-white font-bold py-3.5 rounded-2xl hover:bg-blue-600 shadow-lg shadow-blue-100 transition-all">
+                                        Simpan Data
+                                    </button>
+                                </div>
+
+                            </form>
                         </div>
-
-
-
                     </div>
-                </main>
+                </div>
+
+
+
+            </div>
+        </main>
     </div>
     @if (session('success'))
         <div x-data x-init="Swal.fire({
