@@ -406,16 +406,13 @@
         </aside>
 
         <main class="flex-1 flex flex-col h-screen overflow-hidden">
-            <header
-                class="flex flex-col lg:flex-row lg:items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0 w-full">
-                <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
-                    <button @click="mobileMenuOpen = true"
-                        class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
-                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+            <header class="flex flex-col lg:flex-row lg:items-center justify-between p-4 lg:px-8 lg:pt-8 lg:pb-4 gap-4 flex-shrink-0 w-full">
+    <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
+        <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
 
         @php
             use Illuminate\Support\Facades\Auth;
@@ -484,6 +481,7 @@
                         window.location.href = this.routes[key];
                         return;
                     }
+                    alert('Halaman tidak ditemukan')
                 }
                 alert('Halaman tidak ditemukan');
             }
@@ -944,28 +942,8 @@
                 </div>
 
             </div>
-            <p class="text-xs md:text-sm font-bold text-gray-600 text-center">Klik tombol di bawah untuk memilih file</p>
-            <p class="text-[9px] md:text-[10px] text-gray-400 mt-2">Maksimal ukuran file: 50MB (.xlsx)</p>
-            
-            <input type="file" class="hidden" x-ref="excelInput" @change="importExcel($event)" accept=".xlsx,.xls">
-            
-            <button @click="$refs.excelInput.click()"
-                    class="mt-6 md:mt-8 w-full md:w-auto px-10 py-4 bg-emerald-500 text-white rounded-2xl text-xs font-bold hover:bg-emerald-600 shadow-lg shadow-emerald-100 transition-all">
-                Pilih File Excel
-            </button>
-        </div>
-
-        <div class="mt-6 md:mt-8 p-4 md:p-5 bg-emerald-50 rounded-[25px] flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-            <div class="flex items-center gap-3">
-                <i class="fa-solid fa-circle-info text-emerald-500"></i>
-                <span class="text-[10px] md:text-[11px] font-bold text-emerald-700 uppercase tracking-tight">Butuh Format?</span>
-            </div>
-            <button @click="unduhTemplate('utama')" class="text-[10px] md:text-[11px] font-black text-emerald-600 hover:underline">
-                DOWNLOAD TEMPLATE
-            </button>
         </div>
     </div>
-</div>
 
     <div x-show="showModalProdi" x-cloak
         class="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
