@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Soal Tryout - Admin | PERSISTEN</title>
+    <title>Persisten Dashboard - Edit Tryout</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -178,13 +178,15 @@ laporan</span>
 </aside>
 
         <main class="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
-             <header class="flex flex-col lg:flex-row lg:items-center justify-between pb-4 gap-4 flex-shrink-0 w-full">
-    <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
-        <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
-            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-        </button>
+             <header
+            class="flex flex-col lg:flex-row lg:items-center justify-between lg:pt-2 pb-8 gap-4 flex-shrink-0 w-full">
+            <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
+                <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
 
         @php
             use Illuminate\Support\Facades\Auth;
@@ -253,6 +255,7 @@ laporan</span>
                         window.location.href = this.routes[key];
                         return;
                     }
+                    alert('Halaman tidak ditemukan')
                 }
                 alert('Halaman tidak ditemukan');
             }

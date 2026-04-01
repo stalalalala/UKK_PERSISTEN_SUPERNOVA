@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -28,17 +29,20 @@
     imageUrl: null,
     showImageModal: false,
     showImportModal: false,
-    showConfirmBackModal: false,
     isDirty: false,
+    allowLeave: false,
+
     showSuccessModal: false,
     successMessage: '',
     showErrorModal: false,
     errorMessage: '',
     showPublishModal: false,
     tempImageUrl: '',
+
     namaTryout: '',
     tglMulai: '',
     tglSelesai: '',
+
     subtesList: [
         { name: 'Penalaran Umum', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
         { name: 'Penalaran & Pemahaman Umum', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
@@ -51,10 +55,11 @@
 
     init() {
         history.pushState(null, null, window.location.href);
+
         window.onpopstate = () => {
-            if (this.isDirty) {
-                this.showConfirmBackModal = true;
+            if (this.isDirty && !this.allowLeave) {
                 history.pushState(null, null, window.location.href);
+                this.confirmLeave();
             } else {
                 window.location.href = '/admin/tryout';
             }
@@ -76,98 +81,53 @@
         this.$watch('tglSelesai', () => this.saveLocal());
     },
 
-        saveLocal() {
-            this.isDirty = true;
-            localStorage.setItem('persisten_tryout_final', JSON.stringify({
-                subtesList: this.subtesList, 
-                namaTryout: this.namaTryout, 
-                tglMulai: this.tglMulai, 
-                tglSelesai: this.tglSelesai
-            }));
-        },
+   confirmLeave() {
+    Swal.fire({
+        title: 'Yakin ingin keluar?',
+        text: 'Data tryout yang belum dipublikasikan akan hilang.',
+        icon: 'warning',
+        width: '340px',
+        padding: '1.8rem',
+        showCancelButton: true,
+        confirmButtonColor: '#4A72D4',
+        cancelButtonColor: '#E5E7EB',
+        cancelButtonText: 'Batal',
+        confirmButtonText: 'Ya, keluar',    
+        customClass: {
+            popup: 'rounded-3xl shadow-xl',
+            title: 'text-lg font-bold text-gray-800',
+            htmlContainer: 'text-sm text-gray-500',
+            confirmButton: 'rounded-xl px-5 py-2',
+            cancelButton: 'rounded-xl px-5 py-2'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            this.allowLeave = true;
+            localStorage.removeItem('persisten_tryout_final');
+            window.location.href = '/admin/tryout';
+        }
+    });
+},
+
+    saveLocal() {
+        this.isDirty = true;
+        localStorage.setItem('persisten_tryout_final', JSON.stringify({
+            subtesList: this.subtesList, 
+            namaTryout: this.namaTryout, 
+            tglMulai: this.tglMulai, 
+            tglSelesai: this.tglSelesai
+        }));
+    },
 
     get canPublish() {
         return this.namaTryout && this.tglMulai && this.tglSelesai && this.subtesList.every(s => s.completed);
     },
 
-    unduhTemplate() {
-        const wb = XLSX.utils.book_new();
-        const header = [['Pertanyaan', 'Opsi A', 'Opsi B', 'Opsi C', 'Opsi D', 'Opsi E', 'Jawaban Benar', 'Pembahasan', 'Materi Teks', 'Link Gambar']];
-        const dummyData = ['Contoh Pertanyaan', 'A', 'B', 'C', 'D', 'E', 'B', 'Penjelasan...', 'Materi...', ''];
-        
-        this.subtesList.forEach(sub => {
-            const ws = XLSX.utils.aoa_to_sheet([...header, dummyData]);
-            XLSX.utils.book_append_sheet(wb, ws, sub.name.substring(0, 31));
-        });
-        XLSX.writeFile(wb, 'Template_Soal_TRYOUT.xlsx');
-    },
-
-    importSheet(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                let totalImported = 0;
-                let foundSheet = false;
-
-                workbook.SheetNames.forEach(sheetName => {
-                    const sIdx = this.subtesList.findIndex(s => s.name.toLowerCase() === sheetName.toLowerCase());
-                    if (sIdx !== -1) {
-                        foundSheet = true;
-                        const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-                        if (jsonData.length > 0) {
-                            let current = this.subtesList[sIdx];
-                            jsonData.forEach((row, i) => {
-                                if(i < this.targetSoal) {
-                                    current.questions[i] = {
-                                        pertanyaan: row['Pertanyaan'] || '',
-                                        opsi_a: row['Opsi A'] || '', opsi_b: row['Opsi B'] || '',
-                                        opsi_c: row['Opsi C'] || '', opsi_d: row['Opsi D'] || '',
-                                        opsi_e: row['Opsi E'] || '',
-                                        jawaban_benar: row['Jawaban Benar']?.toString().toUpperCase() || '',
-                                        pembahasan: row['Pembahasan'] || '',
-                                        materi_teks: row['Materi Teks'] || '',
-                                        image_url: row['Link Gambar'] || null
-                                    };
-                                }
-                            });
-                            current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
-                            current.completed = (current.soalTerisi >= this.targetSoal);
-                            totalImported += current.soalTerisi;
-                        }
-                    }
-                });
-
-                if (!foundSheet) throw new Error('Nama sheet tidak sesuai subtes.');
-                
-                this.saveLocal();
-                this.successMessage = 'Berhasil mengimport ' + totalImported + ' soal.';
-                this.showSuccessModal = true;
-                this.showImportModal = false;
-                if (this.activeSubtesIndex !== null) this.loadQuestion();
-            } catch (error) {
-                this.errorMessage = error.message;
-                this.showErrorModal = true;
-            }
-            event.target.value = '';
-        };
-        reader.readAsArrayBuffer(file);
-    },
-
-    selectSubtes(index) {
-        this.activeSubtesIndex = index;
-        this.activeQuestion = 1;
-        this.imageUrl = null;
-        this.$nextTick(() => { this.loadQuestion(); });
-    },
-
     backToDaftarTryout() {
-        if (confirm('Yakin ingin kembali? Data yang belum dipublikasikan akan dihapus.')) { 
-            localStorage.removeItem('persisten_tryout_final');
-            window.location.href = '/admin/tryout'; 
+        if (this.isDirty) {
+            this.confirmLeave();
+        } else {
+            window.location.href = '/admin/tryout';
         }
     },
 
@@ -180,14 +140,19 @@
         const file = event.target.files[0];
         if (file) { 
             const reader = new FileReader();
-            reader.onload = (e) => { this.imageUrl = e.target.result; this.showImageModal = false; };
+            reader.onload = (e) => { 
+                this.imageUrl = e.target.result; 
+                this.showImageModal = false; 
+            };
             reader.readAsDataURL(file);
         }
     },
 
     applyImageUrl() {
         if (this.tempImageUrl.trim() !== '') {
-            this.imageUrl = this.tempImageUrl; this.showImageModal = false; this.tempImageUrl = '';
+            this.imageUrl = this.tempImageUrl; 
+            this.showImageModal = false; 
+            this.tempImageUrl = '';
         }
     },
 
@@ -201,25 +166,46 @@
         const pbs = document.getElementById('pembahasan_teks').value.trim();
         const jaw = document.querySelector('input[name=\'correct_option\']:checked');
 
-        if (!q || !a || !b || !c || !d || !e || !pbs || !jaw) { alert('Lengkapi semua field!'); return; }
+        if (!q || !a || !b || !c || !d || !e || !pbs || !jaw) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi semua field!'
+            });
+            return;
+        }
 
         let current = this.subtesList[this.activeSubtesIndex];
         current.questions[this.activeQuestion - 1] = {
             materi_teks: document.getElementById('materi_teks').value,
-            pertanyaan: q, opsi_a: a, opsi_b: b, opsi_c: c, opsi_d: d, opsi_e: e,
-            jawaban_benar: jaw.value, pembahasan: pbs, image_url: this.imageUrl
+            pertanyaan: q,
+            opsi_a: a,
+            opsi_b: b,
+            opsi_c: c,
+            opsi_d: d,
+            opsi_e: e,
+            jawaban_benar: jaw.value,
+            pembahasan: pbs,
+            image_url: this.imageUrl
         };
+
         current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
         this.saveLocal();
 
         if (this.activeQuestion < this.targetSoal) {
-            this.activeQuestion++; this.loadQuestion();
-        } else { alert('Tersimpan!'); }
+            this.activeQuestion++;
+            this.loadQuestion();
+        } else {
+            Swal.fire({
+                icon: 'success',
+                title: 'Tersimpan!'
+            });
+        }
     },
 
     loadQuestion() {
         let current = this.subtesList[this.activeSubtesIndex];
         let data = current.questions[this.activeQuestion - 1];
+
         if (data) {
             document.getElementById('materi_teks').value = data.materi_teks || '';
             document.getElementById('pertanyaan_teks').value = data.pertanyaan || '';
@@ -230,34 +216,47 @@
             document.getElementById('opt_e').value = data.opsi_e || '';
             document.getElementById('pembahasan_teks').value = data.pembahasan || '';
             this.imageUrl = data.image_url || null;
-            document.getElementsByName('correct_option').forEach(r => r.checked = (r.value === data.jawaban_benar));
-        } else { this.resetInputForm(); }
+
+            document.getElementsByName('correct_option')
+                .forEach(r => r.checked = (r.value === data.jawaban_benar));
+        } else {
+            this.resetInputForm();
+        }
     },
 
     resetInputForm() {
-        ['materi_teks','pertanyaan_teks','opt_a','opt_b','opt_c','opt_d','opt_e','pembahasan_teks'].forEach(id => {
-            const el = document.getElementById(id); if(el) el.value = '';
+        ['materi_teks','pertanyaan_teks','opt_a','opt_b','opt_c','opt_d','opt_e','pembahasan_teks']
+        .forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.value = '';
         });
+
         this.imageUrl = null;
-        document.getElementsByName('correct_option').forEach(r => r.checked = false);
+        document.getElementsByName('correct_option')
+            .forEach(r => r.checked = false);
     },
 
     selesaikanSubtes() {
         if (this.subtesList[this.activeSubtesIndex].soalTerisi < this.targetSoal) {
-            alert('Lengkapi 20 soal terlebih dahulu!'); return;
+            Swal.fire({
+                icon: 'warning',
+                title: 'Lengkapi 20 soal terlebih dahulu!'
+            });
+            return;
         }
+
         this.subtesList[this.activeSubtesIndex].completed = true;
         this.activeSubtesIndex = null;
         this.saveLocal();
     },
 
     publikasikan() {
-    if (!this.canPublish) {
-        this.errorMessage = 'Lengkapi semua data dan subtes terlebih dahulu!';
-        this.showErrorModal = true;
-        return;
-    }
-    this.showPublishModal = true;
+        if (!this.canPublish) {
+            this.errorMessage = 'Lengkapi semua data dan subtes terlebih dahulu!';
+            this.showErrorModal = true;
+            return;
+        }
+        this.showPublishModal = true;
     },
 
     confirmPublikasikan() {
@@ -476,13 +475,15 @@ laporan</span>
 </aside>
 
         <main class="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
-             <header class="flex flex-col lg:flex-row lg:items-center justify-between pb-4 gap-4 flex-shrink-0 w-full">
-    <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
-        <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
-            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-        </button>
+             <header
+            class="flex flex-col lg:flex-row lg:items-center justify-between lg:pt-2 pb-8 gap-4 flex-shrink-0 w-full">
+            <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
+                <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
 
         @php
             use Illuminate\Support\Facades\Auth;
@@ -551,6 +552,7 @@ laporan</span>
                         window.location.href = this.routes[key];
                         return;
                     }
+                    alert('Halaman tidak ditemukan')
                 }
                 alert('Halaman tidak ditemukan');
             }
@@ -590,7 +592,12 @@ laporan</span>
                 <div x-show="activeSubtesIndex === null" x-transition>
                 <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
-                        <button type="button" @click="isDirty ? showConfirmBackModal = true : window.location.href = '/admin/tryout'" class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all"><i class="fa-solid fa-arrow-left"></i></button>
+                     <button 
+                        type="button" 
+                        @click="backToDaftarTryout()" 
+                        class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
                         <div>
                             <h2 class="text-2xl font-extrabold text-[#4A72D4]">Panel Pembuatan Tryout</h2>
                             <p class="text-gray-400 text-xs mt-1 italic font-bold tracking-wide">Lengkapi data subtes untuk mempublikasikan.</p>
@@ -598,7 +605,7 @@ laporan</span>
                     </div>
                     
                     <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                        <button type="button" @click="showImportModal = true" class="w-full md:w-auto bg-white border border-blue-100 text-[#4A72D4] px-6 py-3 rounded-2xl font-bold text-xs shadow-lg flex items-center justify-center gap-2 hover:scale-105 transition-all">
+                        <button type="button" @click="showImportModal = true" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white border border-blue-100 px-6 py-3 rounded-2xl font-bold text-xs shadow-lg flex items-center justify-center gap-2 hover:scale-105 transition-all">
                             <i class="fa-solid fa-file-import"></i> IMPORT VIA SHEET
                         </button>
                     </div>
@@ -750,23 +757,6 @@ laporan</span>
             </form>
         </main>
     </div>
-
-    {{-- MODAL KEMBALI --}}
-    <div x-show="showConfirmBackModal" x-cloak class="fixed inset-0 z-[150] flex items-center justify-center p-4">
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showConfirmBackModal = false"></div>
-    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[151] text-center shadow-2xl border border-blue-50">
-        <div class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-        </div>
-        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Konfirmasi Keluar</h3>
-        <p class="text-gray-500 text-sm mb-8">Data belum disimpan. Jika keluar sekarang, data akan dihapus.</p>
-        <div class="flex gap-3">
-            <button type="button" @click="showConfirmBackModal = false" class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200">Batal</button>
-            <button type="button" @click="isDirty = false; localStorage.removeItem('persisten_tryout_final'); window.location.href = '/admin/tryout'" 
-                    class="flex-1 py-3 rounded-xl font-bold bg-red-500 text-white shadow-lg shadow-red-200">Ya, Keluar</button>
-        </div>
-    </div>
-</div>
 
 {{-- MODAL BERHASIL IMPORT --}}
 <div x-show="showSuccessModal" x-cloak class="fixed inset-0 z-[160] flex items-center justify-center p-4">
