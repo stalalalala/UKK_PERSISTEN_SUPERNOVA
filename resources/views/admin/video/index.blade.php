@@ -707,19 +707,27 @@ function videoApp() {
                 });
 
                 if (response.ok) {
+    const result = await response.json(); // Mengambil respon message dari controller
+    
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Data berhasil diimport',
+                        icon: result.success ? 'success' : 'warning',
+                        title: 'Hasil Import',
+                        text: result.message, // Menampilkan pesan "Berhasil: X, Dilewati: Y"
                         width: '340px',
-                        padding: '1.8rem',
                         confirmButtonColor: '#4A72D4',
                         customClass: {
                             popup: 'rounded-3xl shadow-xl',
                             title: 'text-lg font-bold',
                             confirmButton: 'rounded-xl px-6 py-2'
                         }
-                    }).then(() => location.reload());
-                } else { throw new Error(); }
+                    }).then(() => {
+                        // Hanya reload jika ada data yang berhasil masuk
+                        if (result.success) location.reload();
+                    });
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Gagal tersimpan');
+                }
             } catch (error) {
                 Swal.fire({
                     icon: 'error',

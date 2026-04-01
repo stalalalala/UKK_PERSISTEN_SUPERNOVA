@@ -58,7 +58,13 @@ class AdminVideoController extends Controller
     public function import(Request $request)
 {
     $count = 0;
+    $skipped = 0;
     foreach ($request->data as $row) {
+
+            if (empty($row['subtes']) || empty($row['judul_video']) || empty($row['iframe'])) {
+            $skipped++;
+            continue; 
+        }
 
         $iframe = trim($row['iframe'] ?? '');
 
@@ -69,15 +75,25 @@ class AdminVideoController extends Controller
         $iframe = preg_replace('/^"(.*)"$/', '$1', $iframe);
 
         AdminVideo::create([
-            'subtes' => $row['subtes'] ?? '',
-            'judul_video' => $row['judul_video'] ?? '',
+            'subtes' => $row['subtes'],
+            'judul_video' => $row['judul_video'],
             'iframe' => $iframe,
         ]);
         $count++;
     }
 
+    if ($count > 0) {
     $this->logAktivitas('IMPORT VIDEO', "Batch Import ($count Video)", "Melakukan import data video pembelajaran");
-    return response()->json(['success' => true]);
+    return response()->json([
+        'success' => true, 
+        'message' => "Berhasil: $count, Dilewati: $skipped"
+    ]);
+} else {
+    return response()->json([
+        'success' => false, 
+        'message' => "Gagal! Tidak ada data valid ditemukan. Dilewati: $skipped"
+    ], 422); // Kirim status 422 agar masuk ke catch(error) di JS
+}
 }
 
 

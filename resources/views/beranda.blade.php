@@ -380,13 +380,15 @@
                                     class="fa-solid {{ $to->is_open ? 'fa-clock' : ($to->sudah_dikerjakan ? 'fa-circle-check' : 'fa-lock') }} text-[10px]"></i>
 
                                 <span class="text-[11px] font-bold">
-                                    {{ $to->sudah_dikerjakan
-                                        ? 'Lihat Hasil'
-                                        : ($to->is_open
-                                            ? $to->tanggal->format('d M') . ' - ' . $to->tanggal_akhir->format('d M')
-                                            : ($to->is_locked
-                                                ? 'Pilih Jurusan'
-                                                : 'Belum Tersedia')) }}
+                                    @if($to->sudah_dikerjakan)
+                                        Lihat Hasil
+                                    @elseif($to->is_open)
+                                        {{ date('d M', strtotime($to->tanggal)) }} - {{ date('d M', strtotime($to->tanggal_akhir)) }}
+                                    @elseif($to->is_locked)
+                                        Pilih Jurusan
+                                    @else
+                                        Belum Tersedia
+                                    @endif
                                 </span>
                             </div>
 
