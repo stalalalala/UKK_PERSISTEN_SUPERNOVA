@@ -162,11 +162,8 @@
         <div class="main-container p-5 md:p-12">
 
             <div class="text-center mb-12 md:mb-16">
-                <span
-                    class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-3 md:mb-4 inline-block">Personal
-                    Insights</span>
-                <h2 class="text-lg md:text-3xl font-extrabold text-slate-800 px-2 leading-tight">Tiga Rekomendasi
-                    Jurusan Utama</h2>
+                <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-3 md:mb-4 inline-block">Kenali Dirimu</span>
+                <h2 class="text-lg md:text-3xl font-extrabold text-slate-800 px-2 leading-tight">Tiga Potensi Utama</h2>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10 mb-12 md:mb-16 items-end">

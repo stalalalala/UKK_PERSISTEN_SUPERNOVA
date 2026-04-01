@@ -37,66 +37,44 @@
             </div>
         </div>
 
-        <h1 class="text-xl sm:text-2xl lg:text-3xl 
-                   font-bold text-blue-700 mb-2">
-            Verifikasi Email
-        </h1>
+        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700 mb-2">Verifikasi Email</h1>
 
-        <p class="text-blue-600 
-                  text-sm sm:text-base 
-                  mb-5 sm:mb-6">
-            Silakan cek email Anda untuk link verifikasi.
-            Pastikan juga cek folder spam jika tidak muncul.
+        <p class="text-blue-600 text-sm sm:text-base mb-5 sm:mb-6">
+            Silakan cek email Anda untuk link verifikasi. Pastikan juga cek folder spam jika tidak muncul.
         </p>
 
-        @if (session('success'))
-            <p
-                class="text-green-600 bg-green-100 
-                      px-4 py-2 rounded-md mb-4 
-                      text-sm sm:text-base">
+        @if(session('success'))
+            <p class="text-green-600 bg-green-100 px-4 py-2 rounded-md mb-4 text-sm sm:text-base">
                 {{ session('success') }}
             </p>
         @endif
 
-        @if (session('error'))
-            <p
-                class="text-red-600 bg-red-100 
-                      px-4 py-2 rounded-md mb-4 
-                      text-sm sm:text-base">
+        @if(session('error'))
+            <p class="text-red-600 bg-red-100 px-4 py-2 rounded-md mb-4 text-sm sm:text-base">
                 {{ session('error') }}
             </p>
         @endif
 
-        <!-- Tombol kirim ulang -->
-        <div x-data="{
-            canResend: true,
+        <div x-data="{ 
+            canResend: true, 
             timer: 0,
             storageKey: 'verification_expiry',
-        
             init() {
-                // Cek apakah ada waktu kedaluwarsa yang tersimpan saat halaman dimuat
                 const expiry = localStorage.getItem(this.storageKey);
                 if (expiry) {
                     const remaining = Math.floor((parseInt(expiry) - Date.now()) / 1000);
-                    if (remaining > 0) {
-                        this.startCountdown(remaining);
-                    } else {
-                        localStorage.removeItem(this.storageKey);
-                    }
+                    if (remaining > 0) { this.startCountdown(remaining); } 
+                    else { localStorage.removeItem(this.storageKey); }
                 }
             },
-        
             startTimer() {
-                // Set waktu kedaluwarsa 60 detik dari sekarang
                 const expiryTime = Date.now() + (60 * 1000);
                 localStorage.setItem(this.storageKey, expiryTime);
                 this.startCountdown(60);
             },
-        
             startCountdown(seconds) {
                 this.canResend = false;
                 this.timer = seconds;
-        
                 let interval = setInterval(() => {
                     this.timer--;
                     if (this.timer <= 0) {
@@ -109,35 +87,24 @@
         }">
             <form method="POST" action="{{ route('verification.send') }}" @submit="startTimer()">
                 @csrf
-                <button type="submit" :disabled="!canResend"
-                    :class="!canResend ? 'bg-gray-300 cursor-not-allowed text-gray-500' :
-                        'bg-blue-400 hover:bg-blue-500 text-white'"
+                <button type="submit"
+                    :disabled="!canResend"
+                    :class="!canResend ? 'bg-gray-300 cursor-not-allowed text-gray-500' : 'bg-blue-400 hover:bg-blue-500 text-white'"
                     class="w-full font-semibold py-2 sm:py-3 text-sm sm:text-base rounded-2xl shadow-md transition-colors">
-
                     <span x-show="canResend">Kirim Ulang Link Verifikasi</span>
-
                     <span x-show="!canResend" x-cloak>Tunggu <span x-text="timer"></span> detik</span>
                 </button>
             </form>
         </div>
 
-
         <form method="POST" action="{{ route('logout') }}" class="mt-4">
             @csrf
-            <button type="submit"
-                class="w-full flex items-center justify-center gap-2
-               bg-gray-100 hover:bg-gray-200 
-               text-gray-600 font-semibold 
-               py-2 sm:py-3 
-               text-sm sm:text-base
-               rounded-xl transition-all duration-300">
+            <button type="submit" class="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold py-2 sm:py-3 text-sm sm:text-base rounded-xl transition-all duration-300">
                 <i class="fa-solid fa-arrow-left"></i>
-                Kembali ke Halaman Masuk
+                Keluar dan Kembali ke Login
             </button>
         </form>
-
     </div>
-
 </body>
 
 </html>

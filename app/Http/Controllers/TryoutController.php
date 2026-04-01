@@ -23,7 +23,7 @@ class TryoutController extends Controller
         $now = Carbon::now();
         $userId = Auth::id();
 
-        // 1. Ambil target tryout user dari tabel baru: user_target_tryouts
+        // 1. Ambil target tryout user
         $userTarget = DB::table('user_target_tryouts')
             ->join('prodis', 'user_target_tryouts.prodi_id', '=', 'prodis.id')
             ->join('universitas', 'prodis.universitas_id', '=', 'universitas.id')
@@ -38,11 +38,49 @@ class TryoutController extends Controller
             )
             ->first();
 
-        // 2. Hitung Peluang Lolos (Logika: Kuota / Peminat * 100)
+        // 2. LOGIKA PELUANG LOLOS (AKUMULASI NILAI + KEKETATAN JURUSAN)
         $peluangLolos = 0;
-        if ($userTarget && $userTarget->peminat > 0) {
-            $peluangLolos = round(($userTarget->kuota / $userTarget->peminat) * 100);
-            if ($peluangLolos > 100) $peluangLolos = 100;
+
+        if ($userTarget) {
+            // Ambil data performa user dari semua jawaban yang pernah dikerjakan
+            $userScores = DB::table('tryout_jawaban_peserta')
+                ->join('soal_tryouts', 'tryout_jawaban_peserta.soal_id', '=', 'soal_tryouts.id')
+                ->where('tryout_jawaban_peserta.user_id', $userId)
+                ->select(
+                    'soal_tryouts.category_id',
+                    DB::raw('COUNT(CASE WHEN is_correct = 1 THEN 1 END) as benar'),
+                    DB::raw('COUNT(*) as total_soal')
+                )
+                ->groupBy('soal_tryouts.category_id')
+                ->get();
+
+            // Peluang 0% jika belum mengerjakan TO sama sekali (userScores kosong)
+            if ($userScores->count() > 0) {
+                // A. Faktor Keketatan Jurusan (Bobot 30%)
+                // Rumus: (Kuota / Peminat) * 30. Contoh: (50/1000) * 30 = 1.5%
+                $scoreJurusan = ($userTarget->peminat > 0) ? ($userTarget->kuota / $userTarget->peminat) * 30 : 0;
+
+                // B. Faktor Performa Akumulasi (Bobot 70%)
+                // Hitung rata-rata nilai dari seluruh subtes/TO yang pernah diikuti
+                $totalRataRata = $userScores->map(function($item) {
+                    return ($item->total_soal > 0) ? ($item->benar / $item->total_soal) * 1000 : 0;
+                })->avg();
+
+                // Kita asumsikan skor 750 adalah angka aman (Passing Grade ideal)
+                // Rumus: (Rata-rata Skor / 750) * 70
+                $scorePerforma = ($totalRataRata / 750) * 70;
+
+                // C. Total Gabungan
+                $peluangLolos = round($scoreJurusan + $scorePerforma);
+
+                // Keamanan: Batasi maksimal 98% (karena UTBK tidak pernah 100% pasti)
+                if ($peluangLolos > 98) $peluangLolos = 98;
+                // Jika sudah mengerjakan tapi hasil sangat kecil, tetap beri minimal 1%
+                if ($peluangLolos < 1) $peluangLolos = 1;
+            } else {
+                // Jika userTarget ada tapi belum mengerjakan TO sama sekali, peluang 0%
+                $peluangLolos = 0;
+            }
         }
 
         // 3. Ambil data Universitas & Prodi untuk Dropdown
@@ -52,60 +90,41 @@ class TryoutController extends Controller
             ->where('is_deleted', false)
             ->get();
 
-        // 4. Ambil semua tryout
+        // 4. Ambil semua tryout untuk ditampilkan di list
         $tryouts = AdminTryout::orderBy('id', 'asc')->get();
 
-        // 5. Ambil ID tryout yang sudah pernah dikerjakan
+        // 5. Identifikasi Tryout yang sudah dikerjakan
         $userResults = DB::table('tryout_jawaban_peserta')
-        ->join('soal_tryouts', 'tryout_jawaban_peserta.soal_id', '=', 'soal_tryouts.id')
-        ->join('tryout_categories', 'soal_tryouts.category_id', '=', 'tryout_categories.id')
-        ->where('tryout_jawaban_peserta.user_id', $userId)
-        ->select('tryout_categories.admin_tryout_id as tryout_id')
-        ->distinct()
-        ->pluck('tryout_id') 
-        ->toArray();
+            ->join('soal_tryouts', 'tryout_jawaban_peserta.soal_id', '=', 'soal_tryouts.id')
+            ->join('tryout_categories', 'soal_tryouts.category_id', '=', 'tryout_categories.id')
+            ->where('tryout_jawaban_peserta.user_id', $userId)
+            ->select('tryout_categories.admin_tryout_id as tryout_id')
+            ->distinct()
+            ->pluck('tryout_id') 
+            ->toArray();
 
-        // Ambil 3 TO terbaru yang aktif & tanggal sekarang masih dalam rentang
-    $latestTryouts = AdminTryout::where('is_active', true)
-        ->orderBy('tanggal', 'desc')
-        ->take(3)
-        ->get()
-        ->map(function ($to) use ($now, $userId) {
-            // Status sudah dikerjakan
-            $sudahDikerjakan = DB::table('tryout_jawaban_peserta')
-                ->join('soal_tryouts', 'tryout_jawaban_peserta.soal_id', '=', 'soal_tryouts.id')
-                ->join('tryout_categories', 'soal_tryouts.category_id', '=', 'tryout_categories.id')
-                ->where('tryout_jawaban_peserta.user_id', $userId)
-                ->where('tryout_categories.admin_tryout_id', $to->id)
-                ->exists();
+        // 6. Ambil 3 TO terbaru untuk section "Terbaru"
+        $latestTryouts = AdminTryout::where('is_active', true)
+            ->orderBy('tanggal', 'desc')
+            ->take(3)
+            ->get()
+            ->map(function ($to) use ($now, $userId, $userResults) {
+                $to->sudah_dikerjakan = in_array($to->id, $userResults);
+                $to->is_open = ($to->tanggal <= $now && $to->tanggal_akhir >= $now) && !$to->sudah_dikerjakan;
+                $to->is_locked = !DB::table('user_target_tryouts')->where('user_id', $userId)->exists();
+                return $to;
+            });
 
-            // Apakah TO bisa dikerjakan sekarang
-            $is_open = $to->tanggal <= $now && $to->tanggal_akhir >= $now;
-
-            // Bisa pakai logika “locked” misal belum pilih target
-            $hasTarget = DB::table('user_target_tryouts')->where('user_id', $userId)->exists();
-
-            $to->sudah_dikerjakan = $sudahDikerjakan;
-            $to->is_open = $is_open && !$sudahDikerjakan;
-            $to->is_locked = !$hasTarget;
-
-            return $to;
-        });
-
-        // 6. Tentukan status ketersediaan & Kunci Tryout
+        // 7. Transform status Tryout di list utama
         $tryouts->transform(function ($item) use ($now, $userResults, $userTarget) {
-        $isWithinDate = ($now >= $item->tanggal && $now <= $item->tanggal_akhir);
-        
-        // Pengecekan apakah ID tryout ada di dalam array hasil pengerjaan
-        $sudahDikerjakan = in_array($item->id, $userResults);
+            $isWithinDate = ($now >= $item->tanggal && $now <= $item->tanggal_akhir);
+            $sudahDikerjakan = in_array($item->id, $userResults);
 
-        // LOGIKA BARU: is_available hanya untuk akses "Mengerjakan" (tombol biru)
-        $item->is_available = ($item->is_active && $isWithinDate && !$sudahDikerjakan && $userTarget);
-        
-        $item->is_locked_by_target = !$userTarget;
-        $item->sudah_dikerjakan = $sudahDikerjakan;
+            $item->is_available = ($item->is_active && $isWithinDate && !$sudahDikerjakan && $userTarget);
+            $item->is_locked_by_target = !$userTarget;
+            $item->sudah_dikerjakan = $sudahDikerjakan;
 
-        return $item;
+            return $item;
         });
 
         return view('tryout.index', compact('tryouts', 'userResults', 'userTarget', 'peluangLolos', 'allUnivs', 'latestTryouts'));

@@ -100,7 +100,7 @@
                 class="fa-solid fa-magnifying-glass absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-blue-300 text-sm md:text-xl"></i>
         </div>
 
-        {{-- FORM ADD SOAL (AUTO RESIZE) --}}
+        {{-- FORM ADD SOAL --}}
         <div x-show="showFormAdd" x-cloak class="mb-8" x-transition>
             <div class="bg-white p-4 md:p-6 rounded-[2rem] md:rounded-3xl shadow-xl border-b-8 border-blue-400">
                 <textarea x-model="newText" x-ref="newTextarea"
@@ -147,18 +147,12 @@
                                                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
                                             });
 
-                                            if(response.ok){
-                                                const now = new Date();
-                                                const deletedAt = now.toLocaleString('id-ID');
-
-                                                history.unshift({ ...soal, deletedAt, id_history: Date.now() });
-                                                localStorage.setItem('recycle_bin_soal', JSON.stringify(history));
-
-                                                questions = questions.filter(q => q.id !== soal.id);
-                                            }
-                                        } catch(e){
-                                            Swal.fire('Error', 'Gagal menghapus', 'error')
-                                        }
+                                    if(response.ok){
+                                        const now = new Date();
+                                        const deletedAt = now.toLocaleString('id-ID');
+                                        history.unshift({ ...soal, deletedAt, id_history: Date.now() });
+                                        localStorage.setItem('recycle_bin_soal', JSON.stringify(history));
+                                        questions = questions.filter(q => q.id !== soal.id);
                                     }
                                 })
                                 "
@@ -196,6 +190,7 @@
                     class="fa-solid fa-chevron-right text-xs"></i></button>
         </div>
 
+        {{-- IMPORT MODAL --}}
         <div x-show="showImportModal" x-cloak class="fixed inset-0 z-[100] overflow-y-auto">
             <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="showImportModal = false">
             </div>
@@ -304,25 +299,19 @@
                                         showCancelButton: true,
                                         confirmButtonColor: '#22c55e',
                                         confirmButtonText: 'Ya, Pulihkan!',
-                                        cancelButtonText: 'Batal',
-                                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm', cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
                                         }).then(async (result) => {
                                             if(result.isConfirmed){
                                                 try {
                                                     const response = await fetch('{{ route('admin.minatBakat.soal.restore') }}', {
                                                         method: 'POST',
-                                                        headers: {
-                                                            'Content-Type': 'application/json',
-                                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                                            'Accept': 'application/json'
-                                                        },
+                                                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
                                                         body: JSON.stringify({ text: h.text, category: categoryName })
                                                     });
 
                                                     if(response.ok){
                                                         const restored = await response.json();
                                                         questions.unshift(restored);
-
                                                         history = history.filter(item => item.id_history !== h.id_history);
                                                         localStorage.setItem('recycle_bin_soal', JSON.stringify(history));
                                                     }
@@ -330,17 +319,14 @@
                                                     Swal.fire('Error', 'Gagal restore', 'error')
                                                 }
                                             }
-                                        })
-                                        "
-                                        class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
+                                        })"
+                                        class="text-blue-500 px-2 py-1 rounded-lg text-xs hover:bg-blue-600 hover:text-white transition-all shadow-sm"> 
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8 8 0 0116 0 8 8 0 01-16 0z" />
                                         </svg>
                                     </button>
-                                    <button
-                                        @click="
+                                   <button 
+                                    @click="
                                     Swal.fire({
                                         title: 'Hapus Permanen?',
                                         text: 'Data tidak bisa dikembalikan!',
@@ -349,21 +335,17 @@
                                         showCancelButton: true,
                                         confirmButtonColor: '#ef4444',
                                         confirmButtonText: 'Ya, Hapus!',
-                                        cancelButtonText: 'Batal',
-                                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm',   cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
+                                        customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold', confirmButton: 'px-5 py-2.5 rounded-xl text-sm', cancelButton: 'px-5 py-2.5 rounded-xl text-sm bg-gray-100 text-gray-600 hover:bg-gray-200' }
                                             }).then((result) => {
                                                 if(result.isConfirmed){
                                                     history = history.filter(item => item.id_history !== h.id_history);
                                                     localStorage.setItem('recycle_bin_soal', JSON.stringify(history));
                                                 }
-                                            })
-                                            "
-                                        class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="2" stroke="currentColor" class="size-5">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                        </svg>
+                                            })"
+                                            class="text-red-500 px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                            </svg>
                                     </button>
                                 </div>
                             </div>
@@ -372,8 +354,6 @@
                 </div>
             </div>
         </div>
-
-
 
     </div>
 
@@ -393,7 +373,6 @@
                 actionId: null,
                 actionText: '',
                 selectedItem: null,
-
                 history: JSON.parse(localStorage.getItem('recycle_bin_soal') || '[]'),
 
                 saveHistory() {
@@ -412,93 +391,145 @@
                 },
 
                 unduhTemplate() {
-                    const wb = XLSX.utils.book_new();
-                    let header, filename;
-                    if (this.importMode === 'single') {
-                        header = [
-                            ['Pertanyaan']
-                        ];
-                        filename = `Template_Soal_${this.categoryName}.xlsx`;
-                    } else {
-                        header = [
-                            ['Kategori', 'Pertanyaan']
-                        ];
-                        filename = `Template_Semua_Kategori.xlsx`;
-                    }
-                    const dummy = this.importMode === 'single' ? [
-                        ['Contoh soal...']
-                    ] : [
-                        [this.categoryName, 'Contoh soal...']
-                    ];
-                    const ws = XLSX.utils.aoa_to_sheet([...header, ...dummy]);
-                    XLSX.utils.book_append_sheet(wb, ws, "Soal");
-                    XLSX.writeFile(wb, filename);
-                },
+    const wb = XLSX.utils.book_new();
+    let header, filename;
+
+    if (this.importMode === 'single') {
+        header = [['Pertanyaan']];
+        filename = `Template_Soal_${this.categoryName}.xlsx`;
+        const dummy = [['Contoh soal...']];
+        const ws = XLSX.utils.aoa_to_sheet([...header, ...dummy]);
+        XLSX.utils.book_append_sheet(wb, ws, "Soal");
+    } else {
+        // --- LOGIKA UNTUK SEMUA KATEGORI ---
+        header = [['Kategori', 'Pertanyaan']];
+        filename = `Template_Semua_Kategori.xlsx`;
+        const dummy = [[this.categoryName, 'Contoh soal...']];
+        
+        // 1. Sheet Utama (Input Soal)
+        const ws = XLSX.utils.aoa_to_sheet([...header, ...dummy]);
+        XLSX.utils.book_append_sheet(wb, ws, "Soal");
+
+        // 2. Sheet Referensi (Otomatis dari Database)
+        // Mengambil data dari variable yang dikirim oleh Controller
+        const categoriesFromDb = @json($allCategories ?? []);
+        
+        // Buat data untuk sheet referensi
+        const refData = [["DAFTAR KATEGORI ACUAN"]]; // Header sheet referensi
+        categoriesFromDb.forEach(cat => {
+            refData.push([cat]); // Masukkan tiap nama kategori ke baris baru
+        });
+
+        const wsRef = XLSX.utils.aoa_to_sheet(refData);
+
+        // Atur lebar kolom agar rapi (Opsional)
+        wsRef['!cols'] = [{ wch: 30 }]; 
+
+        // Tambahkan sheet referensi ke dalam file Excel
+        XLSX.utils.book_append_sheet(wb, wsRef, "Referensi Kategori");
+
+        // Tampilkan notifikasi kecil agar Admin tahu ada sheet acuan
+        Swal.fire({
+            icon: 'info',
+            title: 'Template Diunduh',
+            text: 'Lihat sheet "Referensi Kategori" di dalam Excel untuk melihat daftar kategori yang valid.',
+            confirmButtonColor: '#4A72D4',
+            customClass: { popup: 'rounded-[2rem]' }
+        });
+    }
+
+    XLSX.writeFile(wb, filename);
+},
 
                 async importExcel(event) {
-                    const file = event.target.files[0];
-                    if (!file) return;
+    const file = event.target.files[0];
+    if (!file) return;
 
-                    const reader = new FileReader();
+    // Tampilkan Loading (SweetAlert2)
+    Swal.fire({
+        title: 'Sedang Memproses...',
+        text: 'Mohon tunggu sebentar data sedang diimpor',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        },
+        customClass: {
+            popup: 'rounded-[2rem] shadow-xl',
+            title: 'text-lg font-bold'
+        }
+    });
 
-                    reader.onload = async (e) => {
-                        try {
-                            const data = new Uint8Array(e.target.result);
-                            const workbook = XLSX.read(data, {
-                                type: 'array'
-                            });
-                            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                            const jsonData = XLSX.utils.sheet_to_json(sheet, {
-                                header: 1
-                            });
-
-                            const response = await fetch('{{ route('admin.minatBakat.soal.importBulk') }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                    'Accept': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    data: jsonData,
-                                    mode: this.importMode,
-                                    current_category: this.categoryName
-                                })
-                            });
-
-                            if (response.ok) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Data berhasil diimport',
-                                    width: '340px',
-                                    padding: '1.8rem',
-                                    confirmButtonColor: '#4A72D4',
-                                    customClass: {
-                                        popup: 'rounded-3xl shadow-xl',
-                                        title: 'text-lg font-bold',
-                                        confirmButton: 'rounded-xl px-6 py-2'
-                                    }
-                                }).then(() => location.reload());
-                            } else {
-                                throw new Error();
-                            }
-
-                        } catch (err) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Data Gagal Tersimpan!',
-                                width: '340px',
-                                confirmButtonColor: '#ef4444',
-                                customClass: {
-                                    popup: 'rounded-3xl shadow-xl',
-                                    title: 'text-lg font-bold'
-                                }
-                            });
-                        }
-                    };
-
-                    reader.readAsArrayBuffer(file);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            
+            const response = await fetch('{{ route("admin.minatBakat.soal.importBulk") }}', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                    'Accept': 'application/json' 
                 },
+                body: JSON.stringify({ 
+                    data: jsonData, 
+                    mode: this.importMode,
+                    current_category: this.categoryName 
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Notifikasi Berhasil (SweetAlert2)
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: result.message || 'Data soal berhasil diimport.',
+                    confirmButtonColor: '#4A72D4',
+                    confirmButtonText: 'Selesai',
+                    customClass: {
+                        popup: 'rounded-[2rem] shadow-xl',
+                        title: 'text-xl font-bold',
+                        confirmButton: 'px-8 py-2.5 rounded-xl text-sm font-bold uppercase'
+                    }
+                }).then(() => {
+                    window.location.reload(); 
+                });
+            } else {
+                // Notifikasi Gagal dari Server
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Import',
+                    text: result.message,
+                    confirmButtonColor: '#ef4444',
+                    customClass: {
+                        popup: 'rounded-[2rem] shadow-xl',
+                        confirmButton: 'px-8 py-2.5 rounded-xl text-sm'
+                    }
+                });
+            }
+        } catch (err) {
+            // Notifikasi Error Pembacaan File
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Terjadi kesalahan saat membaca file Excel.',
+                confirmButtonColor: '#ef4444',
+                customClass: {
+                    popup: 'rounded-[2rem] shadow-xl'
+                }
+            });
+        }
+    };
+    reader.readAsArrayBuffer(file);
+    
+    // Reset input file agar bisa upload file yang sama jika gagal
+    event.target.value = '';
+},
 
                 async saveNew() {
                     if (!this.newText.trim()) return;
@@ -520,8 +551,7 @@
                             this.questions.unshift(newSoal);
                             this.newText = '';
                             this.showFormAdd = false;
-                            this.currentPage = 1;
-                            // Reset tinggi textarea
+                            this.currentPage = 1; 
                             if (this.$refs.newTextarea) this.$refs.newTextarea.style.height = 'auto';
                         }
                     } catch (e) {

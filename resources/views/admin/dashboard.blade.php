@@ -173,15 +173,204 @@
         </aside>
 
         <main class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
+            <header class="flex flex-col lg:flex-row lg:items-center justify-between pb-4 gap-4 flex-shrink-0 w-full">
+    <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
+        <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
 
-            <header
-                class="flex flex-col lg:flex-row lg:items-center justify-between lg:pt-4 pb-4 gap-4 flex-shrink-0 w-full">
-                <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
-                    <button @click="mobileMenuOpen = true"
-                        class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
-                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
+        @php
+            use Illuminate\Support\Facades\Auth;
+            $user = Auth::user();
+            // Mengambil nama depan saja untuk tampilan ringkas di bar
+            $firstName = explode(' ', trim($user->name))[0];
+        @endphp
+
+        <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
+            <div @click="open = !open" 
+                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto ml-auto">
+                
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden border-2 border-white shrink-0">
+                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=4A72D4&color=fff' }}" 
+                             alt="{{ $user->name }}" class="w-full h-full object-cover">
+                    </div>
+                    <span class="font-bold text-sm text-gray-700 truncate">{{ $firstName }}</span>
+                </div>
+                
+                <i class="fa-solid fa-chevron-down text-gray-400 text-[10px]"></i>
+            </div>
+
+            <div x-show="open" 
+                x-cloak
+                @click.away="open = false"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
+                x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                class="absolute right-0 mt-3 w-64 bg-white rounded-[20px] shadow-2xl border border-gray-100 z-[100] overflow-hidden">
+                
+                <div class="p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                    <p class="font-extrabold text-gray-800 leading-tight">{{ $user->name }}</p>
+                    <p class="text-[11px] text-gray-400 mt-1 truncate">{{ $user->email }}</p>
+                </div>
+                
+                <div class="p-4 flex flex-col gap-2 bg-white">
+                    <div class="flex items-center gap-3 text-xs text-gray-500 p-2 bg-gray-50 rounded-xl border border-gray-100">
+                        <i class="fa-solid fa-phone text-blue-400"></i>
+                        <span>{{ $user->no_hp ?? 'No HP belum diatur' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div x-data="{
+            keyword: '',
+            routes: {
+                'dashboard': '{{ route('admin.dashboard.index') }}',
+                'user': '{{ route('admin.user.index') }}',
+                'streak': '{{ route('admin.streak.index') }}',
+                'monitoring': '{{ route('admin.laporan.index') }}',
+                'video': '{{ route('admin.videoPembelajaran.index') }}',
+                'peluang': '{{ route('admin.peluang.index') }}',
+                'tryout': '{{ route('admin.tryout.index') }}',
+                'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                'kuis': '{{ route('admin.kuis.index') }}',
+                'latihan': '{{ route('admin.latihan.index') }}'
+            },
+            goToPage(){
+                let search = this.keyword.toLowerCase().trim();
+                if(!search) return;
+                for (let key in this.routes) {
+                    if (key.includes(search)) {
+                        window.location.href = this.routes[key];
+                        return;
+                    }
+                }
+                alert('Halaman tidak ditemukan');
+            }
+        }"
+        class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1"
+    >
+        <div class="relative w-full group">
+            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 group-focus-within:text-[#4A72D4] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+            </div>
+            <input 
+                type="text" 
+                x-model="keyword" 
+                placeholder="Cari halaman..." 
+                @keydown.enter="goToPage()"
+                class="w-full bg-white border-none rounded-full py-3.5 pl-14 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm placeholder:text-gray-400 font-medium"
+            >
+        </div>
+
+        <button 
+            @click="goToPage()" 
+            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-7 py-3.5 rounded-full text-sm font-extrabold shadow-lg shadow-blue-100 transition-all active:scale-95 shrink-0"
+        >
+            Cari
+        </button>
+    </div>
+</header>
+
+          <div class="grid grid-cols-12 gap-6 pb-8">
+    <div class="col-span-12 bg-white rounded-[20px] p-6 lg:p-8 lg:pb-12 shadow-sm border border-blue-50 relative overflow-hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+            <h2 class="text-xl font-bold text-[#4A72D4]">
+                Perbandingan Pendaftar akun
+                <span class="text-[#3B455E] font-medium text-lg">dalam setahun</span>
+            </h2>
+        </div>
+
+        @php
+            $barWidth = 33;   
+            $spacing = 40;  
+            $offset = 50;    
+            $chartHeight = 165;
+            $totalData = count($months);
+            $chartWidth = ($totalData * ($barWidth + $spacing)) + $offset;
+            $maxValue = max($months);
+            $steps = 5;
+            $stepValue = $maxValue > 0 ? ceil($maxValue / ($steps - 1)) : 1;
+            $chartMax = $stepValue * ($steps - 1);
+        @endphp
+
+        <div class="w-full mt-4 relative">
+            <div class="overflow-x-auto pb-4 scrollbar-hide lg:overflow-visible">
+                <div style="min-width: {{ $chartWidth }}px;" class="h-64 px-6">
+                    <svg viewBox="0 0 {{ $chartWidth }} 240" class="w-full h-full" preserveAspectRatio="xMinYMid meet">
+                        <g stroke="#F1F5F9" stroke-width="1">
+                            <line x1="0" y1="180" x2="{{ $chartWidth }}" y2="180" />
+                            <line x1="0" y1="140" x2="{{ $chartWidth }}" y2="140" />
+                            <line x1="0" y1="100" x2="{{ $chartWidth }}" y2="100" />
+                            <line x1="0" y1="60" x2="{{ $chartWidth }}" y2="60" />
+                            <line x1="0" y1="20" x2="{{ $chartWidth }}" y2="20" />
+                        </g>
+
+                        @php $i = 0; @endphp
+                        @foreach($months as $index => $value)
+                            @php
+                                $x = $i * ($barWidth + $spacing) + $offset;
+                                $height = $chartMax > 0 ? ($value / $chartMax) * $chartHeight : 0;
+                                $y = 180 - $height;
+                                $i++;
+                            @endphp
+
+                            <rect x="{{ $x }}" y="{{ $y }}" width="{{ $barWidth }}" height="{{ $height }}" rx="8" fill="#4A72D4" class="hover:opacity-80 transition" />
+                            <text x="{{ $x + ($barWidth/2) }}" y="230" text-anchor="middle" class="text-[10px] font-bold fill-gray-400 uppercase tracking-widest">
+                                {{ \Carbon\Carbon::create()->month($index)->format('M') }}
+                            </text>
+                        @endforeach
+                    </svg>
+                </div>
+            </div>
+
+            <div class="absolute inset-y-0 left-0 flex flex-col justify-between text-[10px] text-gray-400 font-bold py-2 pointer-events-none bg-white/80 pr-2" style="height: 180px; top: 16px;">
+                @php
+                    $ySteps = 4;
+                    $yStepValue = $maxValue > 0 ? ceil($maxValue / $ySteps) : 1;
+                @endphp
+                @for ($i = $ySteps; $i >= 0; $i--)
+                    <span>{{ $i * $yStepValue }}</span>
+                @endfor
+            </div>
+        </div>
+
+        <div class="mt-10 flex items-center justify-between bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+            <div class="flex items-center gap-3">
+                <div class="w-4 h-4 bg-[#4A72D4] rounded-full"></div>
+                <span class="text-sm font-medium text-gray-600">Total pendaftar tahun ini</span>
+            </div>
+            <span class="text-lg font-bold text-[#4A72D4]">{{ array_sum($months) }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-12 gap-6">
+    <div class="col-span-12 lg:col-span-7 space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-[20px] p-6 lg:p-2 shadow-sm flex items-center gap-6 border border-blue-50">
+                <div class="w-14 h-14 bg-[#A6C1FF] rounded-full shrink-0 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#4A72D4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9.003 9.003 0 0112 15c2.21 0 4.21.896 5.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-[#4A72D4] text-xl font-bold">Total Peserta</p>
+                    <h3 class="text-2xl font-bold text-gray-700"> {{ number_format($totalUsers) }}</h3>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[20px] p-6 lg:p-2 shadow-sm border border-blue-50">
+                <div class="flex items-center gap-6">
+                    <div class="w-14 h-14 bg-[#5BB58D] rounded-full shrink-0 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l7 4v6c0 5.25-3.75 10-7 10s-7-4.75-7-10V6l7-4z" />
                         </svg>
                     </button>
 

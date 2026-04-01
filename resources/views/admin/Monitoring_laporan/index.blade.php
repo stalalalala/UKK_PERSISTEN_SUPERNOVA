@@ -9,11 +9,12 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        * { font-family: 'Poppins', sans-serif !important; }
+        body { font-family: 'Poppins', sans-serif; }
+        h1, h2, h3, h4, h5, h6, p, span, button, div { font-family: 'Poppins', sans-serif; }
         [x-cloak] { display: none !important; }
         .log-scroll::-webkit-scrollbar { width: 4px; }
         .log-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -161,9 +162,8 @@
 </aside>
 
         <main class="h-full overflow-y-auto log-scroll p-6 lg:p-10">
-            <header class="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4 w-full">
+            <header class="flex flex-col lg:flex-row lg:items-center justify-between pb-4 gap-4 flex-shrink-0 w-full">
     <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
-        
         <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
             <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -173,36 +173,43 @@
         @php
             use Illuminate\Support\Facades\Auth;
             $user = Auth::user();
+            // Mengambil nama depan saja untuk tampilan ringkas di bar
+            $firstName = explode(' ', trim($user->name))[0];
         @endphp
 
         <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
             <div @click="open = !open" 
-                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
+                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto ml-auto">
                 
                 <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
-                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}" 
-                             alt="Admin" class="w-full h-full object-cover">
+                    <div class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden border-2 border-white shrink-0">
+                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=4A72D4&color=fff' }}" 
+                             alt="{{ $user->name }}" class="w-full h-full object-cover">
                     </div>
-                    <span class="font-bold text-sm text-gray-700 truncate lg:max-w-none">Admin</span>
+                    <span class="font-bold text-sm text-gray-700 truncate">{{ $firstName }}</span>
                 </div>
                 
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 text-gray-500">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                </svg>
+                <i class="fa-solid fa-chevron-down text-gray-400 text-[10px]"></i>
             </div>
 
-            <div x-show="open" @click.away="open = false"
-                class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+            <div x-show="open" 
+                x-cloak
+                @click.away="open = false"
                 x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0 transform scale-95"
-                x-transition:enter-end="opacity-100 transform scale-100">
-                <div class="p-4 bg-gray-50/50 border-b border-gray-100">
-                    <p class="font-bold text-gray-800">{{ $user->name }}</p>
-                    <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
+                x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
+                x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                class="absolute right-0 mt-3 w-64 bg-white rounded-[20px] shadow-2xl border border-gray-100 z-[100] overflow-hidden">
+                
+                <div class="p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                    <p class="font-extrabold text-gray-800 leading-tight">{{ $user->name }}</p>
+                    <p class="text-[11px] text-gray-400 mt-1 truncate">{{ $user->email }}</p>
                 </div>
-                <div class="p-4 text-xs text-gray-500 bg-white">
-                    {{ $user->no_hp ?? '-' }}
+                
+                <div class="p-4 flex flex-col gap-2 bg-white">
+                    <div class="flex items-center gap-3 text-xs text-gray-500 p-2 bg-gray-50 rounded-xl border border-gray-100">
+                        <i class="fa-solid fa-phone text-blue-400"></i>
+                        <span>{{ $user->no_hp ?? 'No HP belum diatur' }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -223,21 +230,22 @@
                 'latihan': '{{ route('admin.latihan.index') }}'
             },
             goToPage(){
-                let search = this.keyword.toLowerCase()
+                let search = this.keyword.toLowerCase().trim();
+                if(!search) return;
                 for (let key in this.routes) {
                     if (key.includes(search)) {
-                        window.location.href = this.routes[key]
-                        return
+                        window.location.href = this.routes[key];
+                        return;
                     }
                 }
-                alert('Halaman tidak ditemukan')
+                alert('Halaman tidak ditemukan');
             }
         }"
         class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1"
     >
-        <div class="relative w-full">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="relative w-full group">
+            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 group-focus-within:text-[#4A72D4] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                 </svg>
             </div>
@@ -246,13 +254,13 @@
                 x-model="keyword" 
                 placeholder="Cari halaman..." 
                 @keydown.enter="goToPage()"
-                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm"
+                class="w-full bg-white border-none rounded-full py-3.5 pl-14 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm placeholder:text-gray-400 font-medium"
             >
         </div>
 
         <button 
             @click="goToPage()" 
-            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0"
+            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-7 py-3.5 rounded-full text-sm font-extrabold shadow-lg shadow-blue-100 transition-all active:scale-95 shrink-0"
         >
             Cari
         </button>
@@ -505,29 +513,86 @@
         </main>
     </div>
 
-    <div x-show="showDraftDetail" x-transition x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
-        <div @click.away="showDraftDetail = false" class="bg-white rounded-[2rem] w-full max-w-2xl overflow-hidden shadow-2xl">
-            <div class="bg-slate-900 p-8 text-white flex justify-between items-center">
-                <h4 class="text-xl font-black uppercase" x-text="selectedDraftTitle"></h4>
-                <button @click="showDraftDetail = false" class="text-slate-500 hover:text-white"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    <div x-show="showDraftDetail" 
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0 scale-95"
+     x-transition:enter-end="opacity-100 scale-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100 scale-100"
+     x-transition:leave-end="opacity-0 scale-95"
+     x-cloak 
+     class="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-slate-900/90 backdrop-blur-md">
+    
+    <div @click.away="showDraftDetail = false" 
+         class="bg-white rounded-[1.5rem] sm:rounded-[2rem] w-full max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-white/20">
+        
+        <div class="bg-slate-900 p-5 sm:p-8 text-white flex justify-between items-start gap-4">
+            <div class="min-w-0"> <h4 class="text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-tight truncate" x-text="selectedDraftTitle"></h4>
+                <p class="text-slate-400 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold mt-1">Laporan Aktivitas Mingguan</p>
+                
+                <button 
+                    @click="window.location.href = `{{ route('admin.laporan.download-pdf') }}?year=${selectedCriteria.year}&month=${selectedCriteria.month}&week=${selectedCriteria.week}`"
+                    class="mt-4 sm:mt-5 flex items-center gap-2 sm:gap-3 bg-[#4A72D4] hover:bg-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black transition-all uppercase tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 group"
+                >
+                    <i class="fa-solid fa-file-pdf text-xs sm:text-sm group-hover:rotate-12 transition-transform"></i>
+                    <span class="hidden xs:inline">Cetak Draf Ke PDF</span>
+                    <span class="xs:hidden">Cetak PDF</span>
+                </button>
             </div>
-            <div class="p-8 max-h-[400px] overflow-y-auto log-scroll">
+
+            <button @click="showDraftDetail = false" 
+                    class="shrink-0 bg-white/5 hover:bg-white/10 p-2 sm:p-3 rounded-xl text-slate-500 hover:text-white transition-all">
+                <svg class="w-5 h-5 sm:w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-4 sm:p-8 overflow-y-auto log-scroll bg-slate-50/50 flex-1">
+            <div class="space-y-4 sm:space-y-1">
                 <template x-for="log in filteredLogsByDraft">
-                    <div class="flex gap-6 pb-6 border-b border-slate-100 mb-6 last:border-0">
-                        <div class="text-right min-w-[80px]">
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-6 pb-6 border-b border-slate-100 mb-6 last:border-0 last:mb-0 last:pb-0 group">
+                        
+                        <div class="flex sm:flex-col justify-between sm:justify-start items-center sm:items-end sm:min-w-[100px] bg-white sm:bg-transparent p-2 sm:p-0 rounded-lg border sm:border-0 border-slate-100 shadow-sm sm:shadow-none">
                             <p class="text-[10px] font-black text-[#4A72D4] uppercase" x-text="log.hari"></p>
-                            <p class="text-[9px] font-bold text-slate-300 italic" x-text="log.jam"></p>
+                            <p class="text-[9px] font-bold text-slate-400 sm:text-slate-300 italic group-hover:text-slate-400 transition-colors" x-text="log.jam"></p>
                         </div>
-                        <div>
-                            <p class="text-[11px] font-black text-slate-700" x-text="'Admin: ' + log.nama_admin"></p>
-                            <p class="text-xs font-black text-slate-800 mt-1" x-text="log.objek"></p>
-                            <p class="text-[11px] text-slate-500 mt-1 italic" x-text="'» ' + log.detail"></p>
+                        
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="hidden sm:block w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                                <p class="text-[10px] sm:text-[11px] font-black text-slate-500 uppercase tracking-wider truncate" x-text="'Admin: ' + log.nama_admin"></p>
+                            </div>
+                            <p class="text-xs sm:text-sm font-black text-slate-800 mt-1 sm:mt-1.5 leading-relaxed" x-text="log.objek"></p>
+                            
+                            <div class="mt-2 bg-white p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm group-hover:border-blue-100 transition-colors">
+                                <p class="text-[10px] sm:text-[11px] text-slate-500 italic leading-relaxed" x-text="'» ' + log.detail"></p>
+                            </div>
                         </div>
                     </div>
                 </template>
             </div>
+
+            <template x-if="filteredLogsByDraft.length === 0">
+                <div class="py-12 sm:py-20 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-slate-100 rounded-full mb-4">
+                        <i class="fa-solid fa-folder-open text-3xl sm:text-4xl text-slate-300"></i>
+                    </div>
+                    <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest px-4">Tidak ada aktivitas pada draf ini</p>
+                </div>
+            </template>
+        </div>
+
+        <div class="px-5 sm:px-8 py-3 sm:py-4 bg-white border-t border-slate-50 flex justify-between items-center">
+             <div class="flex gap-1">
+                 <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+                 <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+                 <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+             </div>
+             <p class="text-[8px] sm:text-[9px] font-bold text-slate-300 uppercase tracking-[0.2em]">Persisten Monitoring System</p>
         </div>
     </div>
+</div>
 
     @if(session('success'))
 <div 
