@@ -112,8 +112,10 @@ Route::middleware(['auth'])->group(function () {
 
 
         // Monitoring Laporan
+        Route::get('/laporan/download-pdf', [HalamanMonitoringLaporanController::class, 'downloadPDF'])->name('laporan.download-pdf');
         Route::post('/monitoringLaporan/destroy-multiple', [HalamanMonitoringLaporanController::class, 'destroyMultiple'])->name('laporan.destroy-multiple');
         Route::post('/monitoringLaporan/update-status-multiple', [HalamanMonitoringLaporanController::class, 'updateStatusMultiple'])->name('laporan.update-status-multiple');
+        
 
         Route::resource('monitoringLaporan', HalamanMonitoringLaporanController::class)->names('laporan');
      

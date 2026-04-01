@@ -13,7 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        * { font-family: 'Poppins', sans-serif !important; }
+        body { font-family: 'Poppins', sans-serif; }
+        h1, h2, h3, h4, h5, h6, p, span, button, div { font-family: 'Poppins', sans-serif; }
         [x-cloak] { display: none !important; }
         .log-scroll::-webkit-scrollbar { width: 4px; }
         .log-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -512,29 +513,86 @@
         </main>
     </div>
 
-    <div x-show="showDraftDetail" x-transition x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
-        <div @click.away="showDraftDetail = false" class="bg-white rounded-[2rem] w-full max-w-2xl overflow-hidden shadow-2xl">
-            <div class="bg-slate-900 p-8 text-white flex justify-between items-center">
-                <h4 class="text-xl font-black uppercase" x-text="selectedDraftTitle"></h4>
-                <button @click="showDraftDetail = false" class="text-slate-500 hover:text-white"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    <div x-show="showDraftDetail" 
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0 scale-95"
+     x-transition:enter-end="opacity-100 scale-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100 scale-100"
+     x-transition:leave-end="opacity-0 scale-95"
+     x-cloak 
+     class="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 bg-slate-900/90 backdrop-blur-md">
+    
+    <div @click.away="showDraftDetail = false" 
+         class="bg-white rounded-[1.5rem] sm:rounded-[2rem] w-full max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-white/20">
+        
+        <div class="bg-slate-900 p-5 sm:p-8 text-white flex justify-between items-start gap-4">
+            <div class="min-w-0"> <h4 class="text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-tight truncate" x-text="selectedDraftTitle"></h4>
+                <p class="text-slate-400 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold mt-1">Laporan Aktivitas Mingguan</p>
+                
+                <button 
+                    @click="window.location.href = `{{ route('admin.laporan.download-pdf') }}?year=${selectedCriteria.year}&month=${selectedCriteria.month}&week=${selectedCriteria.week}`"
+                    class="mt-4 sm:mt-5 flex items-center gap-2 sm:gap-3 bg-[#4A72D4] hover:bg-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black transition-all uppercase tracking-widest shadow-xl shadow-blue-500/20 active:scale-95 group"
+                >
+                    <i class="fa-solid fa-file-pdf text-xs sm:text-sm group-hover:rotate-12 transition-transform"></i>
+                    <span class="hidden xs:inline">Cetak Draf Ke PDF</span>
+                    <span class="xs:hidden">Cetak PDF</span>
+                </button>
             </div>
-            <div class="p-8 max-h-[400px] overflow-y-auto log-scroll">
+
+            <button @click="showDraftDetail = false" 
+                    class="shrink-0 bg-white/5 hover:bg-white/10 p-2 sm:p-3 rounded-xl text-slate-500 hover:text-white transition-all">
+                <svg class="w-5 h-5 sm:w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-4 sm:p-8 overflow-y-auto log-scroll bg-slate-50/50 flex-1">
+            <div class="space-y-4 sm:space-y-1">
                 <template x-for="log in filteredLogsByDraft">
-                    <div class="flex gap-6 pb-6 border-b border-slate-100 mb-6 last:border-0">
-                        <div class="text-right min-w-[80px]">
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-6 pb-6 border-b border-slate-100 mb-6 last:border-0 last:mb-0 last:pb-0 group">
+                        
+                        <div class="flex sm:flex-col justify-between sm:justify-start items-center sm:items-end sm:min-w-[100px] bg-white sm:bg-transparent p-2 sm:p-0 rounded-lg border sm:border-0 border-slate-100 shadow-sm sm:shadow-none">
                             <p class="text-[10px] font-black text-[#4A72D4] uppercase" x-text="log.hari"></p>
-                            <p class="text-[9px] font-bold text-slate-300 italic" x-text="log.jam"></p>
+                            <p class="text-[9px] font-bold text-slate-400 sm:text-slate-300 italic group-hover:text-slate-400 transition-colors" x-text="log.jam"></p>
                         </div>
-                        <div>
-                            <p class="text-[11px] font-black text-slate-700" x-text="'Admin: ' + log.nama_admin"></p>
-                            <p class="text-xs font-black text-slate-800 mt-1" x-text="log.objek"></p>
-                            <p class="text-[11px] text-slate-500 mt-1 italic" x-text="'» ' + log.detail"></p>
+                        
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="hidden sm:block w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+                                <p class="text-[10px] sm:text-[11px] font-black text-slate-500 uppercase tracking-wider truncate" x-text="'Admin: ' + log.nama_admin"></p>
+                            </div>
+                            <p class="text-xs sm:text-sm font-black text-slate-800 mt-1 sm:mt-1.5 leading-relaxed" x-text="log.objek"></p>
+                            
+                            <div class="mt-2 bg-white p-3 sm:p-4 rounded-xl border border-slate-100 shadow-sm group-hover:border-blue-100 transition-colors">
+                                <p class="text-[10px] sm:text-[11px] text-slate-500 italic leading-relaxed" x-text="'» ' + log.detail"></p>
+                            </div>
                         </div>
                     </div>
                 </template>
             </div>
+
+            <template x-if="filteredLogsByDraft.length === 0">
+                <div class="py-12 sm:py-20 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-slate-100 rounded-full mb-4">
+                        <i class="fa-solid fa-folder-open text-3xl sm:text-4xl text-slate-300"></i>
+                    </div>
+                    <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest px-4">Tidak ada aktivitas pada draf ini</p>
+                </div>
+            </template>
+        </div>
+
+        <div class="px-5 sm:px-8 py-3 sm:py-4 bg-white border-t border-slate-50 flex justify-between items-center">
+             <div class="flex gap-1">
+                 <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+                 <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+                 <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+             </div>
+             <p class="text-[8px] sm:text-[9px] font-bold text-slate-300 uppercase tracking-[0.2em]">Persisten Monitoring System</p>
         </div>
     </div>
+</div>
 
     @if(session('success'))
 <div 
