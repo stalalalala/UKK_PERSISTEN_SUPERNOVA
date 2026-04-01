@@ -49,6 +49,13 @@
 
             questions: [],
 
+            errors: {
+                subtes: '',
+                pertanyaan: '',
+                opsi: ['', '', '', '', ''],
+                benar: ''
+            },
+
             currentQuestion: {
                 materi: '',
                 gambar: null,
@@ -409,38 +416,53 @@
             simpanSoal() {
 
                 this.autoSaveSoal();
-                this.saveToLocal(); // 🔥 penting
+                this.saveToLocal(); // 🔥 tetap jalan
+
+                // ==========================
+                // RESET ERROR
+                // ==========================
+                this.errors = {
+                    subtes: '',
+                    pertanyaan: '',
+                    opsi: ['', '', '', '', ''],
+                    benar: ''
+                };
+
+                let valid = true;
 
                 // ==========================
                 // VALIDASI
                 // ==========================
                 if (!this.selectedSubtes) {
-                    alert("Subtes wajib dipilih!");
-                    return;
+                    this.errors.subtes = "Subtes wajib dipilih!";
+                    valid = false;
                 }
 
                 if (this.currentQuestion.pertanyaan.trim() === '') {
-                    alert("Pertanyaan wajib diisi!");
-                    return;
+                    this.errors.pertanyaan = "Pertanyaan wajib diisi!";
+                    valid = false;
                 }
-                // ✅ TAMBAH DI SINI
+
                 for (let i = 0; i < this.currentQuestion.opsi.length; i++) {
                     if (!this.currentQuestion.opsi[i] || this.currentQuestion.opsi[i].trim() === '') {
-                        alert(`Jawaban ${['A','B','C','D','E'][i]} wajib diisi!`);
-                        return;
+                        this.errors.opsi[i] = `Opsi ${['A','B','C','D','E'][i]} wajib diisi!`;
+                        valid = false;
                     }
                 }
 
                 if (this.currentQuestion.benar === null) {
-                    alert("Pilih jawaban benar!");
+                    this.errors.benar = "Pilih jawaban benar!";
+                    valid = false;
+                }
+
+                // ❌ STOP kalau ada error
+                if (!valid) {
                     return;
                 }
 
-
-
-
-
-
+                // ==========================
+                // SIMPAN DATA
+                // ==========================
                 let index = this.activeQuestion - 1;
 
                 this.questions[index] = {
@@ -461,16 +483,15 @@
                     jawaban_benar: ['a', 'b', 'c', 'd', 'e'][this.currentQuestion.benar],
                 };
 
-
-
                 this.soalTersimpan = this.questions.filter(q => q).length;
 
+                // ==========================
+                // PINDAH SOAL
+                // ==========================
                 if (this.activeQuestion < 20) {
                     this.activeQuestion++;
                     this.loadQuestion();
                 }
-
-
 
                 window.scrollTo({
                     top: 0,
@@ -572,23 +593,23 @@
             confirmLeave() {
 
                 Swal.fire({
-                title: 'Yakin ingin keluar?',
-                text: 'Perubahan kuis yang belum disimpan akan hilang.',
-                icon: 'warning',
-                width: '340px',
-                padding: '1.8rem',
-                showCancelButton: true,
-                confirmButtonColor: '#4A72D4',
-                cancelButtonColor: '#E5E7EB',
-                cancelButtonText: 'Batal',
-                confirmButtonText: 'Ya, keluar',    
-                customClass: {
-                    popup: 'rounded-3xl shadow-xl',
-                    title: 'text-lg font-bold text-gray-800',
-                    htmlContainer: 'text-sm text-gray-500',
-                    confirmButton: 'rounded-xl px-5 py-2',
-                    cancelButton: 'rounded-xl px-5 py-2'
-                }
+                    title: 'Yakin ingin keluar?',
+                    text: 'Perubahan kuis yang belum disimpan akan hilang.',
+                    icon: 'warning',
+                    width: '340px',
+                    padding: '1.8rem',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4A72D4',
+                    cancelButtonColor: '#E5E7EB',
+                    cancelButtonText: 'Batal',
+                    confirmButtonText: 'Ya, keluar',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-xl',
+                        title: 'text-lg font-bold text-gray-800',
+                        htmlContainer: 'text-sm text-gray-500',
+                        confirmButton: 'rounded-xl px-5 py-2',
+                        cancelButton: 'rounded-xl px-5 py-2'
+                    }
                 }).then((result) => {
 
                     if (result.isConfirmed) {
@@ -1043,6 +1064,8 @@ loadFromLocal()"
                                             </div>
                                         </div>
                                     </div>
+                                    <p x-show="errors.subtes" class="text-red-500 text-xs mt-1"
+                                        x-text="errors.subtes"></p>
 
                                     <div class="space-y-6">
 
@@ -1121,6 +1144,9 @@ loadFromLocal()"
                                                 class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none shadow-inner transition-all overflow-hidden resize-none"
                                                 placeholder="Masukkan teks pertanyaan di sini..." style="min-height: 120px;"></textarea>
                                         </div>
+                                        <p x-show="errors.pertanyaan" class="text-red-500 text-xs mt-1"
+                                            x-text="errors.pertanyaan"></p>
+
 
                                         <div class="grid grid-cols-1 gap-4">
                                             <template x-for="(opt, i) in ['a','b','c','d','e']">
@@ -1143,6 +1169,8 @@ loadFromLocal()"
                                                     }" x-init="resize()" @input="resize()"
                                                         class="flex-1 bg-transparent border-none outline-none text-sm font-medium resize-none overflow-hidden leading-relaxed"
                                                         placeholder="Tulis jawaban di sini..." style="min-height:60px;"></textarea>
+                                                    <p x-show="errors.opsi[i]" class="text-red-500 text-xs mt-1"
+                                                        x-text="errors.opsi[i]"></p>
 
                                                     <!-- Radio Button -->
                                                     <input type="radio" @click="currentQuestion.benar = i"
@@ -1152,6 +1180,8 @@ loadFromLocal()"
                                                 </div>
                                             </template>
                                         </div>
+                                        <p x-show="errors.benar" class="text-red-500 text-xs mt-2"
+                                            x-text="errors.benar"></p>
 
                                     </div>
 
