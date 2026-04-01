@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Karakter Streak - Admin | PERSISTEN</title>
-
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -89,34 +89,34 @@
 
             confirmLeave() {
 
-    Swal.fire({
-        title: 'Yakin ingin keluar?',
-        text: 'Karakter streak yang sedang dibuat akan hilang.',
-        icon: 'warning',
-        width: '340px',
-        padding: '1.8rem',
-        showCancelButton: true,
-        confirmButtonColor: '#4A72D4',
-        cancelButtonColor: '#E5E7EB',
-        cancelButtonText: 'Batal',
-        confirmButtonText: 'Ya, keluar',    
-        customClass: {
-            popup: 'rounded-3xl shadow-xl',
-            title: 'text-lg font-bold text-gray-800',
-            htmlContainer: 'text-sm text-gray-500',
-            confirmButton: 'rounded-xl px-5 py-2',
-            cancelButton: 'rounded-xl px-5 py-2'
-        }
-    }).then((result) => {
+                Swal.fire({
+                    title: 'Yakin ingin keluar?',
+                    text: 'Karakter streak yang sedang dibuat akan hilang.',
+                    icon: 'warning',
+                    width: '340px',
+                    padding: '1.8rem',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4A72D4',
+                    cancelButtonColor: '#E5E7EB',
+                    cancelButtonText: 'Batal',
+                    confirmButtonText: 'Ya, keluar',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-xl',
+                        title: 'text-lg font-bold text-gray-800',
+                        htmlContainer: 'text-sm text-gray-500',
+                        confirmButton: 'rounded-xl px-5 py-2',
+                        cancelButton: 'rounded-xl px-5 py-2'
+                    }
+                }).then((result) => {
 
-        if (result.isConfirmed) {
-            this.allowLeave = true
-            window.location.href = "{{ route('admin.streak.index') }}"
-        }
+                    if (result.isConfirmed) {
+                        this.allowLeave = true
+                        window.location.href = "{{ route('admin.streak.index') }}"
+                    }
 
-    })
+                })
 
-}
+            }
 
         }
 
@@ -135,12 +135,7 @@ svgPreviewAnimasi = null">
 
             <div class="flex items-center justify-between mb-10 px-2">
                 <div class="flex items-center gap-3">
-                    <div class="bg-white p-2 rounded-xl">
-                        <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                    </div>
+                    <img src="{{ asset('img/logo.svg') }}" alt="Logo" class="w-14 h-14">
                     <h1 class="text-2xl font-bold tracking-tight">P E R S I S T E N</h1>
                 </div>
                 <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">

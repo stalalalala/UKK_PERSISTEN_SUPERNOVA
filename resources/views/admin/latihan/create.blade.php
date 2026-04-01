@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Latihan Soal - Admin | PERSISTEN</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -48,6 +49,14 @@
             activeQuestion: 1,
             questions: [],
 
+            errors: {
+                subtes: '',
+                pertanyaan: '',
+                opsi: ['', '', '', '', ''],
+                benar: '',
+                pembahasan: ''
+            },
+
             currentQuestion: {
                 materi: '',
                 gambar: '',
@@ -68,6 +77,8 @@
 
                 localStorage.setItem('latihan_draft', JSON.stringify(data));
             },
+
+
 
             openPublishModal() {
 
@@ -313,6 +324,8 @@
                     }
                 };
 
+
+
                 reader.readAsArrayBuffer(file);
             },
 
@@ -379,35 +392,54 @@
             },
 
             simpanSoal() {
+
+                // 🔥 reset error dulu
+                this.errors = {
+                    subtes: '',
+                    pertanyaan: '',
+                    opsi: ['', '', '', '', ''],
+                    benar: '',
+                    pembahasan: ''
+                };
+
+                let isValid = true;
+
+                // ✅ VALIDASI
                 if (!this.selectedSubtes) {
-                    alert("Pilih Subtes dulu di bagian atas!");
-                    return;
+                    this.errors.subtes = "Subtes wajib dipilih!";
+                    isValid = false;
                 }
+
                 if (this.currentQuestion.pertanyaan.trim() === '') {
-                    alert("Pertanyaan tidak boleh kosong!");
-                    return;
+                    this.errors.pertanyaan = "Pertanyaan tidak boleh kosong!";
+                    isValid = false;
                 }
 
                 for (let i = 0; i < this.currentQuestion.opsi.length; i++) {
                     if (!this.currentQuestion.opsi[i] || this.currentQuestion.opsi[i].trim() === '') {
-                        alert(`Jawaban ${['A','B','C','D','E'][i]} wajib diisi!`);
-                        return;
+                        this.errors.opsi[i] = `Opsi ${['A','B','C','D','E'][i]} wajib diisi!`;
+                        isValid = false;
                     }
                 }
 
                 if (this.currentQuestion.benar === null) {
-                    alert("Pilih kunci jawaban (A-E)!");
-                    return;
+                    this.errors.benar = "Pilih kunci jawaban!";
+                    isValid = false;
                 }
 
                 if (this.currentQuestion.pembahasan.trim() === '') {
-                    alert("Pembahasan tidak boleh kosong!");
+                    this.errors.pembahasan = "Pembahasan wajib diisi!";
+                    isValid = false;
+                }
+
+                // ❌ STOP kalau ada error
+                if (!isValid) {
                     return;
                 }
 
+                // ✅ SIMPAN DATA
                 let index = this.activeQuestion - 1;
 
-                // Bungkus data agar sesuai dengan struktur database LatihanQuestion
                 this.questions[index] = {
                     materi: this.currentQuestion.materi,
                     gambar: this.currentQuestion.gambar,
@@ -427,7 +459,6 @@
                     this.saveCurrentDraft();
                     this.activeQuestion++;
                     this.loadQuestion();
-                    alert("Soal ke-" + (this.activeQuestion - 1) + " tersimpan sementara.");
                 } else {
                     alert("Semua 20 soal sudah terisi! Silakan klik 'Publish Latihan'.");
                 }
@@ -522,23 +553,23 @@
             confirmLeave() {
 
                 Swal.fire({
-                title: 'Yakin ingin keluar?',
-                text: 'Perubahan latihan yang belum disimpan akan hilang.',
-                icon: 'warning',
-                width: '340px',
-                padding: '1.8rem',
-                showCancelButton: true,
-                confirmButtonColor: '#4A72D4',
-                cancelButtonColor: '#E5E7EB',
-                cancelButtonText: 'Batal',
-                confirmButtonText: 'Ya, keluar',    
-                customClass: {
-                    popup: 'rounded-3xl shadow-xl',
-                    title: 'text-lg font-bold text-gray-800',
-                    htmlContainer: 'text-sm text-gray-500',
-                    confirmButton: 'rounded-xl px-5 py-2',
-                    cancelButton: 'rounded-xl px-5 py-2'
-                }
+                    title: 'Yakin ingin keluar?',
+                    text: 'Perubahan latihan yang belum disimpan akan hilang.',
+                    icon: 'warning',
+                    width: '340px',
+                    padding: '1.8rem',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4A72D4',
+                    cancelButtonColor: '#E5E7EB',
+                    cancelButtonText: 'Batal',
+                    confirmButtonText: 'Ya, keluar',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-xl',
+                        title: 'text-lg font-bold text-gray-800',
+                        htmlContainer: 'text-sm text-gray-500',
+                        confirmButton: 'rounded-xl px-5 py-2',
+                        cancelButton: 'rounded-xl px-5 py-2'
+                    }
                 }).then((result) => {
 
                     if (result.isConfirmed) {
@@ -569,12 +600,7 @@ loadFromLocal()"
 
             <div class="flex items-center justify-between mb-10 px-2">
                 <div class="flex items-center gap-3">
-                    <div class="bg-white p-2 rounded-xl">
-                        <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                    </div>
+                    <img src="{{ asset('img/logo.svg') }}" alt="Logo" class="w-14 h-14">
                     <h1 class="text-2xl font-bold tracking-tight">P E R S I S T E N</h1>
                 </div>
                 <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">
@@ -947,6 +973,8 @@ loadFromLocal()"
                                             </div>
                                         </div>
                                     </div>
+                                    <p x-show="errors.subtes" class="text-red-500 text-xs mt-1"
+                                        x-text="errors.subtes"></p>
 
                                     <div class="space-y-6" x-data="{ imageUrl: null }">
 
@@ -1029,6 +1057,8 @@ loadFromLocal()"
                                                 class="w-full bg-gray-50 border-none rounded-[25px] p-6 text-sm focus:bg-white focus:ring-2 focus:ring-blue-100 outline-none shadow-inner transition-all overflow-hidden resize-none"
                                                 placeholder="Masukkan teks pertanyaan di sini..." style="min-height: 120px;"></textarea>
                                         </div>
+                                        <p x-show="errors.pertanyaan" class="text-red-500 text-xs mt-1"
+                                            x-text="errors.pertanyaan"></p>
 
                                         <div class="grid grid-cols-1 gap-4">
                                             <template x-for="(opt, i) in ['a','b','c','d','e']">
@@ -1051,6 +1081,8 @@ loadFromLocal()"
                                                     }" x-init="resize()" @input="resize()"
                                                         class="flex-1 bg-transparent border-none outline-none text-sm font-medium resize-none overflow-hidden leading-relaxed"
                                                         placeholder="Tulis jawaban di sini..." style="min-height:60px;"></textarea>
+                                                    <p x-show="errors.opsi[i]" class="text-red-500 text-xs mt-1"
+                                                        x-text="errors.opsi[i]"></p>
 
                                                     <!-- Radio Button -->
                                                     <input type="radio" @click="currentQuestion.benar = i"
@@ -1059,7 +1091,11 @@ loadFromLocal()"
 
                                                 </div>
                                             </template>
+                                            <p x-show="errors.benar" class="text-red-500 text-xs mt-2"
+                                                x-text="errors.benar"></p>
+
                                         </div>
+
 
                                         <!-- PEMBAHASAN -->
                                         <div class="space-y-2 mt-8">
@@ -1080,6 +1116,8 @@ loadFromLocal()"
                                                 placeholder="Masukkan pembahasan soal di sini..." style="min-height:120px;">
     </textarea>
                                         </div>
+                                        <p x-show="errors.pembahasan" class="text-red-500 text-xs mt-1"
+                                            x-text="errors.pembahasan"></p>
 
                                     </div>
 

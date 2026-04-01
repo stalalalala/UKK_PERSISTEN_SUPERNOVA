@@ -6,6 +6,7 @@ use App\Models\UserXpLog;
 use App\Models\Character;
 use App\Models\StreakCharacter;
 use App\Models\StreakRestore;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class XpService
@@ -39,6 +40,8 @@ class XpService
             'xp' => $amount,
             'xp_date' => $today
         ]);
+
+        
 
 
         // Tambah XP
@@ -76,64 +79,79 @@ class XpService
 {
     if (!$user->last_xp_date) return;
 
-    // Gunakan diffInDays untuk mengecek selisih hari kalender
-    $days = Carbon::parse($user->last_xp_date)->startOfDay()
-    ->diffInDays(Carbon::today());
+    $lastDate = Carbon::parse($user->last_xp_date)->startOfDay();
+    $today = Carbon::today();
 
-    if ($days >= 5 && !$user->character_locked) { // GANTI KE 5 HARI
-        // Backup data
-        $user->backup_xp = $user->total_xp;
-        $user->backup_streak_days = $user->streak_days;
-        $user->backup_level = $user->level;
+    $days = $lastDate->diffInDays($today);
 
-        // Reset
-        $user->streak_days = 1;
-        $user->streak_active = false;
-        $user->total_xp = 0;
-        $user->level = 1;
-        $user->character_locked = true;
+  
 
-        $user->save();
-        $user->refresh(); // Penting agar instance user di memori terupdate
+    // 🔥 JANGAN reset kalau sudah pernah hangus
+    if ($days < 5 || $user->character_locked) {
+        return;
     }
+
+    // 🔥 BACKUP (cuma kalau belum ada backup)
+    $user->backup_xp = $user->total_xp;
+$user->backup_streak_days = $user->streak_days;
+$user->backup_level = $user->level;
+
+    // 🔥 RESET
+    $user->streak_days = 1;
+    $user->streak_active = false;
+    $user->total_xp = 0;
+    $user->level = 1;
+    $user->character_locked = true;
+
+    $user->save();
 }
 
     public function restoreStreak($user)
 {
     if ($user->streak_active) return false;
 
+    // ❗ WAJIB: cuma bisa restore kalau lagi ke-lock
+    if (!$user->character_locked) return false;
+
     $month = now()->month;
+    $year = now()->year;
 
     $used = StreakRestore::where('user_id', $user->id)
         ->whereMonth('restore_date', $month)
+        ->whereYear('restore_date', $year)
         ->exists();
 
-    if ($used) return false;
-
-    // Catat pemakaian
+    // 🔥 CATAT PEMAKAIAN
     StreakRestore::create([
         'user_id' => $user->id,
         'restore_date' => now()
     ]);
 
-    // 🔥 RESTORE
-    // 🔥 BALIKIN DATA LAMA
-$user->total_xp = $user->backup_xp ?? 0;
-$user->streak_days = $user->backup_streak_days ?? 1;
-$user->level = $user->backup_level ?? 1;
+    UserXpLog::where('user_id', $user->id)
+    ->where('source', 'login')
+    ->whereDate('xp_date', today())
+    ->delete();
 
-$user->streak_active = true;
-$user->last_xp_date = now();
+    if (!$used) {
+        // 🟢 RESTORE PERTAMA → BALIKIN DATA
+        $user->total_xp = $user->backup_xp ?? 0;
+        $user->streak_days = $user->backup_streak_days ?? 1;
+        $user->level = $user->backup_level ?? 1;
+    } else {
+        // 🔴 RESTORE KEDUA → RESET TOTAL
+        $user->total_xp = 0;
+        $user->streak_days = 1;
+        $user->level = 1;
+    }
 
-$user->character_locked = false;
+    $user->streak_active = true;
+    $user->last_xp_date = now();
+    $user->character_locked = false;
 
-// ❗ HAPUS BACKUP BIAR GA BISA DIPAKE LAGI
-$user->backup_xp = null;
-$user->backup_streak_days = null;
-$user->backup_level = null;
-
-    // (Optional) kasih XP awal biar ga terlalu kejam
-    // $user->total_xp = 50;
+    // ❗ HAPUS BACKUP
+    $user->backup_xp = null;
+    $user->backup_streak_days = null;
+    $user->backup_level = null;
 
     $user->save();
 

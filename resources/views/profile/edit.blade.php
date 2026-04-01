@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile | PERSISTEN</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -131,7 +132,7 @@
 
             {{-- Bagian Form --}}
             <div class="bg-white rounded-[20px] md:rounded-[35px] p-5 md:p-10 shadow-sm w-full border border-white">
-                
+
 
                 <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data"
                     class="space-y-4 md:space-y-6">
@@ -185,51 +186,51 @@
 
                     {{-- Password --}}
                     <div class="space-y-2" x-data="{
-                                password: '',
-                                confirm: '',
-                                passwordError: '',
-                                showPassword: false,
-                                showConfirm: false,
-
-                                validate() {
-                                    // kalau dua-duanya kosong → aman
-                                    if (!this.password && !this.confirm) {
-                                        this.passwordError = '';
-                                        return;
-                                    }
-
-                                    // kalau salah satu doang
-                                    if (!this.password || !this.confirm) {
-                                        this.passwordError = 'Password dan konfirmasi harus diisi keduanya';
-                                        return;
-                                    }
-
-                                    // validasi isi password
-                                    if (this.password.length < 6) {
-                                        this.passwordError = 'Minimal 6 karakter';
-                                        return;
-                                    }
-
-                                    if (!/[0-9]/.test(this.password)) {
-                                        this.passwordError = 'Wajib ada angka';
-                                        return;
-                                    }
-
-                                    if (!/[^A-Za-z0-9]/.test(this.password)) {
-                                        this.passwordError = 'Wajib ada simbol (@$!%*#?&)';
-                                        return;
-                                    }
-
-                                    // cek sama atau tidak
-                                    if (this.password !== this.confirm) {
-                                        this.passwordError = 'Konfirmasi password tidak sama';
-                                        return;
-                                    }
-
-                                    // lolos semua
-                                    this.passwordError = '';
-                                }
-                            }">
+                        password: '',
+                        confirm: '',
+                        passwordError: '',
+                        showPassword: false,
+                        showConfirm: false,
+                    
+                        validate() {
+                            // kalau dua-duanya kosong → aman
+                            if (!this.password && !this.confirm) {
+                                this.passwordError = '';
+                                return;
+                            }
+                    
+                            // kalau salah satu doang
+                            if (!this.password || !this.confirm) {
+                                this.passwordError = 'Password dan konfirmasi harus diisi keduanya';
+                                return;
+                            }
+                    
+                            // validasi isi password
+                            if (this.password.length < 6) {
+                                this.passwordError = 'Minimal 6 karakter';
+                                return;
+                            }
+                    
+                            if (!/[0-9]/.test(this.password)) {
+                                this.passwordError = 'Wajib ada angka';
+                                return;
+                            }
+                    
+                            if (!/[^A-Za-z0-9]/.test(this.password)) {
+                                this.passwordError = 'Wajib ada simbol (@$!%*#?&)';
+                                return;
+                            }
+                    
+                            // cek sama atau tidak
+                            if (this.password !== this.confirm) {
+                                this.passwordError = 'Konfirmasi password tidak sama';
+                                return;
+                            }
+                    
+                            // lolos semua
+                            this.passwordError = '';
+                        }
+                    }">
                         <label class="block text-[#4A5578] font-semibold text-sm ml-1">Kata Sandi (Kosongkan jika tidak
                             diubah)</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
@@ -242,13 +243,9 @@
                                         :class="passwordError ? 'bg-red-500' : ''">
                                         <i class="fa-solid fa-lock text-lg"></i>
                                     </div>
-                                    <input 
-                                    :type="showPassword ? 'text' : 'password'" 
-                                    name="password"
-                                    x-model="password"
-                                    @input="validate()"
-                                    placeholder="kata sandi baru"
-                                    class="w-full px-2 md:px-4 py-1 md:py-3 pr-10 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
+                                    <input :type="showPassword ? 'text' : 'password'" name="password"
+                                        x-model="password" @input="validate()" placeholder="kata sandi baru"
+                                        class="w-full px-2 md:px-4 py-1 md:py-3 pr-10 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
 
                                     <button type="button" @click="showPassword = !showPassword"
                                         class="absolute right-3 text-gray-400 hover:text-[#6EB4FF] transition-colors">
@@ -266,13 +263,9 @@
                                     class="bg-[#6EB4FF] px-2 md:px-4 py-1 md:py-3 text-white flex items-center justify-center">
                                     <i class="fa-solid fa-lock text-lg"></i>
                                 </div>
-                                <input 
-                                :type="showConfirm ? 'text' : 'password'" 
-                                name="password_confirmation"
-                                x-model="confirm"
-                                @input="validate()"
-                                placeholder="konfirmasi kata sandi baru"
-                                class="w-full px-2 md:px-4 py-1 md:py-3 pr-10 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
+                                <input :type="showConfirm ? 'text' : 'password'" name="password_confirmation"
+                                    x-model="confirm" @input="validate()" placeholder="konfirmasi kata sandi baru"
+                                    class="w-full px-2 md:px-4 py-1 md:py-3 pr-10 outline-none text-[#4A5578] text-xs md:text-sm font-medium placeholder:text-gray-300">
 
                                 <button type="button" @click="showConfirm = !showConfirm"
                                     class="absolute right-3 text-gray-400 hover:text-[#6EB4FF] transition-colors">
@@ -289,12 +282,10 @@
                                 Batal
                             </button>
                         </a>
-                        <button 
-                        type="submit"
-                        :disabled="passwordError"
-                        class="w-full sm:w-auto bg-[#6EB4FF] hover:bg-blue-500 text-white px-8 py-3 rounded-full font-medium shadow-lg text-xs md:text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Simpan Perubahan
-                    </button>
+                        <button type="submit" :disabled="passwordError"
+                            class="w-full sm:w-auto bg-[#6EB4FF] hover:bg-blue-500 text-white px-8 py-3 rounded-full font-medium shadow-lg text-xs md:text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Simpan Perubahan
+                        </button>
                     </div>
                 </form>
             </div>

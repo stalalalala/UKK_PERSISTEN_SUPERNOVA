@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Karakter Streak - Admin | PERSISTEN</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -92,7 +93,7 @@
 
             confirmLeave() {
 
-                 Swal.fire({
+                Swal.fire({
                     title: 'Yakin ingin keluar?',
                     text: 'Karakter streak yang sedang dibuat akan hilang.',
                     icon: 'warning',
@@ -102,7 +103,7 @@
                     confirmButtonColor: '#4A72D4',
                     cancelButtonColor: '#E5E7EB',
                     cancelButtonText: 'Batal',
-                    confirmButtonText: 'Ya, keluar',    
+                    confirmButtonText: 'Ya, keluar',
                     customClass: {
                         popup: 'rounded-3xl shadow-xl',
                         title: 'text-lg font-bold text-gray-800',
@@ -114,9 +115,13 @@
 
                     if (result.isConfirmed) {
 
+                        // 🔥 HAPUS DATA
+                        localStorage.removeItem('streakForm')
+                        localStorage.removeItem('svgPreview')
+                        localStorage.removeItem('svgPreviewAnimasi')
+
                         this.allowLeave = true
                         window.location.href = "{{ route('admin.streak.index') }}"
-
                     }
 
                 })
@@ -128,7 +133,12 @@
     }
 </script>
 
-<body class="bg-[#F4F7FF] text-[#2D3B61] overflow-hidden" x-data="{ ...streakPageGuard(), activeMenu: 'Manajemen Streak', mobileMenuOpen: false }" x-init="init()">
+<body class="bg-[#F4F7FF] text-[#2D3B61] overflow-hidden" x-data="{
+    ...streakPageGuard(),
+    ...streakForm(),
+    activeMenu: 'Manajemen Streak',
+    mobileMenuOpen: false
+}" x-init="init()">
 
     <div class="flex h-screen w-full relative">
 
@@ -138,12 +148,7 @@
 
             <div class="flex items-center justify-between mb-10 px-2">
                 <div class="flex items-center gap-3">
-                    <div class="bg-white p-2 rounded-xl">
-                        <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                    </div>
+                    <img src="{{ asset('img/logo.svg') }}" alt="Logo" class="w-14 h-14">
                     <h1 class="text-2xl font-bold tracking-tight">P E R S I S T E N</h1>
                 </div>
                 <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">
@@ -426,8 +431,8 @@
                     </div>
                 </div>
 
-                <form action="{{ route('admin.streak.store') }}" @submit="allowLeave = true" method="POST"
-                    enctype="multipart/form-data" x-data="streakForm()" x-init="init()">
+                <form action="{{ route('admin.streak.store') }}" @submit.prevent="submitForm" method="POST"
+                    enctype="multipart/form-data" x-init="init()">
                     @csrf
 
                     <div class="space-y-8">
@@ -458,20 +463,24 @@
                                         <label
                                             class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-[#4A72D4] transition-colors">Nama
                                             Karakter</label>
-                                        <input type="text" name="nama" x-model="form.nama" required
+                                        <input type="text" name="nama" x-model="form.nama"
                                             class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-5 py-4 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-[#4A72D4] transition-all outline-none text-gray-700 font-medium"
                                             placeholder="John Doe">
                                     </div>
+                                    <p x-show="errors.nama" class="text-red-500 text-xs mt-1" x-text="errors.nama">
+                                    </p>
 
                                     <div class="group">
                                         <label
                                             class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-[#4A72D4] transition-colors">Minimum
                                             Level</label>
                                         <div class="relative">
-                                            <input type="number" name="min_level" x-model="form.min_level" required
+                                            <input type="number" name="min_level" x-model="form.min_level"
                                                 min="1"
                                                 class="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-5 pr-14 py-4 focus:bg-white focus:ring-4 focus:ring-blue-100 focus:border-[#4A72D4] transition-all outline-none text-gray-700 font-medium"
                                                 placeholder="1">
+                                            <p x-show="errors.min_level" class="text-red-500 text-xs mt-1"
+                                                x-text="errors.min_level">
                                             <div
                                                 class="absolute right-4 top-1/2 -translate-y-1/2 px-3 py-1 bg-white border border-gray-100 rounded-lg text-[10px] font-black text-gray-400 shadow-sm">
                                                 LVL</div>
@@ -553,6 +562,9 @@
                                                     <input type="file" name="svg_static" accept=".svg"
                                                         @change="previewSvg($event, 'normal')"
                                                         class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+
+                                                    <p x-show="errors.svg" class="text-red-500 text-xs mt-3"
+                                                        x-text="errors.svg"></p>
 
                                                     <div class="space-y-3">
                                                         <div
@@ -649,6 +661,9 @@
                                                         @change="previewSvg($event, 'animasi')"
                                                         class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
 
+                                                    <p x-show="errors.svg_animasi" class="text-red-500 text-xs mt-3"
+                                                        x-text="errors.svg_animasi"></p>
+
                                                     <div class="space-y-3">
                                                         <div
                                                             class="w-14 h-14 bg-white shadow-sm border border-gray-100 rounded-2xl flex items-center justify-center mx-auto text-xl">
@@ -719,6 +734,8 @@
     </div>
     <script>
         function streakForm() {
+
+
             return {
                 svgPreview: null,
                 svgPreviewAnimasi: null,
@@ -726,6 +743,13 @@
                 form: {
                     nama: '',
                     min_level: ''
+                },
+
+                errors: {
+                    nama: '',
+                    min_level: '',
+                    svg: '',
+                    svg_animasi: ''
                 },
 
                 init() {
@@ -754,6 +778,48 @@
                     })
                 },
 
+                submitForm() {
+
+                    // reset error
+                    this.errors = {
+                        nama: '',
+                        min_level: '',
+                        svg: '',
+                        svg_animasi: ''
+                    };
+
+                    let valid = true;
+
+                    // ==========================
+                    // VALIDASI
+                    // ==========================
+                    if (!this.form.nama.trim()) {
+                        this.errors.nama = "Nama wajib diisi";
+                        valid = false;
+                    }
+
+                    if (!this.form.min_level || this.form.min_level < 1) {
+                        this.errors.min_level = "Minimum level wajib diisi";
+                        valid = false;
+                    }
+
+                    if (!this.svgPreview) {
+                        this.errors.svg = "SVG karakter wajib diupload";
+                        valid = false;
+                    }
+
+                    if (!this.svgPreviewAnimasi) {
+                        this.errors.svg_animasi = "SVG animasi wajib diupload";
+                        valid = false;
+                    }
+
+                    if (!valid) return;
+
+                    // 🔥 kalau lolos
+                    this.allowLeave = true;
+                    this.$el.submit();
+                },
+
                 previewSvg(event, type) {
                     const file = event.target.files[0]
 
@@ -776,6 +842,11 @@
 
                         reader.readAsDataURL(file)
                     }
+                },
+                clearForm() {
+                    localStorage.removeItem('streakForm')
+                    localStorage.removeItem('svgPreview')
+                    localStorage.removeItem('svgPreviewAnimasi')
                 },
 
                 get animationClass() {

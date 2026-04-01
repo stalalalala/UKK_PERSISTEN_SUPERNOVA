@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instruksi Minat dan Bakat | PERSISTEN</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -193,7 +194,7 @@
 
                 <div
                     class="px-6 md:px-12 py-4 bg-slate-50 border-t border-gray-100 flex flex-col md:flex-row justify-end gap-3 md:gap-4 shrink-0">
-                    <a href="/tryout" class="w-full md:w-auto order-2 md:order-1">
+                    <a href="/" class="w-full md:w-auto order-2 md:order-1">
                         <button
                             class="w-full px-10 py-2 rounded-xl font-semibold text-gray-400 bg-white border border-gray-200 hover:bg-gray-100 transition duration-300">
                             Batal

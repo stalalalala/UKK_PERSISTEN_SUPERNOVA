@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Streak | PERSISTEN</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -150,7 +151,7 @@
         <div class="flex flex-col items-center mb-12">
             <div
                 class="bg-blue-600 text-white px-8 py-1.5 rounded-full font-bold shadow-lg -mb-10 z-20 tracking-widest text-sm">
-                • Level {{ $level }} •
+                Level {{ $level }}
             </div>
 
             <div class="slime relative z-10 w-full max-w-[320px] md:max-w-[500px] lg:max-w-[600px] cursor-pointer"
