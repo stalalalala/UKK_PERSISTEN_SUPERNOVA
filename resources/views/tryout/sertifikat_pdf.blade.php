@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Sertifikat | PERSISTEN</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
     <style>
         @page {
             size: a4 landscape;

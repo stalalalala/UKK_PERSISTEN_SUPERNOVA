@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minat Bakat - Admin | PERSISTEN</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -56,12 +57,7 @@
 
             <div class="flex items-center justify-between mb-10 px-2">
                 <div class="flex items-center gap-3">
-                    <div class="bg-white p-2 rounded-xl">
-                        <svg class="w-6 h-6 text-[#4A72D4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                    </div>
+                    <img src="{{ asset('img/logo.svg') }}" alt="Logo" class="w-14 h-14">
                     <h1 class="text-2xl font-bold tracking-tight">P E R S I S T E N</h1>
                 </div>
                 <button @click="mobileMenuOpen = false" class="lg:hidden p-2 hover:bg-white/10 rounded-full">
@@ -727,7 +723,7 @@
                 async resetData() {
                     if (confirm(
                             'PERINGATAN: Pastikan Anda sudah membackup data! Hapus semua data peserta sekarang?'
-                            )) {
+                        )) {
                         try {
                             const response = await fetch('{{ route('admin.minatBakat.reset') }}', {
                                 method: 'POST',

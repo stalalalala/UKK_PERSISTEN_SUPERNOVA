@@ -4,7 +4,7 @@
         <!-- LOGO + DESKRIPSI -->
         <div class="flex-[1.5]">
             <div class="flex gap-3 items-center">
-                <img src="{{ asset('img/bg-home-1.png') }}" alt="" class="w-8 h-8">
+                <img src="{{ asset('img/logo.svg') }}" alt="" class="w-14 h-14">
                 <h2 class="text-3xl md:text-4xl font-bold tracking-tight">PERSISTEN</h2>
             </div>
 

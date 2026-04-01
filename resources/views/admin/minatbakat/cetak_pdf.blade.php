@@ -4,6 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Laporan Hasil Analisis - {{ $nama }} | PERSISTEN</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/logo.svg') }}">
     <style>
         @page {
             margin: 0cm;
