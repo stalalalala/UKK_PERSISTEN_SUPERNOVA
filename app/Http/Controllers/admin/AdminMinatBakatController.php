@@ -222,51 +222,77 @@ class AdminMinatBakatController extends Controller
 {
     try {
         $rows = $request->data;
-        $mode = $request->mode; // Ambil mode dari request (single/all)
-        $currentCategory = $request->current_category; // Ambil kategori saat ini
-
-        if (!$rows || count($rows) <= 1) {
-            return response()->json(['success' => false, 'message' => 'File kosong atau hanya berisi header'], 400);
-        }
+        $mode = $request->mode;
+        $currentCategory = trim($request->current_category);
+        
+        $categoriesFromDb = MinatBakatKategori::pluck('name')->toArray();
+        $validCategoriesLower = array_map(fn($item) => strtolower(trim($item)), $categoriesFromDb);
+        $categoryMap = array_combine($validCategoriesLower, $categoriesFromDb);
 
         $count = 0;
         DB::beginTransaction();
 
         foreach ($rows as $index => $row) {
-            // Lewati baris pertama (Header)
-            if ($index === 0) continue;
+            if (empty($row) || !isset($row[0])) continue;
 
             $pertanyaan = null;
-            $kategori = null;
+            $kategoriRaw = null;
 
             if ($mode === 'single') {
-                // Template Single: ['Pertanyaan'] -> Kolom 0
-                $pertanyaan = $row[0] ?? null;
-                $kategori = $currentCategory; 
+                $pertanyaan = $row[0] ?? ($row[1] ?? null);
+                $kategoriRaw = $currentCategory;
             } else {
-                // Template All: ['Kategori', 'Pertanyaan'] -> Kolom 0 dan 1
-                $kategori = $row[0] ?? null;
+                $kategoriRaw = $row[0] ?? null;
                 $pertanyaan = $row[1] ?? null;
             }
 
-            if (!empty($pertanyaan) && !empty($kategori)) {
-                MinatBakatSoal::create([
-                    'text' => trim($pertanyaan),
-                    'kategori_name' => trim($kategori)
-                ]);
-                $count++;
+            $cleanPertanyaan = trim(preg_replace('/\s+/', ' ', (string)$pertanyaan));
+            $cleanKategori = strtolower(trim((string)$kategoriRaw));
+
+            $isHeader = in_array(strtolower($cleanPertanyaan), ['pertanyaan', 'soal', 'no', 'nama', 'text']);
+            $isTooShort = strlen($cleanPertanyaan) < 8;
+            
+            if (
+                $cleanPertanyaan !== '' && 
+                !$isHeader && 
+                !$isTooShort && 
+                isset($categoryMap[$cleanKategori])
+            ) {
+                $exists = MinatBakatSoal::where('text', $cleanPertanyaan)
+                            ->where('kategori_name', $categoryMap[$cleanKategori])
+                            ->exists();
+
+                if (!$exists) {
+                    MinatBakatSoal::create([
+                        'text' => $cleanPertanyaan,
+                        'kategori_name' => $categoryMap[$cleanKategori]
+                    ]);
+                    $count++;
+                }
             }
         }
 
         DB::commit();
-        return response()->json([
-            'success' => true, 
-            'message' => "Berhasil mengimpor $count soal ke kategori " . ($mode === 'single' ? $currentCategory : 'masing-masing') . "!"
-        ]);
+
+        if ($count > 0) {
+            return response()->json([
+                'success' => true,
+                'message' => "Berhasil mengimpor $count soal."
+            ], 200);
+        } else {
+            // Notifikasi jika tidak ada data yang masuk
+            return response()->json([
+                'success' => false,
+                'message' => "Gagal mengimpor soal! Periksa kembali format file atau kategori."
+            ], 422);
+        }
 
     } catch (\Exception $e) {
         DB::rollBack();
-        return response()->json(['success' => false, 'message' => 'Gagal: ' . $e->getMessage()], 500);
+        return response()->json([
+            'success' => false, 
+            'message' => 'Terjadi kesalahan sistem.'
+        ], 500);
     }
 }
 }

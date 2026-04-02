@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -36,268 +38,26 @@
     </style>
 </head>
 
-<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="{
-    mobileMenuOpen: false,
-    activeSubtesIndex: null,
-    activeQuestion: 1,
-    targetSoal: 20,
-    imageUrl: null,
-    showImageModal: false,
-    showImportModal: false,
-    showConfirmBackModal: false,
-    isDirty: false,
-    showSuccessModal: false,
-    successMessage: '',
-    showErrorModal: false,
-    errorMessage: '',
-    showPublishModal: false,
-    tempImageUrl: '',
-    namaTryout: '',
-    tglMulai: '',
-    tglSelesai: '',
-    subtesList: [
-        { name: 'Penalaran Umum', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
-        { name: 'Penalaran & Pemahaman Umum', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
-        { name: 'Pemahaman Bacaan & Menulis', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
-        { name: 'Pengetahuan Kuantitatif', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
-        { name: 'Penalaran Matematika', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
-        { name: 'Literasi Bahasa Indonesia', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
-        { name: 'Literasi Bahasa Inggris', completed: false, soalTerisi: 0, waktu: 20, questions: [] }
-    ],
+<body class="bg-[#E9EFFF] h-screen overflow-hidden text-[#2D3B61]" x-data="tryoutHandler()">
 
-    init() {
-        history.pushState(null, null, window.location.href);
-        window.onpopstate = () => {
-            if (this.isDirty) {
-                this.showConfirmBackModal = true;
-                history.pushState(null, null, window.location.href);
-            } else {
-                window.location.href = '/admin/tryout';
-            }
-        };
+    @if (session('success'))
+    <div x-data x-init="Swal.fire({
+        icon: 'success',
+        title: '{{ session('success') }}',
+        confirmButtonColor: '#4A72D4',
+        customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl' },
+        showClass: { popup: 'animate__animated animate__fadeInDown' }
+    })"></div>
+@endif
 
-        const saved = localStorage.getItem('persisten_tryout_final');
-        if (saved) {
-            const data = JSON.parse(saved);
-            this.subtesList = data.subtesList || [];
-            this.namaTryout = data.namaTryout || '';
-            this.tglMulai = data.tglMulai || '';
-            this.tglSelesai = data.tglSelesai || '';
-            this.isDirty = true;
-        }
-
-        this.$watch('subtesList', () => this.saveLocal());
-        this.$watch('namaTryout', () => this.saveLocal());
-        this.$watch('tglMulai', () => this.saveLocal());
-        this.$watch('tglSelesai', () => this.saveLocal());
-    },
-
-    saveLocal() {
-        this.isDirty = true;
-        localStorage.setItem('persisten_tryout_final', JSON.stringify({
-            subtesList: this.subtesList,
-            namaTryout: this.namaTryout,
-            tglMulai: this.tglMulai,
-            tglSelesai: this.tglSelesai
-        }));
-    },
-
-    get canPublish() {
-        return this.namaTryout && this.tglMulai && this.tglSelesai && this.subtesList.every(s => s.completed);
-    },
-
-    unduhTemplate() {
-        const wb = XLSX.utils.book_new();
-        const header = [
-            ['Pertanyaan', 'Opsi A', 'Opsi B', 'Opsi C', 'Opsi D', 'Opsi E', 'Jawaban Benar', 'Pembahasan', 'Materi Teks', 'Link Gambar']
-        ];
-        const dummyData = ['Contoh Pertanyaan', 'A', 'B', 'C', 'D', 'E', 'B', 'Penjelasan...', 'Materi...', ''];
-
-        this.subtesList.forEach(sub => {
-            const ws = XLSX.utils.aoa_to_sheet([...header, dummyData]);
-            XLSX.utils.book_append_sheet(wb, ws, sub.name.substring(0, 31));
-        });
-        XLSX.writeFile(wb, 'Template_Soal_TRYOUT.xlsx');
-    },
-
-    importSheet(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                let totalImported = 0;
-                let foundSheet = false;
-
-                workbook.SheetNames.forEach(sheetName => {
-                    const sIdx = this.subtesList.findIndex(s => s.name.toLowerCase() === sheetName.toLowerCase());
-                    if (sIdx !== -1) {
-                        foundSheet = true;
-                        const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-                        if (jsonData.length > 0) {
-                            let current = this.subtesList[sIdx];
-                            jsonData.forEach((row, i) => {
-                                if (i < this.targetSoal) {
-                                    current.questions[i] = {
-                                        pertanyaan: row['Pertanyaan'] || '',
-                                        opsi_a: row['Opsi A'] || '',
-                                        opsi_b: row['Opsi B'] || '',
-                                        opsi_c: row['Opsi C'] || '',
-                                        opsi_d: row['Opsi D'] || '',
-                                        opsi_e: row['Opsi E'] || '',
-                                        jawaban_benar: row['Jawaban Benar']?.toString().toUpperCase() || '',
-                                        pembahasan: row['Pembahasan'] || '',
-                                        materi_teks: row['Materi Teks'] || '',
-                                        image_url: row['Link Gambar'] || null
-                                    };
-                                }
-                            });
-                            current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
-                            current.completed = (current.soalTerisi >= this.targetSoal);
-                            totalImported += current.soalTerisi;
-                        }
-                    }
-                });
-
-                if (!foundSheet) throw new Error('Nama sheet tidak sesuai subtes.');
-
-                this.saveLocal();
-                this.successMessage = 'Berhasil mengimport ' + totalImported + ' soal.';
-                this.showSuccessModal = true;
-                this.showImportModal = false;
-                if (this.activeSubtesIndex !== null) this.loadQuestion();
-            } catch (error) {
-                this.errorMessage = error.message;
-                this.showErrorModal = true;
-            }
-            event.target.value = '';
-        };
-        reader.readAsArrayBuffer(file);
-    },
-
-    selectSubtes(index) {
-        this.activeSubtesIndex = index;
-        this.activeQuestion = 1;
-        this.imageUrl = null;
-        this.$nextTick(() => { this.loadQuestion(); });
-    },
-
-    backToDaftarTryout() {
-        if (confirm('Yakin ingin kembali? Data yang belum dipublikasikan akan dihapus.')) {
-            localStorage.removeItem('persisten_tryout_final');
-            window.location.href = '/admin/tryout';
-        }
-    },
-
-    backToKategori() {
-        this.saveLocal();
-        this.activeSubtesIndex = null;
-    },
-
-    handleImageFile(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => { this.imageUrl = e.target.result;
-                this.showImageModal = false; };
-            reader.readAsDataURL(file);
-        }
-    },
-
-    applyImageUrl() {
-        if (this.tempImageUrl.trim() !== '') {
-            this.imageUrl = this.tempImageUrl;
-            this.showImageModal = false;
-            this.tempImageUrl = '';
-        }
-    },
-
-    simpanSoal() {
-        const q = document.getElementById('pertanyaan_teks').value.trim();
-        const a = document.getElementById('opt_a').value.trim();
-        const b = document.getElementById('opt_b').value.trim();
-        const c = document.getElementById('opt_c').value.trim();
-        const d = document.getElementById('opt_d').value.trim();
-        const e = document.getElementById('opt_e').value.trim();
-        const pbs = document.getElementById('pembahasan_teks').value.trim();
-        const jaw = document.querySelector('input[name=\'correct_option\']:checked');
-
-        if (!q || !a || !b || !c || !d || !e || !pbs || !jaw) { alert('Lengkapi semua field!'); return; }
-
-        let current = this.subtesList[this.activeSubtesIndex];
-        current.questions[this.activeQuestion - 1] = {
-            materi_teks: document.getElementById('materi_teks').value,
-            pertanyaan: q,
-            opsi_a: a,
-            opsi_b: b,
-            opsi_c: c,
-            opsi_d: d,
-            opsi_e: e,
-            jawaban_benar: jaw.value,
-            pembahasan: pbs,
-            image_url: this.imageUrl
-        };
-        current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
-        this.saveLocal();
-
-        if (this.activeQuestion < this.targetSoal) {
-            this.activeQuestion++;
-            this.loadQuestion();
-        } else { alert('Tersimpan!'); }
-    },
-
-    loadQuestion() {
-        let current = this.subtesList[this.activeSubtesIndex];
-        let data = current.questions[this.activeQuestion - 1];
-        if (data) {
-            document.getElementById('materi_teks').value = data.materi_teks || '';
-            document.getElementById('pertanyaan_teks').value = data.pertanyaan || '';
-            document.getElementById('opt_a').value = data.opsi_a || '';
-            document.getElementById('opt_b').value = data.opsi_b || '';
-            document.getElementById('opt_c').value = data.opsi_c || '';
-            document.getElementById('opt_d').value = data.opsi_d || '';
-            document.getElementById('opt_e').value = data.opsi_e || '';
-            document.getElementById('pembahasan_teks').value = data.pembahasan || '';
-            this.imageUrl = data.image_url || null;
-            document.getElementsByName('correct_option').forEach(r => r.checked = (r.value === data.jawaban_benar));
-        } else { this.resetInputForm(); }
-    },
-
-    resetInputForm() {
-        ['materi_teks', 'pertanyaan_teks', 'opt_a', 'opt_b', 'opt_c', 'opt_d', 'opt_e', 'pembahasan_teks'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-        });
-        this.imageUrl = null;
-        document.getElementsByName('correct_option').forEach(r => r.checked = false);
-    },
-
-    selesaikanSubtes() {
-        if (this.subtesList[this.activeSubtesIndex].soalTerisi < this.targetSoal) {
-            alert('Lengkapi 20 soal terlebih dahulu!');
-            return;
-        }
-        this.subtesList[this.activeSubtesIndex].completed = true;
-        this.activeSubtesIndex = null;
-        this.saveLocal();
-    },
-
-    publikasikan() {
-        if (!this.canPublish) {
-            this.errorMessage = 'Lengkapi semua data dan subtes terlebih dahulu!';
-            this.showErrorModal = true;
-            return;
-        }
-        this.showPublishModal = true;
-    },
-
-    confirmPublikasikan() {
-        localStorage.removeItem('persisten_tryout_final');
-        document.getElementById('formTryout').submit();
-    }
-}">
+@if (session('error'))
+    <div x-data x-init="Swal.fire({
+        icon: 'error',
+        title: '{{ session('error') }}',
+        confirmButtonColor: '#ef4444',
+        customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl' }
+    })"></div>
+@endif
 
     <div x-show="showImageModal" x-cloak
         class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" x-transition>
@@ -552,103 +312,110 @@
         </aside>
 
         <main class="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
-            <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-                <div class="flex items-center w-full gap-4">
-                    <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm">
-                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+             <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+    <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
+        <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
 
-                    <div x-data="{
-                        keyword: '',
-                        routes: {
-                            'dashboard': '{{ route('admin.dashboard.index') }}',
-                            'user': '{{ route('admin.user.index') }}',
-                            'streak': '{{ route('admin.streak.index') }}',
-                            'monitoring': '{{ route('admin.laporan.index') }}',
-                            'video': '{{ route('admin.videoPembelajaran.index') }}',
-                            'peluang': '{{ route('admin.peluang.index') }}',
-                            'tryout': '{{ route('admin.tryout.index') }}',
-                            'minat bakat': '{{ route('admin.minatBakat.index') }}',
-                            'kuis': '{{ route('admin.kuis.index') }}',
-                            'latihan': '{{ route('admin.latihan.index') }}'
-                        },
-                        goToPage() {
-                            let search = this.keyword.toLowerCase()
-                    
-                            for (let key in this.routes) {
-                                if (key.includes(search)) {
-                                    window.location.href = this.routes[key]
-                                    return
-                                }
-                            }
-                    
-                            alert('Halaman tidak ditemukan')
-                        }
-                    }" class="relative w-full group flex items-center gap-2">
+        @php
+            use Illuminate\Support\Facades\Auth;
+            $user = Auth::user();
+            // Mengambil nama depan saja untuk tampilan ringkas di bar
+            $firstName = explode(' ', trim($user->name))[0];
+        @endphp
 
-                        <div class="relative w-full">
+        <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
+            <div @click="open = !open" 
+                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto ml-auto">
+                
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden border-2 border-white shrink-0">
+                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=4A72D4&color=fff' }}" 
+                             alt="{{ $user->name }}" class="w-full h-full object-cover">
+                    </div>
+                    <span class="font-bold text-sm text-gray-700 truncate">{{ $firstName }}</span>
+                </div>
+                
+                <i class="fa-solid fa-chevron-down text-gray-400 text-[10px]"></i>
+            </div>
 
-                            <!-- ICON -->
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                                </svg>
-                            </div>
-
-                            <input type="text" x-model="keyword" placeholder="Cari halaman..."
-                                @keydown.enter="goToPage()"
-                                class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all">
-                        </div>
-
-                        <button @click="goToPage()"
-                            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium shadow-sm transition-all active:scale-95 shrink-0">
-                            Cari
-                        </button>
-
+            <div x-show="open" 
+                x-cloak
+                @click.away="open = false"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
+                x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                class="absolute right-0 mt-3 w-64 bg-white rounded-[20px] shadow-2xl border border-gray-100 z-[100] overflow-hidden">
+                
+                <div class="p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                    <p class="font-extrabold text-gray-800 leading-tight">{{ $user->name }}</p>
+                    <p class="text-[11px] text-gray-400 mt-1 truncate">{{ $user->email }}</p>
+                </div>
+                
+                <div class="p-4 flex flex-col gap-2 bg-white">
+                    <div class="flex items-center gap-3 text-xs text-gray-500 p-2 bg-gray-50 rounded-xl border border-gray-100">
+                        <i class="fa-solid fa-phone text-blue-400"></i>
+                        <span>{{ $user->no_hp ?? 'No HP belum diatur' }}</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                @php
-                    use Illuminate\Support\Facades\Auth;
-                    $user = Auth::user();
-                @endphp
-                <div x-data="{ open: false }" class="relative flex w-full md:w-auto md:inline-block">
+    <div x-data="{
+            keyword: '',
+            routes: {
+                'dashboard': '{{ route('admin.dashboard.index') }}',
+                'user': '{{ route('admin.user.index') }}',
+                'streak': '{{ route('admin.streak.index') }}',
+                'monitoring': '{{ route('admin.laporan.index') }}',
+                'video': '{{ route('admin.videoPembelajaran.index') }}',
+                'peluang': '{{ route('admin.peluang.index') }}',
+                'tryout': '{{ route('admin.tryout.index') }}',
+                'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                'kuis': '{{ route('admin.kuis.index') }}',
+                'latihan': '{{ route('admin.latihan.index') }}'
+            },
+            goToPage(){
+                let search = this.keyword.toLowerCase().trim();
+                if(!search) return;
+                for (let key in this.routes) {
+                    if (key.includes(search)) {
+                        window.location.href = this.routes[key];
+                        return;
+                    }
+                }
+                alert('Halaman tidak ditemukan');
+            }
+        }"
+        class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1"
+    >
+        <div class="relative w-full group">
+            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 group-focus-within:text-[#4A72D4] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+            </div>
+            <input 
+                type="text" 
+                x-model="keyword" 
+                placeholder="Cari halaman..." 
+                @keydown.enter="goToPage()"
+                class="w-full bg-white border-none rounded-full py-3.5 pl-14 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm placeholder:text-gray-400 font-medium"
+            >
+        </div>
 
-                    <div @click="open = !open"
-                        class="flex items-center gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm shrink-0 
-                                ml-auto md:ml-0 cursor-pointer">
-
-                        <div class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white">
-                            <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
-                                alt="Admin">
-                        </div>
-
-                        <span class="font-bold text-sm hidden sm:block text-gray-700">Admin</span>
-
-                        <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-                    </div>
-
-                    <div x-show="open" @click.away="open = false"
-                        class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
-                        x-transition:enter="transition ease-out duration-200"
-                        x-transition:enter-start="opacity-0 transform scale-95"
-                        x-transition:enter-end="opacity-100 transform scale-100"
-                        x-transition:leave="transition ease-in duration-150"
-                        x-transition:leave-start="opacity-100 transform scale-100"
-                        x-transition:leave-end="opacity-0 transform scale-95">
-                        <div class="p-4">
-                            <p class="font-semibold text-gray-700">{{ $user->name }}</p>
-                            <p class="text-sm text-gray-500">{{ $user->email }}</p>
-                            <p class="text-sm text-gray-500">{{ $user->no_hp ?? '-' }}</p>
-                        </div>
-                    </div>
-                </div>
-            </header>
+        <button 
+            @click="goToPage()" 
+            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-7 py-3.5 rounded-full text-sm font-extrabold shadow-lg shadow-blue-100 transition-all active:scale-95 shrink-0"
+        >
+            Cari
+        </button>
+    </div>
+</header>
             <form id="formTryout" action="{{ route('admin.tryout.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="nama_tryout" :value="namaTryout">
@@ -657,18 +424,25 @@
                 <input type="hidden" name="payload_full_data" :value="JSON.stringify(subtesList)">
 
                 <div x-show="activeSubtesIndex === null" x-transition>
-                    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <button type="button"
-                                @click="isDirty ? showConfirmBackModal = true : window.location.href = '/admin/tryout'"
-                                class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all"><i
-                                    class="fa-solid fa-arrow-left"></i></button>
-                            <div>
-                                <h2 class="text-2xl font-extrabold text-[#4A72D4]">Panel Pembuatan Tryout</h2>
-                                <p class="text-gray-400 text-xs mt-1 italic font-bold tracking-wide">Lengkapi data
-                                    subtes untuk mempublikasikan.</p>
-                            </div>
+                <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <button type="button" 
+                            @click="backToDaftarTryout()" 
+                            class="p-3 bg-white rounded-xl text-gray-400 hover:text-red-500 shadow-sm border border-blue-50 transition-all">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-[#4A72D4]">Panel Pembuatan Tryout</h2>
+                            <p class="text-gray-400 text-xs mt-1 italic font-bold tracking-wide">Lengkapi data subtes untuk mempublikasikan.</p>
                         </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                        <button type="button" @click="showImportModal = true" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white border-blue-100 px-6 py-3 rounded-2xl font-bold text-xs shadow-lg flex items-center justify-center gap-2 hover:scale-105 transition-all">
+                            <i class="fa-solid fa-file-import"></i> IMPORT VIA SHEET
+                        </button>
+                    </div>
+                </div>
 
                         <div class="flex flex-wrap gap-2 w-full md:w-auto">
                             <button type="button" @click="showImportModal = true"
@@ -880,93 +654,353 @@
     </main>
     </div>
 
-    {{-- MODAL KEMBALI --}}
-    <div x-show="showConfirmBackModal" x-cloak class="fixed inset-0 z-[150] flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showConfirmBackModal = false"></div>
-        <div
-            class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[151] text-center shadow-2xl border border-blue-50">
-            <div
-                class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <h3 class="text-xl font-black text-[#2E3B66] mb-2">Konfirmasi Keluar</h3>
-            <p class="text-gray-500 text-sm mb-8">Data belum disimpan. Jika keluar sekarang, data akan dihapus.</p>
-            <div class="flex gap-3">
-                <button type="button" @click="showConfirmBackModal = false"
-                    class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200">Batal</button>
-                <button type="button"
-                    @click="isDirty = false; localStorage.removeItem('persisten_tryout_final'); window.location.href = '/admin/tryout'"
-                    class="flex-1 py-3 rounded-xl font-bold bg-red-500 text-white shadow-lg shadow-red-200">Ya,
-                    Keluar</button>
-            </div>
+    <script>
+function tryoutHandler() {
+    return {
+        mobileMenuOpen: false,
+        activeSubtesIndex: null,
+        activeQuestion: 1,
+        targetSoal: 20, 
+        imageUrl: null,
+        showImageModal: false,
+        showImportModal: false,
+        showPublishModal: false,
+        showErrorModal: false, // Tambahan untuk handling error
+        errorMessage: '',      // Tambahan untuk handling error
+        isDirty: false,        // Pastikan variabel ini ada
+        tempImageUrl: '',
+        namaTryout: '',
+        tglMulai: '',
+        tglSelesai: '',
+        subtesList: [
+            { name: 'Penalaran Umum', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
+            { name: 'Penalaran & Pemahaman Umum', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
+            { name: 'Pemahaman Bacaan & Menulis', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
+            { name: 'Pengetahuan Kuantitatif', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
+            { name: 'Penalaran Matematika', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
+            { name: 'Literasi Bahasa Indonesia', completed: false, soalTerisi: 0, waktu: 20, questions: [] },
+            { name: 'Literasi Bahasa Inggris', completed: false, soalTerisi: 0, waktu: 20, questions: [] }
+        ],
+
+        init() {
+            // Push state awal untuk mendeteksi tombol back browser
+            history.pushState(null, null, window.location.href);
+            
+            window.onpopstate = () => {
+                if (this.isDirty) {
+                    // Kembalikan URL agar tidak keluar dulu
+                    history.pushState(null, null, window.location.href);
+                    
+                    // Trigger SweetAlert untuk Back Browser
+                    this.backToDaftarTryout();
+                } else {
+                    window.location.href = '/admin/tryout';
+                }
+            };
+
+            // Load data dari LocalStorage
+            const saved = localStorage.getItem('persisten_tryout_final');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    this.subtesList = data.subtesList || this.subtesList;
+                    this.namaTryout = data.namaTryout || '';
+                    this.tglMulai = data.tglMulai || '';
+                    this.tglSelesai = data.tglSelesai || '';
+                    this.isDirty = true; 
+                } catch (e) {
+                    console.error("Gagal load data lokal", e);
+                }
+            }
+
+            // Watcher untuk simpan otomatis ke local
+            this.$watch('subtesList', () => this.saveLocal());
+            this.$watch('namaTryout', () => this.saveLocal());
+            this.$watch('tglMulai', () => this.saveLocal());
+            this.$watch('tglSelesai', () => this.saveLocal());
+        },
+
+        saveLocal() {
+            this.isDirty = true;
+            localStorage.setItem('persisten_tryout_final', JSON.stringify({
+                subtesList: this.subtesList, 
+                namaTryout: this.namaTryout, 
+                tglMulai: this.tglMulai, 
+                tglSelesai: this.tglSelesai
+            }));
+        },
+
+        get canPublish() {
+            return this.namaTryout && this.tglMulai && this.tglSelesai && this.subtesList.every(s => s.completed);
+        },
+
+        unduhTemplate() {
+            const wb = XLSX.utils.book_new();
+            const header = [['Pertanyaan', 'Opsi A', 'Opsi B', 'Opsi C', 'Opsi D', 'Opsi E', 'Jawaban Benar', 'Pembahasan', 'Materi Teks', 'Link Gambar']];
+            const dummyData = ['Contoh Pertanyaan', 'A', 'B', 'C', 'D', 'E', 'B', 'Penjelasan...', 'Materi...', ''];
+            
+            this.subtesList.forEach(sub => {
+                const ws = XLSX.utils.aoa_to_sheet([...header, dummyData]);
+                XLSX.utils.book_append_sheet(wb, ws, sub.name.substring(0, 31));
+            });
+            XLSX.writeFile(wb, 'Template_Soal_TRYOUT.xlsx');
+        },
+
+        importSheet(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    let totalImported = 0;
+                    let foundSheet = false;
+
+                    workbook.SheetNames.forEach(sheetName => {
+                        const sIdx = this.subtesList.findIndex(s => s.name.toLowerCase() === sheetName.toLowerCase());
+                        if (sIdx !== -1) {
+                            foundSheet = true;
+                            const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+                            if (jsonData.length > 0) {
+                                let current = this.subtesList[sIdx];
+                                jsonData.forEach((row, i) => {
+                                    if(i < this.targetSoal) {
+                                        current.questions[i] = {
+                                            pertanyaan: row['Pertanyaan'] || '',
+                                            opsi_a: row['Opsi A'] || '', opsi_b: row['Opsi B'] || '',
+                                            opsi_c: row['Opsi C'] || '', opsi_d: row['Opsi D'] || '',
+                                            opsi_e: row['Opsi E'] || '',
+                                            jawaban_benar: row['Jawaban Benar']?.toString().toUpperCase() || '',
+                                            pembahasan: row['Pembahasan'] || '',
+                                            materi_teks: row['Materi Teks'] || '',
+                                            image_url: row['Link Gambar'] || null
+                                        };
+                                    }
+                                });
+                                current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
+                                current.completed = (current.soalTerisi >= this.targetSoal);
+                                totalImported += current.soalTerisi;
+                            }
+                        }
+                    });
+
+                    if (!foundSheet) throw new Error('Nama sheet tidak sesuai subtes.');
+                    
+                    this.saveLocal();
+                    this.showImportModal = false;
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Import Berhasil!',
+                        text: 'Berhasil mengimport ' + totalImported + ' soal.',
+                        width: '340px',
+                        confirmButtonColor: '#4A72D4',
+                        customClass: {
+                            popup: 'rounded-3xl shadow-xl',
+                            title: 'text-lg font-bold',
+                            confirmButton: 'rounded-xl px-6 py-2'
+                        }
+                    });
+                    
+                    if (this.activeSubtesIndex !== null) this.loadQuestion();
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Import',
+                        text: error.message,
+                        width: '340px',
+                    confirmButtonColor: '#ef4444',
+                    customClass: { popup: 'rounded-3xl shadow-xl', title: 'text-lg font-bold' }
+                    });
+                }
+                event.target.value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        },
+
+        selectSubtes(index) {
+            this.activeSubtesIndex = index;
+            this.activeQuestion = 1;
+            this.imageUrl = null;
+            this.$nextTick(() => { this.loadQuestion(); });
+        },
+
+        // Perbaikan: Menggunakan SweetAlert untuk navigasi kembali
+        backToDaftarTryout() {
+            Swal.fire({
+                title: 'Yakin ingin keluar?',
+                text: 'Data tryout yang belum dipublikasikan akan hilang.',
+                icon: 'warning',
+                width: '340px',
+                padding: '1.8rem',
+                showCancelButton: true,
+                confirmButtonColor: '#4A72D4',
+                cancelButtonColor: '#E5E7EB',
+                cancelButtonText: 'Batal',
+                confirmButtonText: 'Ya, keluar',    
+                customClass: {
+                    popup: 'rounded-3xl shadow-xl',
+                    title: 'text-lg font-bold text-gray-800',
+                    htmlContainer: 'text-sm text-gray-500',
+                    confirmButton: 'rounded-xl px-5 py-2',
+                    cancelButton: 'rounded-xl px-5 py-2'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.isDirty = false;
+                    localStorage.removeItem('persisten_tryout_final');
+                    window.location.href = '/admin/tryout';
+                }
+            });
+        },
+
+        backToKategori() { 
+            this.saveLocal();
+            this.activeSubtesIndex = null; 
+        },
+
+        handleImageFile(event) {
+            const file = event.target.files[0];
+            if (file) { 
+                const reader = new FileReader();
+                reader.onload = (e) => { this.imageUrl = e.target.result; this.showImageModal = false; };
+                reader.readAsDataURL(file);
+            }
+        },
+
+        applyImageUrl() {
+            if (this.tempImageUrl.trim() !== '') {
+                this.imageUrl = this.tempImageUrl; this.showImageModal = false; this.tempImageUrl = '';
+            }
+        },
+
+        // Tetap menggunakan Modal sesuai permintaan, hanya perbaikan logic simpan
+        simpanSoal() {
+            const q = document.getElementById('pertanyaan_teks').value.trim();
+            const a = document.getElementById('opt_a').value.trim();
+            const b = document.getElementById('opt_b').value.trim();
+            const c = document.getElementById('opt_c').value.trim();
+            const d = document.getElementById('opt_d').value.trim();
+            const e = document.getElementById('opt_e').value.trim();
+            const pbs = document.getElementById('pembahasan_teks').value.trim();
+            const jaw = document.querySelector('input[name=\'correct_option\']:checked');
+
+            if (!q || !a || !b || !c || !d || !e || !pbs || !jaw) { 
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lengkapi Data',
+                    text: 'Semua field pertanyaan dan opsi harus diisi!',
+                    confirmButtonColor: '#ef4444',
+                    customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl' }
+                });
+                return; 
+            }
+
+            let current = this.subtesList[this.activeSubtesIndex];
+            current.questions[this.activeQuestion - 1] = {
+                materi_teks: document.getElementById('materi_teks').value,
+                pertanyaan: q, opsi_a: a, opsi_b: b, opsi_c: c, opsi_d: d, opsi_e: e,
+                jawaban_benar: jaw.value, pembahasan: pbs, image_url: this.imageUrl
+            };
+            current.soalTerisi = current.questions.filter(x => x && x.pertanyaan).length;
+            this.saveLocal();
+
+            if (this.activeQuestion < this.targetSoal) {
+                this.activeQuestion++; 
+                this.loadQuestion();
+            } else { 
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Tersimpan!',
+                    text: 'Berhasil menyimpan soal nomor ' + this.activeQuestion,
+                    timer: 1500,
+                    showConfirmButton: false,
+                    customClass: { popup: 'rounded-3xl' }
+                });
+            }
+        },
+
+        loadQuestion() {
+            let current = this.subtesList[this.activeSubtesIndex];
+            let data = current.questions[this.activeQuestion - 1];
+            if (data) {
+                document.getElementById('materi_teks').value = data.materi_teks || '';
+                document.getElementById('pertanyaan_teks').value = data.pertanyaan || '';
+                document.getElementById('opt_a').value = data.opsi_a || '';
+                document.getElementById('opt_b').value = data.opsi_b || '';
+                document.getElementById('opt_c').value = data.opsi_c || '';
+                document.getElementById('opt_d').value = data.opsi_d || '';
+                document.getElementById('opt_e').value = data.opsi_e || '';
+                document.getElementById('pembahasan_teks').value = data.pembahasan || '';
+                this.imageUrl = data.image_url || null;
+                document.getElementsByName('correct_option').forEach(r => r.checked = (r.value === data.jawaban_benar));
+            } else { 
+                this.resetInputForm(); 
+            }
+        },
+
+        resetInputForm() {
+            ['materi_teks','pertanyaan_teks','opt_a','opt_b','opt_c','opt_d','opt_e','pembahasan_teks'].forEach(id => {
+                const el = document.getElementById(id); if(el) el.value = '';
+            });
+            this.imageUrl = null;
+            document.getElementsByName('correct_option').forEach(r => r.checked = false);
+        },
+
+        selesaikanSubtes() {
+            if (this.subtesList[this.activeSubtesIndex].soalTerisi < this.targetSoal) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Soal Belum Cukup',
+                    text: 'Lengkapi minimal ' + this.targetSoal + ' soal terlebih dahulu!',
+                    confirmButtonColor: '#4A72D4',
+                    customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl' }
+                });
+                return;
+            }
+            this.subtesList[this.activeSubtesIndex].completed = true;
+            this.activeSubtesIndex = null;
+            this.saveLocal();
+        },
+
+        // Tetap menggunakan Modal (showPublishModal) sesuai permintaan
+        publikasikan() {
+            if (!this.canPublish) {
+                this.errorMessage = 'Lengkapi semua data utama dan pastikan seluruh subtes sudah memiliki 20 soal!';
+                this.showErrorModal = true;
+                return;
+            }
+            this.showPublishModal = true;
+        },
+
+        confirmPublikasikan() {
+            this.isDirty = false;
+            localStorage.removeItem('persisten_tryout_final');
+            document.getElementById('formTryout').submit();
+        }
+    }
+}
+</script>
+{{-- MODAL KONFIRM PUBLIKASI --}}
+<div x-show="showPublishModal" x-cloak class="fixed inset-0 z-[180] flex items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showPublishModal = false"></div>
+    
+    <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[181] text-center shadow-2xl border border-blue-50"
+         x-show="showPublishModal"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100">
+        
+        <div class="w-20 h-20 bg-blue-100 text-[#4A72D4] rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
         </div>
-    </div>
-
-    {{-- MODAL BERHASIL IMPORT --}}
-    <div x-show="showSuccessModal" x-cloak class="fixed inset-0 z-[160] flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showSuccessModal = false"></div>
-
-        <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[161] text-center shadow-2xl border border-blue-50"
-            x-show="showSuccessModal" x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
-
-            <div
-                class="w-20 h-20 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                <i class="fa-solid fa-circle-check"></i>
-            </div>
-
-            <h3 class="text-xl font-black text-[#2E3B66] mb-2">Import Berhasil</h3>
-            <p class="text-gray-500 text-sm mb-8" x-text="successMessage"></p>
-
-            <button type="button" @click="showSuccessModal = false"
-                class="w-full py-3 rounded-xl font-bold bg-[#4A72D4] text-white shadow-lg shadow-blue-100 hover:bg-blue-600 transition-all text-center">
-                Tutup
-            </button>
-        </div>
-    </div>
-
-    {{-- MODAL GAGAL IMPORT --}}
-    <div x-show="showErrorModal" x-cloak class="fixed inset-0 z-[170] flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showErrorModal = false"></div>
-
-        <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[171] text-center shadow-2xl border border-blue-50"
-            x-show="showErrorModal" x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
-
-            <div
-                class="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                <i class="fa-solid fa-circle-xmark"></i>
-            </div>
-
-            <h3 class="text-xl font-black text-[#2E3B66] mb-2">Import Gagal</h3>
-            <p class="text-gray-500 text-sm mb-8" x-text="errorMessage"></p>
-
-            <button type="button" @click="showErrorModal = false"
-                class="w-full py-3 rounded-xl font-bold bg-gray-800 text-white shadow-lg hover:bg-black transition-all text-center">
-                Coba Lagi
-            </button>
-        </div>
-    </div>
-
-    {{-- MODAL KONFIRM PUBLIKASI --}}
-    <div x-show="showPublishModal" x-cloak class="fixed inset-0 z-[180] flex items-center justify-center p-4">
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="showPublishModal = false"></div>
-
-        <div class="bg-white rounded-[2rem] p-8 max-w-sm w-full relative z-[181] text-center shadow-2xl border border-blue-50"
-            x-show="showPublishModal" x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
-
-            <div
-                class="w-20 h-20 bg-blue-100 text-[#4A72D4] rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-            </div>
-
-            <h3 class="text-xl font-black text-[#2E3B66] mb-2">Publikasikan Tryout?</h3>
-            <p class="text-gray-500 text-sm mb-8">Pastikan semua data sudah benar. Tryout yang dipublikasikan akan
-                langsung dapat diakses.</p>
-
-            <div class="flex gap-3">
-                <button type="button" @click="showPublishModal = false"
+        
+        <h3 class="text-xl font-black text-[#2E3B66] mb-2">Publikasikan Tryout?</h3>
+        <p class="text-gray-500 text-sm mb-8">Pastikan semua data sudah benar. Tryout yang dipublikasikan akan langsung dapat diakses.</p>
+        
+        <div class="flex gap-3">
+            <button type="button" @click="showPublishModal = false" 
                     class="flex-1 py-3 rounded-xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all">
                     Batal
                 </button>

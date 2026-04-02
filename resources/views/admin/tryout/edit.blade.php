@@ -230,103 +230,111 @@
         </aside>
 
         <main class="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar p-4 lg:p-8">
-            <header
-                class="flex flex-col lg:flex-row lg:items-center justify-between lg:pt-2 pb-8 gap-4 flex-shrink-0 w-full">
-                <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
-                    <button @click="mobileMenuOpen = true"
-                        class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
-                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+             <header class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+    <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:order-2">
+        <button @click="mobileMenuOpen = true" class="lg:hidden p-3 bg-white rounded-xl shadow-sm shrink-0">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
 
-                    @php
-                        use Illuminate\Support\Facades\Auth;
-                        $user = Auth::user();
-                    @endphp
+        @php
+            use Illuminate\Support\Facades\Auth;
+            $user = Auth::user();
+            // Mengambil nama depan saja untuk tampilan ringkas di bar
+            $firstName = explode(' ', trim($user->name))[0];
+        @endphp
 
-                    <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
-                        <div @click="open = !open"
-                            class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto">
+        <div x-data="{ open: false }" class="relative flex-1 lg:flex-initial">
+            <div @click="open = !open" 
+                class="flex items-center justify-between lg:justify-start gap-3 bg-white p-1 pr-4 pl-1 rounded-full shadow-sm cursor-pointer border border-transparent hover:border-blue-100 transition-all w-full lg:w-auto ml-auto">
+                
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden border-2 border-white shrink-0">
+                        <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=4A72D4&color=fff' }}" 
+                             alt="{{ $user->name }}" class="w-full h-full object-cover">
+                    </div>
+                    <span class="font-bold text-sm text-gray-700 truncate">{{ $firstName }}</span>
+                </div>
+                
+                <i class="fa-solid fa-chevron-down text-gray-400 text-[10px]"></i>
+            </div>
 
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-10 h-10 bg-gray-200 rounded-full overflow-hidden border-2 border-white shrink-0">
-                                    <img src="{{ $user->photo ? asset('storage/' . $user->photo) : 'https://ui-avatars.com/api/?name=Admin&background=random' }}"
-                                        alt="Admin" class="w-full h-full object-cover">
-                                </div>
-                                <span class="font-bold text-sm text-gray-700 truncate">Admin</span>
-                            </div>
-
-                            <i class="fa-solid fa-chevron-down text-gray-400 text-xs"></i>
-                        </div>
-
-                        <div x-show="open" @click.away="open = false"
-                            class="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
-                            x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 transform scale-95"
-                            x-transition:enter-end="opacity-100 transform scale-100"
-                            x-transition:leave="transition ease-in duration-150"
-                            x-transition:leave-start="opacity-100 transform scale-100"
-                            x-transition:leave-end="opacity-0 transform scale-95">
-                            <div class="p-4 bg-gray-50/50 border-b border-gray-100">
-                                <p class="font-bold text-gray-800">{{ $user->name }}</p>
-                                <p class="text-xs text-gray-500 truncate">{{ $user->email }}</p>
-                            </div>
-                            <div class="p-4 text-xs text-gray-500 bg-white">
-                                {{ $user->no_hp ?? '-' }}
-                            </div>
-                        </div>
+            <div x-show="open" 
+                x-cloak
+                @click.away="open = false"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
+                x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                class="absolute right-0 mt-3 w-64 bg-white rounded-[20px] shadow-2xl border border-gray-100 z-[100] overflow-hidden">
+                
+                <div class="p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                    <p class="font-extrabold text-gray-800 leading-tight">{{ $user->name }}</p>
+                    <p class="text-[11px] text-gray-400 mt-1 truncate">{{ $user->email }}</p>
+                </div>
+                
+                <div class="p-4 flex flex-col gap-2 bg-white">
+                    <div class="flex items-center gap-3 text-xs text-gray-500 p-2 bg-gray-50 rounded-xl border border-gray-100">
+                        <i class="fa-solid fa-phone text-blue-400"></i>
+                        <span>{{ $user->no_hp ?? 'No HP belum diatur' }}</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div x-data="{
-                    keyword: '',
-                    routes: {
-                        'dashboard': '{{ route('admin.dashboard.index') }}',
-                        'user': '{{ route('admin.user.index') }}',
-                        'streak': '{{ route('admin.streak.index') }}',
-                        'monitoring': '{{ route('admin.laporan.index') }}',
-                        'video': '{{ route('admin.videoPembelajaran.index') }}',
-                        'peluang': '{{ route('admin.peluang.index') }}',
-                        'tryout': '{{ route('admin.tryout.index') }}',
-                        'minat bakat': '{{ route('admin.minatBakat.index') }}',
-                        'kuis': '{{ route('admin.kuis.index') }}',
-                        'latihan': '{{ route('admin.latihan.index') }}'
-                    },
-                    goToPage() {
-                        let search = this.keyword.toLowerCase()
-                        for (let key in this.routes) {
-                            if (key.includes(search)) {
-                                window.location.href = this.routes[key]
-                                return
-                            }
-                        }
-                        alert('Halaman tidak ditemukan')
+    <div x-data="{
+            keyword: '',
+            routes: {
+                'dashboard': '{{ route('admin.dashboard.index') }}',
+                'user': '{{ route('admin.user.index') }}',
+                'streak': '{{ route('admin.streak.index') }}',
+                'monitoring': '{{ route('admin.laporan.index') }}',
+                'video': '{{ route('admin.videoPembelajaran.index') }}',
+                'peluang': '{{ route('admin.peluang.index') }}',
+                'tryout': '{{ route('admin.tryout.index') }}',
+                'minat bakat': '{{ route('admin.minatBakat.index') }}',
+                'kuis': '{{ route('admin.kuis.index') }}',
+                'latihan': '{{ route('admin.latihan.index') }}'
+            },
+            goToPage(){
+                let search = this.keyword.toLowerCase().trim();
+                if(!search) return;
+                for (let key in this.routes) {
+                    if (key.includes(search)) {
+                        window.location.href = this.routes[key];
+                        return;
                     }
-                }" class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1">
-                    <div class="relative w-full">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                            </svg>
-                        </div>
-                        <input type="text" x-model="keyword" placeholder="Cari halaman..."
-                            @keydown.enter="goToPage()"
-                            class="w-full bg-white border-none rounded-full py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm">
-                    </div>
+                }
+                alert('Halaman tidak ditemukan');
+            }
+        }"
+        class="relative w-full lg:flex-grow flex items-center gap-2 lg:order-1"
+    >
+        <div class="relative w-full group">
+            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 group-focus-within:text-[#4A72D4] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+            </div>
+            <input 
+                type="text" 
+                x-model="keyword" 
+                placeholder="Cari halaman..." 
+                @keydown.enter="goToPage()"
+                class="w-full bg-white border-none rounded-full py-3.5 pl-14 pr-4 shadow-sm focus:ring-2 focus:ring-blue-400 outline-none transition-all text-sm placeholder:text-gray-400 font-medium"
+            >
+        </div>
 
-                    <button @click="goToPage()"
-                        class="bg-[#4A72D4] hover:bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-bold shadow-sm transition-all active:scale-95 shrink-0">
-                        Cari
-                    </button>
-                </div>
-            </header>
-            <form id="formTryout" action="{{ route('admin.tryout.update', $tryout->id) }}" method="POST"
-                @submit.prevent="submitForm">
+        <button 
+            @click="goToPage()" 
+            class="bg-[#4A72D4] hover:bg-blue-600 text-white px-7 py-3.5 rounded-full text-sm font-extrabold shadow-lg shadow-blue-100 transition-all active:scale-95 shrink-0"
+        >
+            Cari
+        </button>
+    </div>
+</header>
+            <form id="formTryout" action="{{ route('admin.tryout.update', $tryout->id) }}" method="POST" @submit.prevent="submitForm">
                 @csrf
                 @method('PUT')
 
