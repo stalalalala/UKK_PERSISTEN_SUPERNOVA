@@ -86,14 +86,8 @@
                                         <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Jumlah
                                             Pertanyaan</p>
                                         <p class="text-xl font-extrabold text-[#2E3B66]">
-<<<<<<< HEAD
-                                            {{ \App\Models\SoalTryout::whereIn('category_id', $tryout->categories->pluck('id'))->count() }}
-                                            <span
-                                                class="text-xs font-medium text-gray-400 block tracking-normal">Soal</span>
-=======
                                             {{ $totalSoal }} 
                                             <span class="text-xs font-medium text-gray-400 block tracking-normal">Soal</span>
->>>>>>> perubahan3
                                         </p>
                                     </div>
                                 </div>
@@ -108,14 +102,8 @@
                                         <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Alokasi
                                             Waktu</p>
                                         <p class="text-xl font-extrabold text-[#2E3B66]">
-<<<<<<< HEAD
-                                            {{ $tryout->categories->sum('durasi') }}
-                                            <span class="text-xs font-medium text-gray-400 block tracking-normal">Menit
-                                                Pengerjaan</span>
-=======
                                             {{ $totalDurasi }} 
                                             <span class="text-xs font-medium text-gray-400 block tracking-normal">Menit Pengerjaan</span>
->>>>>>> perubahan3
                                         </p>
                                     </div>
                                 </div>
@@ -127,16 +115,8 @@
                                         <i class="fa-solid fa-circle-check text-green-500 text-xl"></i>
                                     </div>
                                     <div>
-<<<<<<< HEAD
-                                        <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Metode
-                                            Ujian</p>
-                                        <p class="text-lg font-extrabold text-[#2E3B66]">Pilihan Ganda
-                                            <span class="text-xs font-medium text-gray-400 block tracking-normal">Single
-                                                Answer Selection</span>
-=======
                                         <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Metode Ujian</p>
                                         <p class="text-lg font-extrabold text-[#2E3B66]">Pilihan Ganda 
->>>>>>> perubahan3
                                         </p>
                                     </div>
                                 </div>
