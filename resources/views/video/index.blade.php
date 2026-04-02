@@ -243,58 +243,63 @@
 
         <section class="px-4 md:px-10">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                @foreach ($videos as $index => $video)
-                    <div x-data="{ ditonton: {{ $video->ditonton ? 'true' : 'false' }} }" x-show="shouldShow('{{ $video->subtes }}', {{ $index }})"
-                        x-transition @click="ditonton = true; tontonVideo({{ $video->id }})"
-                        class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group cursor-pointer">
+    @foreach ($videos as $index => $video)
+        <div x-data="{ 
+                ditonton: {{ $video->ditonton ? 'true' : 'false' }},
+                iframeHtml: '{{ str_replace(["\r", "\n"], '', preg_replace(['/width=".*?"/', '/height=".*?"/'], ['width="100%"', 'height="100%"'], $video->iframe)) }}'
+            }" 
+            x-show="shouldShow('{{ $video->subtes }}', {{ $index }})"
+            x-transition 
+            class="border-2 border-blue-400 rounded-[2.5rem] p-6 flex flex-col sm:flex-row gap-6 hover:shadow-xl transition-all group cursor-pointer">
 
-                        <div class="flex-1 flex flex-col justify-between">
-
-                            <div>
-                                <h3 class="text-blue-600 font-bold text-xl mb-3">{{ $video->subtes }}</h3>
-
-                                <div class="space-y-3">
-
-                                    <div class="flex items-center gap-3 text-blue-500 font-semibold">
-                                        <i class="fa-solid fa-book-open"></i>
-                                        <span>{{ $video->judul_video }}</span>
-                                    </div>
-
-                                    <div class="flex items-center gap-3 text-blue-500 font-semibold">
-                                        <span>Video Pembelajaran</span>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <div class="mt-6">
-
-                                <span x-show="!ditonton"
-                                    class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
-                                    Belum Ditonton
-                                </span>
-
-                                <span x-show="ditonton"
-                                    class="bg-green-500 text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
-                                    Ditonton
-                                </span>
-
-                            </div>
+            <div class="flex-1 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-blue-600 font-bold text-xl mb-3">{{ $video->subtes }}</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>{{ $video->judul_video }}</span>
                         </div>
-
-                        <!-- VIDEO -->
-                        <div @click="ditonton = true; tontonVideo({{ $video->id }})"
-                            class="w-full sm:w-56 h-36 rounded-3xl overflow-hidden bg-gray-100 relative cursor-pointer">
-
-                            <div class="absolute inset-0">
-                                {!! preg_replace(['/width=".*?"/', '/height=".*?"/'], ['width="100%"', 'height="100%"'], $video->iframe) !!}
-                            </div>
-
+                        <div class="flex items-center gap-3 text-blue-500 font-semibold">
+                            <span>Video Pembelajaran</span>
                         </div>
-
                     </div>
-                @endforeach
+                </div>
+
+                <div class="mt-6">
+                    <span x-show="!ditonton"
+                        class="bg-[#FF6B6B] text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
+                        Belum Ditonton
+                    </span>
+                    <span x-show="ditonton" x-cloak
+                        class="bg-green-500 text-white text-xs px-5 py-2 rounded-full font-bold shadow-sm">
+                        Ditonton
+                    </span>
+                </div>
             </div>
+
+            <div class="w-full sm:w-56 h-36 rounded-3xl overflow-hidden bg-gray-100 relative shadow-inner">
+                
+                <template x-if="!ditonton">
+                    <div @click.stop="
+                            ditonton = true; 
+                            tontonVideo({{ $video->id }});
+                            let src = $refs.vidFrame.querySelector('iframe').src;
+                            $refs.vidFrame.querySelector('iframe').src = src + (src.includes('?') ? '&' : '?') + 'autoplay=1';
+                         "
+                         class="absolute inset-0 z-30 cursor-pointer bg-black/0 flex items-center justify-center">
+                         <i class="fa-solid fa-play text-white/20 text-3xl"></i>
+                    </div>
+                </template>
+
+                <div x-ref="vidFrame" class="absolute inset-0 z-10">
+                    {!! preg_replace(['/width=".*?"/', '/height=".*?"/'], ['width="100%"', 'height="100%"'], $video->iframe) !!}
+                </div>
+            </div>
+
+        </div>
+    @endforeach
+</div>
 
             <div class="flex justify-center items-center gap-3 mt-16" x-show="getTotalPages() > 1">
                 <button @click="if(currentPage > 1) currentPage--"

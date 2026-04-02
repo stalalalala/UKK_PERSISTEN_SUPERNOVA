@@ -460,72 +460,80 @@
     });
 
     const reader = new FileReader();
-    reader.onload = async (e) => {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-            
-            const response = await fetch('{{ route("admin.minatBakat.soal.importBulk") }}', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}', 
-                    'Accept': 'application/json' 
-                },
-                body: JSON.stringify({ 
-                    data: jsonData, 
-                    mode: this.importMode,
-                    current_category: this.categoryName 
-                })
+reader.onload = async (e) => {
+    try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { 
+            header: 1, 
+            defval: null,
+            blankrows: false
+        });
+        
+        const response = await fetch('{{ route("admin.minatBakat.soal.importBulk") }}', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                'Accept': 'application/json' 
+            },
+            body: JSON.stringify({ 
+                data: jsonData, 
+                mode: this.importMode,
+                current_category: this.categoryName 
+            })
+        });
+
+        // Mengambil hasil respon JSON dari controller
+        const result = await response.json();
+
+        if (result.success) {
+            // Notifikasi Berhasil (Menampilkan jumlah yang berhasil & dilewati)
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: result.message || 'Data soal berhasil diimport.',
+                confirmButtonColor: '#4A72D4',
+                confirmButtonText: 'Selesai',
+                customClass: {
+                    popup: 'rounded-[2rem] shadow-xl',
+                    title: 'text-xl font-bold',
+                    confirmButton: 'px-8 py-2.5 rounded-xl text-sm font-bold uppercase'
+                }
+            }).then(() => {
+                window.location.reload(); 
             });
-
-            const result = await response.json();
-
-            if (result.success) {
-                // Notifikasi Berhasil (SweetAlert2)
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: result.message || 'Data soal berhasil diimport.',
-                    confirmButtonColor: '#4A72D4',
-                    confirmButtonText: 'Selesai',
-                    customClass: {
-                        popup: 'rounded-[2rem] shadow-xl',
-                        title: 'text-xl font-bold',
-                        confirmButton: 'px-8 py-2.5 rounded-xl text-sm font-bold uppercase'
-                    }
-                }).then(() => {
-                    window.location.reload(); 
-                });
-            } else {
-                // Notifikasi Gagal dari Server
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal Import',
-                    text: result.message,
-                    confirmButtonColor: '#ef4444',
-                    customClass: {
-                        popup: 'rounded-[2rem] shadow-xl',
-                        confirmButton: 'px-8 py-2.5 rounded-xl text-sm'
-                    }
-                });
-            }
-        } catch (err) {
-            // Notifikasi Error Pembacaan File
+        } else {
+            // Notifikasi Gagal (Jika format salah atau tidak ada data valid)
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: 'Terjadi kesalahan saat membaca file Excel.',
+                title: 'Gagal Import',
+                text: result.message || 'Terjadi kesalahan saat memproses file.',
                 confirmButtonColor: '#ef4444',
+                confirmButtonText: 'Coba Lagi',
                 customClass: {
-                    popup: 'rounded-[2rem] shadow-xl'
+                    popup: 'rounded-[2rem] shadow-xl',
+                    title: 'text-xl font-bold',
+                    confirmButton: 'px-8 py-2.5 rounded-xl text-sm font-bold uppercase'
                 }
             });
         }
-    };
-    reader.readAsArrayBuffer(file);
+    } catch (err) {
+        // Notifikasi jika file rusak atau gagal menghubungi server
+        Swal.fire({
+            icon: 'error',
+            title: 'Error Sistem',
+            text: 'Gagal memproses data. Pastikan format file benar.',
+            confirmButtonColor: '#ef4444',
+            customClass: {
+                popup: 'rounded-[2rem] shadow-xl',
+                title: 'text-xl font-bold'
+            }
+        });
+    }
+};
+reader.readAsArrayBuffer(file);
     
     // Reset input file agar bisa upload file yang sama jika gagal
     event.target.value = '';

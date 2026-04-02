@@ -8,6 +8,7 @@ use App\Models\Prodi;
 use Illuminate\Http\Request;
 use App\Models\SystemLog;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class HalamanPeluangPtnController extends Controller
 {
@@ -103,18 +104,44 @@ class HalamanPeluangPtnController extends Controller
     }
 
     public function importExcel(Request $request)
-    {
-        $data = $request->data; 
+{
+    try {
+        $data = $request->data;
+
+        // Validasi awal: apakah data ada dan berbentuk array
+        if (empty($data) || !is_array($data)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File kosong atau format tidak didukung.'
+            ], 422);
+        }
+
+        // 1. VALIDASI HEADER (Mencegah file salah format masuk)
+        $firstRow = $data[0];
+        $requiredColumns = ['Nama Universitas', 'Nama Prodi', 'Kuota', 'Peminat'];
+        
+        foreach ($requiredColumns as $col) {
+            // Menggunakan !isset karena library XLSX biasanya menghasilkan key sesuai nama kolom
+            if (!isset($firstRow[$col])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Format file salah! Kolom '$col' tidak ditemukan."
+                ], 422);
+            }
+        }
+
         $count = 0;
+        DB::beginTransaction();
 
         foreach ($data as $row) {
-            if (empty($row['Nama Universitas'])) continue;
+            // Skip jika nama universitas kosong
+            if (empty(trim($row['Nama Universitas'] ?? ''))) continue;
 
             $cleanUnivName = ucwords(strtolower(trim($row['Nama Universitas'])));
-            $cleanLokasi = isset($row['Lokasi']) ? ucwords(strtolower(trim($row['Lokasi']))) : '-';
+            $cleanLokasi = !empty($row['Lokasi']) ? ucwords(strtolower(trim($row['Lokasi']))) : '-';
 
+            // Cari atau buat Universitas
             $univ = Universitas::where('nama_univ', $cleanUnivName)->first();
-
             if (!$univ) {
                 $univ = Universitas::create([
                     'nama_univ' => $cleanUnivName,
@@ -123,25 +150,54 @@ class HalamanPeluangPtnController extends Controller
                 ]);
             }
 
-            if (!empty($row['Nama Prodi'])) {
+            // Tambah Prodi jika kolom Nama Prodi tidak kosong
+            if (!empty(trim($row['Nama Prodi'] ?? ''))) {
                 $cleanProdiName = ucwords(strtolower(trim($row['Nama Prodi'])));
-                Prodi::create([
-                    'universitas_id' => $univ->id,
-                    'nama_prodi'     => $cleanProdiName,
-                    'kuota'          => $row['Kuota'] ?? 0,
-                    'peminat'        => $row['Peminat'] ?? 0,
-                    'is_deleted'     => false,
-                    'deleted_by_univ'=> false
-                ]);
+                
+                // Proteksi agar tidak duplikat prodi di univ yang sama
+                $exists = Prodi::where('universitas_id', $univ->id)
+                               ->where('nama_prodi', $cleanProdiName)
+                               ->where('is_deleted', false)
+                               ->exists();
+                
+                if (!$exists) {
+                    Prodi::create([
+                        'universitas_id' => $univ->id,
+                        'nama_prodi'     => $cleanProdiName,
+                        'kuota'          => (int)($row['Kuota'] ?? 0),
+                        'peminat'        => (int)($row['Peminat'] ?? 0),
+                        'is_deleted'     => false,
+                        'deleted_by_univ'=> false
+                    ]);
+                    $count++;
+                }
             }
-            $count++;
         }
 
-        $this->logAktivitas('IMPORT EXCEL PTN', 'Peluang PTN', "Admin melakukan import data PTN");
-        
-        session()->flash('success', "Berhasil mengimpor $count data dari Excel");
-        return response()->json(['message' => 'Import Berhasil']);
+        DB::commit();
+
+        if ($count > 0) {
+            $this->logAktivitas('IMPORT EXCEL PTN', 'Peluang PTN', "Admin berhasil mengimport $count data prodi");
+            session()->flash('success', "Berhasil mengimpor $count data dari Excel");
+            return response()->json([
+                'success' => true,
+                'message' => 'Import Berhasil'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal import! Tidak ada data baru yang valid untuk disimpan.'
+            ], 422);
+        }
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan sistem saat membaca file.'
+        ], 500);
     }
+}
 
     public function destroy($id)
     {

@@ -148,11 +148,26 @@
     },
 
     async importExcel(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    const file = event.target.files[0];
+    if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = async (e) => {
+    // Loading dengan ukuran kecil & rounded
+    Swal.fire({
+        title: 'Memproses File...',
+        width: '320px',
+        allowOutsideClick: false,
+        customClass: {
+            popup: 'rounded-3xl shadow-xl',
+            title: 'text-lg font-bold'
+        },
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
             const workbook = XLSX.read(e.target.result, { type: 'binary' });
             const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 
@@ -160,16 +175,51 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({ data: jsonData })
             });
 
-            if (res.ok) window.location.reload();
-        };
+            const result = await res.json();
 
-        reader.readAsBinaryString(file);
-    },
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                // Pop up Gagal yang sudah diperkecil
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Import',
+                    text: result.message || 'Format tidak sesuai.',
+                    width: '340px',
+                    confirmButtonText: 'Oke',
+                    confirmButtonColor: '#ef4444',
+                    customClass: {
+                        popup: 'rounded-3xl shadow-xl',
+                        title: 'text-lg font-bold',
+                        confirmButton: 'rounded-xl px-6 py-2'
+                    }
+                });
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Gagal membaca file.',
+                width: '340px',
+                confirmButtonColor: '#ef4444',
+                customClass: {
+                    popup: 'rounded-3xl shadow-xl',
+                    title: 'text-lg font-bold'
+                }
+            });
+        } finally {
+            event.target.value = '';
+        }
+    };
+
+    reader.readAsBinaryString(file);
+},
 
     async saveUniv() {
         let payload = {
